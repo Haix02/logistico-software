@@ -15,7 +15,8 @@ public sealed record TeamMember(
     bool TwoFactorEnabled,
     bool IsYou,
     DateTimeOffset? LockedOutUntil = null,
-    string? CourierCode = null);
+    string? CourierCode = null,
+    Guid? MerchantId = null);
 
 public sealed record TeamList(IReadOnlyList<TeamMember> Members);
 
@@ -37,6 +38,9 @@ public sealed class CreateTeamMemberRequest : IValidatableObject
     [StringLength(30, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.MaxLength))]
     public string? CourierCode { get; set; }
 
+    /// <summary>For the <see cref="StaffRoles.Seller"/> role: the seller (Sellers page) whose orders the account books.</summary>
+    public Guid? MerchantId { get; set; }
+
     [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
     [StringLength(128, MinimumLength = 10, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.PasswordLength))]
     public string Password { get; set; } = "";
@@ -52,6 +56,11 @@ public sealed class CreateTeamMemberRequest : IValidatableObject
         {
             yield return new(ValidationText.CourierCode, [nameof(CourierCode)]);
         }
+
+        if (TeamRules.NeedsMerchant(Role, MerchantId))
+        {
+            yield return new(ValidationText.Merchant, [nameof(MerchantId)]);
+        }
     }
 }
 
@@ -64,6 +73,9 @@ public sealed class ChangeTeamRoleRequest : IValidatableObject
     [StringLength(30, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.MaxLength))]
     public string? CourierCode { get; set; }
 
+    /// <summary>Required with the <see cref="StaffRoles.Seller"/> role, ignored otherwise.</summary>
+    public Guid? MerchantId { get; set; }
+
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (Role is not null && !StaffRoles.IsKnown(Role))
@@ -75,6 +87,11 @@ public sealed class ChangeTeamRoleRequest : IValidatableObject
         {
             yield return new(ValidationText.CourierCode, [nameof(CourierCode)]);
         }
+
+        if (TeamRules.NeedsMerchant(Role, MerchantId))
+        {
+            yield return new(ValidationText.Merchant, [nameof(MerchantId)]);
+        }
     }
 }
 
@@ -82,6 +99,9 @@ public static class TeamRules
 {
     /// <summary>A courier account must say which courier it delivers for.</summary>
     public static bool NeedsCourier(string? role, string? courierCode) => role == StaffRoles.Courier && string.IsNullOrWhiteSpace(courierCode);
+
+    /// <summary>A seller account must say which seller's orders it books.</summary>
+    public static bool NeedsMerchant(string? role, Guid? merchantId) => role == StaffRoles.Seller && (merchantId ?? Guid.Empty) == Guid.Empty;
 }
 
 /// <summary>An administrator sets a new password for a colleague who forgot theirs (email sending is optional).</summary>

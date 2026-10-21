@@ -75,6 +75,7 @@ public static class ValidationText
     public static string InsideIraq => Get("Validation_InsideIraq");
     public static string Role => Get("Validation_Role");
     public static string CourierCode => Get("Validation_CourierCode");
+    public static string Merchant => Get("Validation_Merchant");
     public static string PasswordLength => Get("Validation_PasswordLength");
     public static string Choice => Get("Validation_Choice");
 

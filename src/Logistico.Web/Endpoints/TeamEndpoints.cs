@@ -44,7 +44,8 @@ internal static class TeamEndpoints
         return TypedResults.Ok(new TeamList(members
             .Select(m => new TeamMember(m.Id, m.Email, m.DisplayName, m.Role, IsDeactivated(m.LockoutEnd), m.TwoFactorEnabled, m.Id == me,
                 LockedOutUntil: !IsDeactivated(m.LockoutEnd) && m.LockoutEnd > now ? m.LockoutEnd : null,
-                CourierCode: m.Role == StaffRoles.Courier ? m.CourierCode : null))
+                CourierCode: m.Role == StaffRoles.Courier ? m.CourierCode : null,
+                MerchantId: m.Role == StaffRoles.Seller ? m.MerchantId : null))
             .OrderBy(m => m.Role is null ? int.MaxValue : RoleRank(m.Role))
             .ThenBy(m => m.DisplayName ?? m.Email, StringComparer.CurrentCultureIgnoreCase)
             .ToList()));
@@ -85,9 +86,10 @@ internal static class TeamEndpoints
         }
 
         Ensure(await users.AddToRoleAsync(member, request.Role));
-        var courier = await LinkCourierAsync(users, member, request.Role, request.CourierCode);
+        var (courier, merchant) = await LinkAsync(users, member, request.Role, request.CourierCode, request.MerchantId);
         await change.CommitAsync(ct);
-        return TypedResults.Created($"/{TeamApiRoutes.Team}/{member.Id}", new TeamMember(member.Id, email, member.DisplayName, request.Role, false, false, false, CourierCode: courier));
+        return TypedResults.Created($"/{TeamApiRoutes.Team}/{member.Id}",
+            new TeamMember(member.Id, email, member.DisplayName, request.Role, false, false, false, CourierCode: courier, MerchantId: merchant));
     }
 
     private static async Task<IResult> ChangeRoleAsync(
@@ -124,7 +126,7 @@ internal static class TeamEndpoints
             Ensure(await users.AddToRoleAsync(member, request.Role));
         }
 
-        await LinkCourierAsync(users, member, request.Role, request.CourierCode);
+        await LinkAsync(users, member, request.Role, request.CourierCode, request.MerchantId);
 
         // The role travels in the sign-in cookie; a new security stamp makes their sessions pick it up (or end).
         Ensure(await users.UpdateSecurityStampAsync(member));
@@ -215,28 +217,37 @@ internal static class TeamEndpoints
         return TypedResults.NoContent();
     }
 
-    private sealed record MemberRow(string Id, string Email, string? DisplayName, string? Role, DateTimeOffset? LockoutEnd, bool TwoFactorEnabled, string? CourierCode);
+    private sealed record MemberRow(string Id, string Email, string? DisplayName, string? Role, DateTimeOffset? LockoutEnd, bool TwoFactorEnabled, string? CourierCode, Guid? MerchantId);
+
+    private static readonly string[] LinkClaims = [LogisticoClaimTypes.CourierCode, LogisticoClaimTypes.MerchantId];
 
     /// <summary>
-    /// A courier account carries the code of the courier it delivers for (a claim in its sign-in cookie); any other role
-    /// carries none. Returns the code that was set.
+    /// A courier account carries the code of the courier it delivers for, and a seller account the id of its shop (claims
+    /// in the sign-in cookie); any other role carries neither. Returns what was set.
     /// </summary>
-    private static async Task<string?> LinkCourierAsync(UserManager<ApplicationUser> users, ApplicationUser member, string? role, string? courierCode)
+    private static async Task<(string? CourierCode, Guid? MerchantId)> LinkAsync(
+        UserManager<ApplicationUser> users, ApplicationUser member, string? role, string? courierCode, Guid? merchantId)
     {
-        var existing = (await users.GetClaimsAsync(member)).Where(c => c.Type == LogisticoClaimTypes.CourierCode).ToList();
+        var existing = (await users.GetClaimsAsync(member)).Where(c => LinkClaims.Contains(c.Type)).ToList();
         if (existing.Count > 0)
         {
             Ensure(await users.RemoveClaimsAsync(member, existing));
         }
 
-        if (role != StaffRoles.Courier || string.IsNullOrWhiteSpace(courierCode))
+        if (role == StaffRoles.Courier && !string.IsNullOrWhiteSpace(courierCode))
         {
-            return null;
+            var code = courierCode.Trim();
+            Ensure(await users.AddClaimAsync(member, new Claim(LogisticoClaimTypes.CourierCode, code)));
+            return (code, null);
         }
 
-        var code = courierCode.Trim();
-        Ensure(await users.AddClaimAsync(member, new Claim(LogisticoClaimTypes.CourierCode, code)));
-        return code;
+        if (role == StaffRoles.Seller && merchantId is { } shop && shop != Guid.Empty)
+        {
+            Ensure(await users.AddClaimAsync(member, new Claim(LogisticoClaimTypes.MerchantId, shop.ToString())));
+            return (null, shop);
+        }
+
+        return (null, null);
     }
 
     /// <summary>Every account of the company with its highest staff role (one query).</summary>
@@ -250,11 +261,11 @@ internal static class TeamEndpoints
             select new { u.Id, u.Email, u.UserName, u.DisplayName, Role = r == null ? null : r.Name, u.LockoutEnd, u.TwoFactorEnabled })
             .ToListAsync(ct);
         var ids = rows.Select(r => r.Id).Distinct().ToList();
-        var courierClaims = await db.UserClaims.AsNoTracking()
-            .Where(c => ids.Contains(c.UserId) && c.ClaimType == LogisticoClaimTypes.CourierCode)
-            .Select(c => new { c.UserId, c.ClaimValue })
+        var linkClaims = await db.UserClaims.AsNoTracking()
+            .Where(c => ids.Contains(c.UserId) && LinkClaims.Contains(c.ClaimType!))
+            .Select(c => new { c.UserId, c.ClaimType, c.ClaimValue })
             .ToListAsync(ct);
-        var couriers = courierClaims.GroupBy(c => c.UserId).ToDictionary(g => g.Key, g => g.First().ClaimValue);
+        string? Link(string userId, string type) => linkClaims.FirstOrDefault(c => c.UserId == userId && c.ClaimType == type)?.ClaimValue;
 
         return rows
             .GroupBy(r => r.Id)
@@ -262,7 +273,8 @@ internal static class TeamEndpoints
             {
                 var first = g.First();
                 var role = g.Select(r => r.Role).Where(StaffRoles.IsKnown).OrderBy(r => RoleRank(r!)).FirstOrDefault();
-                return new MemberRow(first.Id, first.Email ?? first.UserName ?? "", first.DisplayName, role, first.LockoutEnd, first.TwoFactorEnabled, couriers.GetValueOrDefault(first.Id));
+                return new MemberRow(first.Id, first.Email ?? first.UserName ?? "", first.DisplayName, role, first.LockoutEnd, first.TwoFactorEnabled,
+                    Link(first.Id, LogisticoClaimTypes.CourierCode), Guid.TryParse(Link(first.Id, LogisticoClaimTypes.MerchantId), out var shop) ? shop : null);
             })
             .ToList();
     }

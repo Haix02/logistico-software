@@ -16,6 +16,7 @@
   <data name="Validation_IraqiMobile" xml:space="preserve"><value>Enter an Iraqi mobile number, e.g. 0770 123 4567.</value></data>
   <data name="Validation_LocationCode" xml:space="preserve"><value>Use a 3–5 letter location code (UN/LOCODE or IATA), e.g. CNSHA.</value></data>
   <data name="Validation_MaxLength" xml:space="preserve"><value>Use at most {1} characters.</value></data>
+  <data name="Validation_Merchant" xml:space="preserve"><value>Choose the seller this account books orders for.</value></data>
   <data name="Validation_NoFriday" xml:space="preserve"><value>Couriers do not deliver on Friday. Please choose another day.</value></data>
   <data name="Validation_Phone" xml:space="preserve"><value>Phone must contain 7–20 digits, optionally starting with +.</value></data>
   <data name="Validation_PhoneLast4" xml:space="preserve"><value>Enter the last 4 digits of the mobile number on the order.</value></data>

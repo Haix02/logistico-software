@@ -81,6 +81,7 @@
   <data name="CancelReasonPlaceholder" xml:space="preserve"><value>e.g. the seller cancelled, the customer ordered twice</value></data>
   <data name="Capability_Care" xml:space="preserve"><value>Confirmation calls, customer requests and messages</value></data>
   <data name="Capability_Deliver" xml:space="preserve"><value>Courier app: deliver their own parcels</value></data>
+  <data name="Capability_Sell" xml:space="preserve"><value>Seller portal: their shop's orders and payouts</value></data>
   <data name="ChangedBy" xml:space="preserve"><value>Changed {0} by {1}</value></data>
   <data name="Chargeable" xml:space="preserve"><value>Chargeable weight</value></data>
   <data name="ChargeableRule" xml:space="preserve"><value>Rule</value></data>
@@ -757,12 +758,14 @@
   <data name="Risk_New" xml:space="preserve"><value>New</value></data>
   <data name="RoleHint_Admin" xml:space="preserve"><value>Everything, including prices, automation rules, warehouses, open data and the team.</value></data>
   <data name="RoleHint_Courier" xml:space="preserve"><value>The courier app only: their own parcels for the day. Sees no other company data.</value></data>
+  <data name="RoleHint_Seller" xml:space="preserve"><value>The seller portal only: one shop books and follows its own orders and payouts. Sees no other company data.</value></data>
   <data name="RoleHint_CustomerSupport" xml:space="preserve"><value>The call desk: confirmation calls, customer requests and messages; reads everything outside finance.</value></data>
   <data name="RoleHint_Finance" xml:space="preserve"><value>Delivery prices and seller payouts; reads everything else.</value></data>
   <data name="RoleHint_Operations" xml:space="preserve"><value>The daily work: orders, hub scans, trucks, couriers, returns, customer requests and customs.</value></data>
   <data name="RoleHint_Viewer" xml:space="preserve"><value>Reads dashboards, lists and insights; changes nothing.</value></data>
   <data name="Role_Admin" xml:space="preserve"><value>Administrator</value></data>
   <data name="Role_Courier" xml:space="preserve"><value>Courier</value></data>
+  <data name="Role_Seller" xml:space="preserve"><value>Seller (shop)</value></data>
   <data name="Role_CustomerSupport" xml:space="preserve"><value>Customer support</value></data>
   <data name="Role_Finance" xml:space="preserve"><value>Finance</value></data>
   <data name="Role_Operations" xml:space="preserve"><value>Operations</value></data>
@@ -849,6 +852,58 @@
   <data name="SellerCreated" xml:space="preserve"><value>Seller “{0}” added</value></data>
   <data name="SellerNotFound" xml:space="preserve"><value>Seller not found</value></data>
   <data name="SellerReceives" xml:space="preserve"><value>Seller receives</value></data>
+  <data name="Seller_Active" xml:space="preserve"><value>Orders in progress</value></data>
+  <data name="Seller_Cancel" xml:space="preserve"><value>Cancel order</value></data>
+  <data name="Seller_CancelMessage" xml:space="preserve"><value>Order {0} has not been picked up yet. Cancelling takes it off the courier's pickups.</value></data>
+  <data name="Seller_CancelTitle" xml:space="preserve"><value>Cancel this order?</value></data>
+  <data name="Seller_CancelledToast" xml:space="preserve"><value>Order {0} cancelled.</value></data>
+  <data name="Seller_FeeN" xml:space="preserve"><value>Fee {0}</value></data>
+  <data name="Seller_NewOrder" xml:space="preserve"><value>New order</value></data>
+  <data name="Seller_NoMatches" xml:space="preserve"><value>Nothing matches this search or filter.</value></data>
+  <data name="Seller_NoOrdersText" xml:space="preserve"><value>Book your first order with New order. We pick it up and deliver it anywhere in Iraq.</value></data>
+  <data name="Seller_NoOrdersTitle" xml:space="preserve"><value>No orders here</value></data>
+  <data name="Seller_NoPayoutsText" xml:space="preserve"><value>When the company pays out the cash collected for your delivered orders, each payout and its statement appear here.</value></data>
+  <data name="Seller_NoPayoutsTitle" xml:space="preserve"><value>No payouts yet</value></data>
+  <data name="Seller_NotLinkedText" xml:space="preserve"><value>Ask the delivery company to link your account to your shop on their Team page.</value></data>
+  <data name="Seller_NotLinkedTitle" xml:space="preserve"><value>Not linked to a shop yet</value></data>
+  <data name="Seller_OnTheWay" xml:space="preserve"><value>Cash still to collect</value></data>
+  <data name="Seller_OnTheWayHint" xml:space="preserve"><value>{0} orders not delivered yet</value></data>
+  <data name="Seller_OnTheWayHint_Few" xml:space="preserve"><value>{0} orders not delivered yet</value></data>
+  <data name="Seller_OnTheWayHint_Many" xml:space="preserve"><value>{0} orders not delivered yet</value></data>
+  <data name="Seller_OnTheWayHint_One" xml:space="preserve"><value>1 order not delivered yet</value></data>
+  <data name="Seller_OnTheWayHint_Two" xml:space="preserve"><value>2 orders not delivered yet</value></data>
+  <data name="Seller_Orders" xml:space="preserve"><value>Orders</value></data>
+  <data name="Seller_OrdersN" xml:space="preserve"><value>{0} orders</value></data>
+  <data name="Seller_OrdersN_Few" xml:space="preserve"><value>{0} orders</value></data>
+  <data name="Seller_OrdersN_Many" xml:space="preserve"><value>{0} orders</value></data>
+  <data name="Seller_OrdersN_One" xml:space="preserve"><value>1 order</value></data>
+  <data name="Seller_OrdersN_Two" xml:space="preserve"><value>2 orders</value></data>
+  <data name="Seller_Owed" xml:space="preserve"><value>Owed to you</value></data>
+  <data name="Seller_OwedHint" xml:space="preserve"><value>{0} delivered orders not paid out yet</value></data>
+  <data name="Seller_OwedHint_Few" xml:space="preserve"><value>{0} delivered orders not paid out yet</value></data>
+  <data name="Seller_OwedHint_Many" xml:space="preserve"><value>{0} delivered orders not paid out yet</value></data>
+  <data name="Seller_OwedHint_One" xml:space="preserve"><value>1 delivered order not paid out yet</value></data>
+  <data name="Seller_OwedHint_Two" xml:space="preserve"><value>2 delivered orders not paid out yet</value></data>
+  <data name="Seller_PaidOut" xml:space="preserve"><value>Paid out</value></data>
+  <data name="Seller_PaidSoFar" xml:space="preserve"><value>Paid to you so far: {0}</value></data>
+  <data name="Seller_PasteHelper" xml:space="preserve"><value>Paste the customer's message (name, phone, address, price) and the form fills itself.</value></data>
+  <data name="Seller_PayoutBreakdown" xml:space="preserve"><value>{0} collected − {1} fees</value></data>
+  <data name="Seller_Payouts" xml:space="preserve"><value>Payouts</value></data>
+  <data name="Seller_ReturningHint" xml:space="preserve"><value>{0} coming back to you</value></data>
+  <data name="Seller_ReturningHint_Few" xml:space="preserve"><value>{0} coming back to you</value></data>
+  <data name="Seller_ReturningHint_Many" xml:space="preserve"><value>{0} coming back to you</value></data>
+  <data name="Seller_ReturningHint_One" xml:space="preserve"><value>1 coming back to you</value></data>
+  <data name="Seller_ReturningHint_Two" xml:space="preserve"><value>2 coming back to you</value></data>
+  <data name="Seller_Search" xml:space="preserve"><value>Tracking number, customer or phone</value></data>
+  <data name="Seller_SendingFrom" xml:space="preserve"><value>Sending from {0}</value></data>
+  <data name="Seller_Success" xml:space="preserve"><value>Delivery rate · 30 days</value></data>
+  <data name="Seller_SuccessHint" xml:space="preserve"><value>{0} delivered · {1} returned</value></data>
+  <data name="Seller_Title" xml:space="preserve"><value>My shop</value></data>
+  <data name="Seller_ViewActive" xml:space="preserve"><value>In progress</value></data>
+  <data name="Seller_ViewAll" xml:space="preserve"><value>All</value></data>
+  <data name="Seller_ViewDelivered" xml:space="preserve"><value>Delivered</value></data>
+  <data name="Seller_ViewReturns" xml:space="preserve"><value>Returns</value></data>
+  <data name="Seller_YouReceive" xml:space="preserve"><value>You receive</value></data>
   <data name="SellerSearchPlaceholder" xml:space="preserve"><value>Search by shop name, Instagram handle or phone…</value></data>
   <data name="SellersSubtitle" xml:space="preserve"><value>Instagram and online shops whose parcels we deliver</value></data>
   <data name="SellersTitle" xml:space="preserve"><value>Sellers</value></data>
@@ -913,6 +968,10 @@
   <data name="Team_LinkCourier" xml:space="preserve"><value>Link</value></data>
   <data name="Team_LinkCourierHelper" xml:space="preserve"><value>The account sees only the parcels out for delivery with this courier (Fleet page).</value></data>
   <data name="Team_LinkCourierTitle" xml:space="preserve"><value>Which courier is {0}?</value></data>
+  <data name="Team_ChooseSeller" xml:space="preserve"><value>Choose the shop</value></data>
+  <data name="Team_LinkSellerHelper" xml:space="preserve"><value>The account books and sees only this shop's orders and payouts (Sellers page).</value></data>
+  <data name="Team_LinkSellerTitle" xml:space="preserve"><value>Which shop is {0}?</value></data>
+  <data name="Team_Seller" xml:space="preserve"><value>Shop</value></data>
   <data name="Team_LockedOutUntil" xml:space="preserve"><value>Wrong passwords: locked until {0}</value></data>
   <data name="Team_PasswordSet" xml:space="preserve"><value>New password set for {0}.</value></data>
   <data name="Team_SetPassword" xml:space="preserve"><value>Set password</value></data>

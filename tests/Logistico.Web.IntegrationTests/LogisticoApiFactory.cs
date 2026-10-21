@@ -63,9 +63,10 @@ public sealed class LogisticoApiFactory : WebApplicationFactory<Program>, IAsync
     /// <summary>
     /// An API client signed in as <paramref name="user"/> of <paramref name="tenant"/> with a staff role (Admin unless given;
     /// "" for none). <paramref name="userId"/> ties it to a real account when the test needs "who am I" (the team screen);
-    /// <paramref name="courierCode"/> links a courier account to its courier.
+    /// <paramref name="courierCode"/> links a courier account to its courier, <paramref name="merchantId"/> a seller account to its shop.
     /// </summary>
-    public HttpClient CreateUserClient(string user = "agent@logistico.test", Guid? tenant = null, string role = StaffRoles.Admin, string? userId = null, string? courierCode = null)
+    public HttpClient CreateUserClient(
+        string user = "agent@logistico.test", Guid? tenant = null, string role = StaffRoles.Admin, string? userId = null, string? courierCode = null, Guid? merchantId = null)
     {
         var client = CreateClient();
         client.DefaultRequestHeaders.Add(TestAuthHandler.UserHeader, user);
@@ -79,6 +80,11 @@ public sealed class LogisticoApiFactory : WebApplicationFactory<Program>, IAsync
         if (courierCode is not null)
         {
             client.DefaultRequestHeaders.Add(TestAuthHandler.CourierHeader, courierCode);
+        }
+
+        if (merchantId is not null)
+        {
+            client.DefaultRequestHeaders.Add(TestAuthHandler.MerchantHeader, merchantId.Value.ToString());
         }
 
         return client;
@@ -127,6 +133,7 @@ internal sealed class TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOption
     public const string RoleHeader = "X-Test-Role";
     public const string UserIdHeader = "X-Test-UserId";
     public const string CourierHeader = "X-Test-Courier";
+    public const string MerchantHeader = "X-Test-Merchant";
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
@@ -149,6 +156,11 @@ internal sealed class TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOption
         if (Request.Headers[CourierHeader].ToString() is { Length: > 0 } courier)
         {
             claims.Add(new(LogisticoClaimTypes.CourierCode, courier));
+        }
+
+        if (Request.Headers[MerchantHeader].ToString() is { Length: > 0 } merchant)
+        {
+            claims.Add(new(LogisticoClaimTypes.MerchantId, merchant));
         }
 
         var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, SchemeName));

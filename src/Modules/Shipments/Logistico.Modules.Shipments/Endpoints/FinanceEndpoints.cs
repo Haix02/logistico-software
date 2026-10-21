@@ -33,7 +33,11 @@ internal static class FinanceEndpoints
         return app;
     }
 
-    private static async Task<Ok<FinanceSummary>> SummaryAsync(Guid? merchantId, ShipmentsDbContext db, CancellationToken ct)
+    private static async Task<Ok<FinanceSummary>> SummaryAsync(Guid? merchantId, ShipmentsDbContext db, CancellationToken ct) =>
+        TypedResults.Ok(await SummarizeAsync(db, merchantId, ct));
+
+    /// <summary>The money figures of the company, or of one seller (the seller portal shows the same numbers).</summary>
+    internal static async Task<FinanceSummary> SummarizeAsync(ShipmentsDbContext db, Guid? merchantId, CancellationToken ct)
     {
         var shipments = db.Shipments.AsNoTracking().Where(s => s.Status != ShipmentStatus.Cancelled && (s.CodAmount > 0 || s.DeliveryFee > 0));
         var settlements = db.CodSettlements.AsNoTracking();
@@ -79,7 +83,7 @@ internal static class FinanceEndpoints
 
         var gross = totals?.Gross ?? 0m;
         var fees = totals?.Fees ?? 0m;
-        return TypedResults.Ok(new FinanceSummary(totals?.Pending ?? 0m, gross, fees, gross - fees, paid, totals?.Revenue ?? 0m, sellerBalances, recent));
+        return new FinanceSummary(totals?.Pending ?? 0m, gross, fees, gross - fees, paid, totals?.Revenue ?? 0m, sellerBalances, recent);
     }
 
     private static async Task<IResult> SettleAsync(CreateCodSettlementRequest request, ClaimsPrincipal user, ShipmentsDbContext db, NumberGenerator numbers, ITenantContext tenant, TimeProvider clock, CancellationToken ct)
@@ -112,9 +116,13 @@ internal static class FinanceEndpoints
         }
     }
 
-    private static async Task<IResult> ExportAsync(Guid id, HttpResponse response, ShipmentsDbContext db, CancellationToken ct)
+    private static Task<IResult> ExportAsync(Guid id, HttpResponse response, ShipmentsDbContext db, CancellationToken ct) =>
+        StatementAsync(id, null, response, db, ct);
+
+    /// <summary>Writes a settlement's CSV statement; with <paramref name="merchantId"/>, only that seller's settlements exist.</summary>
+    internal static async Task<IResult> StatementAsync(Guid id, Guid? merchantId, HttpResponse response, ShipmentsDbContext db, CancellationToken ct)
     {
-        var settlement = await db.CodSettlements.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id, ct);
+        var settlement = await db.CodSettlements.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id && (merchantId == null || s.MerchantId == merchantId), ct);
         if (settlement is null)
         {
             return Api.NotFound("finance.settlement_not_found");

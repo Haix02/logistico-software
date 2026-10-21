@@ -16,6 +16,7 @@
   <data name="Validation_IraqiMobile" xml:space="preserve"><value>أدخل رقم موبايل عراقي، مثال: ⁦0770 123 4567⁩.</value></data>
   <data name="Validation_LocationCode" xml:space="preserve"><value>استخدم رمز موقع من 3 إلى 5 أحرف (⁦UN/LOCODE⁩ أو IATA)، مثال: CNSHA.</value></data>
   <data name="Validation_MaxLength" xml:space="preserve"><value>الحد الأقصى {1} حرفاً.</value></data>
+  <data name="Validation_Merchant" xml:space="preserve"><value>اختر المتجر الذي يحجز هذا الحساب طلباته.</value></data>
   <data name="Validation_NoFriday" xml:space="preserve"><value>لا يوجد توصيل يوم الجمعة. يرجى اختيار يوم آخر.</value></data>
   <data name="Validation_Phone" xml:space="preserve"><value>يجب أن يحتوي رقم الهاتف على 7 إلى 20 رقماً، ويمكن أن يبدأ بـ +.</value></data>
   <data name="Validation_PhoneLast4" xml:space="preserve"><value>أدخل آخر 4 أرقام من رقم الموبايل المسجّل في الطلب.</value></data>

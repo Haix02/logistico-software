@@ -10,6 +10,8 @@ namespace Logistico.SharedKernel.Identity;
 /// <item><see cref="Viewer"/>: reads dashboards, lists and insights, changes nothing.</item>
 /// <item><see cref="Courier"/>: the courier app only: their own parcels for the day, delivered or failed. Couriers see no
 /// other company data, so the role is not one of the office roles in <see cref="All"/>.</item>
+/// <item><see cref="Seller"/>: the seller portal only: one shop's own orders, returns and payouts (an online shop that
+/// sends with the company). Like couriers, sellers see nothing else of the company.</item>
 /// </list>
 /// A signed-in account without a role (for example one that registered itself) sees no company data until an
 /// administrator gives it one.
@@ -22,12 +24,13 @@ public static class StaffRoles
     public const string Finance = "Finance";
     public const string Viewer = "Viewer";
     public const string Courier = "Courier";
+    public const string Seller = "Seller";
 
     /// <summary>The office roles: every one of them reads the company's data.</summary>
     public static readonly IReadOnlyList<string> All = [Admin, Operations, CustomerSupport, Finance, Viewer];
 
-    /// <summary>Every role an administrator can give: the office roles and <see cref="Courier"/>.</summary>
-    public static readonly IReadOnlyList<string> Assignable = [.. All, Courier];
+    /// <summary>Every role an administrator can give: the office roles, <see cref="Courier"/> and <see cref="Seller"/>.</summary>
+    public static readonly IReadOnlyList<string> Assignable = [.. All, Courier, Seller];
 
     public static bool IsKnown(string? role) => role is not null && Assignable.Contains(role, StringComparer.Ordinal);
 }
@@ -51,7 +54,10 @@ public static class StaffPolicies
     /// <summary>The courier app: a courier's own parcels (see <see cref="LogisticoClaimTypes.CourierCode"/>).</summary>
     public const string Deliver = "deliver";
 
-    public static readonly IReadOnlyList<string> All = [Staff, Operate, Care, Finance, Administer, Deliver];
+    /// <summary>The seller portal: one shop's own orders and payouts (see <see cref="LogisticoClaimTypes.MerchantId"/>).</summary>
+    public const string Sell = "sell";
+
+    public static readonly IReadOnlyList<string> All = [Staff, Operate, Care, Finance, Administer, Deliver, Sell];
 
     /// <summary>The roles that satisfy a policy.</summary>
     public static IReadOnlyList<string> RolesFor(string policy) => policy switch
@@ -62,6 +68,7 @@ public static class StaffPolicies
         Finance => [StaffRoles.Admin, StaffRoles.Finance],
         Administer => [StaffRoles.Admin],
         Deliver => [StaffRoles.Courier],
+        Sell => [StaffRoles.Seller],
         _ => throw new ArgumentOutOfRangeException(nameof(policy), policy, "Unknown staff policy."),
     };
 }

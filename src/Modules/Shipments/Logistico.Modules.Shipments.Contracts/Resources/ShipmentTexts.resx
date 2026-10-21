@@ -90,6 +90,8 @@
   <data name="Problem_return.mixed_sellers" xml:space="preserve"><value>Hand over one seller's parcels at a time.</value></data>
   <data name="Problem_scan.unknown_hub" xml:space="preserve"><value>Unknown hub {0}.</value></data>
   <data name="Problem_scan.unsupported" xml:space="preserve"><value>Use the returns screen for this step.</value></data>
+  <data name="Problem_seller.cannot_cancel" xml:space="preserve"><value>Order {0} has already been picked up. To stop it now, ask the company to return it to you.</value></data>
+  <data name="Problem_seller.not_linked" xml:space="preserve"><value>This account is not linked to an active seller. Ask the company to link it on the Team page.</value></data>
   <data name="Problem_shipment.already_returning" xml:space="preserve"><value>This parcel is already being returned.</value></data>
   <data name="Problem_shipment.awaiting_confirmation" xml:space="preserve"><value>The customer has not confirmed this order yet. Confirm it first (Confirmations).</value></data>
   <data name="Problem_shipment.cod_currency" xml:space="preserve"><value>Cash-on-delivery amount and currency must be given together.</value></data>

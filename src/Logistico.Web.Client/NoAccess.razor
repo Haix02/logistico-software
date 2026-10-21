@@ -26,12 +26,17 @@ else
 
     [Parameter, EditorRequired] public ClaimsPrincipal User { get; set; } = default!;
 
-    // Couriers have one page: their run. Sign-in lands on the dashboard, which is not theirs, so send them there.
+    // Couriers and sellers have one page each: their run, their shop. Sign-in lands on the dashboard, which is not
+    // theirs, so send them there.
     protected override void OnInitialized()
     {
         if (User.IsInRole(StaffRoles.Courier))
         {
             Navigation.NavigateTo("courier", replace: true);
+        }
+        else if (User.IsInRole(StaffRoles.Seller))
+        {
+            Navigation.NavigateTo("seller", replace: true);
         }
     }
 }

@@ -24,6 +24,7 @@ Shipments (international and domestic), hub network and trucks, hub station with
 ### Unreleased
 
 - **Courier app:** couriers deliver from their phones (their own parcels only), with call and WhatsApp, cash to collect and failure reasons; the app can be installed on the home screen.
+- **Seller portal:** shops book their own orders at the company's prices, follow them and their returns, cancel before pickup, and see what they are owed and every payout with its statement (their own shop only).
 
 ## Next
 
@@ -35,7 +36,6 @@ These are the most useful next steps, roughly in order.
 | **Real email and MFA enforcement** | Password reset and confirmation in production; second factor for staff | [10](10-security-and-compliance.md) §8 |
 | **Customer OTP or signed links** | Self-service on the tracking page without relying on knowing the phone number | WhatsApp or SMS provider needed |
 | **WhatsApp Business API sending** | Today messages are queued and sent by staff with one click | Provider-neutral interface |
-| **Seller portal** | Sellers book their own orders, see balances and returns | Builds on roles; a new "Seller" role scoped to one merchant |
 | **Saved list views** | Each user keeps their filters and columns | Small, self-contained |
 | **Kurdish (Sorani)** | Third language, RTL | Texts only; the RTL work is done |
 | **Load tests and telemetry** | Turn the targets in [00](00-overview.md) §6 into measurements | OpenTelemetry, k6 or NBomber |

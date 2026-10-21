@@ -3,6 +3,7 @@
 @using System.Security.Cryptography
 @inject TeamApi Team
 @inject ShipmentsApi Shipments
+@inject MerchantsApi Merchants
 @inject Toaster Toaster
 @inject Confirmer Confirm
 
@@ -70,6 +71,10 @@
                     @if (m.CourierCode is { } code)
                     {
                         <div class="lx-cell-sub"><Icon Name="drive-time" /> <Mixed Text="@CourierLabel(code)" /></div>
+                    }
+                    @if (m.MerchantId is { } shop)
+                    {
+                        <div class="lx-cell-sub"><Icon Name="shop" /> <Mixed Text="@ShopName(shop)" /></div>
                     }
                 </td>
                 <td>
@@ -196,6 +201,21 @@
                         </span>
                     </FormField>
                 }
+                @if (draft.Role == StaffRoles.Seller)
+                {
+                    <FormField Label="@L["Team_Seller"]" Required="true" Helper="@L["Team_LinkSellerHelper"]" Field="() => draft.MerchantId" CssClass="lx-span-2">
+                        <span class="bp6-html-select bp6-fill">
+                            <InputSelect @bind-Value="draft.MerchantId">
+                                <option value="">@L["Team_ChooseSeller"]</option>
+                                @foreach (var shop in shops)
+                                {
+                                    <option value="@shop.Id">@shop.Name · @Fmt.Place(shop.Governorate)</option>
+                                }
+                            </InputSelect>
+                            <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                        </span>
+                    </FormField>
+                }
                 <FormField Label="@L["Field_FirstPassword"]" Required="true" Helper="@L["FirstPasswordHelper"]" Field="() => draft.Password" CssClass="lx-span-2">
                     <div class="bp6-control-group bp6-fill">
                         <InputText class="bp6-input bp6-fill lx-mono" @bind-Value="draft.Password" dir="ltr" autocomplete="new-password" spellcheck="false" />
@@ -220,17 +240,33 @@
 </Dialog>
 
 <Dialog IsOpen="linking is not null" IsOpenChanged="@(async open => { if (!open) await CancelLink(); })"
-        Title="@string.Format(CultureInfo.CurrentCulture, L["Team_LinkCourierTitle"], linking?.DisplayName ?? linking?.Email)" Icon="drive-time" Width="480px">
+        Title="@string.Format(CultureInfo.CurrentCulture, L[linkRole == StaffRoles.Seller ? "Team_LinkSellerTitle" : "Team_LinkCourierTitle"], linking?.DisplayName ?? linking?.Email)"
+        Icon="@(linkRole == StaffRoles.Seller ? "shop" : "drive-time")" Width="480px">
     <ChildContent>
-        <FormField TValue="string" Label="@L["Team_Courier"]" Required="true" Helper="@L["Team_LinkCourierHelper"]">
-            <HtmlSelect Value="@linkCode" ValueChanged="@(v => linkCode = v)" Label="@L["Team_Courier"]">
-                <option value="">@L["Team_ChooseCourier"]</option>
-                @foreach (var c in couriers)
-                {
-                    <option value="@c.Code">@c.DisplayLabel · @Fmt.Place(c.Governorate)</option>
-                }
-            </HtmlSelect>
-        </FormField>
+        @if (linkRole == StaffRoles.Seller)
+        {
+            <FormField TValue="string" Label="@L["Team_Seller"]" Required="true" Helper="@L["Team_LinkSellerHelper"]">
+                <HtmlSelect Value="@linkCode" ValueChanged="@(v => linkCode = v)" Label="@L["Team_Seller"]">
+                    <option value="">@L["Team_ChooseSeller"]</option>
+                    @foreach (var shop in shops)
+                    {
+                        <option value="@shop.Id">@shop.Name · @Fmt.Place(shop.Governorate)</option>
+                    }
+                </HtmlSelect>
+            </FormField>
+        }
+        else
+        {
+            <FormField TValue="string" Label="@L["Team_Courier"]" Required="true" Helper="@L["Team_LinkCourierHelper"]">
+                <HtmlSelect Value="@linkCode" ValueChanged="@(v => linkCode = v)" Label="@L["Team_Courier"]">
+                    <option value="">@L["Team_ChooseCourier"]</option>
+                    @foreach (var c in couriers)
+                    {
+                        <option value="@c.Code">@c.DisplayLabel · @Fmt.Place(c.Governorate)</option>
+                    }
+                </HtmlSelect>
+            </FormField>
+        }
     </ChildContent>
     <Footer>
         <Button Text="@L["Cancel"]" OnClick="CancelLink" />
@@ -273,12 +309,15 @@
         ("Capability_Finance", StaffPolicies.Finance),
         ("Capability_Administer", StaffPolicies.Administer),
         ("Capability_Deliver", StaffPolicies.Deliver),
+        ("Capability_Sell", StaffPolicies.Sell),
     ];
 
     private IReadOnlyList<TeamMember>? members;
     private IReadOnlyList<CourierLookupItem> couriers = [];
+    private IReadOnlyList<MerchantLookupItem> shops = [];
     private TeamMember? linking;
-    private string? linkCode;
+    private string? linkRole;
+    private string? linkCode; // the courier's code, or the shop's id
     private CreateTeamMemberRequest draft = new();
     private bool dialogOpen;
     private bool saving;
@@ -293,15 +332,19 @@
         await LoadAsync();
         try
         {
+            var shopsTask = Merchants.LookupAsync();
             couriers = await Shipments.LookupCouriersAsync();
+            shops = await shopsTask;
         }
         catch (ApiException)
         {
-            couriers = []; // linking a courier account then waits until the fleet list loads
+            // Linking a courier or seller account then waits until the lists load.
         }
     }
 
     private string CourierLabel(string code) => couriers.FirstOrDefault(c => c.Code == code)?.DisplayLabel ?? code;
+
+    private string ShopName(Guid id) => shops.FirstOrDefault(s => s.Id == id)?.Name ?? "—";
 
     private async Task LoadAsync()
     {
@@ -402,9 +445,11 @@
         }
 
         var name = member.DisplayName ?? member.Email;
-        if (role == StaffRoles.Courier)
+        if (role is StaffRoles.Courier or StaffRoles.Seller)
         {
-            // A courier account must say which courier it delivers for: ask before changing anything.
+            // A courier account must say which courier it delivers for, a seller account which shop it books for: ask
+            // before changing anything.
+            linkRole = role;
             linkCode = null;
             linking = member;
             return;
@@ -430,12 +475,23 @@
             return;
         }
 
-        var code = linkCode;
+        var (role, code) = (linkRole, linkCode);
         linking = null;
         await RunAsync(member, async () =>
         {
-            await Team.ChangeRoleAsync(member.Id, StaffRoles.Courier, code);
-            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["Team_RoleChanged"], member.DisplayName ?? member.Email, $"{RoleName(StaffRoles.Courier)} · {CourierLabel(code)}"));
+            string linked;
+            if (role == StaffRoles.Seller && Guid.TryParse(code, out var shop))
+            {
+                await Team.ChangeRoleAsync(member.Id, StaffRoles.Seller, merchantId: shop);
+                linked = ShopName(shop);
+            }
+            else
+            {
+                await Team.ChangeRoleAsync(member.Id, StaffRoles.Courier, code);
+                linked = CourierLabel(code);
+            }
+
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["Team_RoleChanged"], member.DisplayName ?? member.Email, $"{RoleName(role)} · {linked}"));
         });
     }
 

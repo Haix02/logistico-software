@@ -35,6 +35,7 @@ public static class ShipmentsModule
         services.AddScoped<WarehouseScanner>();
         services.AddScoped<RequestDesk>();
         services.AddScoped<ReturnDesk>();
+        services.AddScoped<OrderDesk>();
         services.AddScoped<AutomationEngine>();
         services.AddHostedService<AutomationWorker>();
         return services;
@@ -58,6 +59,7 @@ public static class ShipmentsModule
         .MapCustomsEndpoints()
         .MapFleetEndpoints()
         .MapCourierAppEndpoints()
+        .MapSellerPortalEndpoints()
         .MapFinanceEndpoints();
 
     public static async Task MigrateShipmentsDatabaseAsync(this IServiceProvider services, CancellationToken ct = default)

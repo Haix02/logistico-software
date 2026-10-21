@@ -1,0 +1,433 @@
+@page "/seller"
+@layout PortalLayout
+@attribute [Authorize(Policy = StaffPolicies.Sell)]
+@inject SellerApi Seller
+@inject Toaster Toaster
+@inject Confirmer Confirm
+
+<PageTitle>@L["Seller_Title"] · @L["AppName"]</PageTitle>
+
+<div class="lx-seller">
+    @if (notLinked)
+    {
+        <NonIdealState Icon="shop" Title="@L["Seller_NotLinkedTitle"]" Description="@L["Seller_NotLinkedText"]" />
+    }
+    else if (home is null)
+    {
+        <Skeleton Block="true" Lines="4" />
+    }
+    else
+    {
+        <header class="lx-seller-head">
+            <div>
+                <h1><Mixed Text="@home.MerchantName" /></h1>
+                <p class="bp6-text-muted">@string.Format(CultureInfo.CurrentCulture, L["Seller_SendingFrom"], Fmt.Place(home.Governorate))</p>
+            </div>
+            <Button Large="true" Intent="Intent.Primary" Icon="add" Text="@L["Seller_NewOrder"]" OnClick="OpenNew" />
+        </header>
+
+        <div class="lx-kpis lx-kpis-4">
+            <KpiCard Label="@L["Seller_Owed"]" Amount="home.OwedIqd" Icon="bank-account" Intent="Intent.Success" Hint="@L.Count("Seller_OwedHint", home.OwedOrders)" />
+            <KpiCard Label="@L["Seller_OnTheWay"]" Amount="home.OnTheWayIqd" Icon="truck" Hint="@L.Count("Seller_OnTheWayHint", home.OnTheWayOrders)" />
+            <KpiCard Label="@L["Seller_Active"]" Value="@Fmt.Number(home.ActiveOrders)" Icon="box"
+                     Hint="@(home.ReturningOrders > 0 ? L.Count("Seller_ReturningHint", home.ReturningOrders) : null)" />
+            <KpiCard Label="@L["Seller_Success"]" Value="@Fmt.Percent(SuccessRate)" Icon="tick-circle"
+                     Hint="@string.Format(CultureInfo.CurrentCulture, L["Seller_SuccessHint"], Fmt.Number(home.DeliveredLast30Days), Fmt.Number(home.ReturnedLast30Days))" />
+        </div>
+
+        <Tabs Selected="@tab" SelectedChanged="@(t => tab = t)">
+            <Tab Id="orders" Title="@L["Seller_Orders"]" Icon="list">
+                <div class="lx-seller-toolbar">
+                    <SegmentedControl TValue="SellerOrderView" Options="ViewOptions" Value="view" ValueChanged="ViewChangedAsync" Label="@L["Seller_Orders"]" Small="true" />
+                    <SearchInput Value="@q" ValueChanged="@(v => q = v)" OnSearch="SearchAsync" Placeholder="@L["Seller_Search"]" CssClass="lx-seller-search" />
+                </div>
+                @if (orders is null)
+                {
+                    <Skeleton Block="true" Lines="3" />
+                }
+                else if (orders.Items.Count == 0)
+                {
+                    <NonIdealState Icon="box" Title="@L["Seller_NoOrdersTitle"]" Description="@(string.IsNullOrWhiteSpace(q) && view == SellerOrderView.All ? L["Seller_NoOrdersText"] : L["Seller_NoMatches"])" />
+                }
+                else
+                {
+                    <ul class="lx-seller-orders">
+                        @foreach (var o in orders.Items)
+                        {
+                            <li class="lx-seller-order">
+                                <div class="lx-seller-order-main">
+                                    <div class="lx-seller-order-top">
+                                        <a class="lx-code" href="track/@o.TrackingNumber" target="_blank" rel="noopener">@o.TrackingNumber</a>
+                                        <StatusTag Status="o.Status" />
+                                        @if (o.PaidOut)
+                                        {
+                                            <Tag Intent="Intent.Success" Minimal="true" Icon="bank-account">@L["Seller_PaidOut"]</Tag>
+                                        }
+                                    </div>
+                                    <div class="lx-seller-order-name">
+                                        <Mixed Text="@o.ConsigneeName" />
+                                        <span class="bp6-text-muted"> · @Fmt.Place(o.DestinationCode)@if (!string.IsNullOrWhiteSpace(o.DestinationCity))
+                                        {<text> · </text><Mixed Text="@o.DestinationCity" />}</span>
+                                    </div>
+                                    <div class="bp6-text-muted lx-small">
+                                        @* Each part keeps its own direction, so an Arabic item next to a date does not turn the date around. *@
+                                        @foreach (var (part, i) in Details(o).Select((part, i) => (part, i)))
+                                        {
+                                            @(i > 0 ? " · " : "")<Mixed Text="@part" />
+                                        }
+                                    </div>
+                                </div>
+                                <div class="lx-seller-order-side">
+                                    <b>@Fmt.Money(o.CodAmount ?? 0, "IQD")</b>
+                                    <span class="bp6-text-muted lx-small">@string.Format(CultureInfo.CurrentCulture, L["Seller_FeeN"], Fmt.Money(o.DeliveryFee ?? 0, "IQD"))</span>
+                                    @if (o.Status is ShipmentStatus.Draft or ShipmentStatus.Booked)
+                                    {
+                                        <Button Small="true" Minimal="true" Intent="Intent.Danger" Icon="cross" Text="@L["Seller_Cancel"]" Loading="@(busy == o.Id)" OnClick="@(() => CancelAsync(o))" />
+                                    }
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                    <Pager Page="orders.Page" PageSize="orders.PageSize" Total="orders.Total" OnPage="PageAsync" />
+                }
+            </Tab>
+            <Tab Id="payouts" Title="@L["Seller_Payouts"]" Icon="bank-account" Count="home.Payouts.Count">
+                <p class="lx-seller-paid">@string.Format(CultureInfo.CurrentCulture, L["Seller_PaidSoFar"], Fmt.Money(home.PaidIqd, "IQD"))</p>
+                @if (home.Payouts.Count == 0)
+                {
+                    <NonIdealState Icon="bank-account" Title="@L["Seller_NoPayoutsTitle"]" Description="@L["Seller_NoPayoutsText"]" />
+                }
+                else
+                {
+                    <ul class="lx-seller-orders">
+                        @foreach (var p in home.Payouts)
+                        {
+                            <li class="lx-seller-order">
+                                <div class="lx-seller-order-main">
+                                    <div class="lx-seller-order-top">
+                                        <span class="lx-code">@p.SettlementNumber</span>
+                                        <Tag Minimal="true">@ShipmentTexts.Of(p.PayoutMethod)</Tag>
+                                    </div>
+                                    <div class="bp6-text-muted lx-small">
+                                        @Fmt.Date(p.SettledAt) · @L.Count("Seller_OrdersN", p.ShipmentCount) ·
+                                        @string.Format(CultureInfo.CurrentCulture, L["Seller_PayoutBreakdown"], Fmt.Money(p.GrossCodAmount, "IQD"), Fmt.Money(p.DeliveryFeesAmount, "IQD"))
+                                    </div>
+                                </div>
+                                <div class="lx-seller-order-side">
+                                    <b>@Fmt.Money(p.NetPayoutAmount, "IQD")</b>
+                                    <LinkButton Href="@Seller.StatementUrl(p.Id)" Target="_blank" Small="true" Minimal="true" Icon="download" Text="@L["DownloadStatement"]" />
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+            </Tab>
+        </Tabs>
+    }
+</div>
+
+<Drawer IsOpen="newOpen" IsOpenChanged="@(open => newOpen = open)" Title="@L["Seller_NewOrder"]" Icon="add" Width="560px">
+    <ChildContent>
+        <div class="lx-stack lx-mb" style="gap:8px">
+            <textarea class="bp6-input bp6-fill" rows="2" @bind="pasteText" @bind:event="oninput" placeholder="@L["SmartPastePlaceholder"]" aria-label="@L["SmartPasteTitle"]"></textarea>
+            <div class="lx-seller-paste">
+                <span class="bp6-text-muted lx-small">@L["Seller_PasteHelper"]</span>
+                <Button Small="true" Icon="flash" Text="@L["SmartPasteAction"]" Disabled="@string.IsNullOrWhiteSpace(pasteText)" OnClick="ApplyPasteAsync" />
+            </div>
+        </div>
+        <EditForm Model="draft" OnValidSubmit="BookAsync" Context="form" id="seller-order-form">
+            <DataAnnotationsValidator />
+            <ServerErrors @ref="serverErrors" />
+            <div class="lx-form-grid">
+                <FormField Label="@L["Field_CustomerName"]" Required="true" Field="() => draft.ConsigneeName">
+                    <InputText class="bp6-input bp6-fill" @bind-Value="draft.ConsigneeName" autocomplete="off" />
+                </FormField>
+                <FormField Label="@L["Field_CustomerPhone"]" Required="true" Helper="@L["PhoneHelper"]" Field="() => draft.ConsigneePhone">
+                    <InputText class="bp6-input bp6-fill" @bind-Value="draft.ConsigneePhone" type="tel" dir="ltr" placeholder="0770 123 4567" autocomplete="off" />
+                </FormField>
+                <FormField Label="@L["Field_Governorate"]" Required="true" Field="() => draft.DestinationCode">
+                    <span class="bp6-html-select bp6-fill">
+                        <InputSelect @bind-Value="draft.DestinationCode" @bind-Value:after="QuoteAsync">
+                            <option value="">@L["ChooseGovernorate"]</option>
+                            @foreach (var g in IraqGovernorates.All)
+                            {
+                                <option value="@g.Code">@g.Name</option>
+                            }
+                        </InputSelect>
+                        <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                    </span>
+                </FormField>
+                <FormField Label="@L["Field_Area"]" Field="() => draft.DestinationCity">
+                    <InputText class="bp6-input bp6-fill" @bind-Value="draft.DestinationCity" placeholder="@L["AreaPlaceholder"]" />
+                </FormField>
+                <FormField Label="@L["Field_Address"]" Required="true" Field="() => draft.DeliveryAddress" CssClass="lx-span-2">
+                    <InputText class="bp6-input bp6-fill" @bind-Value="draft.DeliveryAddress" placeholder="@L["AddressPlaceholder"]" />
+                </FormField>
+                <FormField Label="@L["Field_Landmark"]" Hint="@L["Optional"]" Field="() => draft.Landmark" CssClass="lx-span-2">
+                    <InputText class="bp6-input bp6-fill" @bind-Value="draft.Landmark" placeholder="@L["LandmarkPlaceholder"]" />
+                </FormField>
+                <FormField Label="@L["Field_Items"]" Field="() => draft.ItemsDescription" CssClass="lx-span-2">
+                    <InputText class="bp6-input bp6-fill" @bind-Value="draft.ItemsDescription" placeholder="@L["ItemsPlaceholder"]" />
+                </FormField>
+                <FormField Label="@L["Field_Cod"]" Helper="@L["CodHelper"]" Field="() => draft.CodAmount">
+                    <div class="bp6-input-group bp6-fill">
+                        <InputNumber class="bp6-input" @bind-Value="draft.CodAmount" step="250" min="0" />
+                        <span class="bp6-input-action lx-input-suffix">@L["Iqd"]</span>
+                    </div>
+                </FormField>
+                <FormField Label="@L["Field_WeightKg"]" Field="() => draft.GrossWeightKg">
+                    <InputNumber class="bp6-input bp6-fill" @bind-Value="draft.GrossWeightKg" @bind-Value:after="QuoteAsync" step="0.1" min="0" />
+                </FormField>
+                <FormField Label="@L["Field_HowWeGetIt"]" Field="() => draft.PickupRequired">
+                    <SegmentedControl TValue="bool" Options="HandOverOptions" Value="draft.PickupRequired" ValueChanged="@(v => draft.PickupRequired = v)" Fill="true" />
+                </FormField>
+                <FormField Label="@L["Field_OrderRef"]" Hint="@L["Optional"]" Field="() => draft.ExternalReference">
+                    <InputText class="bp6-input bp6-fill" @bind-Value="draft.ExternalReference" placeholder="IG-1234" dir="ltr" />
+                </FormField>
+                <FormField Label="@L["Field_Notes"]" Hint="@L["Optional"]" Field="() => draft.Notes" CssClass="lx-span-2">
+                    <InputTextArea class="bp6-input bp6-fill" rows="2" @bind-Value="draft.Notes" placeholder="@L["NotesPlaceholder"]" />
+                </FormField>
+            </div>
+
+            <dl class="lx-props lx-seller-price">
+                <dt>@L["CustomerPays"]</dt>
+                <dd>@Fmt.Money(draft.CodAmount ?? 0, "IQD")</dd>
+                <dt>@L["Field_DeliveryFee"]</dt>
+                <dd>@(quote is null ? "—" : Fmt.Money(quote.Fee, "IQD"))</dd>
+                <dt>@L["Seller_YouReceive"]</dt>
+                <dd class="lx-strong">@(quote is null ? "—" : Fmt.Money((draft.CodAmount ?? 0) - quote.Fee, "IQD"))</dd>
+            </dl>
+            @if (error is not null)
+            {
+                <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mt">@error</Callout>
+            }
+        </EditForm>
+    </ChildContent>
+    <Footer>
+        <span class="lx-spacer"></span>
+        <Button Text="@L["Cancel"]" OnClick="@(() => newOpen = false)" />
+        <Button Type="submit" Intent="Intent.Primary" Icon="tick" Text="@L["CreateOrder"]" Loading="saving" Attributes="@(new Dictionary<string, object> { ["form"] = "seller-order-form" })" />
+    </Footer>
+</Drawer>
+
+@code {
+    private SellerHome? home;
+    private SellerOrderList? orders;
+    private bool notLinked;
+    private string tab = "orders";
+    private SellerOrderView view;
+    private string? q;
+    private Guid? busy;
+
+    private bool newOpen;
+    private bool saving;
+    private string? error;
+    private string pasteText = "";
+    private PriceQuote? quote;
+    private ServerErrors? serverErrors;
+    private CreateShipmentRequest draft = NewDraft();
+
+    private IReadOnlyList<SegmentOption<SellerOrderView>> ViewOptions =>
+    [
+        new(SellerOrderView.All, L["Seller_ViewAll"]),
+        new(SellerOrderView.Active, L["Seller_ViewActive"]),
+        new(SellerOrderView.Delivered, L["Seller_ViewDelivered"]),
+        new(SellerOrderView.Returns, L["Seller_ViewReturns"]),
+    ];
+
+    private IReadOnlyList<SegmentOption<bool>> HandOverOptions =>
+        [new(true, L["Pickup"], "hand-up"), new(false, L["DropOff"], "import")];
+
+    /// <summary>Delivered out of everything that finished in the last 30 days (null before anything finished).</summary>
+    private decimal? SuccessRate => home is { } h && h.DeliveredLast30Days + h.ReturnedLast30Days > 0
+        ? Math.Round(100m * h.DeliveredLast30Days / (h.DeliveredLast30Days + h.ReturnedLast30Days), 1)
+        : null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            home = await Seller.GetHomeAsync();
+            await LoadOrdersAsync(1);
+        }
+        catch (ApiException ex) when (ex.Problem?.Code == "seller.not_linked")
+        {
+            notLinked = true;
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+    }
+
+    private async Task LoadOrdersAsync(int page)
+    {
+        try
+        {
+            orders = await Seller.GetOrdersAsync(q, view, page);
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+    }
+
+    private async Task RefreshAsync()
+    {
+        try
+        {
+            home = await Seller.GetHomeAsync();
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+
+        await LoadOrdersAsync(orders?.Page ?? 1);
+    }
+
+    private async Task ViewChangedAsync(SellerOrderView value)
+    {
+        view = value;
+        await LoadOrdersAsync(1);
+    }
+
+    private Task SearchAsync(string? value)
+    {
+        q = value;
+        return LoadOrdersAsync(1);
+    }
+
+    private Task PageAsync(int page) => LoadOrdersAsync(page);
+
+    /// <summary>The order's small print: what is inside, the shop's reference, when it was booked and why it is stuck or coming back.</summary>
+    private IEnumerable<string> Details(SellerOrder o)
+    {
+        if (!string.IsNullOrWhiteSpace(o.ItemsDescription))
+        {
+            yield return o.ItemsDescription;
+        }
+
+        if (!string.IsNullOrWhiteSpace(o.ExternalReference))
+        {
+            yield return o.ExternalReference;
+        }
+
+        yield return Fmt.Date(o.CreatedAt);
+        if (o.ReturnReason is { } back)
+        {
+            yield return ShipmentTexts.Of(back);
+        }
+        else if (o.Status == ShipmentStatus.DeliveryFailed && o.LastFailureReason is { } failed)
+        {
+            yield return ShipmentTexts.Of(failed);
+        }
+
+        if (o.DeliveryAttempts > 1)
+        {
+            yield return string.Format(CultureInfo.CurrentCulture, L["Courier_Attempt"], Fmt.Number(o.DeliveryAttempts));
+        }
+    }
+
+    private async Task CancelAsync(SellerOrder o)
+    {
+        if (!await Confirm.AskAsync(L["Seller_CancelTitle"], string.Format(CultureInfo.CurrentCulture, L["Seller_CancelMessage"], o.TrackingNumber), L["Seller_Cancel"], Intent.Danger, "cross"))
+        {
+            return;
+        }
+
+        busy = o.Id;
+        try
+        {
+            await Seller.CancelAsync(o.Id);
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["Seller_CancelledToast"], o.TrackingNumber));
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            busy = null;
+            await RefreshAsync();
+        }
+    }
+
+    private static CreateShipmentRequest NewDraft() => new()
+    {
+        ServiceType = ServiceType.Domestic,
+        Mode = TransportMode.Road,
+        CodCurrency = "IQD",
+        GrossWeightKg = 1,
+        DestinationCode = "",
+    };
+
+    private void OpenNew()
+    {
+        draft = NewDraft();
+        draft.OriginCode = home?.Governorate ?? draft.OriginCode;
+        quote = null;
+        error = null;
+        pasteText = "";
+        serverErrors?.Clear();
+        newOpen = true;
+    }
+
+    private async Task ApplyPasteAsync()
+    {
+        var parsed = SmartOrderParser.ParseSingle(pasteText, draft.OriginCode);
+        draft.ConsigneeName = parsed.ConsigneeName;
+        draft.ConsigneePhone = parsed.ConsigneePhone;
+        draft.DestinationCode = parsed.DestinationCode;
+        draft.DestinationCity = parsed.DestinationCity;
+        draft.DeliveryAddress = parsed.DeliveryAddress;
+        draft.Landmark = parsed.Landmark;
+        draft.ItemsDescription = parsed.ItemsDescription;
+        draft.CodAmount = parsed.CodAmount;
+        await QuoteAsync();
+    }
+
+    /// <summary>The company's fee for this destination and weight, from the server (it knows this shop's discount).</summary>
+    private async Task QuoteAsync()
+    {
+        if (!IraqGovernorates.IsKnown(draft.DestinationCode))
+        {
+            quote = null;
+            return;
+        }
+
+        try
+        {
+            quote = await Seller.QuoteAsync(draft.DestinationCode, draft.GrossWeightKg > 0 ? draft.GrossWeightKg : 1m);
+        }
+        catch (ApiException)
+        {
+            quote = null; // the fee is decided when booking either way
+        }
+    }
+
+    private async Task BookAsync()
+    {
+        saving = true;
+        error = null;
+        try
+        {
+            var created = await Seller.BookAsync(draft);
+            newOpen = false;
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["OrderCreated"], created.TrackingNumber));
+            view = SellerOrderView.All;
+            q = null;
+            tab = "orders";
+            home = await Seller.GetHomeAsync();
+            await LoadOrdersAsync(1);
+        }
+        catch (ApiException ex)
+        {
+            error = serverErrors?.Show(ex) ?? ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

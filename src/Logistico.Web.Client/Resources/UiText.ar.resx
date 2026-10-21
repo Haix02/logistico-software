@@ -92,6 +92,7 @@
   <data name="CancelReasonPlaceholder" xml:space="preserve"><value>مثلاً: ألغاه المتجر، الزبون طلب مرتين</value></data>
   <data name="Capability_Care" xml:space="preserve"><value>مكالمات التأكيد وطلبات الزبائن ورسائلهم</value></data>
   <data name="Capability_Deliver" xml:space="preserve"><value>تطبيق المندوب: تسليم طروده فقط</value></data>
+  <data name="Capability_Sell" xml:space="preserve"><value>بوابة المتجر: طلبات متجره وتحويلاته</value></data>
   <data name="ChangedBy" xml:space="preserve"><value>عُدّلت {0} بواسطة {1}</value></data>
   <data name="Chargeable" xml:space="preserve"><value>الوزن المحتسب</value></data>
   <data name="ChargeableRule" xml:space="preserve"><value>القاعدة</value></data>
@@ -805,12 +806,14 @@
   <data name="Risk_New" xml:space="preserve"><value>جديد</value></data>
   <data name="RoleHint_Admin" xml:space="preserve"><value>كل شيء، ومنه الأسعار وقواعد الأتمتة والمخازن والبيانات المفتوحة والفريق.</value></data>
   <data name="RoleHint_Courier" xml:space="preserve"><value>تطبيق المندوب فقط: طروده لليوم، دون الاطلاع على أي بيانات أخرى للشركة.</value></data>
+  <data name="RoleHint_Seller" xml:space="preserve"><value>بوابة المتجر فقط: يحجز متجر واحد طلباته ويتابعها مع تحويلاته، دون الاطلاع على أي بيانات أخرى للشركة.</value></data>
   <data name="RoleHint_CustomerSupport" xml:space="preserve"><value>مكتب الاتصال: مكالمات التأكيد وطلبات الزبائن ورسائلهم، ويطّلع على كل شيء عدا المالية.</value></data>
   <data name="RoleHint_Finance" xml:space="preserve"><value>أجور التوصيل وتسويات التجار، ويطّلع على كل ما عداها.</value></data>
   <data name="RoleHint_Operations" xml:space="preserve"><value>العمل اليومي: الطلبات ومسح المخازن والشاحنات والمندوبين والمرتجعات وطلبات الزبائن والجمارك.</value></data>
   <data name="RoleHint_Viewer" xml:space="preserve"><value>يطّلع على اللوحات والقوائم والرؤى دون أن يغيّر شيئاً.</value></data>
   <data name="Role_Admin" xml:space="preserve"><value>مدير النظام</value></data>
   <data name="Role_Courier" xml:space="preserve"><value>مندوب توصيل</value></data>
+  <data name="Role_Seller" xml:space="preserve"><value>متجر (بائع)</value></data>
   <data name="Role_CustomerSupport" xml:space="preserve"><value>خدمة الزبائن</value></data>
   <data name="Role_Finance" xml:space="preserve"><value>المالية</value></data>
   <data name="Role_Operations" xml:space="preserve"><value>العمليات</value></data>
@@ -899,6 +902,58 @@
   <data name="SellerCreated" xml:space="preserve"><value>تمت إضافة المتجر «{0}»</value></data>
   <data name="SellerNotFound" xml:space="preserve"><value>المتجر غير موجود</value></data>
   <data name="SellerReceives" xml:space="preserve"><value>يستلم المتجر</value></data>
+  <data name="Seller_Active" xml:space="preserve"><value>طلبات قيد التوصيل</value></data>
+  <data name="Seller_Cancel" xml:space="preserve"><value>إلغاء الطلب</value></data>
+  <data name="Seller_CancelMessage" xml:space="preserve"><value>لم يُستلم الطلب {0} بعد. إلغاؤه يحذفه من قائمة الاستلام لدى المندوب.</value></data>
+  <data name="Seller_CancelTitle" xml:space="preserve"><value>إلغاء هذا الطلب؟</value></data>
+  <data name="Seller_CancelledToast" xml:space="preserve"><value>تم إلغاء الطلب {0}.</value></data>
+  <data name="Seller_FeeN" xml:space="preserve"><value>الأجرة {0}</value></data>
+  <data name="Seller_NewOrder" xml:space="preserve"><value>طلب جديد</value></data>
+  <data name="Seller_NoMatches" xml:space="preserve"><value>لا شيء يطابق هذا البحث أو التصفية.</value></data>
+  <data name="Seller_NoOrdersText" xml:space="preserve"><value>احجز أول طلب من «طلب جديد»، ونحن نستلمه ونوصله إلى أي مكان في العراق.</value></data>
+  <data name="Seller_NoOrdersTitle" xml:space="preserve"><value>لا توجد طلبات</value></data>
+  <data name="Seller_NoPayoutsText" xml:space="preserve"><value>عندما تحوّل الشركة المبالغ المحصَّلة عن طلباتك المسلَّمة، يظهر هنا كل تحويل مع كشفه.</value></data>
+  <data name="Seller_NoPayoutsTitle" xml:space="preserve"><value>لا توجد تحويلات بعد</value></data>
+  <data name="Seller_NotLinkedText" xml:space="preserve"><value>اطلب من شركة التوصيل ربط حسابك بمتجرك من صفحة الفريق.</value></data>
+  <data name="Seller_NotLinkedTitle" xml:space="preserve"><value>الحساب غير مرتبط بمتجر بعد</value></data>
+  <data name="Seller_OnTheWay" xml:space="preserve"><value>مبالغ لم تُحصَّل بعد</value></data>
+  <data name="Seller_OnTheWayHint" xml:space="preserve"><value>{0} طلب لم يُسلَّم بعد</value></data>
+  <data name="Seller_OnTheWayHint_Few" xml:space="preserve"><value>{0} طلبات لم تُسلَّم بعد</value></data>
+  <data name="Seller_OnTheWayHint_Many" xml:space="preserve"><value>{0} طلبًا لم يُسلَّم بعد</value></data>
+  <data name="Seller_OnTheWayHint_One" xml:space="preserve"><value>طلب واحد لم يُسلَّم بعد</value></data>
+  <data name="Seller_OnTheWayHint_Two" xml:space="preserve"><value>طلبان لم يُسلَّما بعد</value></data>
+  <data name="Seller_Orders" xml:space="preserve"><value>الطلبات</value></data>
+  <data name="Seller_OrdersN" xml:space="preserve"><value>{0} طلب</value></data>
+  <data name="Seller_OrdersN_Few" xml:space="preserve"><value>{0} طلبات</value></data>
+  <data name="Seller_OrdersN_Many" xml:space="preserve"><value>{0} طلبًا</value></data>
+  <data name="Seller_OrdersN_One" xml:space="preserve"><value>طلب واحد</value></data>
+  <data name="Seller_OrdersN_Two" xml:space="preserve"><value>طلبان</value></data>
+  <data name="Seller_Owed" xml:space="preserve"><value>مستحق لك</value></data>
+  <data name="Seller_OwedHint" xml:space="preserve"><value>{0} طلب مسلَّم لم يُحوَّل بعد</value></data>
+  <data name="Seller_OwedHint_Few" xml:space="preserve"><value>{0} طلبات مسلَّمة لم تُحوَّل بعد</value></data>
+  <data name="Seller_OwedHint_Many" xml:space="preserve"><value>{0} طلبًا مسلَّمًا لم يُحوَّل بعد</value></data>
+  <data name="Seller_OwedHint_One" xml:space="preserve"><value>طلب مسلَّم واحد لم يُحوَّل بعد</value></data>
+  <data name="Seller_OwedHint_Two" xml:space="preserve"><value>طلبان مسلَّمان لم يُحوَّلا بعد</value></data>
+  <data name="Seller_PaidOut" xml:space="preserve"><value>تم التحويل</value></data>
+  <data name="Seller_PaidSoFar" xml:space="preserve"><value>المحوَّل إليك حتى الآن: {0}</value></data>
+  <data name="Seller_PasteHelper" xml:space="preserve"><value>الصق رسالة الزبون (الاسم، الهاتف، العنوان، السعر) وسيُملأ النموذج تلقائيًا.</value></data>
+  <data name="Seller_PayoutBreakdown" xml:space="preserve"><value>{0} محصَّل − {1} أجور</value></data>
+  <data name="Seller_Payouts" xml:space="preserve"><value>التحويلات</value></data>
+  <data name="Seller_ReturningHint" xml:space="preserve"><value>{0} طلب راجع إليك</value></data>
+  <data name="Seller_ReturningHint_Few" xml:space="preserve"><value>{0} طلبات راجعة إليك</value></data>
+  <data name="Seller_ReturningHint_Many" xml:space="preserve"><value>{0} طلبًا راجعًا إليك</value></data>
+  <data name="Seller_ReturningHint_One" xml:space="preserve"><value>طلب واحد راجع إليك</value></data>
+  <data name="Seller_ReturningHint_Two" xml:space="preserve"><value>طلبان راجعان إليك</value></data>
+  <data name="Seller_Search" xml:space="preserve"><value>رقم التتبع أو الزبون أو الهاتف</value></data>
+  <data name="Seller_SendingFrom" xml:space="preserve"><value>الإرسال من {0}</value></data>
+  <data name="Seller_Success" xml:space="preserve"><value>نسبة التسليم · 30 يومًا</value></data>
+  <data name="Seller_SuccessHint" xml:space="preserve"><value>{0} مسلَّم · {1} مرتجع</value></data>
+  <data name="Seller_Title" xml:space="preserve"><value>متجري</value></data>
+  <data name="Seller_ViewActive" xml:space="preserve"><value>قيد التوصيل</value></data>
+  <data name="Seller_ViewAll" xml:space="preserve"><value>الكل</value></data>
+  <data name="Seller_ViewDelivered" xml:space="preserve"><value>مسلَّمة</value></data>
+  <data name="Seller_ViewReturns" xml:space="preserve"><value>مرتجعات</value></data>
+  <data name="Seller_YouReceive" xml:space="preserve"><value>تستلم أنت</value></data>
   <data name="SellerSearchPlaceholder" xml:space="preserve"><value>ابحث باسم المتجر أو حساب انستغرام أو الهاتف…</value></data>
   <data name="SellersSubtitle" xml:space="preserve"><value>متاجر انستغرام والمتاجر الإلكترونية التي نوصل طرودها</value></data>
   <data name="SellersTitle" xml:space="preserve"><value>المتاجر</value></data>
@@ -965,6 +1020,10 @@
   <data name="Team_LinkCourier" xml:space="preserve"><value>ربط</value></data>
   <data name="Team_LinkCourierHelper" xml:space="preserve"><value>يرى الحساب فقط الطرود الخارجة للتوصيل مع هذا المندوب (صفحة الأسطول).</value></data>
   <data name="Team_LinkCourierTitle" xml:space="preserve"><value>أيّ مندوب هو {0}؟</value></data>
+  <data name="Team_ChooseSeller" xml:space="preserve"><value>اختر المتجر</value></data>
+  <data name="Team_LinkSellerHelper" xml:space="preserve"><value>يحجز الحساب ويرى طلبات هذا المتجر وتحويلاته فقط (صفحة المتاجر).</value></data>
+  <data name="Team_LinkSellerTitle" xml:space="preserve"><value>أيّ متجر هو {0}؟</value></data>
+  <data name="Team_Seller" xml:space="preserve"><value>المتجر</value></data>
   <data name="Team_LockedOutUntil" xml:space="preserve"><value>كلمات مرور خاطئة: مقفل حتى {0}</value></data>
   <data name="Team_PasswordSet" xml:space="preserve"><value>تم تعيين كلمة مرور جديدة لـ {0}.</value></data>
   <data name="Team_SetPassword" xml:space="preserve"><value>تعيين كلمة مرور</value></data>

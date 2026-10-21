@@ -1141,6 +1141,32 @@ tr.lx-row-busy { opacity: 0.55; }
 .lx-courier-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-block-start: 4px; }
 .lx-courier-actions .bp6-button { justify-content: center; }
 .lx-courier-reasons { display: grid; gap: 8px; }
+
+/* Seller portal: a shop's orders and money, on a phone first and a laptop as well */
+.lx-seller { max-width: 980px; margin-inline: auto; }
+.lx-seller-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px; margin-block-end: 16px; }
+.lx-seller-head h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
+.lx-seller-head p { margin-block-start: 4px; font-size: 14px; }
+.lx-seller-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-block: 12px; }
+.lx-seller-search { flex: 1 1 240px; max-width: 360px; }
+.lx-seller-orders { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.lx-seller-order { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 12px 14px;
+    border-radius: var(--lx-radius); background: var(--lx-surface); border: 1px solid var(--lx-border); }
+.lx-seller-order-main { display: grid; gap: 4px; min-width: 0; }
+.lx-seller-order-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.lx-seller-order-name { font-weight: 600; overflow-wrap: anywhere; }
+.lx-seller-order-side { flex: none; display: grid; justify-items: end; gap: 4px; text-align: end; }
+.lx-seller-order-side b { font-size: 16px; font-variant-numeric: tabular-nums; }
+.lx-seller-paid { margin-block: 12px; font-weight: 600; }
+.lx-seller-paste { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.lx-seller-paste > span { flex: 1 1 200px; }
+.lx-seller-paste > .bp6-button { flex: none; white-space: nowrap; }
+.lx-seller-price { margin-block-start: 16px; padding: 12px 14px; border-radius: var(--lx-radius); background: var(--lx-surface-2); }
+@media (max-width: 560px) {
+    .lx-seller-order { flex-direction: column; }
+    .lx-seller-order-side { justify-items: start; text-align: start; grid-auto-flow: column; align-items: center; }
+    .lx-seller-search { max-width: none; }
+}
 .lx-track { max-width: 860px; margin: 0 auto; }
 .lx-track-hero { text-align: center; margin-block-end: 22px; }
 .lx-track-hero h1 { font-size: 28px; margin-block-end: 6px; }

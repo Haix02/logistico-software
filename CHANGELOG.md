@@ -12,6 +12,14 @@ versions follow [Semantic Versioning](https://semver.org/).
   the same scan logic as the hub station, so cash collection, customer messages and automation rules apply unchanged.
 - **Courier role**: administrators give an account the Courier role on the Team page and link it to a courier from the
   Fleet page. Couriers see no other company data. `Seed:DemoTeam` adds `courier@logistico.local` for the demo courier.
+- **Seller portal** (`/seller`): online shops sign in and book their own orders (paste the customer's message and the
+  form fills itself; the fee comes from the company's prices, with the shop's discount), follow them with filters for
+  in progress, delivered and returns, cancel an order before pickup, and see what they are owed, the cash still to
+  collect, their delivery rate and every payout with its CSV statement. The figures are the Finance page's own.
+  Booking goes through the same code as the office's order screen (`OrderDesk`), so numbering, routing and
+  confirmation calls apply unchanged.
+- **Seller role**: administrators give an account the Seller role on the Team page and link it to one shop. Sellers
+  see no other company data. `Seed:DemoTeam` adds `seller@logistico.local` for the demo shop "بوتيك لمار".
 - **Install on a phone**: a web app manifest and icons, so Logistico can be added to the home screen.
 
 ## [3.0.0] - 2026-10-21

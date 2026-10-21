@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Logistico.Modules.Merchants;
+using Logistico.Modules.Merchants.Contracts;
 using Logistico.Modules.Shipments;
 using Logistico.SharedKernel.Identity;
 using Logistico.Web.Data;
@@ -49,7 +50,8 @@ internal static class DatabaseInitializer
             {
                 foreach (var (demoEmail, name, role, courierCode) in DemoTeam)
                 {
-                    await SeedStaffAsync(app.Services, demoEmail, password, name, role, app.Logger, courierCode);
+                    await SeedStaffAsync(app.Services, demoEmail, password, name, role, app.Logger,
+                        courierCode is null ? null : new Claim(LogisticoClaimTypes.CourierCode, courierCode));
                 }
             }
         }
@@ -59,6 +61,26 @@ internal static class DatabaseInitializer
         {
             await app.Services.SeedMerchantsDemoDataAsync();
             await app.Services.SeedShipmentsDemoDataAsync(demoShipments);
+            if (config.GetValue<bool>("Seed:DemoTeam") && config["Seed:AdminPassword"] is { Length: > 0 } sellerPassword)
+            {
+                await SeedDemoSellerAsync(app, sellerPassword);
+            }
+        }
+    }
+
+    /// <summary>A seller-portal account for the demo shop "بوتيك لمار" (its orders are part of the demo data).</summary>
+    private static async Task SeedDemoSellerAsync(WebApplication app, string password)
+    {
+        IReadOnlyList<MerchantLookupItem> shops;
+        await using (var scope = app.Services.CreateAsyncScope())
+        {
+            shops = await scope.ServiceProvider.GetRequiredService<IMerchantDirectory>().ListActiveAsync(CancellationToken.None);
+        }
+
+        if ((shops.FirstOrDefault(m => m.InstagramHandle?.TrimStart('@') == "lamar.boutique") ?? shops.FirstOrDefault()) is { } shop)
+        {
+            await SeedStaffAsync(app.Services, "seller@logistico.local", password, "لمار — " + shop.Name, StaffRoles.Seller, app.Logger,
+                new Claim(LogisticoClaimTypes.MerchantId, shop.Id.ToString()));
         }
     }
 
@@ -76,7 +98,7 @@ internal static class DatabaseInitializer
     }
 
     /// <summary>Creates the account if missing and makes sure it has the role (an existing account keeps its password).</summary>
-    private static async Task SeedStaffAsync(IServiceProvider services, string email, string password, string displayName, string role, ILogger logger, string? courierCode = null)
+    private static async Task SeedStaffAsync(IServiceProvider services, string email, string password, string displayName, string role, ILogger logger, Claim? link = null)
     {
         await using var scope = services.CreateAsyncScope();
         var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
@@ -103,9 +125,10 @@ internal static class DatabaseInitializer
             }
         }
 
-        if (courierCode is not null && !(await users.GetClaimsAsync(user)).Any(c => c.Type == LogisticoClaimTypes.CourierCode))
+        // A courier or seller account is linked to its courier or shop.
+        if (link is not null && !(await users.GetClaimsAsync(user)).Any(c => c.Type == link.Type))
         {
-            await users.AddClaimAsync(user, new Claim(LogisticoClaimTypes.CourierCode, courierCode));
+            await users.AddClaimAsync(user, link);
         }
     }
 }

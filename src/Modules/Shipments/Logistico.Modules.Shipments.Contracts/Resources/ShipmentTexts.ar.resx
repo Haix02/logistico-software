@@ -90,6 +90,8 @@
   <data name="Problem_return.mixed_sellers" xml:space="preserve"><value>سلّم مرتجعات تاجر واحد في كل مرة.</value></data>
   <data name="Problem_scan.unknown_hub" xml:space="preserve"><value>مركز غير معروف: {0}.</value></data>
   <data name="Problem_scan.unsupported" xml:space="preserve"><value>استخدم شاشة المرتجعات لهذه الخطوة.</value></data>
+  <data name="Problem_seller.cannot_cancel" xml:space="preserve"><value>تم استلام الطلب {0} من المندوب. لإيقافه الآن اطلب من الشركة إرجاعه إليك.</value></data>
+  <data name="Problem_seller.not_linked" xml:space="preserve"><value>هذا الحساب غير مرتبط بمتجر فعّال. اطلب من الشركة ربطه من صفحة الفريق.</value></data>
   <data name="Problem_shipment.already_returning" xml:space="preserve"><value>الشحنة قيد الإرجاع بالفعل.</value></data>
   <data name="Problem_shipment.awaiting_confirmation" xml:space="preserve"><value>لم يؤكد الزبون هذا الطلب بعد. أكّده أولاً من شاشة التأكيدات.</value></data>
   <data name="Problem_shipment.cod_currency" xml:space="preserve"><value>يجب إدخال مبلغ الدفع عند الاستلام مع العملة.</value></data>
