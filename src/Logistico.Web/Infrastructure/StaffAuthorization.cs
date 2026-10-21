@@ -6,7 +6,7 @@ namespace Logistico.Web.Infrastructure;
 /// <summary>Registers the staff policies and gives every module endpoint a role requirement by default.</summary>
 internal static class StaffAuthorization
 {
-    private static readonly HashSet<string> ExplicitPolicies = [StaffPolicies.Operate, StaffPolicies.Care, StaffPolicies.Finance, StaffPolicies.Administer];
+    private static readonly HashSet<string> ExplicitPolicies = [StaffPolicies.Operate, StaffPolicies.Care, StaffPolicies.Finance, StaffPolicies.Administer, StaffPolicies.Deliver];
 
     public static AuthorizationBuilder AddStaffPolicies(this AuthorizationBuilder builder)
     {

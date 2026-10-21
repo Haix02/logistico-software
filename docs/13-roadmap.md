@@ -21,6 +21,10 @@ This is where Logistico is heading. It is a direction, not a promise of dates: i
 
 Shipments (international and domestic), hub network and trucks, hub station with scanners, returns, customer requests, automation engine, labels, customs workbench, fleet and COD settlements, public tracking, Arabic/English with RTL, security hardening. See [CHANGELOG.md](../CHANGELOG.md) and [17 — Release audits](17-release-audits.md).
 
+### Unreleased
+
+- **Courier app:** couriers deliver from their phones (their own parcels only), with call and WhatsApp, cash to collect and failure reasons; the app can be installed on the home screen.
+
 ## Next
 
 These are the most useful next steps, roughly in order.
@@ -34,7 +38,6 @@ These are the most useful next steps, roughly in order.
 | **Seller portal** | Sellers book their own orders, see balances and returns | Builds on roles; a new "Seller" role scoped to one merchant |
 | **Saved list views** | Each user keeps their filters and columns | Small, self-contained |
 | **Kurdish (Sorani)** | Third language, RTL | Texts only; the RTL work is done |
-| **Courier app** | Deliveries, failed attempts with reason, COD and proof of delivery from a phone | Web (PWA) first |
 | **Load tests and telemetry** | Turn the targets in [00](00-overview.md) §6 into measurements | OpenTelemetry, k6 or NBomber |
 
 ## Later

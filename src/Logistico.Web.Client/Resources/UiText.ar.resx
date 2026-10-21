@@ -91,6 +91,7 @@
   <data name="CancelOrder" xml:space="preserve"><value>إلغاء الطلب</value></data>
   <data name="CancelReasonPlaceholder" xml:space="preserve"><value>مثلاً: ألغاه المتجر، الزبون طلب مرتين</value></data>
   <data name="Capability_Care" xml:space="preserve"><value>مكالمات التأكيد وطلبات الزبائن ورسائلهم</value></data>
+  <data name="Capability_Deliver" xml:space="preserve"><value>تطبيق المندوب: تسليم طروده فقط</value></data>
   <data name="ChangedBy" xml:space="preserve"><value>عُدّلت {0} بواسطة {1}</value></data>
   <data name="Chargeable" xml:space="preserve"><value>الوزن المحتسب</value></data>
   <data name="ChargeableRule" xml:space="preserve"><value>القاعدة</value></data>
@@ -186,6 +187,33 @@
   <data name="CourierLeaderboard" xml:space="preserve"><value>المندوبون</value></data>
   <data name="CourierPlaceholder" xml:space="preserve"><value>اسم المندوب أو رمزه</value></data>
   <data name="CourierSaved" xml:space="preserve"><value>تم حفظ بيانات المندوب «{0}»</value></data>
+  <data name="Courier_Attempt" xml:space="preserve"><value>المحاولة {0}</value></data>
+  <data name="Courier_Call" xml:space="preserve"><value>اتصال</value></data>
+  <data name="Courier_Cash" xml:space="preserve"><value>النقد المستلم</value></data>
+  <data name="Courier_Collect" xml:space="preserve"><value>استلم</value></data>
+  <data name="Courier_ConfirmCash" xml:space="preserve"><value>هل استلمت {0} من {1}؟</value></data>
+  <data name="Courier_ConfirmDelivered" xml:space="preserve"><value>هل سلّمت الطرد إلى {0}؟</value></data>
+  <data name="Courier_Delivered" xml:space="preserve"><value>سُلّمت اليوم</value></data>
+  <data name="Courier_DeliveredToast" xml:space="preserve"><value>تم تسليم {0}.</value></data>
+  <data name="Courier_DoneText" xml:space="preserve"><value>الطرود الجديدة التي تُسلَّم لك في المخزن تظهر هنا تلقائياً.</value></data>
+  <data name="Courier_DoneTitle" xml:space="preserve"><value>أنجزت كل شيء حالياً</value></data>
+  <data name="Courier_FailedN" xml:space="preserve"><value>{0} محاولة فاشلة اليوم</value></data>
+  <data name="Courier_FailedN_Few" xml:space="preserve"><value>{0} محاولات فاشلة اليوم</value></data>
+  <data name="Courier_FailedN_Many" xml:space="preserve"><value>{0} محاولة فاشلة اليوم</value></data>
+  <data name="Courier_FailedN_One" xml:space="preserve"><value>محاولة فاشلة واحدة اليوم</value></data>
+  <data name="Courier_FailedN_Two" xml:space="preserve"><value>محاولتان فاشلتان اليوم</value></data>
+  <data name="Courier_FailedToast" xml:space="preserve"><value>{0}: سُجّلت المحاولة.</value></data>
+  <data name="Courier_Hello" xml:space="preserve"><value>أهلاً {0}</value></data>
+  <data name="Courier_MarkDelivered" xml:space="preserve"><value>تم التسليم</value></data>
+  <data name="Courier_MarkFailed" xml:space="preserve"><value>لم يُسلَّم</value></data>
+  <data name="Courier_Near" xml:space="preserve"><value>قرب</value></data>
+  <data name="Courier_NotLinkedText" xml:space="preserve"><value>اطلب من المدير ربط حسابك بملفك كمندوب من صفحة الفريق.</value></data>
+  <data name="Courier_NotLinkedTitle" xml:space="preserve"><value>الحساب غير مرتبط بمندوب بعد</value></data>
+  <data name="Courier_Prepaid" xml:space="preserve"><value>لا مبلغ للاستلام</value></data>
+  <data name="Courier_Title" xml:space="preserve"><value>توصيلاتي</value></data>
+  <data name="Courier_ToDeliver" xml:space="preserve"><value>للتوصيل</value></data>
+  <data name="Courier_WhatsAppText" xml:space="preserve"><value>مرحباً {0}، أنا مندوب التوصيل ومعي طردك {1} وأنا في الطريق إليك. يمكنك متابعته هنا: {2}</value></data>
+  <data name="Courier_WhyFailed" xml:space="preserve"><value>لماذا لم يُسلَّم الطرد؟</value></data>
   <data name="CoverageHint" xml:space="preserve"><value>طلبات هذه المحافظات تُسلَّم من هذا المخزن، وطرود البائعين فيها تُستلم هنا.</value></data>
   <data name="CoverageMap" xml:space="preserve"><value>خريطة التغطية</value></data>
   <data name="CoverageMovesN" xml:space="preserve"><value>ستنتقل إلى هذا المخزن: {0}</value></data>
@@ -776,11 +804,13 @@
   <data name="Risk_MediumAdvice" xml:space="preserve"><value>أكّد الطلب هاتفياً قبل استلامه من المتجر.</value></data>
   <data name="Risk_New" xml:space="preserve"><value>جديد</value></data>
   <data name="RoleHint_Admin" xml:space="preserve"><value>كل شيء، ومنه الأسعار وقواعد الأتمتة والمخازن والبيانات المفتوحة والفريق.</value></data>
+  <data name="RoleHint_Courier" xml:space="preserve"><value>تطبيق المندوب فقط: طروده لليوم، دون الاطلاع على أي بيانات أخرى للشركة.</value></data>
   <data name="RoleHint_CustomerSupport" xml:space="preserve"><value>مكتب الاتصال: مكالمات التأكيد وطلبات الزبائن ورسائلهم، ويطّلع على كل شيء عدا المالية.</value></data>
   <data name="RoleHint_Finance" xml:space="preserve"><value>أجور التوصيل وتسويات التجار، ويطّلع على كل ما عداها.</value></data>
   <data name="RoleHint_Operations" xml:space="preserve"><value>العمل اليومي: الطلبات ومسح المخازن والشاحنات والمندوبين والمرتجعات وطلبات الزبائن والجمارك.</value></data>
   <data name="RoleHint_Viewer" xml:space="preserve"><value>يطّلع على اللوحات والقوائم والرؤى دون أن يغيّر شيئاً.</value></data>
   <data name="Role_Admin" xml:space="preserve"><value>مدير النظام</value></data>
+  <data name="Role_Courier" xml:space="preserve"><value>مندوب توصيل</value></data>
   <data name="Role_CustomerSupport" xml:space="preserve"><value>خدمة الزبائن</value></data>
   <data name="Role_Finance" xml:space="preserve"><value>المالية</value></data>
   <data name="Role_Operations" xml:space="preserve"><value>العمليات</value></data>
@@ -930,6 +960,11 @@
   <data name="Tab_AwbLabels" xml:space="preserve"><value>بوليصات الطرود (AWB)</value></data>
   <data name="Tab_QuickCommands" xml:space="preserve"><value>أوامر سريعة</value></data>
   <data name="TakeRequest" xml:space="preserve"><value>سأتابعه</value></data>
+  <data name="Team_ChooseCourier" xml:space="preserve"><value>اختر المندوب</value></data>
+  <data name="Team_Courier" xml:space="preserve"><value>ملف المندوب</value></data>
+  <data name="Team_LinkCourier" xml:space="preserve"><value>ربط</value></data>
+  <data name="Team_LinkCourierHelper" xml:space="preserve"><value>يرى الحساب فقط الطرود الخارجة للتوصيل مع هذا المندوب (صفحة الأسطول).</value></data>
+  <data name="Team_LinkCourierTitle" xml:space="preserve"><value>أيّ مندوب هو {0}؟</value></data>
   <data name="Team_LockedOutUntil" xml:space="preserve"><value>كلمات مرور خاطئة: مقفل حتى {0}</value></data>
   <data name="Team_PasswordSet" xml:space="preserve"><value>تم تعيين كلمة مرور جديدة لـ {0}.</value></data>
   <data name="Team_SetPassword" xml:space="preserve"><value>تعيين كلمة مرور</value></data>

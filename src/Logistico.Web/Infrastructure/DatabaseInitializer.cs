@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Logistico.Modules.Merchants;
 using Logistico.Modules.Shipments;
 using Logistico.SharedKernel.Identity;
@@ -15,12 +16,13 @@ namespace Logistico.Web.Infrastructure;
 internal static class DatabaseInitializer
 {
     /// <summary>Development accounts for trying each role (Seed:DemoTeam), signed in with the administrator's password.</summary>
-    private static readonly (string Email, string DisplayName, string Role)[] DemoTeam =
+    private static readonly (string Email, string DisplayName, string Role, string? CourierCode)[] DemoTeam =
     [
-        ("ops@logistico.local", "حيدر — العمليات", StaffRoles.Operations),
-        ("support@logistico.local", "نور — خدمة الزبائن", StaffRoles.CustomerSupport),
-        ("finance@logistico.local", "زينب — المالية", StaffRoles.Finance),
-        ("viewer@logistico.local", "مصطفى — مشاهد", StaffRoles.Viewer),
+        ("ops@logistico.local", "حيدر — العمليات", StaffRoles.Operations, null),
+        ("support@logistico.local", "نور — خدمة الزبائن", StaffRoles.CustomerSupport, null),
+        ("finance@logistico.local", "زينب — المالية", StaffRoles.Finance, null),
+        ("viewer@logistico.local", "مصطفى — مشاهد", StaffRoles.Viewer, null),
+        ("courier@logistico.local", "مصطفى — مندوب", StaffRoles.Courier, "Baghdad-01"), // the demo courier "مصطفى (Baghdad-01)"
     ];
 
     public static async Task InitializeDatabaseAsync(this WebApplication app)
@@ -45,9 +47,9 @@ internal static class DatabaseInitializer
             await SeedStaffAsync(app.Services, email, password, "مدير النظام", StaffRoles.Admin, app.Logger);
             if (config.GetValue<bool>("Seed:DemoTeam"))
             {
-                foreach (var (demoEmail, name, role) in DemoTeam)
+                foreach (var (demoEmail, name, role, courierCode) in DemoTeam)
                 {
-                    await SeedStaffAsync(app.Services, demoEmail, password, name, role, app.Logger);
+                    await SeedStaffAsync(app.Services, demoEmail, password, name, role, app.Logger, courierCode);
                 }
             }
         }
@@ -64,7 +66,7 @@ internal static class DatabaseInitializer
     {
         await using var scope = services.CreateAsyncScope();
         var roles = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        foreach (var role in StaffRoles.All)
+        foreach (var role in StaffRoles.Assignable)
         {
             if (!await roles.RoleExistsAsync(role))
             {
@@ -74,7 +76,7 @@ internal static class DatabaseInitializer
     }
 
     /// <summary>Creates the account if missing and makes sure it has the role (an existing account keeps its password).</summary>
-    private static async Task SeedStaffAsync(IServiceProvider services, string email, string password, string displayName, string role, ILogger logger)
+    private static async Task SeedStaffAsync(IServiceProvider services, string email, string password, string displayName, string role, ILogger logger, string? courierCode = null)
     {
         await using var scope = services.CreateAsyncScope();
         var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
@@ -99,6 +101,11 @@ internal static class DatabaseInitializer
             {
                 throw new InvalidOperationException($"Assigning the {role} role failed: " + string.Join("; ", roleResult.Errors.Select(e => e.Description)));
             }
+        }
+
+        if (courierCode is not null && !(await users.GetClaimsAsync(user)).Any(c => c.Type == LogisticoClaimTypes.CourierCode))
+        {
+            await users.AddClaimAsync(user, new Claim(LogisticoClaimTypes.CourierCode, courierCode));
         }
     }
 }

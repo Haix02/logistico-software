@@ -25,4 +25,13 @@ else
     private bool waiting => !User.IsStaff();
 
     [Parameter, EditorRequired] public ClaimsPrincipal User { get; set; } = default!;
+
+    // Couriers have one page: their run. Sign-in lands on the dashboard, which is not theirs, so send them there.
+    protected override void OnInitialized()
+    {
+        if (User.IsInRole(StaffRoles.Courier))
+        {
+            Navigation.NavigateTo("courier", replace: true);
+        }
+    }
 }

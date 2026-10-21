@@ -14,7 +14,8 @@ public sealed record TeamMember(
     bool IsLocked,
     bool TwoFactorEnabled,
     bool IsYou,
-    DateTimeOffset? LockedOutUntil = null);
+    DateTimeOffset? LockedOutUntil = null,
+    string? CourierCode = null);
 
 public sealed record TeamList(IReadOnlyList<TeamMember> Members);
 
@@ -32,6 +33,10 @@ public sealed class CreateTeamMemberRequest : IValidatableObject
 
     public string Role { get; set; } = StaffRoles.Operations;
 
+    /// <summary>For the <see cref="StaffRoles.Courier"/> role: the courier (Fleet page code) whose parcels the account delivers.</summary>
+    [StringLength(30, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.MaxLength))]
+    public string? CourierCode { get; set; }
+
     [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
     [StringLength(128, MinimumLength = 10, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.PasswordLength))]
     public string Password { get; set; } = "";
@@ -42,6 +47,11 @@ public sealed class CreateTeamMemberRequest : IValidatableObject
         {
             yield return new(ValidationText.Role, [nameof(Role)]);
         }
+
+        if (TeamRules.NeedsCourier(Role, CourierCode))
+        {
+            yield return new(ValidationText.CourierCode, [nameof(CourierCode)]);
+        }
     }
 }
 
@@ -50,13 +60,28 @@ public sealed class ChangeTeamRoleRequest : IValidatableObject
 {
     public string? Role { get; set; }
 
+    /// <summary>Required with the <see cref="StaffRoles.Courier"/> role, ignored otherwise.</summary>
+    [StringLength(30, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.MaxLength))]
+    public string? CourierCode { get; set; }
+
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (Role is not null && !StaffRoles.IsKnown(Role))
         {
             yield return new(ValidationText.Role, [nameof(Role)]);
         }
+
+        if (TeamRules.NeedsCourier(Role, CourierCode))
+        {
+            yield return new(ValidationText.CourierCode, [nameof(CourierCode)]);
+        }
     }
+}
+
+public static class TeamRules
+{
+    /// <summary>A courier account must say which courier it delivers for.</summary>
+    public static bool NeedsCourier(string? role, string? courierCode) => role == StaffRoles.Courier && string.IsNullOrWhiteSpace(courierCode);
 }
 
 /// <summary>An administrator sets a new password for a colleague who forgot theirs (email sending is optional).</summary>

@@ -68,6 +68,8 @@
   <data name="Problem_automation.stale" xml:space="preserve"><value>عدّل شخص آخر هذه القواعد. حدّث الصفحة وأعد المحاولة.</value></data>
   <data name="Problem_courier.code_taken" xml:space="preserve"><value>يوجد مندوب آخر يستخدم الرمز {0}.</value></data>
   <data name="Problem_courier.not_found" xml:space="preserve"><value>المندوب غير موجود.</value></data>
+  <data name="Problem_courier.not_linked" xml:space="preserve"><value>هذا الحساب غير مرتبط بمندوب فعّال. اطلب من المدير ربطه من صفحة الفريق.</value></data>
+  <data name="Problem_courier.not_on_run" xml:space="preserve"><value>هذا الطرد ليس ضمن طرودك الخارجة للتوصيل.</value></data>
   <data name="Problem_courier.stale" xml:space="preserve"><value>تم تعديل بيانات المندوب من قِبل مستخدم آخر. أعد التحميل وحاول مجدداً.</value></data>
   <data name="Problem_customs.domestic_not_supported" xml:space="preserve"><value>البيانات الجمركية مخصصة للشحنات الدولية فقط.</value></data>
   <data name="Problem_customs.stale" xml:space="preserve"><value>قام مستخدم آخر بتعديل هذا البيان الجمركي</value></data>

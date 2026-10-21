@@ -8,6 +8,8 @@ namespace Logistico.SharedKernel.Identity;
 /// <item><see cref="CustomerSupport"/>: the call desk — confirmation calls, customer requests and messages; reads everything else.</item>
 /// <item><see cref="Finance"/>: cash-on-delivery settlements, seller payouts and delivery prices; reads everything else.</item>
 /// <item><see cref="Viewer"/>: reads dashboards, lists and insights, changes nothing.</item>
+/// <item><see cref="Courier"/>: the courier app only: their own parcels for the day, delivered or failed. Couriers see no
+/// other company data, so the role is not one of the office roles in <see cref="All"/>.</item>
 /// </list>
 /// A signed-in account without a role (for example one that registered itself) sees no company data until an
 /// administrator gives it one.
@@ -19,10 +21,15 @@ public static class StaffRoles
     public const string CustomerSupport = "CustomerSupport";
     public const string Finance = "Finance";
     public const string Viewer = "Viewer";
+    public const string Courier = "Courier";
 
+    /// <summary>The office roles: every one of them reads the company's data.</summary>
     public static readonly IReadOnlyList<string> All = [Admin, Operations, CustomerSupport, Finance, Viewer];
 
-    public static bool IsKnown(string? role) => role is not null && All.Contains(role, StringComparer.Ordinal);
+    /// <summary>Every role an administrator can give: the office roles and <see cref="Courier"/>.</summary>
+    public static readonly IReadOnlyList<string> Assignable = [.. All, Courier];
+
+    public static bool IsKnown(string? role) => role is not null && Assignable.Contains(role, StringComparer.Ordinal);
 }
 
 /// <summary>
@@ -41,7 +48,10 @@ public static class StaffPolicies
     public const string Finance = "finance";
     public const string Administer = "administer";
 
-    public static readonly IReadOnlyList<string> All = [Staff, Operate, Care, Finance, Administer];
+    /// <summary>The courier app: a courier's own parcels (see <see cref="LogisticoClaimTypes.CourierCode"/>).</summary>
+    public const string Deliver = "deliver";
+
+    public static readonly IReadOnlyList<string> All = [Staff, Operate, Care, Finance, Administer, Deliver];
 
     /// <summary>The roles that satisfy a policy.</summary>
     public static IReadOnlyList<string> RolesFor(string policy) => policy switch
@@ -51,6 +61,7 @@ public static class StaffPolicies
         Care => [StaffRoles.Admin, StaffRoles.Operations, StaffRoles.CustomerSupport],
         Finance => [StaffRoles.Admin, StaffRoles.Finance],
         Administer => [StaffRoles.Admin],
+        Deliver => [StaffRoles.Courier],
         _ => throw new ArgumentOutOfRangeException(nameof(policy), policy, "Unknown staff policy."),
     };
 }

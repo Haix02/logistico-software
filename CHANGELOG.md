@@ -5,6 +5,15 @@ versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- **Courier app** (`/courier`): couriers sign in on their phone and see only the parcels out for delivery with them,
+  with the customer, address and nearest landmark, the cash to collect, one-tap call and WhatsApp, and Delivered or
+  Not delivered (with the reason). Their day in numbers: to deliver, delivered and cash collected. Deliveries go through
+  the same scan logic as the hub station, so cash collection, customer messages and automation rules apply unchanged.
+- **Courier role**: administrators give an account the Courier role on the Team page and link it to a courier from the
+  Fleet page. Couriers see no other company data. `Seed:DemoTeam` adds `courier@logistico.local` for the demo courier.
+- **Install on a phone**: a web app manifest and icons, so Logistico can be added to the home screen.
+
 ## [3.0.0] - 2026-10-21
 
 First public, open-source release (Apache-2.0). It brings together the work on the main branch and the 2.1 hardening

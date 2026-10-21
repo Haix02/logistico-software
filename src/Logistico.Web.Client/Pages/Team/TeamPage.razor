@@ -2,6 +2,7 @@
 @attribute [Authorize(Policy = StaffPolicies.Administer)]
 @using System.Security.Cryptography
 @inject TeamApi Team
+@inject ShipmentsApi Shipments
 @inject Toaster Toaster
 @inject Confirmer Confirm
 
@@ -59,12 +60,16 @@
                     {
                         <HtmlSelect Small="true" CssClass="lx-role-select" Value="@(m.Role ?? "")" Label="@string.Format(CultureInfo.CurrentCulture, L["Team_RoleOf"], m.DisplayName ?? m.Email)"
                                     Disabled="@(busy == m.Id)" ValueChanged="@(v => ChangeRoleAsync(m, v))">
-                            @foreach (var role in StaffRoles.All)
+                            @foreach (var role in StaffRoles.Assignable)
                             {
                                 <option value="@role">@RoleName(role)</option>
                             }
                             <option value="">@L["Role_None"]</option>
                         </HtmlSelect>
+                    }
+                    @if (m.CourierCode is { } code)
+                    {
+                        <div class="lx-cell-sub"><Icon Name="drive-time" /> <Mixed Text="@CourierLabel(code)" /></div>
                     }
                 </td>
                 <td>
@@ -121,7 +126,7 @@
                 <thead>
                     <tr>
                         <th scope="col"><span class="lx-sr-only">@L["Team_Capability"]</span></th>
-                        @foreach (var role in StaffRoles.All)
+                        @foreach (var role in StaffRoles.Assignable)
                         {
                             <th scope="col">@RoleName(role)</th>
                         }
@@ -133,7 +138,7 @@
                         var allowed = StaffPolicies.RolesFor(policy);
                         <tr>
                             <th scope="row">@L[key]</th>
-                            @foreach (var role in StaffRoles.All)
+                            @foreach (var role in StaffRoles.Assignable)
                             {
                                 <td>
                                     @if (allowed.Contains(role))
@@ -168,7 +173,7 @@
                 <FormField Label="@L["Field_Role"]" Required="true" Helper="@L["RoleHint_" + draft.Role]" Field="() => draft.Role" CssClass="lx-span-2">
                     <span class="bp6-html-select bp6-fill">
                         <InputSelect @bind-Value="draft.Role">
-                            @foreach (var role in StaffRoles.All)
+                            @foreach (var role in StaffRoles.Assignable)
                             {
                                 <option value="@role">@RoleName(role)</option>
                             }
@@ -176,6 +181,21 @@
                         <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
                     </span>
                 </FormField>
+                @if (draft.Role == StaffRoles.Courier)
+                {
+                    <FormField Label="@L["Team_Courier"]" Required="true" Helper="@L["Team_LinkCourierHelper"]" Field="() => draft.CourierCode" CssClass="lx-span-2">
+                        <span class="bp6-html-select bp6-fill">
+                            <InputSelect @bind-Value="draft.CourierCode">
+                                <option value="">@L["Team_ChooseCourier"]</option>
+                                @foreach (var c in couriers)
+                                {
+                                    <option value="@c.Code">@c.DisplayLabel · @Fmt.Place(c.Governorate)</option>
+                                }
+                            </InputSelect>
+                            <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                        </span>
+                    </FormField>
+                }
                 <FormField Label="@L["Field_FirstPassword"]" Required="true" Helper="@L["FirstPasswordHelper"]" Field="() => draft.Password" CssClass="lx-span-2">
                     <div class="bp6-control-group bp6-fill">
                         <InputText class="bp6-input bp6-fill lx-mono" @bind-Value="draft.Password" dir="ltr" autocomplete="new-password" spellcheck="false" />
@@ -196,6 +216,25 @@
     <Footer>
         <Button Text="@L["Cancel"]" OnClick="@(() => dialogOpen = false)" />
         <Button Type="submit" form="member-form" Intent="Intent.Primary" Icon="tick" Text="@L["Team_Add"]" Loading="saving" />
+    </Footer>
+</Dialog>
+
+<Dialog IsOpen="linking is not null" IsOpenChanged="@(async open => { if (!open) await CancelLink(); })"
+        Title="@string.Format(CultureInfo.CurrentCulture, L["Team_LinkCourierTitle"], linking?.DisplayName ?? linking?.Email)" Icon="drive-time" Width="480px">
+    <ChildContent>
+        <FormField TValue="string" Label="@L["Team_Courier"]" Required="true" Helper="@L["Team_LinkCourierHelper"]">
+            <HtmlSelect Value="@linkCode" ValueChanged="@(v => linkCode = v)" Label="@L["Team_Courier"]">
+                <option value="">@L["Team_ChooseCourier"]</option>
+                @foreach (var c in couriers)
+                {
+                    <option value="@c.Code">@c.DisplayLabel · @Fmt.Place(c.Governorate)</option>
+                }
+            </HtmlSelect>
+        </FormField>
+    </ChildContent>
+    <Footer>
+        <Button Text="@L["Cancel"]" OnClick="CancelLink" />
+        <Button Intent="Intent.Primary" Icon="link" Text="@L["Team_LinkCourier"]" Disabled="@string.IsNullOrEmpty(linkCode)" OnClick="LinkAsync" />
     </Footer>
 </Dialog>
 
@@ -233,9 +272,13 @@
         ("Capability_Export", StaffPolicies.Operate),
         ("Capability_Finance", StaffPolicies.Finance),
         ("Capability_Administer", StaffPolicies.Administer),
+        ("Capability_Deliver", StaffPolicies.Deliver),
     ];
 
     private IReadOnlyList<TeamMember>? members;
+    private IReadOnlyList<CourierLookupItem> couriers = [];
+    private TeamMember? linking;
+    private string? linkCode;
     private CreateTeamMemberRequest draft = new();
     private bool dialogOpen;
     private bool saving;
@@ -245,7 +288,20 @@
     private string newPassword = "";
     private string? passwordError;
 
-    protected override Task OnInitializedAsync() => LoadAsync();
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+        try
+        {
+            couriers = await Shipments.LookupCouriersAsync();
+        }
+        catch (ApiException)
+        {
+            couriers = []; // linking a courier account then waits until the fleet list loads
+        }
+    }
+
+    private string CourierLabel(string code) => couriers.FirstOrDefault(c => c.Code == code)?.DisplayLabel ?? code;
 
     private async Task LoadAsync()
     {
@@ -346,6 +402,14 @@
         }
 
         var name = member.DisplayName ?? member.Email;
+        if (role == StaffRoles.Courier)
+        {
+            // A courier account must say which courier it delivers for: ask before changing anything.
+            linkCode = null;
+            linking = member;
+            return;
+        }
+
         if (role is null && !await Confirm.AskAsync(L["Team_RemoveTitle"], string.Format(CultureInfo.CurrentCulture, L["Team_RemoveMessage"], name), L["Team_RemoveConfirm"], Intent.Danger, "blocked-person"))
         {
             await LoadAsync(); // put the picker back
@@ -357,6 +421,28 @@
             await Team.ChangeRoleAsync(member.Id, role);
             Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["Team_RoleChanged"], name, RoleName(role)));
         });
+    }
+
+    private async Task LinkAsync()
+    {
+        if (linking is not { } member || string.IsNullOrEmpty(linkCode))
+        {
+            return;
+        }
+
+        var code = linkCode;
+        linking = null;
+        await RunAsync(member, async () =>
+        {
+            await Team.ChangeRoleAsync(member.Id, StaffRoles.Courier, code);
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["Team_RoleChanged"], member.DisplayName ?? member.Email, $"{RoleName(StaffRoles.Courier)} · {CourierLabel(code)}"));
+        });
+    }
+
+    private async Task CancelLink()
+    {
+        linking = null;
+        await LoadAsync(); // put the picker back
     }
 
     private async Task LockAsync(TeamMember member)

@@ -5,6 +5,7 @@
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="Validation_Choice" xml:space="preserve"><value>اختر أحد الخيارات المعروضة.</value></data>
+  <data name="Validation_CourierCode" xml:space="preserve"><value>اختر المندوب الذي يعود إليه هذا الحساب.</value></data>
   <data name="Validation_Currency" xml:space="preserve"><value>استخدم رمز عملة مثل IQD أو USD.</value></data>
   <data name="Validation_DateWindow" xml:space="preserve"><value>اختر تاريخاً من اليوم وحتى 14 يوماً قادمة.</value></data>
   <data name="Validation_Email" xml:space="preserve"><value>أدخل بريداً إلكترونياً صحيحاً.</value></data>
@@ -21,6 +22,6 @@
   <data name="Validation_Range" xml:space="preserve"><value>أدخل قيمة بين {1} و {2}.</value></data>
   <data name="Validation_Required" xml:space="preserve"><value>هذا الحقل مطلوب.</value></data>
   <data name="Validation_RoutingTag" xml:space="preserve"><value>استخدم 3 أحرف إنجليزية، مثل ⁦NJF⁩.</value></data>
-  <data name="Validation_Role" xml:space="preserve"><value>اختر أحد الأدوار: مدير، عمليات، مالية أو مشاهدة فقط.</value></data>
+  <data name="Validation_Role" xml:space="preserve"><value>اختر أحد الأدوار المعروضة.</value></data>
   <data name="Validation_PasswordLength" xml:space="preserve"><value>يجب أن تتكون كلمة المرور من 10 أحرف على الأقل.</value></data>
 </root>

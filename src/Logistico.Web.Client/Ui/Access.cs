@@ -16,7 +16,7 @@ public static class Access
     public static bool IsStaff(this ClaimsPrincipal user) => user.Can(StaffPolicies.Staff);
 
     /// <summary>The staff role of the user, if any.</summary>
-    public static string? StaffRole(this ClaimsPrincipal user) => StaffRoles.All.FirstOrDefault(user.IsInRole);
+    public static string? StaffRole(this ClaimsPrincipal user) => StaffRoles.Assignable.FirstOrDefault(user.IsInRole);
 
     /// <summary>For pages: <c>canOperate = await AuthState.CanAsync(StaffPolicies.Operate)</c> with the cascading authentication state.</summary>
     public static async Task<bool> CanAsync(this Task<AuthenticationState>? state, string policy) =>

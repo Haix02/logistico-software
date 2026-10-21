@@ -43,7 +43,8 @@ internal static class TeamEndpoints
         var now = clock.GetUtcNow();
         return TypedResults.Ok(new TeamList(members
             .Select(m => new TeamMember(m.Id, m.Email, m.DisplayName, m.Role, IsDeactivated(m.LockoutEnd), m.TwoFactorEnabled, m.Id == me,
-                LockedOutUntil: !IsDeactivated(m.LockoutEnd) && m.LockoutEnd > now ? m.LockoutEnd : null))
+                LockedOutUntil: !IsDeactivated(m.LockoutEnd) && m.LockoutEnd > now ? m.LockoutEnd : null,
+                CourierCode: m.Role == StaffRoles.Courier ? m.CourierCode : null))
             .OrderBy(m => m.Role is null ? int.MaxValue : RoleRank(m.Role))
             .ThenBy(m => m.DisplayName ?? m.Email, StringComparer.CurrentCultureIgnoreCase)
             .ToList()));
@@ -83,14 +84,10 @@ internal static class TeamEndpoints
             return PasswordProblem(created);
         }
 
-        var role = await users.AddToRoleAsync(member, request.Role);
-        if (!role.Succeeded)
-        {
-            throw new InvalidOperationException("Assigning the role failed: " + string.Join("; ", role.Errors.Select(e => e.Description)));
-        }
-
+        Ensure(await users.AddToRoleAsync(member, request.Role));
+        var courier = await LinkCourierAsync(users, member, request.Role, request.CourierCode);
         await change.CommitAsync(ct);
-        return TypedResults.Created($"/{TeamApiRoutes.Team}/{member.Id}", new TeamMember(member.Id, email, member.DisplayName, request.Role, false, false, false));
+        return TypedResults.Created($"/{TeamApiRoutes.Team}/{member.Id}", new TeamMember(member.Id, email, member.DisplayName, request.Role, false, false, false, CourierCode: courier));
     }
 
     private static async Task<IResult> ChangeRoleAsync(
@@ -126,6 +123,8 @@ internal static class TeamEndpoints
         {
             Ensure(await users.AddToRoleAsync(member, request.Role));
         }
+
+        await LinkCourierAsync(users, member, request.Role, request.CourierCode);
 
         // The role travels in the sign-in cookie; a new security stamp makes their sessions pick it up (or end).
         Ensure(await users.UpdateSecurityStampAsync(member));
@@ -216,7 +215,29 @@ internal static class TeamEndpoints
         return TypedResults.NoContent();
     }
 
-    private sealed record MemberRow(string Id, string Email, string? DisplayName, string? Role, DateTimeOffset? LockoutEnd, bool TwoFactorEnabled);
+    private sealed record MemberRow(string Id, string Email, string? DisplayName, string? Role, DateTimeOffset? LockoutEnd, bool TwoFactorEnabled, string? CourierCode);
+
+    /// <summary>
+    /// A courier account carries the code of the courier it delivers for (a claim in its sign-in cookie); any other role
+    /// carries none. Returns the code that was set.
+    /// </summary>
+    private static async Task<string?> LinkCourierAsync(UserManager<ApplicationUser> users, ApplicationUser member, string? role, string? courierCode)
+    {
+        var existing = (await users.GetClaimsAsync(member)).Where(c => c.Type == LogisticoClaimTypes.CourierCode).ToList();
+        if (existing.Count > 0)
+        {
+            Ensure(await users.RemoveClaimsAsync(member, existing));
+        }
+
+        if (role != StaffRoles.Courier || string.IsNullOrWhiteSpace(courierCode))
+        {
+            return null;
+        }
+
+        var code = courierCode.Trim();
+        Ensure(await users.AddClaimAsync(member, new Claim(LogisticoClaimTypes.CourierCode, code)));
+        return code;
+    }
 
     /// <summary>Every account of the company with its highest staff role (one query).</summary>
     private static async Task<List<MemberRow>> MembersAsync(ApplicationDbContext db, Guid tenantId, CancellationToken ct)
@@ -228,6 +249,12 @@ internal static class TeamEndpoints
             from r in db.Roles.Where(x => ur != null && x.Id == ur.RoleId).DefaultIfEmpty()
             select new { u.Id, u.Email, u.UserName, u.DisplayName, Role = r == null ? null : r.Name, u.LockoutEnd, u.TwoFactorEnabled })
             .ToListAsync(ct);
+        var ids = rows.Select(r => r.Id).Distinct().ToList();
+        var courierClaims = await db.UserClaims.AsNoTracking()
+            .Where(c => ids.Contains(c.UserId) && c.ClaimType == LogisticoClaimTypes.CourierCode)
+            .Select(c => new { c.UserId, c.ClaimValue })
+            .ToListAsync(ct);
+        var couriers = courierClaims.GroupBy(c => c.UserId).ToDictionary(g => g.Key, g => g.First().ClaimValue);
 
         return rows
             .GroupBy(r => r.Id)
@@ -235,7 +262,7 @@ internal static class TeamEndpoints
             {
                 var first = g.First();
                 var role = g.Select(r => r.Role).Where(StaffRoles.IsKnown).OrderBy(r => RoleRank(r!)).FirstOrDefault();
-                return new MemberRow(first.Id, first.Email ?? first.UserName ?? "", first.DisplayName, role, first.LockoutEnd, first.TwoFactorEnabled);
+                return new MemberRow(first.Id, first.Email ?? first.UserName ?? "", first.DisplayName, role, first.LockoutEnd, first.TwoFactorEnabled, couriers.GetValueOrDefault(first.Id));
             })
             .ToList();
     }
@@ -293,7 +320,7 @@ internal static class TeamEndpoints
 
     private static int RoleRank(string role)
     {
-        var rank = StaffRoles.All.ToList().IndexOf(role);
+        var rank = StaffRoles.Assignable.ToList().IndexOf(role);
         return rank < 0 ? int.MaxValue : rank;
     }
 

@@ -10,9 +10,9 @@ internal sealed class TeamApi(HttpClient http) : ApiClient(http)
     public Task<TeamMember> CreateAsync(CreateTeamMemberRequest request, CancellationToken ct = default) =>
         SendAsync<TeamMember>(HttpMethod.Post, TeamApiRoutes.Team, request, null, ct);
 
-    /// <summary>Gives the member another role; null takes their access away.</summary>
-    public Task ChangeRoleAsync(string id, string? role, CancellationToken ct = default) =>
-        SendAsync(HttpMethod.Put, TeamApiRoutes.Role(id), new ChangeTeamRoleRequest { Role = role }, null, ct);
+    /// <summary>Gives the member another role (a courier also needs <paramref name="courierCode"/>); null takes their access away.</summary>
+    public Task ChangeRoleAsync(string id, string? role, string? courierCode = null, CancellationToken ct = default) =>
+        SendAsync(HttpMethod.Put, TeamApiRoutes.Role(id), new ChangeTeamRoleRequest { Role = role, CourierCode = courierCode }, null, ct);
 
     public Task LockAsync(string id, CancellationToken ct = default) => SendAsync(HttpMethod.Post, TeamApiRoutes.Lock(id), null, null, ct);
 

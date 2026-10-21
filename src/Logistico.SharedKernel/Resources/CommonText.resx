@@ -5,6 +5,7 @@
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="Validation_Choice" xml:space="preserve"><value>Choose one of the listed options.</value></data>
+  <data name="Validation_CourierCode" xml:space="preserve"><value>Choose the courier this account delivers for.</value></data>
   <data name="Validation_Currency" xml:space="preserve"><value>Use a currency code such as IQD or USD.</value></data>
   <data name="Validation_DateWindow" xml:space="preserve"><value>Choose a date from today up to 14 days ahead.</value></data>
   <data name="Validation_Email" xml:space="preserve"><value>Enter a valid email address.</value></data>
@@ -21,6 +22,6 @@
   <data name="Validation_Range" xml:space="preserve"><value>Enter a value between {1} and {2}.</value></data>
   <data name="Validation_Required" xml:space="preserve"><value>This field is required.</value></data>
   <data name="Validation_RoutingTag" xml:space="preserve"><value>Use 3 English letters, e.g. NJF.</value></data>
-  <data name="Validation_Role" xml:space="preserve"><value>Choose one of the roles: Admin, Operations, Finance or Viewer.</value></data>
+  <data name="Validation_Role" xml:space="preserve"><value>Choose one of the listed roles.</value></data>
   <data name="Validation_PasswordLength" xml:space="preserve"><value>The password needs at least 10 characters.</value></data>
 </root>

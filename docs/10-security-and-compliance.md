@@ -41,14 +41,15 @@ Target: **OWASP ASVS Level 2** for the web app and API. ✅ = implemented, 🟡 
 
 ### Roles
 
-| Can… | Admin | Operations | Customer support | Finance | Viewer |
-|---|:-:|:-:|:-:|:-:|:-:|
-| See dashboards, parcels, maps and insights (`staff`) | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Book and edit orders, scan at hubs, trucks, couriers, returns, customs (`operate`) | ✓ | ✓ | | | |
-| Confirmation calls, customer requests and messages, customer lookup (`care`) | ✓ | ✓ | ✓ | | |
-| Download customer lists as CSV (`operate`: names, phones and addresses in bulk) | ✓ | ✓ | | | |
-| See cash on delivery, seller balances and settlements; change delivery prices, settle and download payouts (`finance`) | ✓ | | | ✓ | |
-| Change automation rules and warehouses, export open data, manage the team (`administer`) | ✓ | | | | |
+| Can… | Admin | Operations | Customer support | Finance | Viewer | Courier |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|
+| See dashboards, parcels, maps and insights (`staff`) | ✓ | ✓ | ✓ | ✓ | ✓ | |
+| Book and edit orders, scan at hubs, trucks, couriers, returns, customs (`operate`) | ✓ | ✓ | | | | |
+| Confirmation calls, customer requests and messages, customer lookup (`care`) | ✓ | ✓ | ✓ | | | |
+| Download customer lists as CSV (`operate`: names, phones and addresses in bulk) | ✓ | ✓ | | | | |
+| See cash on delivery, seller balances and settlements; change delivery prices, settle and download payouts (`finance`) | ✓ | | | ✓ | | |
+| Change automation rules and warehouses, export open data, manage the team (`administer`) | ✓ | | | | | |
+| Courier app: their own parcels out for delivery, delivered or failed (`deliver`) | | | | | | ✓ |
 
 - **Data scopes** (🟡): branch, warehouse and customer scopes limit which rows a user sees.
 - **Field-level protection** (🟡): costs, margins and declared values are hidden from roles that do not need them.

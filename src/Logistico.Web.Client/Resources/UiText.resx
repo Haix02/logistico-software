@@ -80,6 +80,7 @@
   <data name="CancelOrder" xml:space="preserve"><value>Cancel order</value></data>
   <data name="CancelReasonPlaceholder" xml:space="preserve"><value>e.g. the seller cancelled, the customer ordered twice</value></data>
   <data name="Capability_Care" xml:space="preserve"><value>Confirmation calls, customer requests and messages</value></data>
+  <data name="Capability_Deliver" xml:space="preserve"><value>Courier app: deliver their own parcels</value></data>
   <data name="ChangedBy" xml:space="preserve"><value>Changed {0} by {1}</value></data>
   <data name="Chargeable" xml:space="preserve"><value>Chargeable weight</value></data>
   <data name="ChargeableRule" xml:space="preserve"><value>Rule</value></data>
@@ -172,6 +173,33 @@
   <data name="CourierLeaderboard" xml:space="preserve"><value>Couriers</value></data>
   <data name="CourierPlaceholder" xml:space="preserve"><value>Courier name or code</value></data>
   <data name="CourierSaved" xml:space="preserve"><value>Courier “{0}” saved</value></data>
+  <data name="Courier_Attempt" xml:space="preserve"><value>Attempt {0}</value></data>
+  <data name="Courier_Call" xml:space="preserve"><value>Call</value></data>
+  <data name="Courier_Cash" xml:space="preserve"><value>Cash collected</value></data>
+  <data name="Courier_Collect" xml:space="preserve"><value>Collect</value></data>
+  <data name="Courier_ConfirmCash" xml:space="preserve"><value>Did you collect {0} from {1}?</value></data>
+  <data name="Courier_ConfirmDelivered" xml:space="preserve"><value>Did you hand the parcel to {0}?</value></data>
+  <data name="Courier_Delivered" xml:space="preserve"><value>Delivered today</value></data>
+  <data name="Courier_DeliveredToast" xml:space="preserve"><value>{0} delivered.</value></data>
+  <data name="Courier_DoneText" xml:space="preserve"><value>New parcels handed to you at the hub appear here by themselves.</value></data>
+  <data name="Courier_DoneTitle" xml:space="preserve"><value>All done for now</value></data>
+  <data name="Courier_FailedN" xml:space="preserve"><value>{0} failed attempts today</value></data>
+  <data name="Courier_FailedN_Few" xml:space="preserve"><value>{0} failed attempts today</value></data>
+  <data name="Courier_FailedN_Many" xml:space="preserve"><value>{0} failed attempts today</value></data>
+  <data name="Courier_FailedN_One" xml:space="preserve"><value>1 failed attempt today</value></data>
+  <data name="Courier_FailedN_Two" xml:space="preserve"><value>2 failed attempts today</value></data>
+  <data name="Courier_FailedToast" xml:space="preserve"><value>{0}: attempt recorded.</value></data>
+  <data name="Courier_Hello" xml:space="preserve"><value>Hello, {0}</value></data>
+  <data name="Courier_MarkDelivered" xml:space="preserve"><value>Delivered</value></data>
+  <data name="Courier_MarkFailed" xml:space="preserve"><value>Not delivered</value></data>
+  <data name="Courier_Near" xml:space="preserve"><value>Near</value></data>
+  <data name="Courier_NotLinkedText" xml:space="preserve"><value>Ask an administrator to link your account to your courier profile on the Team page.</value></data>
+  <data name="Courier_NotLinkedTitle" xml:space="preserve"><value>Not linked to a courier yet</value></data>
+  <data name="Courier_Prepaid" xml:space="preserve"><value>Nothing to collect</value></data>
+  <data name="Courier_Title" xml:space="preserve"><value>My deliveries</value></data>
+  <data name="Courier_ToDeliver" xml:space="preserve"><value>To deliver</value></data>
+  <data name="Courier_WhatsAppText" xml:space="preserve"><value>Hello {0}, I'm your courier with parcel {1} and I'm on my way. You can follow it here: {2}</value></data>
+  <data name="Courier_WhyFailed" xml:space="preserve"><value>Why wasn't it delivered?</value></data>
   <data name="CoverageHint" xml:space="preserve"><value>Orders for these governorates are delivered from this warehouse, and their sellers' parcels are collected here.</value></data>
   <data name="CoverageMap" xml:space="preserve"><value>Coverage map</value></data>
   <data name="CoverageMovesN" xml:space="preserve"><value>Moving to this warehouse: {0}</value></data>
@@ -728,11 +756,13 @@
   <data name="Risk_MediumAdvice" xml:space="preserve"><value>Confirm the order by phone before collecting it.</value></data>
   <data name="Risk_New" xml:space="preserve"><value>New</value></data>
   <data name="RoleHint_Admin" xml:space="preserve"><value>Everything, including prices, automation rules, warehouses, open data and the team.</value></data>
+  <data name="RoleHint_Courier" xml:space="preserve"><value>The courier app only: their own parcels for the day. Sees no other company data.</value></data>
   <data name="RoleHint_CustomerSupport" xml:space="preserve"><value>The call desk: confirmation calls, customer requests and messages; reads everything outside finance.</value></data>
   <data name="RoleHint_Finance" xml:space="preserve"><value>Delivery prices and seller payouts; reads everything else.</value></data>
   <data name="RoleHint_Operations" xml:space="preserve"><value>The daily work: orders, hub scans, trucks, couriers, returns, customer requests and customs.</value></data>
   <data name="RoleHint_Viewer" xml:space="preserve"><value>Reads dashboards, lists and insights; changes nothing.</value></data>
   <data name="Role_Admin" xml:space="preserve"><value>Administrator</value></data>
+  <data name="Role_Courier" xml:space="preserve"><value>Courier</value></data>
   <data name="Role_CustomerSupport" xml:space="preserve"><value>Customer support</value></data>
   <data name="Role_Finance" xml:space="preserve"><value>Finance</value></data>
   <data name="Role_Operations" xml:space="preserve"><value>Operations</value></data>
@@ -878,6 +908,11 @@
   <data name="Tab_AwbLabels" xml:space="preserve"><value>Shipment AWB labels</value></data>
   <data name="Tab_QuickCommands" xml:space="preserve"><value>Quick commands</value></data>
   <data name="TakeRequest" xml:space="preserve"><value>I'll handle it</value></data>
+  <data name="Team_ChooseCourier" xml:space="preserve"><value>Choose the courier</value></data>
+  <data name="Team_Courier" xml:space="preserve"><value>Courier profile</value></data>
+  <data name="Team_LinkCourier" xml:space="preserve"><value>Link</value></data>
+  <data name="Team_LinkCourierHelper" xml:space="preserve"><value>The account sees only the parcels out for delivery with this courier (Fleet page).</value></data>
+  <data name="Team_LinkCourierTitle" xml:space="preserve"><value>Which courier is {0}?</value></data>
   <data name="Team_LockedOutUntil" xml:space="preserve"><value>Wrong passwords: locked until {0}</value></data>
   <data name="Team_PasswordSet" xml:space="preserve"><value>New password set for {0}.</value></data>
   <data name="Team_SetPassword" xml:space="preserve"><value>Set password</value></data>

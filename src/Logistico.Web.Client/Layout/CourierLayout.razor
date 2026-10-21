@@ -1,0 +1,40 @@
+@* The courier app's frame: a slim top bar for a phone (name, language, sign out) and nothing of the office menu. *@
+@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+@inject AccountApi Account
+
+<div class="lx-public lx-courier-app">
+    <nav class="bp6-navbar bp6-dark lx-topbar">
+        <div class="bp6-navbar-group lx-topbar-start">
+            <a class="lx-brand" href="courier">
+                <span class="lx-logo" aria-hidden="true"></span>
+                <span class="lx-brand-name">@L["AppName"]</span>
+            </a>
+        </div>
+        <div class="bp6-navbar-group lx-topbar-end">
+            <Button Minimal="true" Icon="translate" Text="@L["OtherLanguage"]" OnClick="SwitchLanguage" />
+            <Button Minimal="true" Icon="log-out" Tip="@L["SignOut"]" AriaLabel="@L["SignOut"]" OnClick="Account.SignOutAsync" />
+        </div>
+    </nav>
+    <main class="lx-public-main">
+        @Body
+    </main>
+</div>
+
+<ConfirmHost />
+<ToastHost />
+
+<div id="blazor-error-ui" data-nosnippet>
+    @L["UnhandledError"]
+    <a href="." class="reload">@L["Reload"]</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
+    private void SwitchLanguage()
+    {
+        var target = AppCultures.IsArabic ? AppCultures.English : AppCultures.Arabic;
+        var returnUrl = "/" + Navigation.ToBaseRelativePath(Navigation.Uri);
+        Navigation.NavigateTo($"culture?c={target}&returnUrl={Uri.EscapeDataString(returnUrl)}", forceLoad: true);
+    }
+}

@@ -1,0 +1,230 @@
+@page "/courier"
+@layout CourierLayout
+@attribute [Authorize(Policy = StaffPolicies.Deliver)]
+@implements IDisposable
+@inject CourierApi Courier
+@inject Toaster Toaster
+@inject Confirmer Confirm
+@inject NavigationManager Navigation
+
+<PageTitle>@L["Courier_Title"] · @L["AppName"]</PageTitle>
+
+<div class="lx-courier">
+    @if (notLinked)
+    {
+        <NonIdealState Icon="link" Title="@L["Courier_NotLinkedTitle"]" Description="@L["Courier_NotLinkedText"]" />
+    }
+    else if (run is null)
+    {
+        <Skeleton Block="true" Lines="4" />
+    }
+    else
+    {
+        <header class="lx-courier-head">
+            <div>
+                <h1>@string.Format(CultureInfo.CurrentCulture, L["Courier_Hello"], FirstName(run.CourierName))</h1>
+                <p class="bp6-text-muted">@run.CourierName · <bdi dir="ltr">@run.CourierCode</bdi> · @DateTimeOffset.Now.ToString("dddd d MMMM", CultureInfo.CurrentCulture)</p>
+            </div>
+            <Button Icon="refresh" Minimal="true" Tip="@L["Refresh"]" AriaLabel="@L["Refresh"]" Loading="loading" OnClick="LoadAsync" />
+        </header>
+
+        <div class="lx-courier-day">
+            <div><b>@Fmt.Number(run.Stops.Count)</b><span>@L["Courier_ToDeliver"]</span></div>
+            <div><b>@Fmt.Number(run.DeliveredToday)</b><span>@L["Courier_Delivered"]</span></div>
+            <div><b>@Fmt.Money(run.CashCollectedTodayIqd, "IQD")</b><span>@L["Courier_Cash"]</span></div>
+        </div>
+        @if (run.FailedToday > 0)
+        {
+            <p class="bp6-text-muted lx-small lx-courier-failed">@L.Count("Courier_FailedN", run.FailedToday)</p>
+        }
+
+        @if (run.Stops.Count == 0)
+        {
+            <NonIdealState Icon="tick-circle" Title="@L["Courier_DoneTitle"]" Description="@L["Courier_DoneText"]" />
+        }
+        else
+        {
+            <ul class="lx-courier-stops">
+                @foreach (var s in run.Stops)
+                {
+                    <li class="lx-courier-stop">
+                        <div class="lx-courier-stop-top">
+                            <span class="lx-code">@s.TrackingNumber</span>
+                            @* Every trip out with a courier counts as an attempt, so the first one shows nothing. *@
+                            @if (s.Attempts > 1)
+                            {
+                                <Tag Intent="Intent.Warning" Minimal="true">@string.Format(CultureInfo.CurrentCulture, L["Courier_Attempt"], Fmt.Number(s.Attempts))</Tag>
+                            }
+                        </div>
+                        <div class="lx-courier-name"><Mixed Text="@s.ConsigneeName" /></div>
+                        <div class="lx-courier-where">
+                            <Icon Name="map-marker" />
+                            <span>
+                                <Mixed Text="@string.Join(" · ", new[] { Fmt.Place(s.DestinationCode), s.City, s.Address }.Where(x => !string.IsNullOrWhiteSpace(x)))" />
+                                @if (!string.IsNullOrWhiteSpace(s.Landmark))
+                                {
+                                    <span class="lx-courier-landmark">@L["Courier_Near"] <Mixed Text="@s.Landmark" /></span>
+                                }
+                            </span>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(s.Items) || s.MerchantName is not null)
+                        {
+                            <div class="lx-courier-items bp6-text-muted"><Mixed Text="@string.Join(" · ", new[] { s.Items, s.MerchantName }.Where(x => !string.IsNullOrWhiteSpace(x)))" /></div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(s.Notes))
+                        {
+                            <div class="lx-courier-note"><Icon Name="comment" /><Mixed Text="@s.Notes" /></div>
+                        }
+                        <div class="lx-courier-cod @(s.CodAmount is > 0 ? "" : "lx-courier-cod-none")">
+                            @if (s.CodAmount is > 0)
+                            {
+                                <span>@L["Courier_Collect"]</span><b>@Fmt.Money(s.CodAmount, s.CodCurrency)</b>
+                            }
+                            else
+                            {
+                                <span>@L["Courier_Prepaid"]</span>
+                            }
+                        </div>
+                        <div class="lx-courier-actions">
+                            @if (s.ConsigneePhone is { } phone)
+                            {
+                                <a class="bp6-button bp6-large" href="tel:@phone"><Icon Name="phone" /><span class="bp6-button-text">@L["Courier_Call"]</span></a>
+                                <a class="bp6-button bp6-large" href="@WhatsApp(s, phone)" target="_blank" rel="noopener"><Icon Name="send-message" /><span class="bp6-button-text">WhatsApp</span></a>
+                            }
+                            <Button Large="true" Intent="Intent.Success" Icon="tick" Text="@L["Courier_MarkDelivered"]" Loading="@(busy == s.Id)" OnClick="@(() => DeliveredAsync(s))" />
+                            <Button Large="true" Minimal="true" Intent="Intent.Danger" Icon="cross" Text="@L["Courier_MarkFailed"]" Disabled="@(busy == s.Id)" OnClick="@(() => failing = s)" />
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    }
+</div>
+
+<Dialog IsOpen="failing is not null" IsOpenChanged="@(open => { if (!open) failing = null; })" Title="@L["Courier_WhyFailed"]" Icon="issue" Width="460px">
+    <div class="lx-courier-reasons">
+        @foreach (var reason in Enum.GetValues<DeliveryFailureReason>())
+        {
+            <Button Large="true" Fill="true" Text="@ShipmentTexts.Of(reason)" OnClick="@(() => FailedAsync(reason))" />
+        }
+    </div>
+</Dialog>
+
+@code {
+    private CourierRun? run;
+    private bool loading;
+    private bool notLinked;
+    private Guid? busy;
+    private CourierStop? failing;
+    private CancellationTokenSource? refresh;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+        refresh = new CancellationTokenSource();
+        _ = RefreshLoopAsync(refresh.Token);
+    }
+
+    private async Task LoadAsync()
+    {
+        loading = true;
+        try
+        {
+            run = await Courier.GetRunAsync();
+            notLinked = false;
+        }
+        catch (ApiException ex) when (ex.Problem?.Code == "courier.not_linked")
+        {
+            notLinked = true;
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    /// <summary>New parcels handed to the courier at the hub appear without reloading.</summary>
+    private async Task RefreshLoopAsync(CancellationToken token)
+    {
+        try
+        {
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(60));
+            while (await timer.WaitForNextTickAsync(token))
+            {
+                if (busy is null && failing is null)
+                {
+                    await InvokeAsync(async () => { await LoadAsync(); StateHasChanged(); });
+                }
+            }
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            // Leaving the page.
+        }
+    }
+
+    private async Task DeliveredAsync(CourierStop s)
+    {
+        var message = s.CodAmount is > 0
+            ? string.Format(CultureInfo.CurrentCulture, L["Courier_ConfirmCash"], Isolate(Fmt.Money(s.CodAmount, s.CodCurrency)), Isolate(s.ConsigneeName))
+            : string.Format(CultureInfo.CurrentCulture, L["Courier_ConfirmDelivered"], Isolate(s.ConsigneeName));
+        if (!await Confirm.AskAsync(L["Courier_MarkDelivered"], message, L["Courier_MarkDelivered"], Intent.Success, "tick"))
+        {
+            return;
+        }
+
+        await CompleteAsync(s, () => Courier.DeliveredAsync(s.Id), L["Courier_DeliveredToast"]);
+    }
+
+    private async Task FailedAsync(DeliveryFailureReason reason)
+    {
+        if (failing is not { } s)
+        {
+            return;
+        }
+
+        failing = null;
+        await CompleteAsync(s, () => Courier.FailedAsync(s.Id, reason), L["Courier_FailedToast"]);
+    }
+
+    private async Task CompleteAsync(CourierStop s, Func<Task<ScanOutcome>> action, string done)
+    {
+        busy = s.Id;
+        try
+        {
+            await action();
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, done, Isolate(s.TrackingNumber)));
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            busy = null;
+            await LoadAsync();
+        }
+    }
+
+    private string WhatsApp(CourierStop s, string phone)
+    {
+        var text = string.Format(CultureInfo.CurrentCulture, L["Courier_WhatsAppText"], s.ConsigneeName, s.TrackingNumber,
+            Navigation.ToAbsoluteUri($"track/{s.TrackingNumber}"));
+        return $"https://wa.me/{IraqPhone.WhatsAppDigits(phone)}?text={Uri.EscapeDataString(text)}";
+    }
+
+    /// <summary>Keeps a name or code in its own direction inside a sentence (a Latin name in Arabic text, and back).</summary>
+    private static string Isolate(string text) => $"\u2068{text}\u2069";
+
+    private static string FirstName(string name) => name.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? name;
+
+    public void Dispose()
+    {
+        refresh?.Cancel();
+        refresh?.Dispose();
+    }
+}

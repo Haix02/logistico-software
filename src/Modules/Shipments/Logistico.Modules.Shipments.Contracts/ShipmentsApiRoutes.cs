@@ -43,6 +43,9 @@ public static class ShipmentsApiRoutes
     public const string Fleet = "api/v1/fleet";
     public const string FleetCouriers = Fleet + "/couriers";
     public const string FleetLookup = Fleet + "/lookup";
+
+    /// <summary>The courier app: the signed-in courier's own run.</summary>
+    public const string CourierRun = "api/v1/courier/run";
     public const string Finance = "api/v1/finance";
     public const string FinanceSummary = Finance + "/summary";
     public const string FinanceSettlements = Finance + "/settlements";
@@ -73,5 +76,9 @@ public static class ShipmentsApiRoutes
     public static string CustomsByShipment(Guid shipmentId) => $"{Customs}/{shipmentId}";
     public static string CustomsSadXml(Guid shipmentId) => $"{Customs}/{shipmentId}/sad.xml";
     public static string CourierById(Guid id) => $"{FleetCouriers}/{id}";
+
+    public static string CourierDelivered(Guid shipmentId) => $"{CourierRun}/{shipmentId}/delivered";
+
+    public static string CourierFailed(Guid shipmentId) => $"{CourierRun}/{shipmentId}/failed";
     public static string SettlementExport(Guid id) => $"{FinanceSettlements}/{id}/export.csv";
 }

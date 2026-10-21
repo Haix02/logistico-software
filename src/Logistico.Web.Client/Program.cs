@@ -26,6 +26,7 @@ builder.Services.AddScoped<Confirmer>();
 builder.Services.AddScoped<MerchantsApi>();
 builder.Services.AddScoped<AccountApi>();
 builder.Services.AddScoped<TeamApi>();
+builder.Services.AddScoped<CourierApi>();
 builder.Services.AddScoped<Toaster>();
 
 // The same staff policies as the API (StaffPolicies), so pages and menus hide what the user's role cannot use.

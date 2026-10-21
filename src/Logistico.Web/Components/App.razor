@@ -24,6 +24,11 @@
     }
     <ImportMap nonce="@HttpContext.CspNonce()" />
     <link rel="icon" type="image/png" href="favicon.png" />
+    @* Installable on a phone's home screen (the courier app, the hub station). *@
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Logistico" />
     <script src="@Assets["js/lx.js"]"></script>
     <HeadOutlet @rendermode="PageRenderMode" />
 </head>

@@ -68,6 +68,8 @@
   <data name="Problem_automation.stale" xml:space="preserve"><value>Someone else changed these rules. Reload and try again.</value></data>
   <data name="Problem_courier.code_taken" xml:space="preserve"><value>Another courier already uses code {0}.</value></data>
   <data name="Problem_courier.not_found" xml:space="preserve"><value>Courier not found.</value></data>
+  <data name="Problem_courier.not_linked" xml:space="preserve"><value>This account is not linked to an active courier. Ask an administrator to link it on the Team page.</value></data>
+  <data name="Problem_courier.not_on_run" xml:space="preserve"><value>This parcel is not out for delivery with you.</value></data>
   <data name="Problem_courier.stale" xml:space="preserve"><value>Courier was updated by another user. Reload and try again.</value></data>
   <data name="Problem_customs.domestic_not_supported" xml:space="preserve"><value>Customs declarations apply only to international shipments.</value></data>
   <data name="Problem_customs.stale" xml:space="preserve"><value>Someone else changed this declaration</value></data>

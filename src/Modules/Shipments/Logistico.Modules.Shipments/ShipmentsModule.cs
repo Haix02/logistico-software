@@ -57,6 +57,7 @@ public static class ShipmentsModule
         .MapPublicEndpoints()
         .MapCustomsEndpoints()
         .MapFleetEndpoints()
+        .MapCourierAppEndpoints()
         .MapFinanceEndpoints();
 
     public static async Task MigrateShipmentsDatabaseAsync(this IServiceProvider services, CancellationToken ct = default)

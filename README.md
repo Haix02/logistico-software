@@ -39,6 +39,7 @@ do deliveries fail?** Companies can publish anonymised answers as open data, so 
 | **Automation** | Per-company rules (attempts, rescheduling, SLAs); alerts raised and cleared every minute; WhatsApp message queue |
 | **Demand intelligence** | What customers buy, where, when, basket sizes vs refusals, trade lanes, repeat customers, plain-language findings, open-data export ([below](#demand-intelligence-the-data-advantage)) |
 | **Money** | Delivery prices per company (own governorate, per destination, weight, seller discounts) quoted on the order form; cash held by couriers, seller COD balances, settlement batches (ZainCash, Qi Card, cash, bank) with CSV statements |
+| **Courier app** | Couriers sign in on their phone and see only their parcels: address and landmark, cash to collect, call or WhatsApp the customer, mark delivered or not delivered with the reason; installable on the home screen |
 | **Team & roles** | Administrators add colleagues and give them one of five roles (Administrator, Operations, Customer support, Finance, Viewer); lock, unlock and set new passwords; the API enforces every role and the screens follow it |
 | **International freight & customs** | Bookings by sea/air/road, 4×6" AWB labels with Code-128, ASYCUDA workbench (SAD XML, CoO/invoice e-verification, duty estimate) |
 | **Speed** | Command palette (`Ctrl/⌘+K`), keyboard shortcuts (`?`), barcode scanning from any page, phone layouts without sideways scrolling |
