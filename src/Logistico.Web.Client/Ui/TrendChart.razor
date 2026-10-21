@@ -1,0 +1,119 @@
+@* Daily volume: booked and delivered as paired bars, failed attempts and returns as lines.
+   Time follows the reading direction (right → left in Arabic). Hover a day for its numbers. *@
+<div class="lx-trend">
+    <svg class="lx-trend-svg" viewBox="0 0 @Width @Height" role="img" aria-label="@AriaLabel" preserveAspectRatio="none">
+        @foreach (var tick in Ticks)
+        {
+            var y = Y(tick);
+            <line x1="@F(Bidi.Rtl ? PadEnd : PadStart)" x2="@F(Bidi.Rtl ? Width - PadStart : Width - PadEnd)" y1="@F(y)" y2="@F(y)" class="lx-trend-grid" />
+            @SvgText(Bidi.Rtl ? Width - 4 : 4, y + 4, Bidi.Rtl ? "lx-trend-axis lx-trend-axis-end" : "lx-trend-axis", Fmt.Number(tick))
+        }
+
+        @for (var i = 0; i < Days.Count; i++)
+        {
+            var d = Days[i];
+            var cx = X(i);
+            var bar = Math.Max(2, Slot * 0.32);
+            <g class="@Bp.Cls("lx-trend-day", Bp.When(hover == i, "lx-trend-day-hover"))" @onmouseenter="@(() => hover = i)" @onmouseleave="@(() => hover = null)">
+                <rect x="@F(cx - Slot / 2)" y="@F(PadTop)" width="@F(Slot)" height="@F(Height - PadTop - PadBottom)" class="lx-trend-hit" />
+                <rect x="@F(cx - bar - 1)" y="@F(Y(d.Booked))" width="@F(bar)" height="@F(Y(0) - Y(d.Booked))" rx="2" class="lx-trend-booked" />
+                <rect x="@F(cx + 1)" y="@F(Y(d.Delivered))" width="@F(bar)" height="@F(Y(0) - Y(d.Delivered))" rx="2" class="lx-trend-delivered" />
+            </g>
+            if (ShowLabel(i))
+            {
+                @SvgText(cx, Height - 6, "lx-trend-axis lx-trend-axis-mid", Label(d.Day))
+            }
+        }
+
+        <path d="@LinePath(d => d.Failed)" class="lx-trend-failed" />
+        <path d="@LinePath(d => d.Returned)" class="lx-trend-returned" />
+    </svg>
+
+    @if (hover is { } h && h < Days.Count)
+    {
+        var d = Days[h];
+        <div class="lx-trend-tip bp6-card bp6-elevation-2" style="@TipStyle(h)">
+            <strong>@d.Day.ToString("dddd d MMMM", CultureInfo.CurrentCulture)</strong>
+            <span><i class="lx-dot lx-dot-booked"></i>@L["Trend_Booked"] <b>@Fmt.Number(d.Booked)</b></span>
+            <span><i class="lx-dot lx-dot-delivered"></i>@L["Trend_Delivered"] <b>@Fmt.Number(d.Delivered)</b></span>
+            <span><i class="lx-dot lx-dot-failed"></i>@L["Trend_Failed"] <b>@Fmt.Number(d.Failed)</b></span>
+            <span><i class="lx-dot lx-dot-returned"></i>@L["Trend_Returned"] <b>@Fmt.Number(d.Returned)</b></span>
+        </div>
+    }
+
+    <div class="lx-map-legend">
+        <span class="lx-row" style="gap:6px"><i class="lx-dot lx-dot-booked"></i>@L["Trend_Booked"]</span>
+        <span class="lx-row" style="gap:6px"><i class="lx-dot lx-dot-delivered"></i>@L["Trend_Delivered"]</span>
+        <span class="lx-row" style="gap:6px"><i class="lx-line lx-dot-failed"></i>@L["Trend_Failed"]</span>
+        <span class="lx-row" style="gap:6px"><i class="lx-line lx-dot-returned"></i>@L["Trend_Returned"]</span>
+    </div>
+</div>
+
+@code {
+    private const double Width = 760;
+    private const double Height = 240;
+    private const double PadTop = 12;
+    private const double PadBottom = 26;
+    private const double PadStart = 34;
+    private const double PadEnd = 10;
+
+    private int? hover;
+
+    [Parameter, EditorRequired] public IReadOnlyList<DailyVolume> Days { get; set; } = [];
+    [Parameter] public string? AriaLabel { get; set; }
+
+    private double Max
+    {
+        get
+        {
+            var top = Days.Count == 0 ? 0 : Days.Max(d => Math.Max(Math.Max(d.Booked, d.Delivered), Math.Max(d.Failed, d.Returned)));
+            return NiceCeiling(Math.Max(4, top));
+        }
+    }
+
+    private IEnumerable<int> Ticks => Enumerable.Range(0, 5).Select(i => (int)(Max * i / 4));
+
+    private double Plot => Width - PadStart - PadEnd;
+
+    private double Slot => Plot / Math.Max(1, Days.Count);
+
+    /// <summary>Centre of day <paramref name="i"/>; mirrored in Arabic so time reads right to left (axis on the right).</summary>
+    private double X(int i)
+    {
+        var x = PadStart + Slot * (i + 0.5);
+        return Bidi.Rtl ? Width - x : x;
+    }
+
+    private double Y(double value) => PadTop + (Height - PadTop - PadBottom) * (1 - value / Max);
+
+    private string LinePath(Func<DailyVolume, int> pick) =>
+        Days.Count == 0 ? "" : "M" + string.Join("L", Days.Select((d, i) => string.Create(CultureInfo.InvariantCulture, $"{X(i):0.#},{Y(pick(d)):0.#}")));
+
+    private bool ShowLabel(int i)
+    {
+        var every = Days.Count <= 8 ? 1 : Days.Count <= 31 ? 5 : 15;
+        return i % every == 0 || i == Days.Count - 1;
+    }
+
+    private string Label(DateOnly day) => Days.Count <= 8 ? day.ToString("ddd", CultureInfo.CurrentCulture) : day.ToString("d/M", CultureInfo.CurrentCulture);
+
+    private string TipStyle(int i)
+    {
+        var pct = X(i) / Width * 100;
+        var anchor = pct > 60 ? $"right:{100 - pct + 2:0.#}%" : $"left:{pct + 2:0.#}%";
+        return string.Create(CultureInfo.InvariantCulture, $"{anchor};top:8px");
+    }
+
+    private static double NiceCeiling(double value)
+    {
+        var magnitude = Math.Pow(10, Math.Floor(Math.Log10(value)));
+        var normalized = value / magnitude;
+        var nice = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 4 ? 4 : normalized <= 5 ? 5 : 10;
+        return nice * magnitude;
+    }
+
+    private static string F(double value) => value.ToString("0.#", CultureInfo.InvariantCulture);
+
+    private static MarkupString SvgText(double x, double y, string cssClass, string content) =>
+        new($"<text x=\"{F(x)}\" y=\"{F(y)}\" class=\"{cssClass}\">{System.Net.WebUtility.HtmlEncode(content)}</text>");
+}

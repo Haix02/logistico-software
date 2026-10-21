@@ -1,0 +1,46 @@
+@* Decorative outline of Iraq with the standard sorting hubs and the line-haul lanes from Baghdad (sign-in and public
+   pages). Static SVG, no data: it renders on the server too and is hidden from screen readers. *@
+@using Logistico.Modules.Shipments.Contracts.Rules
+
+<svg class="@Bp.Cls("lx-silhouette", CssClass)" viewBox="0 0 @F(IraqMapShapes.Width) @F(IraqMapShapes.Height)" aria-hidden="true" focusable="false"
+     xmlns="http://www.w3.org/2000/svg">
+    <g class="lx-silhouette-land">
+        @foreach (var shape in IraqMapShapes.Governorates)
+        {
+            <path d="@shape.Path" />
+        }
+    </g>
+    <g class="lx-silhouette-lanes">
+        @foreach (var (from, to) in Lanes)
+        {
+            <path d="@Curve(from, to)" />
+        }
+    </g>
+    @foreach (var hub in Hubs)
+    {
+        <circle class="lx-silhouette-pulse" cx="@F(hub.X)" cy="@F(hub.Y)" r="9" />
+        <circle class="lx-silhouette-hub" cx="@F(hub.X)" cy="@F(hub.Y)" r="4.5" />
+    }
+</svg>
+
+@code {
+    private static readonly IReadOnlyList<(double X, double Y)> Hubs =
+        IraqHubs.Standard.Select(h => IraqMapShapes.Project(h.Latitude, h.Longitude)).ToList();
+
+    // Every regional hub is linked to the primary hub in Baghdad, plus the northern pair (Mosul–Erbil).
+    private static readonly IReadOnlyList<((double X, double Y) From, (double X, double Y) To)> Lanes =
+        [.. Hubs.Skip(1).Select(h => (Hubs[0], h)), (Hubs[4], Hubs[2])];
+
+    [Parameter] public string? CssClass { get; set; }
+
+    private static string F(double value) => value.ToString("0.#", CultureInfo.InvariantCulture);
+
+    /// <summary>A gentle arc between two hubs (control point pushed off the straight line).</summary>
+    private static string Curve((double X, double Y) a, (double X, double Y) b)
+    {
+        var (mx, my) = ((a.X + b.X) / 2, (a.Y + b.Y) / 2);
+        var (dx, dy) = (b.X - a.X, b.Y - a.Y);
+        var (cx, cy) = (mx - dy * 0.18, my + dx * 0.18);
+        return $"M{F(a.X)},{F(a.Y)} Q{F(cx)},{F(cy)} {F(b.X)},{F(b.Y)}";
+    }
+}

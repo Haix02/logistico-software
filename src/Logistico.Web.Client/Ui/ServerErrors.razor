@@ -1,0 +1,69 @@
+@* Shows a server's validation answer next to the fields it is about (inside an EditForm).
+   Field-level problems go under their inputs; anything else is returned for a callout. *@
+@implements IDisposable
+
+@code {
+    private ValidationMessageStore? store;
+
+    [CascadingParameter] private EditContext? EditContext { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (EditContext is not null)
+        {
+            store = new ValidationMessageStore(EditContext);
+            EditContext.OnFieldChanged += OnFieldChanged;
+            EditContext.OnValidationRequested += OnValidationRequested;
+        }
+    }
+
+    /// <summary>Puts field errors from <paramref name="ex"/> on their fields; returns the message for anything left over.</summary>
+    internal string? Show(ApiException ex)
+    {
+        if (store is null || EditContext is null || ex.Problem?.Errors is not { Count: > 0 } errors)
+        {
+            return ex.UserMessage;
+        }
+
+        store.Clear();
+        var unplaced = new List<string>();
+        foreach (var (field, messages) in errors)
+        {
+            var name = field.Split('.').Last();
+            if (EditContext.Model.GetType().GetProperty(name, System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance) is { } property)
+            {
+                store.Add(EditContext.Field(property.Name), messages);
+            }
+            else
+            {
+                unplaced.AddRange(messages);
+            }
+        }
+
+        EditContext.NotifyValidationStateChanged();
+        return unplaced.Count > 0 ? string.Join(" ", unplaced.Distinct()) : null;
+    }
+
+    public void Clear()
+    {
+        store?.Clear();
+        EditContext?.NotifyValidationStateChanged();
+    }
+
+    private void OnFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        store?.Clear(e.FieldIdentifier);
+        EditContext?.NotifyValidationStateChanged();
+    }
+
+    private void OnValidationRequested(object? sender, ValidationRequestedEventArgs e) => store?.Clear();
+
+    public void Dispose()
+    {
+        if (EditContext is not null)
+        {
+            EditContext.OnFieldChanged -= OnFieldChanged;
+            EditContext.OnValidationRequested -= OnValidationRequested;
+        }
+    }
+}

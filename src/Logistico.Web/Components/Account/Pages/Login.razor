@@ -1,0 +1,198 @@
+@page "/Account/Login"
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.Extensions.Localization
+@using Logistico.SharedKernel
+@using Logistico.Web.Data
+
+@inject IConfiguration Configuration
+@inject SignInManager<ApplicationUser> SignInManager
+@inject ILogger<Login> Logger
+@inject NavigationManager NavigationManager
+@inject IdentityRedirectManager RedirectManager
+@inject IStringLocalizer<ServerText> T
+
+<PageTitle>@T["SignInTitle"] · @T["AppName"]</PageTitle>
+
+<div class="lx-signin-split">
+<aside class="lx-signin-hero">
+    <div class="lx-signin-hero-brand">
+        <span class="lx-logo lx-logo-large" aria-hidden="true"></span>
+        <span class="lx-signin-app">@T["AppName"]</span>
+    </div>
+    <h1 class="lx-signin-hero-title">@T["SignInHeroTitle"]</h1>
+    <p class="lx-signin-hero-text">@T["SignInHeroText"]</p>
+    <ul class="lx-signin-points">
+        <li><span class="bp6-icon-standard bp6-icon-map" aria-hidden="true"></span>@T["SignInPoint1"]</li>
+        <li><span class="bp6-icon-standard bp6-icon-predictive-analysis" aria-hidden="true"></span>@T["SignInPoint2"]</li>
+        <li><span class="bp6-icon-standard bp6-icon-bank-account" aria-hidden="true"></span>@T["SignInPoint3"]</li>
+    </ul>
+    <Logistico.Web.Client.Ui.Map.NetworkSilhouette CssClass="lx-signin-map" />
+    <div class="lx-signin-hero-foot">@T["OpenSourceLine"]</div>
+</aside>
+
+<div class="lx-signin">
+    <div class="lx-signin-brand">
+        <span class="lx-logo lx-logo-large" aria-hidden="true"></span>
+        <div>
+            <div class="lx-signin-app">@T["AppName"]</div>
+            <div class="bp6-text-muted">@T["Tagline"]</div>
+        </div>
+    </div>
+
+    <div class="bp6-card bp6-elevation-2 lx-signin-card">
+        <h2 class="bp6-heading">@T["SignInTitle"]</h2>
+        <p class="bp6-text-muted">@T["SignInSubtitle"]</p>
+
+        @if (errorMessage is not null)
+        {
+            <div class="bp6-callout bp6-intent-danger lx-mb">
+                <span class="bp6-icon-standard bp6-icon-error lx-callout-icon"></span>
+                @errorMessage
+            </div>
+        }
+        <StatusMessage />
+
+        <EditForm EditContext="editContext" method="post" OnSubmit="LoginUser" FormName="login">
+            <DataAnnotationsValidator />
+            <div class="bp6-form-group @(Invalid(nameof(InputModel.Email)) ? "bp6-intent-danger" : "")">
+                <label class="bp6-label" for="Input.Email">@T["Email"]</label>
+                <div class="bp6-form-content">
+                    <div class="bp6-input-group bp6-large @(Invalid(nameof(InputModel.Email)) ? "bp6-intent-danger" : "")">
+                        <span class="bp6-icon bp6-icon-standard bp6-icon-envelope"></span>
+                        <InputText @bind-Value="Input.Email" id="Input.Email" class="bp6-input" dir="ltr" autocomplete="username webauthn" aria-required="true" placeholder="name@company.iq" />
+                    </div>
+                    <div class="bp6-form-helper-text"><ValidationMessage For="() => Input.Email" /></div>
+                </div>
+            </div>
+            <div class="bp6-form-group @(Invalid(nameof(InputModel.Password)) ? "bp6-intent-danger" : "")">
+                <label class="bp6-label" for="Input.Password">@T["Password"]</label>
+                <div class="bp6-form-content">
+                    <div class="bp6-input-group bp6-large @(Invalid(nameof(InputModel.Password)) ? "bp6-intent-danger" : "")">
+                        <span class="bp6-icon bp6-icon-standard bp6-icon-lock"></span>
+                        <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="bp6-input" dir="ltr" autocomplete="current-password" aria-required="true" />
+                    </div>
+                    <div class="bp6-form-helper-text"><ValidationMessage For="() => Input.Password" /></div>
+                </div>
+            </div>
+            <label class="bp6-control bp6-checkbox">
+                <InputCheckbox class="bp6-control-input" @bind-Value="Input.RememberMe" />
+                <span class="bp6-control-indicator"></span>
+                @T["RememberMe"]
+            </label>
+            <button type="submit" class="bp6-button bp6-intent-primary bp6-large bp6-fill lx-mt">
+                <span class="bp6-button-text">@T["SignInButton"]</span>
+            </button>
+
+            <div class="lx-signin-or"><span>@T["Or"]</span></div>
+            <PasskeySubmit Operation="PasskeyOperation.Request" Name="Input.Passkey" EmailName="Input.Email" class="bp6-button bp6-outlined bp6-fill">
+                <span class="bp6-icon-standard bp6-icon-key"></span>
+                <span class="bp6-button-text">@T["SignInWithPasskey"]</span>
+            </PasskeySubmit>
+        </EditForm>
+
+        <ul class="lx-signin-links">
+            <li><a href="Account/ForgotPassword">@T["ForgotPassword"]</a></li>
+            @if (Configuration.GetValue<bool>("Identity:AllowSelfRegistration"))
+            {
+                <li><a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">@T["Register"]</a></li>
+            }
+            <li><a href="Account/ResendEmailConfirmation">@T["ResendConfirmation"]</a></li>
+        </ul>
+    </div>
+</div>
+</div>
+
+@code {
+    private string? errorMessage;
+    private EditContext editContext = default!;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = default!;
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Input ??= new();
+
+        editContext = new EditContext(Input);
+
+        if (HttpMethods.IsGet(HttpContext.Request.Method))
+        {
+            // Clear the existing external cookie to ensure a clean login process
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+        }
+    }
+
+    private bool Invalid(string field) => editContext.GetValidationMessages(new FieldIdentifier(Input, field)).Any();
+
+    public async Task LoginUser()
+    {
+        if (!string.IsNullOrEmpty(Input.Passkey?.Error))
+        {
+            errorMessage = Input.Passkey.Error;
+            return;
+        }
+
+        SignInResult result;
+        if (!string.IsNullOrEmpty(Input.Passkey?.CredentialJson))
+        {
+            // When performing passkey sign-in, don't perform form validation.
+            result = await SignInManager.PasskeySignInAsync(Input.Passkey.CredentialJson);
+        }
+        else
+        {
+            // If doing a password sign-in, validate the form.
+            if (!editContext.Validate())
+            {
+                return;
+            }
+
+            // Failed passwords count towards lockout (Identity: 5 attempts).
+            result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: true);
+        }
+
+        if (result.Succeeded)
+        {
+            Logger.LogInformation("User logged in.");
+            RedirectManager.RedirectTo(ReturnUrl);
+        }
+        else if (result.RequiresTwoFactor)
+        {
+            RedirectManager.RedirectTo(
+                "Account/LoginWith2fa",
+                new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
+        }
+        else if (result.IsLockedOut)
+        {
+            Logger.LogWarning("User account locked out.");
+            RedirectManager.RedirectTo("Account/Lockout");
+        }
+        else
+        {
+            errorMessage = T["InvalidLogin"];
+        }
+    }
+
+    private sealed class InputModel
+    {
+        [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
+        [EmailAddress(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Email))]
+        public string Email { get; set; } = "";
+
+        [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = "";
+
+        public bool RememberMe { get; set; }
+
+        public PasskeyInputModel? Passkey { get; set; }
+    }
+}

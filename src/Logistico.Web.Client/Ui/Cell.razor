@@ -1,0 +1,16 @@
+@* Two-line table cell: a title and a muted subtitle, each kept on one line (full text on hover). *@
+<div class="@Bp.Cls("lx-cell", CssClass)">
+    <span class="lx-cell-title" title="@Title">@if (TitleContent is not null) { @TitleContent } else { <Mixed Text="@Title" /> }</span>
+    @if (Sub is not null || SubContent is not null)
+    {
+        <span class="lx-cell-sub" title="@Sub">@if (SubContent is not null) { @SubContent } else { <Mixed Text="@Sub" /> }</span>
+    }
+</div>
+
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Sub { get; set; }
+    [Parameter] public RenderFragment? TitleContent { get; set; }
+    [Parameter] public RenderFragment? SubContent { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+}

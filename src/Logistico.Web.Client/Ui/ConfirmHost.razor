@@ -1,0 +1,42 @@
+@implements IDisposable
+@inject Confirmer Confirmer
+
+@if (Confirmer.Current is { } request)
+{
+    <div class="bp6-portal">
+        <div class="bp6-overlay bp6-overlay-open bp6-overlay-scroll-container" @onkeydown="KeyAsync">
+            <div class="bp6-overlay-backdrop"></div>
+            <div class="bp6-dialog-container bp6-overlay-content">
+                <div class="@Bp.Cls("bp6-dialog", "bp6-alert", "lx-alert")" role="alertdialog" aria-modal="true" aria-label="@request.Title">
+                    <div class="bp6-alert-body">
+                        <span class="@Bp.Cls("bp6-icon", "bp6-icon-large", "bp6-icon-" + request.Icon, "lx-intent-" + request.Intent.ToString().ToLowerInvariant())" style="font-size:40px;width:40px;height:40px" aria-hidden="true"></span>
+                        <div class="bp6-alert-contents">
+                            <h5 class="bp6-heading">@request.Title</h5>
+                            <p>@request.Message</p>
+                        </div>
+                    </div>
+                    <div class="bp6-alert-footer">
+                        <Button Intent="@request.Intent" Text="@request.ConfirmText" OnClick="@(() => Confirmer.Resolve(true))" autofocus />
+                        <Button Text="@L["Cancel"]" OnClick="@(() => Confirmer.Resolve(false))" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    protected override void OnInitialized() => Confirmer.Changed += OnChanged;
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    private void KeyAsync(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            Confirmer.Resolve(false);
+        }
+    }
+
+    public void Dispose() => Confirmer.Changed -= OnChanged;
+}

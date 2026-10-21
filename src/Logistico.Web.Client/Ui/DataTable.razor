@@ -1,0 +1,58 @@
+@typeparam TItem
+
+<div class="@Bp.Cls("lx-table-wrap", Bp.When(Loading, "lx-table-loading"), CssClass)">
+    <table class="@Bp.Cls("bp6-html-table", "bp6-html-table-striped", Bp.When(OnRowClick.HasDelegate, "bp6-interactive"), "lx-table")">
+        <thead>
+            <tr>@Header</tr>
+        </thead>
+        <tbody>
+            @if (Items is null)
+            {
+                <tr class="lx-table-message"><td colspan="@ColumnCount"><div class="lx-center"><Spinner Size="32" /></div></td></tr>
+            }
+            else if (Items.Count == 0)
+            {
+                <tr class="lx-table-message">
+                    <td colspan="@ColumnCount">
+                        <NonIdealState Icon="@EmptyIcon" Title="@(EmptyTitle ?? "")" Description="@EmptyDescription" />
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Items)
+                {
+                    <tr class="@RowClass?.Invoke(item)" @onclick="() => OnRowClick.InvokeAsync(item)" tabindex="@(OnRowClick.HasDelegate ? 0 : -1)" @onkeydown="e => KeyAsync(e, item)">
+                        @Row(item)
+                    </tr>
+                }
+            }
+        </tbody>
+        @if (Footer is not null && Items is { Count: > 0 })
+        {
+            <tfoot><tr>@Footer</tr></tfoot>
+        }
+    </table>
+    @if (Loading && Items is not null)
+    {
+        <div class="lx-table-overlay"><Spinner Size="32" /></div>
+    }
+</div>
+
+@code {
+    [Parameter] public IReadOnlyList<TItem>? Items { get; set; }
+    [Parameter] public bool Loading { get; set; }
+    [Parameter] public int ColumnCount { get; set; } = 1;
+    [Parameter, EditorRequired] public RenderFragment Header { get; set; } = default!;
+    [Parameter, EditorRequired] public RenderFragment<TItem> Row { get; set; } = default!;
+    [Parameter] public RenderFragment? Footer { get; set; }
+    [Parameter] public Func<TItem, string?>? RowClass { get; set; }
+    [Parameter] public EventCallback<TItem> OnRowClick { get; set; }
+    [Parameter] public string EmptyIcon { get; set; } = "search";
+    [Parameter] public string? EmptyTitle { get; set; }
+    [Parameter] public string? EmptyDescription { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+
+    private Task KeyAsync(KeyboardEventArgs e, TItem item) =>
+        e.Key == "Enter" && OnRowClick.HasDelegate ? OnRowClick.InvokeAsync(item) : Task.CompletedTask;
+}

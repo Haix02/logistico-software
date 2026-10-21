@@ -1,0 +1,145 @@
+@* Correct a delivery order before it is out with a courier. Every change goes into the order's history. *@
+@inject ShipmentsApi Shipments
+@inject Toaster Toaster
+
+<Drawer IsOpen="IsOpen" IsOpenChanged="IsOpenChanged" Title="@string.Format(CultureInfo.CurrentCulture, L["EditOrderN"], Shipment?.TrackingNumber)" Icon="edit" Width="640px">
+    <ChildContent>
+        <Callout Intent="Intent.Primary" Icon="history" CssClass="lx-mb">@L["EditOrderHint"]</Callout>
+        <EditForm Model="model" OnValidSubmit="SaveAsync" Context="form" id="edit-order-form">
+            <DataAnnotationsValidator />
+            <ServerErrors @ref="serverErrors" />
+
+            <h4 class="lx-form-section">@L["Sec_Customer"]</h4>
+            <div class="lx-form-grid">
+                <FormField Label="@L["Field_CustomerName"]" Required="true" Field="() => model.ConsigneeName">
+                    <InputText class="bp6-input bp6-fill" @bind-Value="model.ConsigneeName" />
+                </FormField>
+                <FormField Label="@L["Field_CustomerPhone"]" Required="true" Field="() => model.ConsigneePhone">
+                    <InputText class="bp6-input bp6-fill" @bind-Value="model.ConsigneePhone" type="tel" dir="ltr" />
+                </FormField>
+                <FormField Label="@L["Field_Governorate"]" Required="true" Field="() => model.DestinationCode"
+                           Helper="@(MovesHub ? string.Format(CultureInfo.CurrentCulture, L["EditMovesHub"], HubCatalog.ResolveDestinationHub(model.DestinationCode).DisplayLabel) : null)">
+                    <span class="bp6-html-select bp6-fill">
+                        <InputSelect @bind-Value="model.DestinationCode">
+                            @foreach (var g in IraqGovernorates.All.OrderBy(g => g.Name, StringComparer.CurrentCulture))
+                            {
+                                <option value="@g.Code">@g.Name</option>
+                            }
+                        </InputSelect>
+                        <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                    </span>
+                </FormField>
+                <FormField Label="@L["Field_Area"]" Hint="@L["Optional"]" Field="() => model.DestinationCity">
+                    <InputText class="bp6-input bp6-fill" @bind-Value="model.DestinationCity" />
+                </FormField>
+                <FormField Label="@L["Field_Address"]" Required="true" Field="() => model.DeliveryAddress" CssClass="lx-span-2">
+                    <InputText class="bp6-input bp6-fill" @bind-Value="model.DeliveryAddress" />
+                </FormField>
+                <FormField Label="@L["Field_Landmark"]" Hint="@L["Optional"]" Field="() => model.Landmark" CssClass="lx-span-2">
+                    <InputText class="bp6-input bp6-fill" @bind-Value="model.Landmark" />
+                </FormField>
+            </div>
+
+            <h4 class="lx-form-section">@L["Sec_Parcel"]</h4>
+            <div class="lx-form-grid lx-form-grid-3">
+                <FormField Label="@L["Field_Items"]" Field="() => model.ItemsDescription" CssClass="lx-span-all">
+                    <InputText class="bp6-input bp6-fill" @bind-Value="model.ItemsDescription" />
+                </FormField>
+                <FormField Label="@L["Field_Pieces"]" Field="() => model.Pieces">
+                    <InputNumber class="bp6-input bp6-fill" @bind-Value="model.Pieces" min="1" dir="ltr" />
+                </FormField>
+                <FormField Label="@L["Field_WeightKg"]" Field="() => model.GrossWeightKg">
+                    <InputNumber class="bp6-input bp6-fill" @bind-Value="model.GrossWeightKg" step="0.1" min="0" dir="ltr" />
+                </FormField>
+                <FormField Label="@L["Field_OrderRef"]" Hint="@L["Optional"]" Field="() => model.ExternalReference">
+                    <InputText class="bp6-input bp6-fill" @bind-Value="model.ExternalReference" dir="ltr" />
+                </FormField>
+            </div>
+
+            <h4 class="lx-form-section">@L["Sec_Payment"]</h4>
+            <div class="lx-form-grid">
+                <FormField Label="@L["Field_Cod"]" Field="() => model.CodAmount">
+                    <div class="bp6-input-group bp6-fill">
+                        <InputNumber class="bp6-input" @bind-Value="model.CodAmount" step="250" min="0" dir="ltr" />
+                        <span class="bp6-input-action lx-input-suffix">@L["Iqd"]</span>
+                    </div>
+                </FormField>
+                <FormField Label="@L["Field_DeliveryFee"]" Field="() => model.DeliveryFee">
+                    <div class="bp6-input-group bp6-fill">
+                        <InputNumber class="bp6-input" @bind-Value="model.DeliveryFee" step="250" min="0" dir="ltr" />
+                        <span class="bp6-input-action lx-input-suffix">@L["Iqd"]</span>
+                    </div>
+                </FormField>
+                <FormField Label="@L["Field_Notes"]" Hint="@L["Optional"]" Field="() => model.Notes" CssClass="lx-span-2">
+                    <InputTextArea class="bp6-input bp6-fill" rows="2" @bind-Value="model.Notes" />
+                </FormField>
+            </div>
+
+            @if (error is not null)
+            {
+                <Callout Intent="Intent.Danger" Icon="error">@error</Callout>
+            }
+        </EditForm>
+    </ChildContent>
+    <Footer>
+        <span class="lx-spacer"></span>
+        <Button Text="@L["Cancel"]" OnClick="@(() => IsOpenChanged.InvokeAsync(false))" />
+        <Button Type="submit" Intent="Intent.Primary" Icon="tick" Text="@L["SaveChanges"]" Loading="saving" Attributes="@(new Dictionary<string, object> { ["form"] = "edit-order-form" })" />
+    </Footer>
+</Drawer>
+
+@code {
+    private UpdateOrderRequest model = new();
+    private ServerErrors? serverErrors;
+    private string? error;
+    private bool saving;
+    private uint loadedVersion;
+
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter, EditorRequired] public ShipmentDetails? Shipment { get; set; }
+    [Parameter] public EventCallback<ShipmentDetails> OnSaved { get; set; }
+
+    private bool MovesHub => Shipment is not null && model.DestinationCode != Shipment.DestinationCode
+        && HubCatalog.ResolveDestinationHub(model.DestinationCode).Code != Shipment.DestinationHubCode;
+
+    protected override void OnParametersSet()
+    {
+        if (IsOpen && Shipment is not null && loadedVersion != Shipment.Version)
+        {
+            loadedVersion = Shipment.Version;
+            model = UpdateOrderRequest.From(Shipment);
+            error = null;
+        }
+        else if (!IsOpen)
+        {
+            loadedVersion = 0;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (Shipment is null)
+        {
+            return;
+        }
+
+        error = null;
+        saving = true;
+        try
+        {
+            var saved = await Shipments.UpdateOrderAsync(Shipment.Id, Shipment.Version, model);
+            Toaster.Success(L["OrderUpdated"]);
+            await OnSaved.InvokeAsync(saved);
+            await IsOpenChanged.InvokeAsync(false);
+        }
+        catch (ApiException ex)
+        {
+            error = serverErrors?.Show(ex) ?? ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

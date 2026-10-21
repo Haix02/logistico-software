@@ -1,0 +1,534 @@
+@page "/warehouse"
+@attribute [Authorize(Policy = StaffPolicies.Operate)]
+@inject ShipmentsApi Shipments
+@inject OperationsApi Operations
+@inject OpsState Ops
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<PageTitle>@L["Nav_Warehouse"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["WarehouseTitle"]" Subtitle="@L["WarehouseSubtitle"]" Icon="barcode">
+    <Actions>
+        <LinkButton Href="transfers" Icon="drive-time" Text="@L["Nav_Transfers"]" />
+        <LinkButton Href="shipments/labels?tab=actions" Icon="print" Text="@L["Tab_ActionSheet"]" Minimal="true" />
+    </Actions>
+</PageHeader>
+
+<div class="lx-hub-picker" role="radiogroup" aria-label="@L["Col_Hub"]">
+    @foreach (var h in HubCatalog.All)
+    {
+        var load = network?.Hubs.FirstOrDefault(x => x.HubCode == h.Code);
+        <button type="button" role="radio" aria-checked="@(hubCode == h.Code ? "true" : "false")"
+                class="@Bp.Cls("lx-hub-card", Bp.When(hubCode == h.Code, "lx-hub-card-active"))" @onclick="@(() => SelectHubAsync(h.Code))">
+            <span class="lx-hub-card-title">
+                <Tag Intent="@(hubCode == h.Code ? Intent.Primary : Intent.None)">@h.RoutingTag</Tag>
+                <span>@h.Name</span>
+            </span>
+            <span class="lx-hub-card-sub">
+                @string.Format(CultureInfo.CurrentCulture, L["OnShelvesN"], Fmt.Number(load?.OnShelves ?? 0))
+                · @L.Count("ScansN", load?.ScansToday ?? 0)
+            </span>
+        </button>
+    }
+</div>
+
+<div class="lx-station lx-mb-lg">
+    <div class="lx-card lx-scan-box">
+        <div class="lx-mode-switch" role="tablist" aria-label="@L["ScanMode"]">
+            @foreach (var (op, icon, key) in Modes)
+            {
+                <button type="button" role="tab" aria-selected="@(mode == op ? "true" : "false")"
+                        class="@Bp.Cls("lx-mode-btn", Bp.When(mode == op, "lx-mode-btn-active"))" @onclick="@(() => SetModeAsync(op))">
+                    <Icon Name="@icon" /> <span>@L[key]</span>
+                </button>
+            }
+        </div>
+
+        <div class="lx-form-grid">
+            @if (mode == ScanOperation.Receive)
+            {
+                <FormField TValue="string" Label="@L["Field_Shelf"]" Hint="@L["StickyHint"]" For="lx-bin">
+                    <div class="bp6-input-group bp6-large">
+                        <span class="bp6-icon bp6-icon-standard bp6-icon-box"></span>
+                        <input id="lx-bin" class="bp6-input lx-upper" dir="ltr" placeholder="A-01-2" @bind="bin" autocomplete="off" />
+                    </div>
+                </FormField>
+            }
+            else if (mode == ScanOperation.Dispatch)
+            {
+                <FormField TValue="string" Label="@L["Field_Courier"]" Hint="@L["StickyHint"]" For="lx-courier" CssClass="lx-span-2">
+                    <HtmlSelect Id="lx-courier" Value="@courier" ValueChanged="@(v => courier = v)" Fill="true" Label="@L["Field_Courier"]">
+                        <option value="">@L["ChooseCourier"]</option>
+                        @foreach (var c in HubCouriers)
+                        {
+                            <option value="@c.DisplayLabel">@c.Name (@c.Code) · @Fmt.Place(c.Governorate)</option>
+                        }
+                    </HtmlSelect>
+                </FormField>
+            }
+            else if (mode == ScanOperation.Load)
+            {
+                <FormField TValue="string" Label="@L["Field_Truck"]" Helper="@L["LoadAutoHint"]" For="lx-truck" CssClass="lx-span-2">
+                    <div class="bp6-control-group bp6-fill">
+                        <HtmlSelect Id="lx-truck" Value="@truckId" ValueChanged="@(v => truckId = v)" Fill="true" Label="@L["Field_Truck"]">
+                            <option value="">@L["TruckAuto"]</option>
+                            @foreach (var t in loadingTrucks)
+                            {
+                                <option value="@t.Id">@t.Number · @HubCatalog.FindOrDefault(t.FromHubCode).RoutingTag → @HubCatalog.FindOrDefault(t.ToHubCode).RoutingTag · @L.Count("ParcelsN", t.Planned + t.Loaded)</option>
+                            }
+                        </HtmlSelect>
+                        <LinkButton Href="transfers" Icon="share" Tip="@L["Nav_Transfers"]" />
+                    </div>
+                </FormField>
+            }
+        </div>
+
+        <form @onsubmit="ScanAsync" class="bp6-form-group" style="margin:0">
+            <label class="bp6-label" for="lx-scan">@L["ScanOrType"] · <span class="bp6-text-muted">@HubCatalog.FindOrDefault(hubCode).DisplayLabel</span></label>
+            <div class="bp6-control-group bp6-fill bp6-large">
+                <div class="bp6-input-group bp6-large bp6-fill lx-scan-input">
+                    <span class="bp6-icon bp6-icon-large bp6-icon-barcode"></span>
+                    <input id="lx-scan" class="bp6-input bp6-large lx-upper" dir="ltr" placeholder="LX26…" @bind="scan" autocomplete="off" aria-describedby="lx-scan-result" />
+                </div>
+                <Button Large="true" Icon="camera" Tip="@L["CameraScan"]" OnClick="OpenCameraAsync" />
+                <Button Type="submit" Intent="Intent.Primary" Large="true" Icon="tick" Text="@L[ModeKey(mode)]" Loading="busy" />
+            </div>
+        </form>
+
+        <div id="lx-scan-result" role="status" aria-live="polite">
+            @if (last is not null)
+            {
+                <div class="@Bp.Cls("lx-scan-result", !last.Ok ? "lx-scan-error" : last.Warning ? "lx-scan-warn" : "lx-scan-ok")">
+                    <Icon Name="@(!last.Ok ? "error" : last.Warning ? "warning-sign" : "tick-circle")" Large="true" />
+                    <div class="lx-stack">
+                        <div class="lx-scan-title"><span class="lx-code">@last.TrackingNumber</span></div>
+                        <div><Mixed Text="@last.Message" /></div>
+                        @if (last.Hint is not null)
+                        {
+                            <div class="lx-semibold"><Mixed Text="@last.Hint" /></div>
+                        }
+                    </div>
+                    @if (last.ShipmentId is { } sid)
+                    {
+                        <LinkButton Href="@($"shipments/{sid}")" Icon="@Bidi.Forward" Minimal="true" Tip="@L["OpenShipment"]" />
+                    }
+                </div>
+            }
+        </div>
+
+        @if (session.Count > 1)
+        {
+            <ul class="lx-list">
+                @foreach (var s in session.Skip(1).Take(6))
+                {
+                    <li class="lx-list-item" style="padding-inline:4px">
+                        <span class="@Bp.Cls("lx-list-icon", s.Ok ? s.Warning ? "lx-list-icon-warning" : "lx-list-icon-success" : "lx-list-icon-danger")"><Icon Name="@(s.Ok ? "tick" : "cross")" /></span>
+                        <span class="lx-list-body">
+                            <span class="lx-list-title"><span class="lx-code">@s.TrackingNumber</span></span>
+                            <span class="lx-list-sub"><Mixed Text="@s.Message" /></span>
+                        </span>
+                        <span class="lx-list-meta">@Fmt.Time(s.At)</span>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+
+    <Section Title="@string.Format(CultureInfo.CurrentCulture, L["TodayAtHub"], HubCatalog.FindOrDefault(hubCode).Name)" Icon="office" Padded="false">
+        <ul class="lx-list">
+            <li><button type="button" class="lx-list-item" @onclick="@(() => tab = "shelves")">
+                <span class="lx-list-icon lx-list-icon-primary"><Icon Name="box" /></span>
+                <span class="lx-list-body"><span class="lx-list-title">@L["OnShelves"]</span><span class="lx-list-sub">@L["OnShelvesHint"]</span></span>
+                <span class="lx-kpi-number" style="font-size:20px">@Fmt.Number(Hub?.OnShelves ?? 0)</span></button></li>
+            <li><a class="lx-list-item" href="@($"shipments?hub={hubCode}&inWarehouse=true")">
+                <span class="lx-list-icon lx-list-icon-success"><Icon Name="truck" /></span>
+                <span class="lx-list-body"><span class="lx-list-title">@L["ToDispatch"]</span><span class="lx-list-sub">@L["ToDispatchHint"]</span></span>
+                <span class="lx-kpi-number" style="font-size:20px">@Fmt.Number(Hub?.ToDispatch ?? 0)</span></a></li>
+            <li><button type="button" class="lx-list-item" @onclick="@(() => tab = "waiting")">
+                <span class="lx-list-icon lx-list-icon-warning"><Icon Name="drive-time" /></span>
+                <span class="lx-list-body"><span class="lx-list-title">@L["WaitingForTruck"]</span><span class="lx-list-sub">@L["WaitingForTruckHint"]</span></span>
+                <span class="lx-kpi-number" style="font-size:20px">@Fmt.Number(Hub?.ToTransfer ?? 0)</span></button></li>
+            <li><button type="button" class="lx-list-item" @onclick="@(() => tab = "inbound")">
+                <span class="lx-list-icon lx-list-icon-primary"><Icon Name="import" /></span>
+                <span class="lx-list-body"><span class="lx-list-title">@L["InboundTrucks"]</span><span class="lx-list-sub">@L["InboundTrucksHint"]</span></span>
+                <span class="lx-kpi-number" style="font-size:20px">@Fmt.Number(Hub?.Inbound ?? 0)</span></button></li>
+            <li><a class="lx-list-item" href="returns">
+                <span class="lx-list-icon lx-list-icon-warning"><Icon Name="undo" /></span>
+                <span class="lx-list-body"><span class="lx-list-title">@L["ReturnsForSellers"]</span><span class="lx-list-sub">@L["ReturnsForSellersHint"]</span></span>
+                <span class="lx-kpi-number" style="font-size:20px">@Fmt.Number(Hub?.ReturnsWaiting ?? 0)</span></a></li>
+        </ul>
+    </Section>
+</div>
+
+<Tabs @bind-Selected="tab">
+    <Tab Id="shelves" Title="@L["OnShelves"]" Icon="box" Count="@(shelves?.TotalCount)">
+        <div class="lx-table-card">
+            <ShipmentTable Items="shelves?.Items" Loading="loading" Columns="ShipmentColumns.Hub" EmptyIcon="box" EmptyTitle="@L["WarehouseEmpty"]" />
+            @if (shelves is not null)
+            {
+                <Pager Page="shelves.Page" PageSize="shelves.PageSize" Total="shelves.TotalCount" OnPage="@(p => PageAsync(p))" OnPageSize="@(s => PageSizeAsync(s))" />
+            }
+        </div>
+    </Tab>
+    <Tab Id="waiting" Title="@L["WaitingForTruck"]" Icon="drive-time" Count="@(waiting?.TotalCount)" CountIntent="Intent.Warning">
+        <div class="lx-table-card">
+            <ShipmentTable Items="waiting?.Items" Loading="loading" Columns="ShipmentColumns.Hub" EmptyIcon="drive-time" EmptyTitle="@L["NothingWaitingForTruck"]" />
+        </div>
+    </Tab>
+    <Tab Id="inbound" Title="@L["InboundTrucks"]" Icon="import" Count="@(inbound.Count)">
+        <TransferTable Items="inbound" EmptyTitle="@L["NoInboundTrucks"]" />
+    </Tab>
+    <Tab Id="commands" Title="@L["Tab_QuickCommands"]" Icon="flash">
+        <div class="lx-card">
+            <p class="bp6-text-muted lx-card-pad" style="margin:0;padding-block-end:0">@L["ActionBarcodesSubtitle"]</p>
+            <div class="lx-command-grid">
+                @foreach (var cmd in HubCatalog.ActionBarcodes)
+                {
+                    <button type="button" class="lx-command-card" @onclick="@(() => RunCommandAsync(cmd.Code))" title="@cmd.Code">
+                        <div class="lx-command-title"><Mixed Text="@cmd.Label" /></div>
+                        @((MarkupString)Code128Barcode.ToSvg(cmd.Code, 34, true))
+                    </button>
+                }
+            </div>
+        </div>
+    </Tab>
+</Tabs>
+
+<Dialog IsOpen="cameraOpen" IsOpenChanged="OnCameraDialogChangedAsync" Title="@L["CameraScanTitle"]" Icon="camera" Width="540px">
+    <ChildContent>
+        <div class="lx-stack">
+            <div class="lx-camera-frame">
+                <video id="lx-camera-video" playsinline muted autoplay class="lx-camera-video"></video>
+                <div class="lx-camera-reticle"></div>
+            </div>
+            <p class="bp6-text-muted" style="margin:0">@L["CameraScanHint"]</p>
+            @if (cameraError is not null)
+            {
+                <Callout Intent="Intent.Warning" Icon="warning-sign">@cameraError</Callout>
+            }
+            @if (last is not null)
+            {
+                <div class="@Bp.Cls("lx-scan-result", !last.Ok ? "lx-scan-error" : last.Warning ? "lx-scan-warn" : "lx-scan-ok")">
+                    <Icon Name="@(!last.Ok ? "error" : last.Warning ? "warning-sign" : "tick-circle")" Large="true" />
+                    <div class="lx-stack">
+                        <div class="lx-scan-title"><span class="lx-code">@last.TrackingNumber</span></div>
+                        <div><Mixed Text="@last.Message" /></div>
+                    </div>
+                </div>
+            }
+        </div>
+    </ChildContent>
+    <Footer>
+        <Button Text="@L["Close"]" OnClick="CloseCameraAsync" />
+    </Footer>
+</Dialog>
+
+@code {
+    private sealed record SessionScan(DateTimeOffset At, string TrackingNumber, bool Ok, bool Warning, string Message, string? Hint, Guid? ShipmentId);
+
+    private static readonly (ScanOperation Op, string Icon, string Key)[] Modes =
+    [
+        (ScanOperation.Receive, "import", "Mode_Receive"),
+        (ScanOperation.Dispatch, "truck", "Mode_Dispatch"),
+        (ScanOperation.Load, "drive-time", "Mode_Load"),
+        (ScanOperation.Verify, "endorsed", "Mode_Verify"),
+    ];
+
+    [SupplyParameterFromQuery(Name = "hub")] public string? HubParam { get; set; }
+
+    private ScanOperation mode = ScanOperation.Receive;
+    private string hubCode = HubCatalog.Primary.Code;
+    private string? bin = "A-01-1";
+    private string? courier;
+    private string? truckId;
+    private string? scan;
+    private string? tab = "shelves";
+    private bool busy;
+    private bool loading;
+    private bool cameraOpen;
+    private string? cameraError;
+    private DotNetObjectReference<WarehouseStation>? selfRef;
+    private int page = 1;
+    private int pageSize = 25;
+    private SessionScan? last;
+    private readonly List<SessionScan> session = [];
+    private NetworkOverview? network;
+    private ShipmentListResult? shelves;
+    private ShipmentListResult? waiting;
+    private IReadOnlyList<TransferListItem> inbound = [];
+    private IReadOnlyList<TransferListItem> loadingTrucks = [];
+    private IReadOnlyList<CourierLookupItem> couriers = [];
+
+    private HubLoad? Hub => network?.Hubs.FirstOrDefault(h => h.HubCode == hubCode);
+
+    /// <summary>This hub's couriers first, then the others.</summary>
+    private IEnumerable<CourierLookupItem> HubCouriers =>
+        couriers.OrderBy(c => HubCatalog.ResolveDestinationHub(c.Governorate).Code == hubCode ? 0 : 1).ThenBy(c => c.Name);
+
+    private static string ModeKey(ScanOperation op) => op switch
+    {
+        ScanOperation.Dispatch => "Dispatch",
+        ScanOperation.Load => "Mode_Load",
+        ScanOperation.Verify => "Mode_Verify",
+        _ => "Receive",
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubCode = HubCatalog.Find(HubParam)?.Code
+            ?? HubCatalog.Find(await JS.InvokeAsync<string?>("lx.getPref", "hub"))?.Code
+            ?? HubCatalog.Primary.Code;
+        var couriersTask = Shipments.LookupCouriersAsync();
+        await RefreshAsync();
+        couriers = await couriersTask;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("lx.focus", "lx-scan");
+        }
+    }
+
+    private async Task RefreshAsync()
+    {
+        loading = true;
+        try
+        {
+            var networkTask = Operations.GetNetworkAsync();
+            var shelvesTask = Shipments.ListAsync(new ShipmentQuery { Hub = hubCode, InWarehouse = true, Sort = "bin", Desc = false, Page = page, PageSize = pageSize });
+            var waitingTask = Shipments.ListAsync(new ShipmentQuery { Hub = hubCode, NeedsTransfer = true, Sort = "age", PageSize = 100 });
+            var trucksTask = Operations.ListTransfersAsync(hub: hubCode, pageSize: 100);
+            await Task.WhenAll(networkTask, shelvesTask, waitingTask, trucksTask);
+            network = await networkTask;
+            shelves = await shelvesTask;
+            waiting = await waitingTask;
+            var trucks = (await trucksTask).Items;
+            inbound = trucks.Where(t => t.ToHubCode == hubCode && t.Status == TransferStatus.InTransit).ToList();
+            loadingTrucks = trucks.Where(t => t.FromHubCode == hubCode && t.Status == TransferStatus.Loading).ToList();
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private async Task SelectHubAsync(string next)
+    {
+        hubCode = next;
+        truckId = null;
+        page = 1;
+        await JS.InvokeVoidAsync("lx.setPref", "hub", next);
+        await RefreshAsync();
+        await JS.InvokeVoidAsync("lx.focus", "lx-scan");
+    }
+
+    private async Task SetModeAsync(ScanOperation next)
+    {
+        mode = next;
+        last = null;
+        await Task.Yield();
+        await JS.InvokeVoidAsync("lx.focus", "lx-scan");
+    }
+
+    private async Task RunCommandAsync(string code)
+    {
+        scan = code;
+        await ScanAsync();
+    }
+
+    private async Task ScanAsync()
+    {
+        var raw = scan?.Trim();
+        if (string.IsNullOrEmpty(raw) || busy)
+        {
+            return;
+        }
+
+        scan = null;
+        if (HubCatalog.TryParseActionBarcode(raw, out var command))
+        {
+            await ApplyCommandAsync(command, raw);
+            return;
+        }
+
+        var number = TrackingNumber.Normalize(raw);
+        if (!TrackingNumber.IsValid(number))
+        {
+            await RecordAsync(new SessionScan(DateTimeOffset.UtcNow, number, false, false, L["InvalidTrackingNumber"], null, null));
+            return;
+        }
+
+        if (mode == ScanOperation.Dispatch && string.IsNullOrEmpty(courier))
+        {
+            await RecordAsync(new SessionScan(DateTimeOffset.UtcNow, number, false, false, L["ChooseCourierFirst"], null, null));
+            return;
+        }
+
+        busy = true;
+        try
+        {
+            var outcome = await Operations.ScanAsync(new ScanRequest
+            {
+                Operation = mode,
+                TrackingNumber = number,
+                HubCode = hubCode,
+                WarehouseBin = bin,
+                CourierName = courier,
+                TransferId = Guid.TryParse(truckId, out var id) ? id : null,
+            });
+            Ops.LastLocalScanSeq = Math.Max(Ops.LastLocalScanSeq, outcome.Seq);
+            await RecordAsync(new SessionScan(outcome.ScannedAt, number, true, outcome.IsMisrouted || outcome.NextHubCode is not null, outcome.Message, HintFor(outcome), outcome.ShipmentId));
+        }
+        catch (ApiException ex)
+        {
+            await RecordAsync(new SessionScan(DateTimeOffset.UtcNow, number, false, false, ex.UserMessage, null, null));
+        }
+        finally
+        {
+            busy = false;
+        }
+
+        await RefreshAsync();
+        await Ops.RefreshAsync();
+    }
+
+    /// <summary>What to do with the parcel next, in plain words.</summary>
+    private string? HintFor(ScanOutcome o)
+    {
+        if (o.IsMisrouted && o.ExpectedHubCode is { } expected)
+        {
+            return string.Format(CultureInfo.CurrentCulture, L["MisrouteHint"], Fmt.Hub(expected));
+        }
+
+        if (o.NextHubCode is { } next)
+        {
+            return o.TransferNumber is null
+                ? string.Format(CultureInfo.CurrentCulture, L["NextHubHint"], Fmt.Hub(next))
+                : string.Format(CultureInfo.CurrentCulture, L["PlannedOnTruckHint"], Fmt.Hub(next), o.TransferNumber);
+        }
+
+        return o.Operation == ScanOperation.Receive && o.Status is ShipmentStatus.AtWarehouse or ShipmentStatus.AtDestinationWarehouse
+            ? L["ReadyForCourierHint"].Value
+            : null;
+    }
+
+    private async Task ApplyCommandAsync(ActionBarcodeCommand command, string raw)
+    {
+        string message;
+        switch (command.Kind)
+        {
+            case ActionBarcodeKind.SwitchMode:
+                mode = command.Value switch
+                {
+                    "DISPATCH" => ScanOperation.Dispatch,
+                    "VERIFY" => ScanOperation.Verify,
+                    "LOAD" => ScanOperation.Load,
+                    _ => ScanOperation.Receive,
+                };
+                message = string.Format(CultureInfo.CurrentCulture, L["ModeSwitched"], L[ModeKey(mode)]);
+                break;
+            case ActionBarcodeKind.SwitchHub:
+                await SelectHubAsync(command.Value);
+                message = string.Format(CultureInfo.CurrentCulture, L["HubSwitched"], HubCatalog.FindOrDefault(command.Value).Name);
+                break;
+            default:
+                bin = command.Value;
+                mode = ScanOperation.Receive;
+                message = string.Format(CultureInfo.CurrentCulture, L["ShelfSwitched"], command.Value);
+                break;
+        }
+
+        await RecordAsync(new SessionScan(DateTimeOffset.UtcNow, raw.ToUpperInvariant(), true, false, message, null, null));
+    }
+
+    private async Task RecordAsync(SessionScan entry)
+    {
+        last = entry;
+        session.Insert(0, entry);
+        if (session.Count > 30)
+        {
+            session.RemoveAt(session.Count - 1);
+        }
+
+        if (entry.Ok && entry.Warning)
+        {
+            await JS.InvokeVoidAsync("lx.remoteBeep", true, true);
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("lx.beep", entry.Ok);
+        }
+
+        await JS.InvokeVoidAsync("lx.focus", "lx-scan");
+    }
+
+    private Task PageAsync(int p)
+    {
+        page = p;
+        return RefreshAsync();
+    }
+
+    private Task PageSizeAsync(int size)
+    {
+        pageSize = size;
+        page = 1;
+        return RefreshAsync();
+    }
+
+    private async Task OpenCameraAsync()
+    {
+        cameraError = null;
+        cameraOpen = true;
+        await Task.Yield();
+        selfRef ??= DotNetObjectReference.Create(this);
+        var status = await JS.InvokeAsync<string>("lx.startCameraScan", "lx-camera-video", selfRef);
+        if (status != "ok")
+        {
+            cameraError = L["CameraNotSupported"].Value;
+        }
+    }
+
+    private async Task CloseCameraAsync()
+    {
+        cameraOpen = false;
+        cameraError = null;
+        await JS.InvokeVoidAsync("lx.stopCameraScan");
+        await JS.InvokeVoidAsync("lx.focus", "lx-scan");
+    }
+
+    private Task OnCameraDialogChangedAsync(bool open) =>
+        open ? Task.CompletedTask : CloseCameraAsync();
+
+    [JSInvokable]
+    public async Task OnCameraBarcodeDetected(string code)
+    {
+        if (string.IsNullOrWhiteSpace(code) || busy)
+        {
+            return;
+        }
+
+        scan = code;
+        await ScanAsync();
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            if (cameraOpen)
+            {
+                await JS.InvokeVoidAsync("lx.stopCameraScan");
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+
+        selfRef?.Dispose();
+    }
+}

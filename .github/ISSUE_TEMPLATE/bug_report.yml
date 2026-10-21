@@ -1,0 +1,46 @@
+name: Bug report
+description: Something does not work as it should
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Never paste real customer names, phone numbers or addresses. Use demo data or blur them.
+        Security problems go to the Security tab → "Report a vulnerability", not here.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open Hub station, choose BGW
+        2. Scan LX26…
+        3. …
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language
+      options: ["Arabic", "English", "Both"]
+  - type: dropdown
+    id: theme
+    attributes:
+      label: Theme
+      options: ["Dark", "Light", "Both"]
+  - type: input
+    id: device
+    attributes:
+      label: Browser and device
+      placeholder: Chrome 140 on Android phone / Edge on Windows with a USB scanner
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots, logs or version
+      description: The commit or image tag you run helps a lot.

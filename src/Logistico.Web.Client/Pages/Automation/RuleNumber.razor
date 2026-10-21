@@ -1,0 +1,20 @@
+<div class="lx-rule">
+    <div><div class="lx-rule-title">@Title</div><div class="lx-rule-desc">@Hint</div></div>
+    <div class="lx-rule-value">
+        <input class="bp6-input" type="number" min="@Min" max="@Max" value="@Value" @onchange="ChangedAsync" aria-label="@Title" />
+        <span>@Unit</span>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter] public string? Hint { get; set; }
+    [Parameter] public string? Unit { get; set; }
+    [Parameter] public int Min { get; set; } = 1;
+    [Parameter] public int Value { get; set; }
+    [Parameter] public EventCallback<int> ValueChanged { get; set; }
+    [Parameter] public int Max { get; set; } = 168;
+
+    private Task ChangedAsync(ChangeEventArgs e) =>
+        int.TryParse(e.Value?.ToString(), out var value) ? ValueChanged.InvokeAsync(Math.Clamp(value, Min, Max)) : Task.CompletedTask;
+}

@@ -1,0 +1,186 @@
+@page "/shipments/new"
+@attribute [Authorize(Policy = StaffPolicies.Operate)]
+@inject ShipmentsApi Shipments
+@inject MerchantsApi Merchants
+@inject NavigationManager Navigation
+@inject Toaster Toaster
+
+<PageTitle>@L["NewInternationalTitle"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["NewInternationalTitle"]" Subtitle="@L["NewInternationalSubtitle"]" Icon="globe" Breadcrumbs="@([(L["Nav_Shipments"].Value, "shipments")])" />
+
+<EditForm Model="model" OnValidSubmit="SubmitAsync" Context="form">
+    <DataAnnotationsValidator />
+    <div class="lx-form-layout">
+        <div class="lx-stack" style="gap:0;min-width:0">
+            <Section Title="@L["Sec_Route"]" Icon="airplane">
+                <div class="lx-form-grid lx-form-grid-3">
+                    <FormField Label="@L["Field_Mode"]" Required="true" Field="() => model.Mode">
+                        <span class="bp6-html-select bp6-fill">
+                            <InputSelect @bind-Value="model.Mode">
+                                @foreach (var m in Enum.GetValues<TransportMode>())
+                                {
+                                    <option value="@m">@ShipmentTexts.Of(m)</option>
+                                }
+                            </InputSelect>
+                            <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                        </span>
+                    </FormField>
+                    <FormField Label="@L["Field_Origin"]" Required="true" Helper="@L["LocodeHelper"]" Field="() => model.OriginCode">
+                        <InputText class="bp6-input bp6-fill lx-upper" @bind-Value="model.OriginCode" placeholder="CNSHA" dir="ltr" />
+                    </FormField>
+                    <FormField Label="@L["Field_Destination"]" Required="true" Field="() => model.DestinationCode">
+                        <InputText class="bp6-input bp6-fill lx-upper" @bind-Value="model.DestinationCode" placeholder="IQUQR" dir="ltr" />
+                    </FormField>
+                    <FormField Label="@L["Field_Incoterm"]" Hint="@L["Optional"]" Field="() => model.Incoterm">
+                        <span class="bp6-html-select bp6-fill">
+                            <InputSelect @bind-Value="model.Incoterm">
+                                <option value="">—</option>
+                                @foreach (var term in Incoterms)
+                                {
+                                    <option value="@term">@term</option>
+                                }
+                            </InputSelect>
+                            <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                        </span>
+                    </FormField>
+                    <FormField Label="@L["Field_HouseBill"]" Hint="@L["Optional"]" Field="() => model.HouseBillNumber">
+                        <InputText class="bp6-input bp6-fill" @bind-Value="model.HouseBillNumber" dir="ltr" />
+                    </FormField>
+                    <FormField Label="@L["Field_Promised"]" Hint="@L["Optional"]" Field="() => model.PromisedAt">
+                        <InputDate class="bp6-input bp6-fill" @bind-Value="model.PromisedAt" />
+                    </FormField>
+                </div>
+            </Section>
+
+            <Section Title="@L["Sec_Parties"]" Icon="people">
+                <div class="lx-form-grid">
+                    <FormField Label="@L["Field_Shipper"]" Required="true" Field="() => model.ShipperName">
+                        <InputText class="bp6-input bp6-fill" @bind-Value="model.ShipperName" />
+                    </FormField>
+                    <FormField Label="@L["Field_Seller"]" Hint="@L["Optional"]" Field="() => model.MerchantId">
+                        <span class="bp6-html-select bp6-fill">
+                            <InputSelect @bind-Value="model.MerchantId">
+                                <option value="">—</option>
+                                @foreach (var m in merchants)
+                                {
+                                    <option value="@m.Id">@m.Name</option>
+                                }
+                            </InputSelect>
+                            <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                        </span>
+                    </FormField>
+                    <FormField Label="@L["Field_Consignee"]" Required="true" Field="() => model.ConsigneeName">
+                        <InputText class="bp6-input bp6-fill" @bind-Value="model.ConsigneeName" />
+                    </FormField>
+                    <FormField Label="@L["Field_ConsigneePhone"]" Hint="@L["Optional"]" Field="() => model.ConsigneePhone">
+                        <InputText class="bp6-input bp6-fill" @bind-Value="model.ConsigneePhone" type="tel" dir="ltr" placeholder="+964 770 123 4567" />
+                    </FormField>
+                </div>
+            </Section>
+
+            <Section Title="@L["Sec_Cargo"]" Icon="cube">
+                <div class="lx-form-grid lx-form-grid-3">
+                    <FormField Label="@L["Field_Pieces"]" Field="() => model.Pieces">
+                        <InputNumber class="bp6-input bp6-fill" @bind-Value="model.Pieces" min="1" />
+                    </FormField>
+                    <FormField Label="@L["Field_WeightKg"]" Field="() => model.GrossWeightKg">
+                        <InputNumber class="bp6-input bp6-fill" @bind-Value="model.GrossWeightKg" step="0.1" min="0" />
+                    </FormField>
+                    <FormField Label="@L["Field_VolumeCbm"]" Field="() => model.VolumeCbm">
+                        <InputNumber class="bp6-input bp6-fill" @bind-Value="model.VolumeCbm" step="0.01" min="0" />
+                    </FormField>
+                    <FormField Label="@L["Field_DeclaredValue"]" Hint="@L["Optional"]" Field="() => model.DeclaredValue">
+                        <InputNumber class="bp6-input bp6-fill" @bind-Value="model.DeclaredValue" min="0" />
+                    </FormField>
+                    <FormField Label="@L["Field_Currency"]" Field="() => model.DeclaredCurrency">
+                        <span class="bp6-html-select bp6-fill">
+                            <InputSelect @bind-Value="model.DeclaredCurrency">
+                                @foreach (var c in Currencies)
+                                {
+                                    <option value="@c">@c</option>
+                                }
+                            </InputSelect>
+                            <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                        </span>
+                    </FormField>
+                    <FormField Label="@L["Field_Notes"]" Hint="@L["Optional"]" Field="() => model.Notes">
+                        <InputText class="bp6-input bp6-fill" @bind-Value="model.Notes" />
+                    </FormField>
+                </div>
+            </Section>
+        </div>
+
+        <aside class="lx-form-side">
+            <Section Title="@L["Summary"]" Icon="clipboard">
+                <dl class="lx-props">
+                    <dt>@L["Field_Mode"]</dt>
+                    <dd>@(model.Mode is { } mode ? ShipmentTexts.Of(mode) : "—")</dd>
+                    <dt>@L["Chargeable"]</dt>
+                    <dd class="lx-strong">@ChargeableText</dd>
+                    <dt>@L["ChargeableRule"]</dt>
+                    <dd class="bp6-text-muted lx-small">@RuleText</dd>
+                </dl>
+                @if (serverError is not null)
+                {
+                    <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mt">@serverError</Callout>
+                }
+                <Button Type="submit" Intent="Intent.Primary" Large="true" Fill="true" Icon="tick" Text="@L["BookShipment"]" Loading="saving" CssClass="lx-mt" />
+                <LinkButton Href="shipments" Minimal="true" Text="@L["Cancel"]" CssClass="lx-mt bp6-fill" />
+            </Section>
+        </aside>
+    </div>
+</EditForm>
+
+@code {
+    private static readonly string[] Incoterms = ["EXW", "FCA", "FOB", "CFR", "CIF", "CPT", "CIP", "DAP", "DPU", "DDP", "FAS"];
+    private static readonly string[] Currencies = ["USD", "IQD", "EUR", "CNY", "TRY", "AED"];
+
+    private readonly CreateShipmentRequest model = new()
+    {
+        ServiceType = ServiceType.International,
+        Mode = TransportMode.SeaLcl,
+        OriginCode = "",
+        DestinationCode = "IQUQR",
+        DeclaredCurrency = "USD",
+        CodCurrency = null,
+        PickupRequired = false,
+    };
+
+    private IReadOnlyList<MerchantLookupItem> merchants = [];
+    private bool saving;
+    private string? serverError;
+
+    private string ChargeableText =>
+        model.Mode is { } mode && model.GrossWeightKg >= 0 && model.VolumeCbm >= 0
+            ? $"{Fmt.Number(ChargeableWeight.Calculate(mode, model.GrossWeightKg, model.VolumeCbm), 3)} {L["Kg"]}"
+            : "—";
+
+    private string RuleText => model.Mode is TransportMode.SeaFcl or TransportMode.SeaLcl
+        ? L["RuleSea"]
+        : string.Format(CultureInfo.CurrentCulture, L["RuleDivisor"], ChargeableWeight.VolumetricDivisor(model.Mode ?? TransportMode.Air));
+
+    protected override async Task OnInitializedAsync() => merchants = await Merchants.LookupAsync();
+
+    private async Task SubmitAsync()
+    {
+        saving = true;
+        serverError = null;
+        try
+        {
+            model.OriginCode = model.OriginCode.Trim().ToUpperInvariant();
+            model.DestinationCode = model.DestinationCode.Trim().ToUpperInvariant();
+            var created = await Shipments.CreateAsync(model);
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["ShipmentBooked"], created.TrackingNumber));
+            Navigation.NavigateTo($"shipments/{created.Id}");
+        }
+        catch (ApiException ex)
+        {
+            serverError = ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

@@ -1,0 +1,12 @@
+@if (Title is null)
+{
+    <li class="bp6-menu-divider" role="separator"></li>
+}
+else
+{
+    <li class="bp6-menu-header" role="presentation"><h6 class="bp6-heading">@Title</h6></li>
+}
+
+@code {
+    [Parameter] public string? Title { get; set; }
+}

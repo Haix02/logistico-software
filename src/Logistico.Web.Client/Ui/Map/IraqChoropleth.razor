@@ -1,0 +1,91 @@
+@* Iraq's governorates shaded by any value (orders, success rate, basket…), with the value under each name.
+   Sequential blue for amounts; for rates, a red → green scale where higher is better (or the reverse). *@
+
+<svg class="lx-map lx-choropleth" viewBox="@ViewBox" role="img" aria-label="@AriaLabel" xmlns="http://www.w3.org/2000/svg">
+    <g>
+        @foreach (var shape in IraqMapShapes.Governorates)
+        {
+            var value = ValueOf(shape.Code);
+            var name = Logistico.SharedKernel.Iraq.IraqGovernorates.Find(shape.Code)?.Name ?? shape.Code;
+            var shown = value is { } v ? Format(v) : "—";
+            <path d="@shape.Path" class="@Bp.Cls("lx-map-gov", StepFor(value), Bp.When(Selected == shape.Code, "lx-map-gov-selected"))"
+                  @onclick="@(() => OnSelect.InvokeAsync(Selected == shape.Code ? null : shape.Code))"
+                  @onkeydown="@(e => KeyAsync(e, shape.Code))" tabindex="0" role="button" aria-label="@($"{name}: {shown}")">
+                <title>@name · @shown</title>
+            </path>
+        }
+    </g>
+    <g>
+        @foreach (var shape in IraqMapShapes.Governorates)
+        {
+            var value = ValueOf(shape.Code);
+            var (x, y) = IraqMap.LabelAt(shape);
+            @SvgText(x, y, "lx-map-label", Logistico.SharedKernel.Iraq.IraqGovernorates.Find(shape.Code)?.Name ?? shape.Code)
+            @SvgText(x, y + 13, "lx-map-label lx-map-count", value is { } v ? Format(v) : "—")
+        }
+    </g>
+</svg>
+
+<div class="lx-map-legend">
+    <span>@(Scale == ChoroplethScale.Sequential ? L["Map_Low"] : Scale == ChoroplethScale.HigherIsBetter ? L["Map_Worse"] : L["Map_Better"])</span>
+    <span class="@Bp.Cls("lx-map-legend-scale", Bp.When(Scale != ChoroplethScale.Sequential, "lx-map-legend-diverging"), Bp.When(Scale == ChoroplethScale.LowerIsBetter, "lx-map-legend-reversed"))"></span>
+    <span>@(Scale == ChoroplethScale.Sequential ? L["Map_High"] : Scale == ChoroplethScale.HigherIsBetter ? L["Map_Better"] : L["Map_Worse"])</span>
+    @if (Range is { } range && range.Max > range.Min)
+    {
+        <span class="lx-muted">@Format(range.Min) – @Format(range.Max)</span>
+    }
+</div>
+
+@code {
+    private const int Steps = 7;
+
+    /// <summary>Value per governorate code; governorates without a value are drawn empty.</summary>
+    [Parameter, EditorRequired] public IReadOnlyDictionary<string, decimal> Values { get; set; } = new Dictionary<string, decimal>();
+    [Parameter] public Func<decimal, string> Format { get; set; } = v => Fmt.Number(v, 0);
+    [Parameter] public ChoroplethScale Scale { get; set; }
+    [Parameter] public string? Selected { get; set; }
+    [Parameter] public EventCallback<string?> OnSelect { get; set; }
+    [Parameter] public string? AriaLabel { get; set; }
+
+    private static string ViewBox => string.Create(CultureInfo.InvariantCulture, $"0 0 {IraqMapShapes.Width} {IraqMapShapes.Height}");
+
+    private (decimal Min, decimal Max)? Range => Values.Count == 0 ? null : (Values.Values.Min(), Values.Values.Max());
+
+    private decimal? ValueOf(string code) =>
+        Values.TryGetValue(code, out var own) ? own
+        // Halabja has no outline of its own in the source data; it is drawn within Sulaymaniyah.
+        : code == "IQ-SU" && Values.TryGetValue("IQ-HA", out var halabja) ? halabja
+        : null;
+
+    /// <summary>
+    /// Amounts: square-root steps from zero, so one big governorate does not wash out the rest. Rates: spread between the
+    /// lowest and highest governorate, so differences of a few points are still visible.
+    /// </summary>
+    private string StepFor(decimal? value)
+    {
+        if (value is not { } v || Range is not { } range)
+        {
+            return "lx-map-s0";
+        }
+
+        if (Scale == ChoroplethScale.Sequential)
+        {
+            var max = Math.Max(1m, range.Max);
+            var step = v <= 0 ? 0 : (int)Math.Ceiling(Math.Sqrt((double)(v / max)) * (Steps - 1));
+            return "lx-map-s" + Math.Clamp(step, v > 0 ? 1 : 0, Steps - 1).ToString(CultureInfo.InvariantCulture);
+        }
+
+        var share = range.Max > range.Min ? (v - range.Min) / (range.Max - range.Min) : 0.5m;
+        var good = Scale == ChoroplethScale.HigherIsBetter ? share : 1 - share;
+        return "lx-map-d" + Math.Clamp((int)Math.Round(good * (Steps - 1)), 0, Steps - 1).ToString(CultureInfo.InvariantCulture);
+    }
+
+    private Task KeyAsync(KeyboardEventArgs e, string code) =>
+        e.Key is "Enter" or " " ? OnSelect.InvokeAsync(Selected == code ? null : code) : Task.CompletedTask;
+
+    private static string F(double value) => value.ToString("0.#", CultureInfo.InvariantCulture);
+
+    /// <summary>SVG &lt;text&gt; (Razor reserves the &lt;text&gt; tag, so it is written as markup).</summary>
+    private static MarkupString SvgText(double x, double y, string cssClass, string content) =>
+        new($"<text x=\"{F(x)}\" y=\"{F(y)}\" class=\"{cssClass}\">{System.Net.WebUtility.HtmlEncode(content)}</text>");
+}

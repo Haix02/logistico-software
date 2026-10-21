@@ -1,0 +1,52 @@
+<nav class="lx-pager" aria-label="@L["Pager_Label"]">
+    <span class="lx-pager-info">
+        @if (Total == 0)
+        {
+            @L["Pager_None"]
+        }
+        else
+        {
+            <span>@L["Pager_Showing"]</span><bdi dir="ltr" class="lx-semibold">@Fmt.Number(From)–@Fmt.Number(To)</bdi><span>@L["Pager_Of"]</span><bdi class="lx-semibold">@Fmt.Number(Total)</bdi>
+        }
+    </span>
+    @if (Extra is not null)
+    {
+        <span class="lx-pager-extra">@Extra</span>
+    }
+    <span class="lx-spacer"></span>
+    <label class="lx-pager-size">
+        <span class="lx-pager-size-label">@L["Pager_PageSize"]</span>
+        <span class="bp6-html-select bp6-minimal">
+            <select value="@PageSize" @onchange="SizeChangedAsync" aria-label="@L["Pager_PageSize"]">
+                @foreach (var size in Sizes)
+                {
+                    <option value="@size">@size</option>
+                }
+            </select>
+            <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+        </span>
+    </label>
+    <span class="lx-pager-nav">
+        <Button Minimal="true" Icon="@Bidi.ChevronBack" Disabled="@(Page <= 1)" OnClick="@(() => OnPage.InvokeAsync(Page - 1))" Title="@L["Pager_Previous"]" />
+        <span class="lx-pager-page"><span>@L["Pager_Page"]</span><bdi>@Fmt.Number(Page)</bdi><span>@L["Pager_Of"]</span><bdi>@Fmt.Number(Pages)</bdi></span>
+        <Button Minimal="true" Icon="@Bidi.ChevronForward" Disabled="@(Page >= Pages)" OnClick="@(() => OnPage.InvokeAsync(Page + 1))" Title="@L["Pager_Next"]" />
+    </span>
+</nav>
+
+@code {
+    private static readonly int[] Sizes = [25, 50, 100, 200];
+
+    [Parameter] public int Page { get; set; } = 1;
+    [Parameter] public int PageSize { get; set; } = 25;
+    [Parameter] public int Total { get; set; }
+    [Parameter] public EventCallback<int> OnPage { get; set; }
+    [Parameter] public EventCallback<int> OnPageSize { get; set; }
+    [Parameter] public RenderFragment? Extra { get; set; }
+
+    private int Pages => Math.Max(1, (int)Math.Ceiling(Total / (double)PageSize));
+    private int From => Total == 0 ? 0 : (Page - 1) * PageSize + 1;
+    private int To => Math.Min(Total, Page * PageSize);
+
+    private Task SizeChangedAsync(ChangeEventArgs e) =>
+        int.TryParse(e.Value?.ToString(), out var size) ? OnPageSize.InvokeAsync(size) : Task.CompletedTask;
+}

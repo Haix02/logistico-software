@@ -1,0 +1,25 @@
+<label class="@Bp.Cls("bp6-control", Checkbox ? "bp6-checkbox" : "bp6-switch", Bp.When(Inline, "bp6-inline"), Bp.When(Large, "bp6-large"), Bp.When(Disabled, "bp6-disabled"), CssClass)">
+    <input type="checkbox" class="bp6-control-input" checked="@Value" disabled="@Disabled" @onchange="ChangedAsync" />
+    <span class="bp6-control-indicator"></span>
+    @Label@ChildContent
+</label>
+
+@code {
+    [Parameter] public bool Value { get; set; }
+    [Parameter] public EventCallback<bool> ValueChanged { get; set; }
+    [Parameter] public string? Label { get; set; }
+
+    /// <summary>Render as a checkbox instead of a switch.</summary>
+    [Parameter] public bool Checkbox { get; set; }
+    [Parameter] public bool Inline { get; set; }
+    [Parameter] public bool Large { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private Task ChangedAsync(ChangeEventArgs e)
+    {
+        Value = e.Value is true;
+        return ValueChanged.InvokeAsync(Value);
+    }
+}

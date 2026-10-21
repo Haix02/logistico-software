@@ -1,0 +1,361 @@
+@page "/shipments"
+@inject ShipmentsApi Shipments
+@inject OperationsApi Operations
+@inject MerchantsApi Merchants
+@inject OpsState Ops
+@inject NavigationManager Navigation
+@inject Toaster Toaster
+@inject IJSRuntime JS
+
+<PageTitle>@L["Nav_Shipments"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["ShipmentsTitle"]" Subtitle="@L["ShipmentsSubtitle"]" Icon="th">
+    <Actions>
+        <SegmentedControl TValue="bool" Options="ViewOptions" Value="board" ValueChanged="ShowBoard" Label="@L["View"]" />
+        <Allowed Policy="@StaffPolicies.Operate">
+            <a class="bp6-button" href="@Shipments.ExportUrl(query)" download><Icon Name="download" /><span class="bp6-button-text">@L["ExportCsv"]</span></a>
+            <LinkButton Href="orders/new" Icon="add" Text="@L["NewOrder"]" Intent="Intent.Primary" />
+        </Allowed>
+    </Actions>
+</PageHeader>
+
+<div class="lx-chips lx-mb" role="toolbar" aria-label="@L["QuickViews"]">
+    @foreach (var view in QuickViews)
+    {
+        var active = view.IsActive(query);
+        <a class="@Bp.Cls("lx-chip", Bp.When(active, "lx-chip-active"))" href="@($"shipments{(active ? "" : view.Query.ToQueryString())}")">
+            <Icon Name="@view.Icon" /> @L[view.TextKey]
+        </a>
+    }
+</div>
+
+<div class="lx-table-card">
+    <div class="lx-toolbar">
+        <SearchInput CssClass="lx-toolbar-search" Value="@query.Q" Placeholder="@L["SearchPlaceholder"]" OnSearch="@(text => ApplyAsync(q => q.Q = text))" />
+        <SegmentedControl TValue="ServiceType?" Options="ServiceOptions" Value="query.Service" ValueChanged="@(v => ApplyAsync(q => q.Service = v))" Label="@L["Col_Service"]" />
+        <StatusFilter Value="@(query.Status ?? [])" ValueChanged="@(v => ApplyAsync(q => q.Status = v.Count == 0 ? null : v.ToArray()))" />
+        <HtmlSelect Value="@query.Governorate" ValueChanged="@(v => ApplyAsync(q => q.Governorate = v))" Label="@L["Col_Destination"]">
+            <option value="">@L["AllGovernorates"]</option>
+            @foreach (var g in IraqGovernorates.All)
+            {
+                <option value="@g.Code">@g.Name</option>
+            }
+        </HtmlSelect>
+        <HtmlSelect Value="@query.Hub" ValueChanged="@(v => ApplyAsync(q => q.Hub = v))" Label="@L["Col_Hub"]">
+            <option value="">@L["AllHubs"]</option>
+            @foreach (var h in HubCatalog.All)
+            {
+                <option value="@h.Code">@h.RoutingTag · @h.Name</option>
+            }
+        </HtmlSelect>
+        <HtmlSelect Value="@query.MerchantId?.ToString()" ValueChanged="@(v => ApplyAsync(q => q.MerchantId = Guid.TryParse(v, out var id) ? id : null))" Label="@L["Col_Seller"]">
+            <option value="">@L["AllSellers"]</option>
+            @foreach (var m in merchants)
+            {
+                <option value="@m.Id">@m.Name</option>
+            }
+        </HtmlSelect>
+        @if (HasFilters)
+        {
+            <Button Minimal="true" Icon="filter-remove" Text="@L["ClearFilters"]" OnClick="@(() => Navigation.NavigateTo("shipments"))" />
+        }
+    </div>
+
+    @if (selected.Count > 0)
+    {
+        <div class="lx-bulk-bar">
+            <Tag Intent="Intent.Primary" Large="true">@string.Format(CultureInfo.CurrentCulture, L["SelectedN"], Fmt.Number(selected.Count))</Tag>
+            <HtmlSelect Value="@bulkHub" ValueChanged="@(v => bulkHub = v ?? HubCatalog.Primary.Code)" Label="@L["Col_Hub"]" Small="true">
+                @foreach (var h in HubCatalog.All)
+                {
+                    <option value="@h.Code">@h.RoutingTag · @h.Name</option>
+                }
+            </HtmlSelect>
+            <Button Small="true" Icon="import" Text="@L["BulkReceive"]" Loading="bulkBusy" OnClick="@(() => RunBulkAsync(ScanOperation.Receive))" />
+            <Button Small="true" Icon="drive-time" Text="@L["BulkLoad"]" Loading="bulkBusy" OnClick="@(() => RunBulkAsync(ScanOperation.Load))" />
+            <Popover Small="true" Icon="truck" Text="@L["BulkDispatch"]" Align="start" Width="300px">
+                <ul class="bp6-menu lx-menu lx-popover-body">
+                    @foreach (var c in couriers)
+                    {
+                        <MenuItem Icon="person" Text="@c.DisplayLabel" Label="@Fmt.Place(c.Governorate)" OnClick="@(() => RunBulkAsync(ScanOperation.Dispatch, c.DisplayLabel))" />
+                    }
+                </ul>
+            </Popover>
+            <Button Small="true" Icon="print" Text="@L["BulkPrintAwb"]" OnClick="PrintSelected" />
+            <span class="lx-spacer"></span>
+            <Button Small="true" Minimal="true" Icon="cross" Text="@L["ClearSelection"]" OnClick="@(() => selected.Clear())" />
+        </div>
+    }
+
+    @if (error is not null)
+    {
+        <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mt">@error</Callout>
+    }
+
+    @if (board && result is not null)
+    {
+        <div class="lx-card-pad">
+            <div class="lx-kanban">
+                @foreach (var (title, icon, predicate) in BoardColumns)
+                {
+                    var items = result.Items.Where(predicate).ToList();
+                    <div class="lx-kanban-col">
+                        <div class="lx-kanban-head"><span class="lx-row"><Icon Name="@icon" /> @title</span><Tag Round="true">@Fmt.Number(items.Count)</Tag></div>
+                        <div class="lx-kanban-list">
+                            @foreach (var item in items)
+                            {
+                                <a class="lx-kanban-card" href="@($"shipments/{item.Id}")" style="color:inherit;text-decoration:none">
+                                    <div class="lx-row" style="justify-content:space-between">
+                                        <span class="lx-code">@item.TrackingNumber</span>
+                                        <HubRoute Current="@item.CurrentHubCode" Target="@item.DestinationHubCode" Status="item.Status" />
+                                    </div>
+                                    <div class="lx-cell-sub lx-mt" style="margin-block-start:4px"><Mixed Text="@item.ConsigneeName" /> · @Fmt.Place(item.DestinationCode)</div>
+                                    <div class="lx-row lx-mt" style="justify-content:space-between;margin-block-start:6px">
+                                        <StatusTag Status="item.Status" />
+                                        <span class="lx-small lx-semibold lx-nowrap">@Fmt.Money(item.CodAmount, item.CodCurrency)</span>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <CascadingValue Value="sort">
+            <ShipmentTable Items="result?.Items" Loading="loading" Columns="ShipmentColumns.List" Selectable="canOperate" @bind-Selected="selected"
+                           EmptyTitle="@L["NoShipments"]" EmptyDescription="@L["NoShipmentsHint"]" />
+        </CascadingValue>
+    }
+
+    @if (result is not null)
+    {
+        <Pager Page="result.Page" PageSize="result.PageSize" Total="result.TotalCount" OnPage="@(p => ApplyAsync(q => q.Page = p, resetPage: false))" OnPageSize="@(size => ApplyAsync(q => q.PageSize = size))">
+            <Extra>
+                @if (result.CodTotals.Count > 0)
+                {
+                    <span class="lx-row" style="gap:6px"><Icon Name="dollar" /> @L["CodTotal"]: <b>@Fmt.Totals(result.CodTotals)</b></span>
+                }
+            </Extra>
+        </Pager>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "q")] public string? Q { get; set; }
+    [SupplyParameterFromQuery(Name = "status")] public string[]? Status { get; set; }
+    [SupplyParameterFromQuery(Name = "service")] public string? Service { get; set; }
+    [SupplyParameterFromQuery(Name = "merchantId")] public Guid? MerchantId { get; set; }
+    [SupplyParameterFromQuery(Name = "governorate")] public string? Governorate { get; set; }
+    [SupplyParameterFromQuery(Name = "inWarehouse")] public bool? InWarehouse { get; set; }
+    [SupplyParameterFromQuery(Name = "hub")] public string? Hub { get; set; }
+    [SupplyParameterFromQuery(Name = "destinationHub")] public string? DestinationHub { get; set; }
+    [SupplyParameterFromQuery(Name = "needsTransfer")] public bool? NeedsTransfer { get; set; }
+    [SupplyParameterFromQuery(Name = "late")] public bool? Late { get; set; }
+    [SupplyParameterFromQuery(Name = "sort")] public string? Sort { get; set; }
+    [SupplyParameterFromQuery(Name = "desc")] public bool? Desc { get; set; }
+    [SupplyParameterFromQuery(Name = "page")] public int? Page { get; set; }
+    [SupplyParameterFromQuery(Name = "pageSize")] public int? PageSize { get; set; }
+
+    /// <summary>"board" shows the pipeline board; kept in the address so the view can be shared like the filters.</summary>
+    [SupplyParameterFromQuery(Name = "view")] public string? View { get; set; }
+
+    private sealed record QuickView(string TextKey, string Icon, ShipmentQuery Query)
+    {
+        public bool IsActive(ShipmentQuery current) => Query.ToQueryString() == new ShipmentQuery
+        {
+            Status = current.Status,
+            InWarehouse = current.InWarehouse,
+            NeedsTransfer = current.NeedsTransfer,
+            Late = current.Late,
+        }.ToQueryString();
+    }
+
+    private static readonly QuickView[] QuickViews =
+    [
+        new("View_Late", "time", new ShipmentQuery { Late = true }),
+        new("View_NeedsTruck", "drive-time", new ShipmentQuery { NeedsTransfer = true }),
+        new("View_InWarehouse", "box", new ShipmentQuery { InWarehouse = true }),
+        new("View_WithCourier", "truck", new ShipmentQuery { Status = [ShipmentStatus.OutForDelivery] }),
+        new("View_Failed", "warning-sign", new ShipmentQuery { Status = [ShipmentStatus.DeliveryFailed] }),
+        new("View_Returns", "undo", new ShipmentQuery { Status = [ShipmentStatus.ReturnInitiated, ShipmentStatus.ReturnInTransit, ShipmentStatus.ReturnAtHub] }),
+        new("View_PickupPending", "shopping-cart", new ShipmentQuery { Status = [ShipmentStatus.Booked] }),
+        new("View_CustomsHold", "ban-circle", new ShipmentQuery { Status = [ShipmentStatus.CustomsHold] }),
+    ];
+
+    private ShipmentQuery query = new();
+    private SortState? sort;
+    private ShipmentListResult? result;
+    private IReadOnlyList<MerchantLookupItem> merchants = [];
+    private IReadOnlyList<CourierLookupItem> couriers = [];
+    private HashSet<Guid> selected = [];
+    private readonly Dictionary<Guid, string> trackingById = [];
+    private string bulkHub = HubCatalog.Primary.Code;
+    private bool bulkBusy;
+    private bool board;
+    private bool loading = true;
+    private bool canOperate;
+    private string? error;
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    private IReadOnlyList<SegmentOption<bool>> ViewOptions => [new(false, L["View_Table"], "th"), new(true, L["View_Kanban"], "column-layout")];
+
+    private IReadOnlyList<SegmentOption<ServiceType?>> ServiceOptions =>
+        [new(null, L["All"]), new(ServiceType.Domestic, ShipmentTexts.Of(ServiceType.Domestic), "shop"), new(ServiceType.International, ShipmentTexts.Of(ServiceType.International), "globe")];
+
+    private bool HasFilters => query.ToQueryString() != new ShipmentQuery { Sort = query.Sort, Desc = query.Desc, Page = 1, PageSize = query.PageSize }.ToQueryString();
+
+    private IEnumerable<(string Title, string Icon, Func<ShipmentListItem, bool> Predicate)> BoardColumns =>
+    [
+        (L["Board_Booked"], "shopping-cart", s => s.Status is ShipmentStatus.Booked or ShipmentStatus.PickedUp or ShipmentStatus.ReceivedAtOrigin or ShipmentStatus.DepartedOrigin or ShipmentStatus.InTransit or ShipmentStatus.ArrivedPortOfEntry or ShipmentStatus.CustomsPending or ShipmentStatus.CustomsHold or ShipmentStatus.Released),
+        (L["View_InWarehouse"], "box", s => ShipmentLifecycle.IsInWarehouse(s.Status)),
+        (ShipmentTexts.Of(ShipmentStatus.InTransitToHub), "drive-time", s => s.Status == ShipmentStatus.InTransitToHub),
+        (L["View_WithCourier"], "truck", s => s.Status is ShipmentStatus.OutForDelivery or ShipmentStatus.DeliveryFailed),
+        (L["View_Returns"], "undo", s => ShipmentLifecycle.IsReturning(s.Status) || s.Status == ShipmentStatus.Returned),
+        (ShipmentTexts.Of(ShipmentStatus.Delivered), "tick-circle", s => s.Status == ShipmentStatus.Delivered),
+    ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        sort = new SortState(SortByAsync);
+        canOperate = await AuthState.CanAsync(StaffPolicies.Operate);
+        var merchantsTask = Merchants.LookupAsync();
+        couriers = await Shipments.LookupCouriersAsync();
+        merchants = await merchantsTask;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        query = new ShipmentQuery
+        {
+            Q = Q,
+            Status = ParseStatuses(Status),
+            Service = Enum.TryParse<ServiceType>(Service, true, out var svc) ? svc : null,
+            MerchantId = MerchantId,
+            Governorate = Governorate,
+            InWarehouse = InWarehouse,
+            Hub = Hub,
+            DestinationHub = DestinationHub,
+            NeedsTransfer = NeedsTransfer,
+            Late = Late,
+            Sort = string.IsNullOrWhiteSpace(Sort) ? null : Sort,
+            Desc = Desc,
+            Page = Page is > 1 ? Page : null,
+            PageSize = PageSize is > 0 and not 25 ? PageSize : null,
+        };
+        board = string.Equals(View, "board", StringComparison.OrdinalIgnoreCase);
+        sort ??= new SortState(SortByAsync);
+        sort.Set(query.Sort ?? "createdAt", query.Desc ?? true);
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        loading = true;
+        error = null;
+        try
+        {
+            result = await Shipments.ListAsync(query);
+            foreach (var item in result.Items)
+            {
+                trackingById[item.Id] = item.TrackingNumber;
+            }
+        }
+        catch (ApiException ex)
+        {
+            error = ex.UserMessage;
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private async Task RunBulkAsync(ScanOperation operation, string? courier = null)
+    {
+        if (selected.Count == 0 || bulkBusy)
+        {
+            return;
+        }
+
+        bulkBusy = true;
+        try
+        {
+            var outcome = await Operations.BulkScanAsync(new BulkScanRequest
+            {
+                Operation = operation,
+                TrackingNumbers = selected.Where(trackingById.ContainsKey).Select(id => trackingById[id]).ToList(),
+                HubCode = bulkHub,
+                CourierName = courier,
+            });
+            if (outcome.Items.Count > 0)
+            {
+                Ops.LastLocalScanSeq = Math.Max(Ops.LastLocalScanSeq, outcome.Items.Max(i => i.Seq));
+            }
+
+            await JS.InvokeVoidAsync("lx.beep", outcome.Failed == 0);
+            var message = string.Format(CultureInfo.CurrentCulture, L["BulkDone"], Fmt.Number(outcome.Succeeded), Fmt.Number(outcome.Failed));
+            if (outcome.Failed == 0)
+            {
+                Toaster.Success(message);
+            }
+            else
+            {
+                Toaster.Warning(message + " " + outcome.Items.First(i => !i.Ok).Message);
+            }
+
+            selected.Clear();
+            await LoadAsync();
+            await Ops.RefreshAsync();
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            bulkBusy = false;
+        }
+    }
+
+    private void PrintSelected()
+    {
+        var numbers = selected.Where(trackingById.ContainsKey).Select(id => trackingById[id]);
+        Navigation.NavigateTo($"shipments/labels?q={Uri.EscapeDataString(string.Join(',', numbers))}");
+    }
+
+    private Task SortByAsync(string key, bool desc) => ApplyAsync(q => { q.Sort = key; q.Desc = desc; }, resetPage: false);
+
+    private Task ApplyAsync(Action<ShipmentQuery> change, bool resetPage = true)
+    {
+        var next = query.Clone();
+        change(next);
+        if (resetPage)
+        {
+            next.Page = null;
+        }
+
+        var url = "shipments" + next.ToQueryString();
+        Navigation.NavigateTo(board ? url + (url.Contains('?', StringComparison.Ordinal) ? "&" : "?") + "view=board" : url);
+        return Task.CompletedTask;
+    }
+
+    private static ShipmentStatus[]? ParseStatuses(string[]? raw)
+    {
+        var parsed = (raw ?? [])
+            .SelectMany(r => r.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            .Select(s => Enum.TryParse<ShipmentStatus>(s, true, out var st) ? (ShipmentStatus?)st : null)
+            .OfType<ShipmentStatus>()
+            .ToArray();
+        return parsed.Length == 0 ? null : parsed;
+    }
+
+    private void ShowBoard(bool value)
+    {
+        board = value;
+        Navigation.NavigateTo(Navigation.GetUriWithQueryParameter("view", value ? "board" : null), replace: true);
+    }
+}

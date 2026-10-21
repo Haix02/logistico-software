@@ -1,0 +1,35 @@
+@implements IDisposable
+@inject OpsState Ops
+
+<Dialog @bind-IsOpen="open" Title="@L["Shortcuts_Title"]" Icon="key-command" Width="640px">
+    <div class="lx-hotkeys">
+        <div class="lx-hotkey"><span>@L["Shortcuts_Palette"]</span><span><kbd class="lx-kbd lx-kbd-light">Ctrl / ⌘ + K</kbd></span></div>
+        <div class="lx-hotkey"><span>@L["Shortcuts_Search"]</span><span><kbd class="lx-kbd lx-kbd-light">/</kbd></span></div>
+        @if (User.Can(StaffPolicies.Operate))
+        {
+            <div class="lx-hotkey"><span>@L["NewOrder"]</span><span><kbd class="lx-kbd lx-kbd-light">n</kbd></span></div>
+        }
+        <div class="lx-hotkey"><span>@L["Shortcuts_Title"]</span><span><kbd class="lx-kbd lx-kbd-light">?</kbd></span></div>
+        <div class="lx-hotkey"><span>@L["Shortcuts_Scanner"]</span><span><Icon Name="barcode" /></span></div>
+        @foreach (var entry in AppNavigation.All.Where(e => e.Shortcut is not null && User.Can(e.Policy)))
+        {
+            <div class="lx-hotkey"><span>@L[entry.TextKey]</span><span><kbd class="lx-kbd lx-kbd-light">g</kbd> <kbd class="lx-kbd lx-kbd-light">@entry.Shortcut</kbd></span></div>
+        }
+    </div>
+</Dialog>
+
+@code {
+    private bool open;
+
+    [Parameter, EditorRequired] public System.Security.Claims.ClaimsPrincipal User { get; set; } = default!;
+
+    protected override void OnInitialized() => Ops.HelpRequested += OnRequested;
+
+    private void OnRequested() => InvokeAsync(() =>
+    {
+        open = true;
+        StateHasChanged();
+    });
+
+    public void Dispose() => Ops.HelpRequested -= OnRequested;
+}

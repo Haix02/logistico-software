@@ -1,0 +1,18 @@
+<span class="@Bp.Cls("bp6-tag", Bp.IntentClass(Intent), Bp.When(Minimal, "bp6-minimal"), Bp.When(Round, "bp6-round"), Bp.When(Large, "bp6-large"), CssClass)" title="@Title">
+    @if (Icon is not null)
+    {
+        <Icon Name="@Icon" />
+    }
+    <span class="bp6-text-overflow-ellipsis bp6-fill">@ChildContent</span>
+</span>
+
+@code {
+    [Parameter] public Intent Intent { get; set; }
+    [Parameter] public bool Minimal { get; set; } = true;
+    [Parameter] public bool Round { get; set; }
+    [Parameter] public bool Large { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

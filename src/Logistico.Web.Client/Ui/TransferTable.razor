@@ -1,0 +1,87 @@
+@* Line-haul trucks: lane, progress of the manifest, timing and driver. *@
+@inject NavigationManager Navigation
+
+<div class="lx-table-card">
+    <DataTable TItem="TransferListItem" Items="Items" Loading="Loading" ColumnCount="7" OnRowClick="@(t => Navigation.NavigateTo($"transfers/{t.Id}"))"
+               RowClass="@(t => t.IsOverdue ? "lx-row-danger" : t.Missing > 0 ? "lx-row-warning" : null)" EmptyIcon="drive-time" EmptyTitle="@(EmptyTitle ?? L["NoTrucks"])">
+        <Header>
+            <th>@L["Col_Truck"]</th>
+            <th>@L["Col_Route"]</th>
+            <th>@L["Col_Status"]</th>
+            <th>@L["Col_Manifest"]</th>
+            <th>@L["Col_Timing"]</th>
+            <th>@L["Col_Driver"]</th>
+        </Header>
+        <Row Context="t">
+            <td><Cell Sub="@Fmt.Date(t.CreatedAt)"><TitleContent><span class="lx-code">@t.Number</span></TitleContent></Cell></td>
+            <td>
+                <Cell CssClass="lx-cell-wide" Sub="@($"{Fmt.Hub(t.FromHubCode)} {Bidi.Arrow} {Fmt.Hub(t.ToHubCode)}")">
+                    <TitleContent><HubRoute Current="@t.FromHubCode" Target="@t.ToHubCode" /></TitleContent>
+                </Cell>
+            </td>
+            <td>
+                <div class="lx-stack" style="gap:2px">
+                    <Tag Intent="@(t.IsOverdue ? Intent.Danger : t.Status == TransferStatus.InTransit ? Intent.Primary : t.Status == TransferStatus.Loading ? Intent.Warning : Intent.Success)"
+                         Icon="@(t.Status == TransferStatus.InTransit ? "drive-time" : t.Status == TransferStatus.Loading ? "box" : "tick-circle")">@ShipmentTexts.Of(t.Status)</Tag>
+                    @if (t.IsOverdue)
+                    {
+                        <span class="lx-cell-sub lx-intent-danger">@L["Late"]</span>
+                    }
+                </div>
+            </td>
+            <td style="min-width:160px">
+                <div class="lx-progress-row">
+                    <ProgressBar Value="@Progress(t)" Intent="@(t.Missing > 0 ? Intent.Danger : Intent.Success)" />
+                    <span class="lx-small lx-nowrap"><bdi>@Fmt.Number(Done(t))</bdi>/<bdi>@Fmt.Number(t.Planned + t.OnBoard)</bdi></span>
+                </div>
+                <div class="lx-cell-sub">
+                    @ManifestText(t)
+                </div>
+            </td>
+            <td class="lx-nowrap">
+                @if (t.Status == TransferStatus.Loading)
+                {
+                    <span class="bp6-text-muted">@L["DepartsTonight"]</span>
+                }
+                else if (t.Status == TransferStatus.InTransit)
+                {
+                    <Cell Title="@string.Format(CultureInfo.CurrentCulture, L["EtaAt"], Fmt.DateTime(t.ExpectedAt))" Sub="@string.Format(CultureInfo.CurrentCulture, L["LeftAt"], Fmt.DateTime(t.DepartedAt))" />
+                }
+                else
+                {
+                    <Cell Title="@string.Format(CultureInfo.CurrentCulture, L["ArrivedAt"], Fmt.DateTime(t.ArrivedAt))" Sub="@string.Format(CultureInfo.CurrentCulture, L["LeftAt"], Fmt.DateTime(t.DepartedAt))" />
+                }
+            </td>
+            <td><Cell Title="@(t.DriverName ?? "—")" Sub="@t.VehiclePlate" /></td>
+        </Row>
+    </DataTable>
+    @Footer
+</div>
+
+@code {
+    [Parameter] public IReadOnlyList<TransferListItem>? Items { get; set; }
+    [Parameter] public bool Loading { get; set; }
+    [Parameter] public string? EmptyTitle { get; set; }
+    [Parameter] public RenderFragment? Footer { get; set; }
+
+    private static int Done(TransferListItem t) => t.Status switch
+    {
+        TransferStatus.Loading => t.Loaded,
+        _ => t.Received,
+    };
+
+    private static double Progress(TransferListItem t)
+    {
+        var total = t.Planned + t.OnBoard;
+        return total == 0 ? 0 : Done(t) / (double)total;
+    }
+
+    private string ManifestText(TransferListItem t) => t.Status switch
+    {
+        TransferStatus.Loading => string.Format(CultureInfo.CurrentCulture, L["LoadedOfPlanned"], Fmt.Number(t.Loaded), Fmt.Number(t.Planned)),
+        TransferStatus.InTransit => string.Format(CultureInfo.CurrentCulture, L["UnloadedOfOnBoard"], Fmt.Number(t.Received), Fmt.Number(t.OnBoard)),
+        _ => t.Missing > 0
+            ? string.Format(CultureInfo.CurrentCulture, L["MissingN"], Fmt.Number(t.Missing))
+            : L.Count("ParcelsN", t.OnBoard),
+    };
+}

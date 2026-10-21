@@ -1,0 +1,41 @@
+<a href="@Href"
+   class="@Bp.Cls("bp6-button", Bp.IntentClass(Intent), Bp.When(Minimal, "bp6-minimal"), Bp.When(Outlined, "bp6-outlined"), Bp.When(Small, "bp6-small"), Bp.When(Large, "bp6-large"), Bp.When(Fill, "bp6-fill"), Bp.When(Tip is not null, "lx-tip"), CssClass)"
+   target="@Target"
+   rel="@(Target == "_blank" ? "noopener" : null)"
+   title="@(Tip is null ? Title : null)"
+   data-tip="@Tip"
+   aria-label="@(AriaLabel ?? (Text is null && ChildContent is null ? Tip ?? Title : null))"
+   @attributes="Attributes">
+    @if (Icon is not null)
+    {
+        <Icon Name="@Icon" />
+    }
+    @if (Text is not null || ChildContent is not null)
+    {
+        <span class="bp6-button-text">@Text@ChildContent</span>
+    }
+    @if (RightIcon is not null)
+    {
+        <Icon Name="@RightIcon" />
+    }
+</a>
+
+@code {
+    [Parameter, EditorRequired] public string Href { get; set; } = "";
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public string? RightIcon { get; set; }
+    [Parameter] public Intent Intent { get; set; }
+    [Parameter] public bool Minimal { get; set; }
+    [Parameter] public bool Outlined { get; set; }
+    [Parameter] public bool Small { get; set; }
+    [Parameter] public bool Large { get; set; }
+    [Parameter] public bool Fill { get; set; }
+    [Parameter] public string? Target { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Tip { get; set; }
+    [Parameter] public string? AriaLabel { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public IDictionary<string, object>? Attributes { get; set; }
+}

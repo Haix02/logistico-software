@@ -1,0 +1,385 @@
+@page "/insights"
+@implements IDisposable
+@inject OperationsApi Operations
+@inject NavigationManager Navigation
+
+<PageTitle>@L["Nav_Insights"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["Insights_Title"]" Subtitle="@L["Insights_Subtitle"]" Icon="predictive-analysis">
+    <Actions>
+        <SegmentedControl TValue="int" Options="PeriodOptions" Value="days" ValueChanged="PeriodChangedAsync" Label="@L["Period"]" />
+        <Button Icon="refresh" Minimal="true" Tip="@L["Refresh"]" Loading="loading" OnClick="LoadAsync" />
+        <Allowed Policy="@StaffPolicies.Administer">
+            <a class="bp6-button lx-tip lx-tip-end" href="@OperationsApi.OpenDataUrl(days)" download data-tip="@L["Insights_OpenDataHint"]" aria-describedby="open-data-hint">
+                <Icon Name="export" /><span class="bp6-button-text">@L["Insights_OpenData"]</span>
+            </a>
+            <span id="open-data-hint" class="lx-sr-only">@L["Insights_OpenDataHint"]</span>
+        </Allowed>
+    </Actions>
+</PageHeader>
+
+@if (error is not null)
+{
+    <Callout Intent="Intent.Danger" Icon="error" Title="@L["UnhandledError"]">
+        <p>@error</p>
+        <div class="lx-callout-actions"><Button Icon="refresh" Text="@L["Refresh"]" Intent="Intent.Primary" Loading="loading" OnClick="LoadAsync" /></div>
+    </Callout>
+}
+else if (data is null)
+{
+    <div class="lx-kpis">
+        @for (var i = 0; i < 5; i++)
+        {
+            <div class="bp6-skeleton lx-skeleton-block"></div>
+        }
+    </div>
+    <div class="lx-insights-grid">
+        <div class="bp6-skeleton lx-dashboard-chart-skeleton"></div>
+        <div class="bp6-skeleton lx-dashboard-chart-skeleton"></div>
+    </div>
+}
+else if (data.Orders.Value == 0)
+{
+    <div class="lx-card"><NonIdealState Icon="predictive-analysis" Title="@L["Insights_NoData"]" Description="@L["Insights_NoDataHint"]" /></div>
+}
+else
+{
+    var basket = data.AvgBasketIqd;
+    <div class="lx-kpis lx-insights-kpis">
+        <KpiCard Icon="shopping-cart" Label="@L["Insights_Orders"]" Value="@Fmt.Number((int)data.Orders.Value)" Intent="Intent.Primary" Change="data.Orders.ChangePercent" />
+        <KpiCard Icon="endorsed" Label="@L["Kpi_SuccessRate"]" Value="@Fmt.Percent(data.SuccessRate.Value)" Change="data.SuccessRate.ChangePoints" ChangeInPoints="true"
+                 Intent="@(data.SuccessRate.Value >= 90 ? Intent.Success : data.SuccessRate.Value >= 80 ? Intent.Warning : Intent.Danger)" Hint="@L["Kpi_SuccessRateHint"]" />
+        <KpiCard Icon="dollar" Label="@L["Insights_AvgBasket"]" Amount="basket.Value" Currency="IQD" Change="basket.ChangePercent" Hint="@L["Insights_AvgBasketHint"]" />
+        <KpiCard Icon="people" Label="@L["Insights_Customers"]" Value="@Fmt.Number(data.Customers.Customers)" Hint="@L["Insights_CustomersHint"]" />
+        <KpiCard Icon="repeat" Label="@L["Insights_RepeatShare"]" Value="@Fmt.Percent(data.Customers.RepeatOrderShare)" Intent="Intent.Success"
+                 Hint="@string.Format(CultureInfo.CurrentCulture, L["Insights_RepeatHint"], Fmt.Number(data.Customers.RepeatCustomers))" />
+    </div>
+
+    <Section Title="@L["Insights_Findings"]" Subtitle="@L["Insights_FindingsHint"]" Icon="lightbulb" Padded="false" CssClass="lx-findings-section">
+        @if (findings.Count == 0)
+        {
+            <p class="lx-findings-empty">@L["Finding_None"]</p>
+        }
+        else
+        {
+            <ul class="lx-findings">
+                @foreach (var finding in findings)
+                {
+                    <li class="@Bp.Cls("lx-finding", "lx-finding-" + finding.Intent.ToString().ToLowerInvariant())">
+                        <Icon Name="@finding.Icon" />
+                        <span><Mixed Text="@finding.Text" /></span>
+                    </li>
+                }
+            </ul>
+        }
+    </Section>
+
+    <div class="lx-insights-grid lx-insights-grid-map">
+        <Section Title="@L["Insights_DemandMap"]" Subtitle="@L["Insights_DemandMapHint"]" Icon="map" CssClass="lx-insights-map">
+            <Actions>
+                <SegmentedControl TValue="MapMeasure" Options="MeasureOptions" Value="measure" ValueChanged="@(m => measure = m)" Small="true" Label="@L["Map_Measure"]" />
+            </Actions>
+            <ChildContent>
+                <IraqChoropleth Values="MapValues" Format="MapFormat" Scale="MapScale" Selected="@selected" OnSelect="@(code => selected = code)" AriaLabel="@L["Insights_DemandMap"]" />
+            </ChildContent>
+        </Section>
+
+        <Section Title="@L["Insights_Governorates"]" Icon="th-list" Padded="false">
+            <div class="lx-table-wrap lx-insights-table">
+                <table class="bp6-html-table lx-table lx-table-compact">
+                    <thead>
+                        <tr>
+                            <th>@L["Field_Governorate"]</th>
+                            <th class="lx-num">@L["Col_Orders"]</th>
+                            <th class="lx-num">@L["Col_Growth"]</th>
+                            <th class="lx-num">@L["Col_SuccessRate"]</th>
+                            <th class="lx-num">@L["Col_AvgBasket"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var g in data.Governorates)
+                        {
+                            var share = DemandMath.Percent(g.Orders, (int)data.Orders.Value);
+                            <tr class="@Bp.Cls("lx-row-link", Bp.When(selected == g.Code, "lx-row-selected"))" tabindex="0"
+                                @onclick="@(() => selected = selected == g.Code ? null : g.Code)"
+                                @onkeydown="@(e => { if (e.Key is "Enter" or " ") selected = selected == g.Code ? null : g.Code; })">
+                                <td>
+                                    <div class="lx-cell">
+                                        <span class="lx-cell-title">@Fmt.Place(g.Code)</span>
+                                        @if (g.TopCategory is { } top)
+                                        {
+                                            <span class="lx-cell-sub" title="@L["Col_TopCategory"]"><span class="@($"lx-cat-dot lx-cat-{top.ToString().ToLowerInvariant()}")"></span>@ShipmentTexts.Of(top)</span>
+                                        }
+                                        <span class="lx-share"><span class="lx-share-fill" style="@Width(share)"></span></span>
+                                    </div>
+                                </td>
+                                <td class="lx-num"><span class="lx-strong">@Fmt.Number(g.Orders)</span> <span class="lx-muted lx-small">@Fmt.Percent(share)</span></td>
+                                <td class="lx-num">@if (g.Growth is null) { <span class="lx-muted">—</span> } else { <MetricDelta Change="g.Growth" Compact="true" /> }</td>
+                                <td class="lx-num"><RateTag Value="g.SuccessRate" /></td>
+                                <td class="lx-num">@(g.AvgBasketIqd is { } b ? Fmt.Compact(b, "IQD") : "—")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (SelectedGovernorate is { } sg)
+            {
+                <div class="lx-insights-detail">
+                    <div class="lx-insights-detail-title">
+                        <Icon Name="map-marker" /> <strong>@Fmt.Place(sg.Code)</strong>
+                        <LinkButton Href="@($"shipments?governorate={sg.Code}")" Minimal="true" Small="true" Text="@L["ViewOrders"]" RightIcon="@Bidi.ChevronForward" />
+                    </div>
+                    <dl class="lx-props">
+                        <dt>@L["Col_Orders"]</dt><dd>@Fmt.Number(sg.Orders) <span class="lx-muted">(@L["Insights_Previous"]: @Fmt.Number(sg.PreviousOrders))</span></dd>
+                        <dt>@L["Col_Delivered"]</dt><dd>@Fmt.Number(sg.Delivered)</dd>
+                        <dt>@L["Kpi_Returned"]</dt><dd>@Fmt.Number(sg.Returned)</dd>
+                        <dt>@L["Col_AvgDelivery"]</dt><dd>@(sg.AvgDeliveryHours is { } h ? $"{Fmt.Duration((decimal)h, L).Number} {Fmt.Duration((decimal)h, L).Unit}" : "—")</dd>
+                        <dt>@L["Col_TopFailure"]</dt><dd>@(sg.TopFailureReason is { } r ? ShipmentTexts.Of(r) : "—")</dd>
+                    </dl>
+                </div>
+            }
+        </Section>
+    </div>
+
+    <div class="lx-insights-grid">
+        <Section Title="@L["Insights_Categories"]" Subtitle="@L["Insights_CategoriesHint"]" Icon="shopping-cart" Padded="false">
+            <div class="lx-table-wrap">
+                <table class="bp6-html-table lx-table lx-table-compact">
+                    <thead>
+                        <tr>
+                            <th>@L["Col_Category"]</th>
+                            <th class="lx-num">@L["Col_Orders"]</th>
+                            <th class="lx-num">@L["Col_SuccessRate"]</th>
+                            <th class="lx-num">@L["Col_ReturnRate"]</th>
+                            <th class="lx-num">@L["Col_AvgBasket"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var c in data.Categories)
+                        {
+                            var share = DemandMath.Percent(c.Orders, (int)data.Orders.Value);
+                            <tr>
+                                <td>
+                                    <div class="lx-cell">
+                                        <span class="lx-cell-title"><span class="@($"lx-cat-dot lx-cat-{c.Category.ToString().ToLowerInvariant()}")"></span>@ShipmentTexts.Of(c.Category)</span>
+                                        <span class="lx-share"><span class="lx-share-fill" style="@Width(share)"></span></span>
+                                    </div>
+                                </td>
+                                <td class="lx-num"><span class="lx-strong">@Fmt.Number(c.Orders)</span> <span class="lx-muted lx-small">@Fmt.Percent(share)</span></td>
+                                <td class="lx-num"><RateTag Value="c.SuccessRate" /></td>
+                                <td class="lx-num">@Fmt.Percent(c.ReturnRate)</td>
+                                <td class="lx-num">@(c.AvgBasketIqd is { } b ? Fmt.Compact(b, "IQD") : "—")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </Section>
+
+        <Section Title="@L["Insights_OrderTimes"]" Subtitle="@L["Insights_OrderTimesHint"]" Icon="heat-grid">
+            <HeatGrid Cells="data.OrderTimes" AriaLabel="@L["Insights_OrderTimes"]" />
+        </Section>
+    </div>
+
+    <div class="lx-insights-grid">
+        <Section Title="@L["Insights_Baskets"]" Subtitle="@L["Insights_BasketsHint"]" Icon="dollar">
+            @{
+                var maxBand = Math.Max(1, data.Baskets.Max(b => b.Orders));
+            }
+            <div class="lx-basket-rows">
+                <div class="lx-basket-row lx-basket-head">
+                    <span></span><span>@L["Col_Orders"]</span><span class="lx-num">@L["Col_ReturnRate"]</span><span class="lx-num">@L["Col_RefusalRate"]</span>
+                </div>
+                @foreach (var band in data.Baskets.Where(b => b.Orders > 0))
+                {
+                    <div class="lx-basket-row">
+                        <span class="lx-bar-label">@InsightFindings.BasketLabel(band.Band, L)</span>
+                        <span class="lx-row" style="gap:8px">
+                            <span class="lx-bar-track lx-grow"><span class="lx-bar-fill" style="@Width(band.Orders * 100m / maxBand)"></span></span>
+                            <span class="lx-basket-count">@Fmt.Number(band.Orders)</span>
+                        </span>
+                        <span class="lx-num">@Fmt.Percent(band.ReturnRate)</span>
+                        <span class="@Bp.Cls("lx-num", Bp.When(band.RefusalRate is >= 10, "lx-text-danger"))">@Fmt.Percent(band.RefusalRate)</span>
+                    </div>
+                }
+            </div>
+        </Section>
+
+        <Section Title="@L["Insights_Lanes"]" Subtitle="@L["Insights_LanesHint"]" Icon="flows" Padded="false">
+            <div class="lx-table-wrap">
+                <table class="bp6-html-table lx-table lx-table-compact">
+                    <thead>
+                        <tr>
+                            <th>@L["Col_TradeLane"]</th>
+                            <th class="lx-num">@L["Col_Orders"]</th>
+                            <th class="lx-num">@L["Col_SuccessRate"]</th>
+                            <th class="lx-num">@L["Col_AvgDelivery"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var lane in data.Lanes)
+                        {
+                            var hours = lane.AvgDeliveryHours is { } h ? Fmt.Duration((decimal)h, L) : ("—", "");
+                            <tr>
+                                <td>
+                                    @if (lane.OriginCode == lane.DestinationCode)
+                                    {
+                                        <span>@Fmt.Place(lane.DestinationCode)</span> <Tag Minimal="true">@L["Insights_SameCity"]</Tag>
+                                    }
+                                    else
+                                    {
+                                        <span>@Fmt.Place(lane.OriginCode) @Bidi.Arrow @Fmt.Place(lane.DestinationCode)</span>
+                                    }
+                                </td>
+                                <td class="lx-num">@Fmt.Number(lane.Orders)</td>
+                                <td class="lx-num"><RateTag Value="lane.SuccessRate" /></td>
+                                <td class="lx-num">@hours.Item1 <span class="lx-muted lx-small">@hours.Item2</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </Section>
+    </div>
+
+    <div class="lx-insights-grid">
+        <Section Title="@L["Insights_Terms"]" Subtitle="@L["Insights_TermsHint"]" Icon="search-text">
+            <div class="lx-terms">
+                @foreach (var term in data.Terms)
+                {
+                    <span class="lx-term" title="@ShipmentTexts.Of(term.Category)">
+                        <span class="@($"lx-cat-dot lx-cat-{term.Category.ToString().ToLowerInvariant()}")"></span>
+                        <bdi>@term.Term</bdi>
+                        <span class="lx-term-count">@Fmt.Number(term.Orders)</span>
+                    </span>
+                }
+            </div>
+        </Section>
+
+        <Section Title="@L["Insights_Loyalty"]" Subtitle="@L["Insights_LoyaltyHint"]" Icon="repeat">
+            <div class="lx-loyalty">
+                <LoyaltyColumn Title="@L["Loyalty_FirstTime"]" Outcome="data.Customers.FirstTime" Customers="@(data.Customers.Customers - data.Customers.RepeatCustomers)" />
+                <LoyaltyColumn Title="@L["Loyalty_Repeat"]" Outcome="data.Customers.Repeat" Customers="data.Customers.RepeatCustomers" Highlight="true" />
+            </div>
+        </Section>
+    </div>
+
+    <p class="lx-insights-note"><Icon Name="info-sign" /> @L["Insights_DataNote"]</p>
+}
+
+@code {
+    private readonly CancellationTokenSource lifetime = new();
+    private CancellationTokenSource? load;
+    private DemandInsights? data;
+    private IReadOnlyList<Finding> findings = [];
+    private int days = 30;
+    private bool loading;
+    private string? error;
+    private string? selected;
+    private MapMeasure measure = MapMeasure.Orders;
+
+    private enum MapMeasure
+    {
+        Orders,
+        Success,
+        Basket,
+        Hours,
+    }
+
+    private IReadOnlyList<SegmentOption<int>> PeriodOptions =>
+        [new(30, L["Period_30"]), new(90, L["Period_90"]), new(365, L["Period_365"])];
+
+    private IReadOnlyList<SegmentOption<MapMeasure>> MeasureOptions =>
+        [new(MapMeasure.Orders, L["Measure_Orders"]), new(MapMeasure.Success, L["Measure_Success"]), new(MapMeasure.Basket, L["Measure_Basket"]), new(MapMeasure.Hours, L["Measure_Hours"])];
+
+    private GovernorateDemand? SelectedGovernorate => data?.Governorates.FirstOrDefault(g => g.Code == selected);
+
+    private IReadOnlyDictionary<string, decimal> MapValues => (data?.Governorates ?? [])
+        .Select(g => (g.Code, Value: measure switch
+        {
+            MapMeasure.Success => g.SuccessRate,
+            MapMeasure.Basket => g.AvgBasketIqd,
+            MapMeasure.Hours => g.AvgDeliveryHours is { } h ? (decimal?)Math.Round((decimal)h, 1) : null,
+            _ => g.Orders,
+        }))
+        .Where(x => x.Value is not null)
+        .ToDictionary(x => x.Code, x => x.Value!.Value);
+
+    private Func<decimal, string> MapFormat => measure switch
+    {
+        MapMeasure.Success => v => Fmt.Percent(v),
+        MapMeasure.Basket => v => Fmt.Compact(v, null),
+        MapMeasure.Hours => v => Fmt.Number(v) + " " + L["Unit_Hours"],
+        _ => v => Fmt.Number((int)v),
+    };
+
+    private ChoroplethScale MapScale => measure switch
+    {
+        MapMeasure.Success => ChoroplethScale.HigherIsBetter,
+        MapMeasure.Hours => ChoroplethScale.LowerIsBetter,
+        _ => ChoroplethScale.Sequential,
+    };
+
+    [SupplyParameterFromQuery(Name = "days")] public int? DaysParam { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (DaysParam is 30 or 90 or 365)
+        {
+            days = DaysParam.Value;
+        }
+
+        await LoadAsync();
+    }
+
+    private async Task PeriodChangedAsync(int value)
+    {
+        days = value;
+        Navigation.NavigateTo($"insights?days={value}", replace: true);
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        load?.Cancel();
+        load?.Dispose();
+        load = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token);
+        var token = load.Token;
+        loading = true;
+        error = null;
+        try
+        {
+            var result = await Operations.GetInsightsAsync(days, token);
+            if (!token.IsCancellationRequested)
+            {
+                data = result;
+                findings = InsightFindings.From(result, L);
+            }
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            // A newer period replaced this request.
+        }
+        catch (Exception ex) when (ex is ApiException or HttpRequestException)
+        {
+            error = ex is ApiException api ? api.UserMessage : L["ServiceUnavailable"];
+        }
+        finally
+        {
+            if (!token.IsCancellationRequested)
+            {
+                loading = false;
+            }
+        }
+    }
+
+    private static string Width(decimal? percent) =>
+        string.Create(CultureInfo.InvariantCulture, $"width:{Math.Clamp(percent ?? 0, 0, 100):0.#}%");
+
+    public void Dispose()
+    {
+        lifetime.Cancel();
+        lifetime.Dispose();
+        load?.Dispose();
+    }
+}

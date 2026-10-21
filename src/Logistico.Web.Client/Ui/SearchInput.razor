@@ -1,0 +1,89 @@
+@* Search box: searches as you type (debounced), Enter searches at once, the cross clears it. *@
+@implements IDisposable
+
+<div class="@Bp.Cls("bp6-input-group", Bp.When(Large, "bp6-large"), Bp.When(Fill, "bp6-fill"), CssClass)" role="search">
+    <span class="bp6-icon bp6-icon-standard bp6-icon-search" aria-hidden="true"></span>
+    <input class="bp6-input" type="search" id="@Id" placeholder="@Placeholder" aria-label="@Placeholder" value="@text" autocomplete="off"
+           @oninput="InputAsync" @onkeydown="KeyAsync" />
+    @if (!string.IsNullOrEmpty(text))
+    {
+        <span class="bp6-input-action"><Button Minimal="true" Small="true" Icon="cross" Title="@L["Clear"]" OnClick="ClearAsync" /></span>
+    }
+</div>
+
+@code {
+    private string? text;
+    private CancellationTokenSource? pending;
+
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+    [Parameter] public EventCallback<string?> OnSearch { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public string? Id { get; set; }
+    [Parameter] public bool Large { get; set; }
+    [Parameter] public bool Fill { get; set; }
+    [Parameter] public int DelayMs { get; set; } = 350;
+    [Parameter] public string? CssClass { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (pending is null)
+        {
+            text = Value;
+        }
+    }
+
+    private async Task InputAsync(ChangeEventArgs e)
+    {
+        text = e.Value?.ToString();
+        pending?.Cancel();
+        pending = new CancellationTokenSource();
+        var token = pending.Token;
+        try
+        {
+            await Task.Delay(DelayMs, token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        await CommitAsync();
+    }
+
+    private async Task KeyAsync(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            pending?.Cancel();
+            await CommitAsync();
+        }
+        else if (e.Key == "Escape" && !string.IsNullOrEmpty(text))
+        {
+            await ClearAsync();
+        }
+    }
+
+    private async Task ClearAsync()
+    {
+        pending?.Cancel();
+        text = null;
+        await CommitAsync();
+    }
+
+    private async Task CommitAsync()
+    {
+        pending = null;
+        var value = string.IsNullOrWhiteSpace(text) ? null : text.Trim();
+        if (value == Value)
+        {
+            return;
+        }
+
+        Value = value;
+        await ValueChanged.InvokeAsync(value);
+        await OnSearch.InvokeAsync(value);
+    }
+
+    public void Dispose() => pending?.Cancel();
+}

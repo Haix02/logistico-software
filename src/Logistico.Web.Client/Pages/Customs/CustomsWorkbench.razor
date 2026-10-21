@@ -1,0 +1,378 @@
+@page "/customs"
+@inject ShipmentsApi Shipments
+@inject NavigationManager Navigation
+@inject Toaster Toaster
+
+<PageTitle>@L["Nav_Customs"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["CustomsTitle"]" Subtitle="@L["CustomsSubtitle"]" Icon="endorsed">
+    <Actions>
+        <Allowed Policy="@StaffPolicies.Operate">
+            <LinkButton Href="shipments/new" Icon="globe" Text="@L["Nav_NewInternational"]" Intent="Intent.Primary" />
+        </Allowed>
+    </Actions>
+</PageHeader>
+
+@if (summary is not null)
+{
+    <div class="lx-kpis">
+        <KpiCard Icon="import" Label="@L["Kpi_AwaitingDeclaration"]" Value="@Fmt.Number(summary.AwaitingDeclaration)" />
+        <KpiCard Icon="endorsed" Label="@L["Kpi_InClearance"]" Value="@Fmt.Number(summary.InClearance)" Intent="Intent.Primary" />
+        <KpiCard Icon="warning-sign" Label="@L["Kpi_CustomsHold"]" Value="@Fmt.Number(summary.OnHold)" Intent="Intent.Danger" />
+        <KpiCard Icon="tick-circle" Label="@L["Kpi_ReleasedCustoms"]" Value="@Fmt.Number(summary.ReleasedCount)" Intent="Intent.Success" />
+        <KpiCard Icon="bank-account" Label="@L["Kpi_AssessedDuties"]" Amount="summary.TotalAssessedDutiesIqd" />
+    </div>
+}
+
+<div class="lx-toolbar lx-card lx-mb">
+    <form class="lx-toolbar-search" @onsubmit="FilterAsync">
+        <div class="bp6-input-group bp6-fill">
+            <span class="bp6-icon bp6-icon-standard bp6-icon-search"></span>
+            <input class="bp6-input" type="search" placeholder="@L["CustomsSearchPlaceholder"]" @bind="q" aria-label="@L["CustomsSearchPlaceholder"]" />
+        </div>
+    </form>
+    <div class="lx-row-wrap">
+        <span class="bp6-html-select">
+            <select @bind="officeFilter" @bind:after="FilterAsync" aria-label="@L["Col_Office"]">
+                <option value="">@L["AllOffices"]</option>
+                @foreach (var o in CustomsDutyCalculator.Offices)
+                {
+                    <option value="@o.Code">@o.Code — @o.Name</option>
+                }
+            </select>
+            <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+        </span>
+        <span class="bp6-html-select">
+            <select @bind="laneFilter" @bind:after="FilterAsync" aria-label="@L["Col_Lane"]">
+                <option value="">@L["AllLanes"]</option>
+                @foreach (var l in Enum.GetValues<CustomsLane>())
+                {
+                    <option value="@l">@ShipmentTexts.Of(l)</option>
+                }
+            </select>
+            <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+        </span>
+        @if (!string.IsNullOrWhiteSpace(q) || !string.IsNullOrWhiteSpace(officeFilter) || laneFilter is not null)
+        {
+            <Button Minimal="true" Icon="cross" Text="@L["ClearFilters"]" OnClick="ClearFiltersAsync" />
+        }
+    </div>
+</div>
+
+<div class="lx-table-card">
+    <DataTable TItem="CustomsQueueItem" Items="summary?.Items" Loading="loading" ColumnCount="8" OnRowClick="OpenEditor" EmptyIcon="endorsed" EmptyTitle="@L["NoShipments"]">
+        <Header>
+            <th>@L["Col_Tracking"]</th>
+            <th>@L["Col_Status"]</th>
+            <th>@L["Col_Office"]</th>
+            <th>@L["Col_Declaration"]</th>
+            <th>@L["Col_Lane"]</th>
+            <th>@L["Col_Compliance"]</th>
+            <th>@L["Field_Consignee"]</th>
+            <th class="lx-num">@L["Col_DutiesIqd"]</th>
+        </Header>
+        <Row Context="item">
+            <td><Cell CssClass="lx-cell-narrow" Sub="@($"{Fmt.Place(item.OriginCode)} {Bidi.Arrow} {Fmt.Place(item.DestinationCode)}")"><TitleContent><span class="lx-code">@item.TrackingNumber</span></TitleContent></Cell></td>
+            <td><StatusTag Status="item.ShipmentStatus" /></td>
+            <td><Cell CssClass="lx-cell-narrow" Sub="@CustomsDutyCalculator.OfficeNameOrCode(item.CustomsOfficeCode)"><TitleContent><span class="lx-code">@item.CustomsOfficeCode</span></TitleContent></Cell></td>
+            <td><Cell CssClass="lx-cell-narrow" Sub="@($"{item.Regime}{(item.HsCode is null ? "" : " · " + item.HsCode)}")"><TitleContent><span class="lx-code">@(item.DeclarationNumber ?? "—")</span></TitleContent></Cell></td>
+            <td><Tag Intent="@LaneIntent(item.SelectivityLane)">@ShipmentTexts.Of(item.SelectivityLane)</Tag></td>
+            <td class="lx-nowrap">
+                <Tag Intent="@(item.CooEVerified ? Intent.Success : Intent.Warning)" Icon="@(item.CooEVerified ? "tick" : "time")">CoO</Tag>
+                <Tag Intent="@(item.InvoiceEVerified ? Intent.Success : Intent.Warning)" Icon="@(item.InvoiceEVerified ? "tick" : "time")">INV</Tag>
+                @if (!string.IsNullOrWhiteSpace(item.CocNumber))
+                {
+                    <Tag Intent="Intent.Primary">COC</Tag>
+                }
+            </td>
+            <td><Cell Title="@item.ConsigneeName" Sub="@item.ShipperName" /></td>
+            <td class="lx-num">@Fmt.Money(item.AssessedDutyIqd + item.TaxAndFeesIqd, "IQD")</td>
+        </Row>
+    </DataTable>
+    @if (summary is not null)
+    {
+        <Pager Page="summary.Page" PageSize="summary.PageSize" Total="summary.TotalCount" OnPage="PageAsync" OnPageSize="PageSizeAsync" />
+    }
+</div>
+
+<Dialog @bind-IsOpen="dialogOpen" Title="@(selected is null ? L["Nav_Customs"].Value : string.Format(CultureInfo.CurrentCulture, L["CustomsDialogTitle"], selected.TrackingNumber))" Icon="endorsed" Width="820px">
+    <ChildContent>
+        @if (selected is not null)
+        {
+            <EditForm Model="draft" OnValidSubmit="SubmitAsync" id="customs-form">
+                <DataAnnotationsValidator />
+
+                <EditableBy Policy="@StaffPolicies.Operate">
+                    <h6 class="bp6-heading lx-mb">@L["Sec_AsycudaHeader"]</h6>
+                    <div class="lx-form-grid">
+                        <FormField Label="@L["Field_CustomsOffice"]" Required="true" Field="() => draft.CustomsOfficeCode">
+                            <span class="bp6-html-select bp6-fill">
+                                <InputSelect @bind-Value="draft.CustomsOfficeCode">
+                                    @foreach (var o in CustomsDutyCalculator.Offices)
+                                    {
+                                        <option value="@o.Code">@o.Code — @o.Name</option>
+                                    }
+                                </InputSelect>
+                                <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                            </span>
+                        </FormField>
+                        <FormField Label="@L["Field_Regime"]" Required="true" Field="() => draft.Regime">
+                            <span class="bp6-html-select bp6-fill">
+                                <InputSelect @bind-Value="draft.Regime">
+                                    @foreach (var r in CustomsDutyCalculator.Regimes)
+                                    {
+                                        <option value="@r">@r</option>
+                                    }
+                                </InputSelect>
+                                <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                            </span>
+                        </FormField>
+                        <FormField Label="@L["Field_DeclarationNo"]" Field="() => draft.DeclarationNumber">
+                            <InputText class="bp6-input bp6-fill lx-mono lx-upper" @bind-Value="draft.DeclarationNumber" dir="ltr" placeholder="2026-IQUQR-IM4-10421" />
+                        </FormField>
+                        <FormField Label="@L["Field_SelectivityLane"]" Field="() => draft.SelectivityLane">
+                            <span class="bp6-html-select bp6-fill">
+                                <InputSelect @bind-Value="draft.SelectivityLane">
+                                    @foreach (var l in Enum.GetValues<CustomsLane>())
+                                    {
+                                        <option value="@l">@ShipmentTexts.Of(l)</option>
+                                    }
+                                </InputSelect>
+                                <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                            </span>
+                        </FormField>
+                        <FormField Label="@L["Field_HsCode"]" Field="() => draft.HsCode">
+                            <InputText class="bp6-input bp6-fill lx-mono" @bind-Value="draft.HsCode" dir="ltr" placeholder="8517.13.00" />
+                        </FormField>
+                        <FormField Label="@L["Field_CountryOfOrigin"]" Required="true" Field="() => draft.CountryOfOrigin">
+                            <InputText class="bp6-input bp6-fill lx-mono lx-upper" @bind-Value="draft.CountryOfOrigin" dir="ltr" maxlength="2" placeholder="CN" />
+                        </FormField>
+                        <FormField Label="@L["Field_Items"]" Field="() => draft.GoodsDescription" CssClass="lx-span-2">
+                            <InputText class="bp6-input bp6-fill" @bind-Value="draft.GoodsDescription" />
+                        </FormField>
+                    </div>
+
+                    <h6 class="bp6-heading lx-mt lx-mb">@L["Sec_IraqCompliance"]</h6>
+                    <div class="lx-form-grid">
+                        <FormField Label="@L["Field_CooNumber"]" Field="() => draft.CooNumber">
+                            <InputText class="bp6-input bp6-fill lx-mono lx-upper" @bind-Value="draft.CooNumber" dir="ltr" placeholder="COO-CN-2026-10421" />
+                        </FormField>
+                        <FormField Label="@L["Field_InvoiceNumber"]" Field="() => draft.CommercialInvoiceNumber">
+                            <InputText class="bp6-input bp6-fill lx-mono lx-upper" @bind-Value="draft.CommercialInvoiceNumber" dir="ltr" placeholder="INV-2026-10421" />
+                        </FormField>
+                        <label class="bp6-control bp6-switch">
+                            <InputCheckbox class="bp6-control-input" @bind-Value="draft.CooEVerified" />
+                            <span class="bp6-control-indicator"></span>
+                            @L["Field_CooEVerified"]
+                        </label>
+                        <label class="bp6-control bp6-switch">
+                            <InputCheckbox class="bp6-control-input" @bind-Value="draft.InvoiceEVerified" />
+                            <span class="bp6-control-indicator"></span>
+                            @L["Field_InvoiceEVerified"]
+                        </label>
+                        <FormField Label="@L["Field_CocNumber"]" Hint="@L["Optional"]" Field="() => draft.CocNumber">
+                            <InputText class="bp6-input bp6-fill lx-mono lx-upper" @bind-Value="draft.CocNumber" dir="ltr" placeholder="COC-IQ-10421" />
+                        </FormField>
+                        <FormField Label="@L["Field_BrokerName"]" Hint="@L["Optional"]" Field="() => draft.BrokerName">
+                            <InputText class="bp6-input bp6-fill" @bind-Value="draft.BrokerName" />
+                        </FormField>
+                    </div>
+
+                    <h6 class="bp6-heading lx-mt lx-mb">@L["Sec_ValuationAndDuties"]</h6>
+                    <div class="lx-form-grid">
+                        <FormField Label="@L["Field_CustomsValueUsd"]" Field="() => draft.CustomsValueUsd">
+                            <InputNumber class="bp6-input bp6-fill" @bind-Value="draft.CustomsValueUsd" @bind-Value:after="RecalculateDuties" dir="ltr" step="0.01" />
+                        </FormField>
+                        <FormField Label="@L["Field_DutyRate"]" Field="() => draft.DutyRatePercent">
+                            <InputNumber class="bp6-input bp6-fill" @bind-Value="draft.DutyRatePercent" @bind-Value:after="RecalculateDuties" dir="ltr" step="0.5" />
+                        </FormField>
+                        <FormField Label="@L["Field_AssessedDutyIqd"]" Field="() => draft.AssessedDutyIqd">
+                            <InputNumber class="bp6-input bp6-fill" @bind-Value="draft.AssessedDutyIqd" dir="ltr" step="1000" />
+                        </FormField>
+                        <FormField Label="@L["Field_TaxAndFeesIqd"]" Field="() => draft.TaxAndFeesIqd">
+                            <InputNumber class="bp6-input bp6-fill" @bind-Value="draft.TaxAndFeesIqd" dir="ltr" step="1000" />
+                        </FormField>
+                        <FormField Label="@L["Field_AssessmentNo"]" Hint="@L["Optional"]" Field="() => draft.AssessmentNumber">
+                            <InputText class="bp6-input bp6-fill lx-mono" @bind-Value="draft.AssessmentNumber" dir="ltr" />
+                        </FormField>
+                        <FormField Label="@L["Field_ReceiptNo"]" Hint="@L["Optional"]" Field="() => draft.ReceiptNumber">
+                            <InputText class="bp6-input bp6-fill lx-mono" @bind-Value="draft.ReceiptNumber" dir="ltr" />
+                        </FormField>
+                        <FormField Label="@L["Field_HoldReason"]" Hint="@L["Optional"]" Field="() => draft.HoldReason" CssClass="lx-span-2">
+                            <InputText class="bp6-input bp6-fill" @bind-Value="draft.HoldReason" />
+                        </FormField>
+                    </div>
+                </EditableBy>
+
+                @if (error is not null)
+                {
+                    <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mt">@error</Callout>
+                }
+            </EditForm>
+        }
+    </ChildContent>
+    <Footer>
+        @if (selected is not null)
+        {
+            <LinkButton Href="@($"shipments/{selected.ShipmentId}")" Icon="globe" Text="@L["OpenShipment"]" Minimal="true" />
+            <LinkButton Href="@Shipments.SadXmlUrl(selected.ShipmentId)" Target="_blank" Icon="download" Text="@L["DownloadSadXml"]" />
+            <Allowed Policy="@StaffPolicies.Operate">
+                <Button Text="@L["Action_SaveDeclaration"]" Icon="floppy-disk" Loading="saving" OnClick="@(() => TriggerSubmitAsync(CustomsAction.Save))" />
+                @if (selected.ShipmentStatus is ShipmentStatus.ArrivedPortOfEntry or ShipmentStatus.CustomsHold)
+                {
+                    <Button Text="@L["Action_RegisterAsycuda"]" Icon="endorsed" Intent="Intent.Primary" Loading="saving" OnClick="@(() => TriggerSubmitAsync(CustomsAction.Register))" />
+                }
+                @if (selected.ShipmentStatus is ShipmentStatus.ArrivedPortOfEntry or ShipmentStatus.CustomsPending)
+                {
+                    <Button Text="@L["Action_PlaceHold"]" Icon="warning-sign" Intent="Intent.Warning" Loading="saving" OnClick="@(() => TriggerSubmitAsync(CustomsAction.Hold))" />
+                }
+                @if (selected.ShipmentStatus is ShipmentStatus.ArrivedPortOfEntry or ShipmentStatus.CustomsPending or ShipmentStatus.CustomsHold)
+                {
+                    <Button Text="@L["Action_ReleaseCustoms"]" Icon="tick-circle" Intent="Intent.Success" Loading="saving" OnClick="@(() => TriggerSubmitAsync(CustomsAction.Release))" />
+                }
+            </Allowed>
+        }
+    </Footer>
+</Dialog>
+
+@code {
+    [SupplyParameterFromQuery(Name = "shipmentId")] public Guid? ShipmentId { get; set; }
+
+    private CustomsSummary? summary;
+    private string? q;
+    private string? officeFilter;
+    private CustomsLane? laneFilter;
+    private int page = 1;
+    private int pageSize = 25;
+    private bool loading = true;
+    private bool dialogOpen;
+    private bool saving;
+    private string? error;
+    private CustomsQueueItem? selected;
+    private UpsertCustomsDeclarationRequest draft = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadAsync();
+        if (ShipmentId is { } id
+            && (summary?.Items.FirstOrDefault(i => i.ShipmentId == id) ?? await Shipments.GetCustomsByShipmentAsync(id)) is { } match)
+        {
+            OpenEditor(match);
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        loading = true;
+        summary = await Shipments.GetCustomsSummaryAsync(q, null, laneFilter, officeFilter, page, pageSize);
+        loading = false;
+    }
+
+    private Task PageAsync(int p)
+    {
+        page = p;
+        return LoadAsync();
+    }
+
+    private Task PageSizeAsync(int size)
+    {
+        pageSize = size;
+        page = 1;
+        return LoadAsync();
+    }
+
+    private Task ClearFiltersAsync()
+    {
+        q = null;
+        officeFilter = null;
+        laneFilter = null;
+        return FilterAsync();
+    }
+
+    /// <summary>Any filter change starts again from the first page.</summary>
+    private Task FilterAsync()
+    {
+        page = 1;
+        return LoadAsync();
+    }
+
+    private void OpenEditor(CustomsQueueItem item)
+    {
+        selected = item;
+        draft = new UpsertCustomsDeclarationRequest
+        {
+            CustomsOfficeCode = item.CustomsOfficeCode,
+            Regime = item.Regime,
+            DeclarationNumber = item.DeclarationNumber,
+            AssessmentNumber = item.AssessmentNumber,
+            ReceiptNumber = item.ReceiptNumber,
+            ReleaseOrderNumber = item.ReleaseOrderNumber,
+            SelectivityLane = item.SelectivityLane,
+            HsCode = item.HsCode,
+            GoodsDescription = item.GoodsDescription,
+            CountryOfOrigin = item.CountryOfOrigin,
+            CooNumber = item.CooNumber,
+            CooEVerified = item.CooEVerified,
+            CommercialInvoiceNumber = item.CommercialInvoiceNumber,
+            InvoiceEVerified = item.InvoiceEVerified,
+            CocNumber = item.CocNumber,
+            CustomsValueUsd = item.CustomsValueUsd,
+            DutyRatePercent = item.DutyRatePercent,
+            AssessedDutyIqd = item.AssessedDutyIqd,
+            TaxAndFeesIqd = item.TaxAndFeesIqd,
+            HoldReason = item.HoldReason,
+            BrokerName = item.BrokerName,
+            Action = CustomsAction.Save,
+        };
+        error = null;
+        dialogOpen = true;
+    }
+
+    private void RecalculateDuties()
+    {
+        draft.AssessedDutyIqd = CustomsDutyCalculator.CalculateDutyIqd(draft.CustomsValueUsd, draft.DutyRatePercent);
+        draft.TaxAndFeesIqd = CustomsDutyCalculator.CalculateStampAndPortFeesIqd(draft.CustomsValueUsd);
+    }
+
+    private async Task TriggerSubmitAsync(CustomsAction action)
+    {
+        draft.Action = action;
+        await SubmitAsync();
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (selected is null)
+        {
+            return;
+        }
+
+        saving = true;
+        error = null;
+        try
+        {
+            var updated = await Shipments.UpsertCustomsAsync(selected.ShipmentId, draft, selected.Version);
+            dialogOpen = false;
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["CustomsSaved"], updated.TrackingNumber));
+            await LoadAsync();
+        }
+        catch (ApiException ex)
+        {
+            error = ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private static Intent LaneIntent(CustomsLane lane) => lane switch
+    {
+        CustomsLane.Green => Intent.Success,
+        CustomsLane.Yellow => Intent.Warning,
+        CustomsLane.Red => Intent.Danger,
+        CustomsLane.Blue => Intent.Primary,
+        _ => Intent.None,
+    };
+}
+

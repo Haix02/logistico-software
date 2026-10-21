@@ -1,0 +1,88 @@
+@* The parcel's path across Iraq's hubs: seller → origin hub → (truck) → destination hub → customer.
+   Returns show the way back: destination hub → (truck) → seller's hub → seller. *@
+<div class="lx-journey" role="list" aria-label="@L["Col_Route"]">
+    @for (var i = 0; i < nodes.Count; i++)
+    {
+        var node = nodes[i];
+        if (i > 0)
+        {
+            <span class="@Bp.Cls("lx-journey-link", LinkState(i))" aria-hidden="true"></span>
+        }
+
+        <div class="@Bp.Cls("lx-journey-node", node.State)" role="listitem" aria-current="@(node.State == "lx-here" ? "location" : null)">
+            <span class="lx-journey-hub">
+                @if (node.Icon is not null)
+                {
+                    <Icon Name="@node.Icon" />
+                }
+                else
+                {
+                    @node.Code
+                }
+            </span>
+            <span class="lx-journey-name"><Mixed Text="@node.Name" /></span>
+        </div>
+    }
+</div>
+
+@code {
+    private sealed record Node(string? Code, string? Icon, string Name, string? State);
+
+    [Parameter, EditorRequired] public ShipmentDetails Shipment { get; set; } = default!;
+
+    private List<Node> nodes = [];
+    private int moving = -1;
+
+    protected override void OnParametersSet()
+    {
+        var s = Shipment;
+        var returning = ShipmentLifecycle.IsReturning(s.Status) || s.Status == ShipmentStatus.Returned;
+        var origin = HubCatalog.Find(s.OriginHubCode);
+        var destination = HubCatalog.FindOrDefault(s.DestinationHubCode);
+        var hubs = new List<HubInfo>();
+        if (origin is not null)
+        {
+            hubs.Add(origin);
+        }
+
+        if (origin?.Code != destination.Code)
+        {
+            hubs.Add(destination);
+        }
+
+        if (returning)
+        {
+            hubs.Reverse();
+        }
+
+        var start = returning ? new Node(null, "home", s.ConsigneeName, null) : new Node(null, "shop", s.MerchantName ?? s.ShipperName, null);
+        var end = returning ? new Node(null, "shop", s.MerchantName ?? s.ShipperName, null) : new Node(null, "home", s.ConsigneeName, null);
+
+        // Where is the parcel? 0: not yet at a hub, 1..n: at that hub, n+1: with the customer (or back with the seller).
+        var position = s.Status switch
+        {
+            ShipmentStatus.Delivered or ShipmentStatus.Returned => hubs.Count + 1,
+            ShipmentStatus.OutForDelivery or ShipmentStatus.DeliveryFailed when !returning => hubs.Count + 1,
+            _ when s.CurrentHubCode is { } current => hubs.FindIndex(h => h.Code == current) + 1,
+            _ => 0,
+        };
+        moving = ShipmentLifecycle.IsOnLineHaul(s.Status) ? Math.Max(1, hubs.FindIndex(h => h.Code == s.TargetHubCode) + 1) : -1;
+
+        var all = new List<Node> { start };
+        all.AddRange(hubs.Select(h => new Node(h.RoutingTag, null, h.Name, null)));
+        all.Add(end);
+        var finished = s.Status is ShipmentStatus.Delivered or ShipmentStatus.Returned;
+        nodes = all.Select((n, i) => n with
+        {
+            State = i < position || (finished && i == position) ? "lx-done" : i == position ? "lx-here" : null,
+        }).ToList();
+
+        if (moving > 0)
+        {
+            nodes = nodes.Select((n, i) => n with { State = i < moving ? "lx-done" : null }).ToList();
+        }
+    }
+
+    private string? LinkState(int index) =>
+        index == moving ? "lx-moving" : nodes[index].State is "lx-done" or "lx-here" ? "lx-done" : null;
+}

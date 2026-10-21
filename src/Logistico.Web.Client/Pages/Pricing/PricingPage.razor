@@ -1,0 +1,271 @@
+@page "/pricing"
+@inject ShipmentsApi Shipments
+@inject MerchantsApi Merchants
+@inject Toaster Toaster
+
+<PageTitle>@L["Nav_Pricing"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["PricingTitle"]" Subtitle="@L["PricingSubtitle"]" Icon="tag">
+    <Actions>
+        <Allowed Policy="@StaffPolicies.Finance">
+            <Button Icon="reset" Minimal="true" Text="@L["StandardPrices"]" OnClick="ResetToStandard" Disabled="@(card is null)" />
+            <Button Intent="Intent.Primary" Icon="tick" Text="@L["SavePrices"]" Loading="saving" Disabled="@(card is null)" OnClick="SaveAsync" />
+        </Allowed>
+    </Actions>
+</PageHeader>
+
+@if (card is null)
+{
+    <Skeleton Block="true" Lines="4" />
+}
+else
+{
+    @if (error is not null)
+    {
+        <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mb">@error</Callout>
+    }
+
+    <div class="lx-split lx-split-wide">
+        <div class="lx-stack" style="gap:18px;min-width:0">
+            <EditableBy Policy="@StaffPolicies.Finance">
+                <Section Title="@L["Pricing_Basics"]" Icon="dollar">
+                    <div class="lx-form-grid">
+                        <FormField TValue="decimal" Label="@L["Pricing_SameGovernorate"]" Helper="@L["Pricing_SameGovernorateHint"]">
+                            <MoneyInput @bind-Value="card.SameGovernorateFee" />
+                        </FormField>
+                        <FormField TValue="decimal" Label="@L["Pricing_Default"]" Helper="@L["Pricing_DefaultHint"]">
+                            <MoneyInput @bind-Value="card.DefaultFee" />
+                        </FormField>
+                        <FormField TValue="decimal" Label="@L["Pricing_IncludedWeight"]" Helper="@L["Pricing_IncludedWeightHint"]">
+                            <div class="bp6-input-group bp6-fill">
+                                <input class="bp6-input" type="number" min="0" step="0.5" dir="ltr" value="@card.IncludedWeightKg.ToString(CultureInfo.InvariantCulture)"
+                                       @onchange="@(e => card.IncludedWeightKg = ParseDecimal(e.Value, card.IncludedWeightKg))" />
+                                <span class="bp6-input-action lx-input-suffix">@L["Kg"]</span>
+                            </div>
+                        </FormField>
+                        <FormField TValue="decimal" Label="@L["Pricing_ExtraKg"]" Helper="@L["Pricing_ExtraKgHint"]">
+                            <MoneyInput @bind-Value="card.ExtraKgFee" />
+                        </FormField>
+                    </div>
+                </Section>
+
+                <Section Title="@L["Pricing_ByGovernorate"]" Subtitle="@L["Pricing_ByGovernorateHint"]" Icon="map" Padded="false">
+                    <div class="lx-table-wrap">
+                        <table class="bp6-html-table lx-table lx-table-compact">
+                            <thead>
+                                <tr><th>@L["Field_Governorate"]</th><th>@L["DestinationHub"]</th><th>@L["Pricing_Price"]</th><th class="lx-num">@L["Pricing_Change"]</th></tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var hub in HubCatalog.All)
+                                {
+                                    var governorates = IraqGovernorates.All.Where(g => HubCatalog.ResolveDestinationHub(g.Code).Code == hub.Code).OrderBy(g => g.Name, StringComparer.CurrentCulture).ToList();
+                                    if (governorates.Count == 0)
+                                    {
+                                        continue;
+                                    }
+
+                                    <tr class="lx-group-row">
+                                        <td colspan="2"><Tag Minimal="true"><bdi>@hub.RoutingTag</bdi></Tag> @hub.Name</td>
+                                        <td colspan="2">
+                                            <span class="lx-row" style="gap:6px">
+                                                <span class="bp6-text-muted lx-small">@L["Pricing_SetAll"]</span>
+                                                <MoneyInput Value="@CommonFee(governorates)" ValueChanged="@(v => SetAll(governorates, v))" Small="true" />
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    @foreach (var g in governorates)
+                                    {
+                                        var fee = card.GovernorateFees.GetValueOrDefault(g.Code, card.DefaultFee);
+                                        var standard = RateCard.DefaultGovernorateFees().GetValueOrDefault(g.Code);
+                                        <tr>
+                                            <td>@g.Name</td>
+                                            <td><span class="bp6-text-muted lx-small">@hub.RoutingTag</span></td>
+                                            <td><MoneyInput Value="fee" ValueChanged="@(v => card.GovernorateFees[g.Code] = v)" Small="true" /></td>
+                                            <td class="lx-num">
+                                                @if (fee != standard)
+                                                {
+                                                    <span class="@(fee > standard ? "lx-text-danger" : "lx-text-success")">@(fee > standard ? "+" : "")@Fmt.Money(fee - standard, "IQD")</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </Section>
+
+                <Section Title="@L["Pricing_Sellers"]" Subtitle="@L["Pricing_SellersHint"]" Icon="shop" Padded="false">
+                    <Actions>
+                        <div class="bp6-control-group">
+                            <HtmlSelect Value="@newSeller?.ToString()" ValueChanged="@(v => newSeller = Guid.TryParse(v, out var id) ? id : null)" Small="true" Label="@L["Field_Seller"]">
+                                <option value="">@L["ChooseSeller"]</option>
+                                @foreach (var m in merchants.Where(m => card.SellerDiscounts.All(d => d.MerchantId != m.Id)))
+                                {
+                                    <option value="@m.Id">@m.Name</option>
+                                }
+                            </HtmlSelect>
+                            <Button Small="true" Icon="add" Text="@L["Add"]" Disabled="@(newSeller is null)" OnClick="AddSeller" />
+                        </div>
+                    </Actions>
+                    <ChildContent>
+                        @if (card.SellerDiscounts.Count == 0)
+                        {
+                            <NonIdealState Icon="tag" Title="@L["Pricing_NoDiscounts"]" Description="@L["Pricing_NoDiscountsHint"]" />
+                        }
+                        else
+                        {
+                            <ul class="lx-list">
+                                @foreach (var d in card.SellerDiscounts.ToList())
+                                {
+                                    <li class="lx-list-item">
+                                        <span class="lx-list-icon lx-list-icon-primary"><Icon Name="shop" /></span>
+                                        <span class="lx-list-body"><span class="lx-list-title"><Mixed Text="@d.MerchantName" /></span></span>
+                                        <div class="bp6-input-group" style="width:120px">
+                                            <input class="bp6-input bp6-small" type="number" min="0" max="100" step="1" dir="ltr" value="@d.Percent.ToString(CultureInfo.InvariantCulture)"
+                                                   @onchange="@(e => UpdateDiscount(d, ParseDecimal(e.Value, d.Percent)))" aria-label="@L["Pricing_Discount"]" />
+                                            <span class="bp6-input-action lx-input-suffix">%</span>
+                                        </div>
+                                        <Button Small="true" Minimal="true" Icon="trash" Tip="@L["Remove"]" OnClick="@(() => card.SellerDiscounts.Remove(d))" />
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </ChildContent>
+                </Section>
+            </EditableBy>
+        </div>
+
+        <aside class="lx-form-side">
+            <Section Title="@L["Pricing_Calculator"]" Subtitle="@L["Pricing_CalculatorHint"]" Icon="calculator">
+                <FormField TValue="string" Label="@L["Pricing_From"]">
+                    <HtmlSelect Value="@from" ValueChanged="@(v => from = v ?? from)" Fill="true" Label="@L["Pricing_From"]">
+                        @foreach (var g in IraqGovernorates.All.OrderBy(g => g.Name, StringComparer.CurrentCulture))
+                        {
+                            <option value="@g.Code">@g.Name</option>
+                        }
+                    </HtmlSelect>
+                </FormField>
+                <FormField TValue="string" Label="@L["Pricing_To"]">
+                    <HtmlSelect Value="@to" ValueChanged="@(v => to = v ?? to)" Fill="true" Label="@L["Pricing_To"]">
+                        @foreach (var g in IraqGovernorates.All.OrderBy(g => g.Name, StringComparer.CurrentCulture))
+                        {
+                            <option value="@g.Code">@g.Name</option>
+                        }
+                    </HtmlSelect>
+                </FormField>
+                <div class="lx-form-grid">
+                    <FormField TValue="decimal" Label="@L["Field_WeightKg"]">
+                        <input class="bp6-input bp6-fill" type="number" min="0" step="0.5" dir="ltr" value="@weight.ToString(CultureInfo.InvariantCulture)" @onchange="@(e => weight = ParseDecimal(e.Value, weight))" />
+                    </FormField>
+                    <FormField TValue="string" Label="@L["Field_Seller"]">
+                        <HtmlSelect Value="@quoteSeller?.ToString()" ValueChanged="@(v => quoteSeller = Guid.TryParse(v, out var id) ? id : null)" Fill="true" Label="@L["Field_Seller"]">
+                            <option value="">@L["AnySeller"]</option>
+                            @foreach (var d in card.SellerDiscounts)
+                            {
+                                <option value="@d.MerchantId">@d.MerchantName</option>
+                            }
+                        </HtmlSelect>
+                    </FormField>
+                </div>
+                @{ var quote = card.Quote(from, to, weight, quoteSeller); }
+                <dl class="lx-props">
+                    <dt>@L[quote.SameGovernorate ? "Pricing_SameGovernorate" : "Pricing_Price"]</dt><dd>@Fmt.Money(quote.BaseFee, "IQD")</dd>
+                    @if (quote.WeightCharge > 0)
+                    {
+                        <dt>@L["Pricing_WeightCharge"]</dt><dd>@Fmt.Money(quote.WeightCharge, "IQD")</dd>
+                    }
+                    @if (quote.DiscountPercent > 0)
+                    {
+                        <dt>@L["Pricing_Discount"]</dt><dd>@Fmt.Number(quote.DiscountPercent, 0)%</dd>
+                    }
+                </dl>
+                <div class="lx-summary-total"><span>@L["Field_DeliveryFee"]</span><span>@Fmt.Money(quote.Fee, "IQD")</span></div>
+            </Section>
+            @if (card.UpdatedAt is { } changed)
+            {
+                <p class="bp6-text-muted lx-small lx-mt">@string.Format(CultureInfo.CurrentCulture, L["UpdatedByAt"], card.UpdatedBy ?? "—", Fmt.DateTime(changed))</p>
+            }
+        </aside>
+    </div>
+}
+
+@code {
+    private RateCard? card;
+    private IReadOnlyList<MerchantLookupItem> merchants = [];
+    private Guid? newSeller;
+    private Guid? quoteSeller;
+    private string from = "IQ-BG";
+    private string to = "IQ-BA";
+    private decimal weight = 1;
+    private bool saving;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var merchantsTask = Merchants.LookupAsync();
+        card = await Shipments.GetPricingAsync();
+        merchants = await merchantsTask;
+    }
+
+    private decimal CommonFee(IReadOnlyList<Governorate> governorates)
+    {
+        var fees = governorates.Select(g => card!.GovernorateFees.GetValueOrDefault(g.Code, card.DefaultFee)).Distinct().ToList();
+        return fees.Count == 1 ? fees[0] : 0;
+    }
+
+    private void SetAll(IReadOnlyList<Governorate> governorates, decimal fee)
+    {
+        foreach (var g in governorates)
+        {
+            card!.GovernorateFees[g.Code] = fee;
+        }
+    }
+
+    private void AddSeller()
+    {
+        if (newSeller is { } id && merchants.FirstOrDefault(m => m.Id == id) is { } m)
+        {
+            card!.SellerDiscounts.Add(new SellerDiscount(m.Id, m.Name, 10));
+            newSeller = null;
+        }
+    }
+
+    private void UpdateDiscount(SellerDiscount discount, decimal percent)
+    {
+        var index = card!.SellerDiscounts.IndexOf(discount);
+        card.SellerDiscounts[index] = discount with { Percent = Math.Clamp(percent, 0, 100) };
+    }
+
+    private void ResetToStandard()
+    {
+        var standard = new RateCard();
+        card!.SameGovernorateFee = standard.SameGovernorateFee;
+        card.DefaultFee = standard.DefaultFee;
+        card.IncludedWeightKg = standard.IncludedWeightKg;
+        card.ExtraKgFee = standard.ExtraKgFee;
+        card.GovernorateFees = standard.GovernorateFees;
+    }
+
+    private async Task SaveAsync()
+    {
+        error = null;
+        saving = true;
+        try
+        {
+            card = await Shipments.UpdatePricingAsync(card!);
+            Toaster.Success(L["PricesSaved"]);
+        }
+        catch (ApiException ex)
+        {
+            error = ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private static decimal ParseDecimal(object? value, decimal fallback) =>
+        decimal.TryParse(value?.ToString(), NumberStyles.Number, CultureInfo.InvariantCulture, out var parsed) && parsed >= 0 ? parsed : fallback;
+}

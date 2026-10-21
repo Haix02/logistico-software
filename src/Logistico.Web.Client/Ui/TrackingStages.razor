@@ -1,0 +1,50 @@
+@* Customer-friendly progress: Order placed → Picked up → In warehouse → Out for delivery → Delivered *@
+<div class="@Bp.Cls("lx-stages", Bp.When(Aborted, "lx-stages-aborted"), Bp.When(Large, "lx-stages-large"))" role="list">
+    @for (var i = 0; i < stages.Count; i++)
+    {
+        var stage = stages[i];
+        var state = i < current || (i == current && Status == ShipmentStatus.Delivered) ? "done" : i == current ? "current" : "todo";
+        <div class="@($"lx-stage lx-stage-{state}")" role="listitem" aria-current="@(state == "current" ? "step" : null)">
+            <div class="lx-stage-dot">
+                <Icon Name="@(state == "done" ? "tick" : IconOf(stage))" />
+            </div>
+            <div class="lx-stage-label">@ShipmentTexts.Of(stage)</div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public ServiceType Service { get; set; }
+    [Parameter, EditorRequired] public ShipmentStatus Status { get; set; }
+    [Parameter] public bool Large { get; set; }
+
+    /// <summary>The parcel travels between two hubs (adds the "on the way" stage for domestic orders).</summary>
+    [Parameter] public bool CrossesHubs { get; set; }
+
+    /// <summary>The parcel already reached its destination hub (line-haul done).</summary>
+    [Parameter] public bool AtDestinationHub { get; set; }
+
+    private IReadOnlyList<TrackingStage> stages = [];
+    private int current;
+
+    private bool Aborted => TrackingProgress.IsAborted(Status);
+
+    protected override void OnParametersSet()
+    {
+        stages = TrackingProgress.Stages(Service, CrossesHubs);
+        current = TrackingProgress.CurrentIndex(Service, Status, CrossesHubs, AtDestinationHub);
+    }
+
+    private string IconOf(TrackingStage stage) => stage switch
+    {
+        TrackingStage.OrderPlaced => "shopping-cart",
+        TrackingStage.PickedUp => "hand-up",
+        TrackingStage.AtOrigin => "office",
+        TrackingStage.InTransit => Service == ServiceType.Domestic ? "drive-time" : "airplane",
+        TrackingStage.Customs => "endorsed",
+        TrackingStage.AtWarehouse => "box",
+        TrackingStage.OutForDelivery => "truck",
+        TrackingStage.Delivered => "home",
+        _ => "circle",
+    };
+}

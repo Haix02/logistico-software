@@ -1,0 +1,20 @@
+@inject IJSRuntime JS
+@inject Toaster Toaster
+
+<Button Icon="duplicate" Text="@Text" Minimal="Minimal" Small="Small" Title="@(Title ?? L["Copy"])" OnClick="CopyAsync" />
+
+@code {
+    [Parameter, EditorRequired] public string Value { get; set; } = "";
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public bool Minimal { get; set; } = true;
+    [Parameter] public bool Small { get; set; }
+
+    private async Task CopyAsync()
+    {
+        if (await JS.InvokeAsync<bool>("lx.copy", Value))
+        {
+            Toaster.Success(L["Copied"]);
+        }
+    }
+}

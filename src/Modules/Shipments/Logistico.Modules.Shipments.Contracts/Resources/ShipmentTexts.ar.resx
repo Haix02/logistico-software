@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Alert_ConfirmationOverdue" xml:space="preserve"><value>تأكيد متأخر</value></data>
+  <data name="Alert_Misrouted" xml:space="preserve"><value>وصلت إلى مركز خاطئ</value></data>
+  <data name="Alert_MissingInTransfer" xml:space="preserve"><value>مفقودة من شاحنة</value></data>
+  <data name="Alert_OutForDeliveryOverdue" xml:space="preserve"><value>طال بقاؤها مع المندوب</value></data>
+  <data name="Alert_PickupOverdue" xml:space="preserve"><value>تأخر الاستلام من المتجر</value></data>
+  <data name="Alert_PromiseMissed" xml:space="preserve"><value>تجاوز موعد التوصيل</value></data>
+  <data name="Alert_RequestOverdue" xml:space="preserve"><value>طلب متأخر</value></data>
+  <data name="Alert_ReturnNotCollected" xml:space="preserve"><value>مرتجع لم يستلمه المتجر</value></data>
+  <data name="Alert_TransferOverdue" xml:space="preserve"><value>تأخر شاحنة النقل</value></data>
+  <data name="Alert_WarehouseDwell" xml:space="preserve"><value>بقيت طويلاً على الرف</value></data>
+  <data name="AutoCancelReason" xml:space="preserve"><value>لم يؤكده الزبون في الوقت المحدد</value></data>
+  <data name="Confirmation_Confirmed" xml:space="preserve"><value>أكّده الزبون</value></data>
+  <data name="Confirmation_Declined" xml:space="preserve"><value>رفضه الزبون</value></data>
+  <data name="Confirmation_NotRequired" xml:space="preserve"><value>غير مطلوب</value></data>
+  <data name="Confirmation_Pending" xml:space="preserve"><value>بانتظار التأكيد</value></data>
+  <data name="ConfirmationMode_AllOrders" xml:space="preserve"><value>كل الطلبات</value></data>
+  <data name="ConfirmationMode_Off" xml:space="preserve"><value>متوقف</value></data>
+  <data name="ConfirmationMode_RiskyCustomers" xml:space="preserve"><value>الزبائن ذوو المرتجعات</value></data>
+  <data name="ConfirmationOutcome_Confirmed" xml:space="preserve"><value>تم التأكيد</value></data>
+  <data name="ConfirmationOutcome_Declined" xml:space="preserve"><value>رفض الطلب</value></data>
+  <data name="ConfirmationOutcome_NoAnswer" xml:space="preserve"><value>لم يرد</value></data>
+  <data name="CustomerRisk_High" xml:space="preserve"><value>خطر إرجاع عالٍ</value></data>
+  <data name="CustomerRisk_Low" xml:space="preserve"><value>موثوق</value></data>
+  <data name="CustomerRisk_Medium" xml:space="preserve"><value>بعض المرتجعات</value></data>
+  <data name="CustomerRisk_New" xml:space="preserve"><value>زبون جديد</value></data>
+  <data name="Edit_Address" xml:space="preserve"><value>العنوان</value></data>
+  <data name="Edit_Cod" xml:space="preserve"><value>مبلغ الاستلام</value></data>
+  <data name="Edit_Fee" xml:space="preserve"><value>أجور التوصيل</value></data>
+  <data name="Edit_Governorate" xml:space="preserve"><value>المحافظة</value></data>
+  <data name="Edit_Items" xml:space="preserve"><value>المحتويات</value></data>
+  <data name="Edit_Name" xml:space="preserve"><value>الاسم</value></data>
+  <data name="Edit_Notes" xml:space="preserve"><value>الملاحظات</value></data>
+  <data name="Edit_Phone" xml:space="preserve"><value>الموبايل</value></data>
+  <data name="Edit_Reference" xml:space="preserve"><value>رقم طلب المتجر</value></data>
+  <data name="Failure_CustomerRefused" xml:space="preserve"><value>الزبون رفض الاستلام</value></data>
+  <data name="Failure_CustomerRescheduled" xml:space="preserve"><value>الزبون طلب موعداً آخر</value></data>
+  <data name="Failure_NoAnswer" xml:space="preserve"><value>الزبون لم يرد</value></data>
+  <data name="Failure_Other" xml:space="preserve"><value>سبب آخر</value></data>
+  <data name="Failure_Unreachable" xml:space="preserve"><value>الهاتف مغلق أو خارج التغطية</value></data>
+  <data name="Failure_WrongAddress" xml:space="preserve"><value>العنوان خاطئ أو غير مكتمل</value></data>
+  <data name="HubKind_Branch" xml:space="preserve"><value>فرع</value></data>
+  <data name="HubKind_Fulfilment" xml:space="preserve"><value>مستودع تخزين</value></data>
+  <data name="HubKind_SortingHub" xml:space="preserve"><value>مركز فرز</value></data>
+  <data name="Lane_Blue" xml:space="preserve"><value>المسار الأزرق (تدقيق لاحق)</value></data>
+  <data name="Lane_Green" xml:space="preserve"><value>المسار الأخضر (إفراج فوري)</value></data>
+  <data name="Lane_Red" xml:space="preserve"><value>المسار الأحمر (كشف فعلي)</value></data>
+  <data name="Lane_Unassigned" xml:space="preserve"><value>غير محدد</value></data>
+  <data name="Lane_Yellow" xml:space="preserve"><value>المسار الأصفر (تدقيق مستندات)</value></data>
+  <data name="Message_Pending" xml:space="preserve"><value>بانتظار الإرسال</value></data>
+  <data name="Message_Sent" xml:space="preserve"><value>أُرسلت</value></data>
+  <data name="Message_Skipped" xml:space="preserve"><value>تم التجاوز</value></data>
+  <data name="Mode_Air" xml:space="preserve"><value>جوي</value></data>
+  <data name="Mode_Courier" xml:space="preserve"><value>بريد سريع</value></data>
+  <data name="Mode_Road" xml:space="preserve"><value>بري</value></data>
+  <data name="Mode_SeaFcl" xml:space="preserve"><value>بحري حاوية كاملة</value></data>
+  <data name="Mode_SeaLcl" xml:space="preserve"><value>بحري شحن جزئي</value></data>
+  <data name="Payout_BankTransfer" xml:space="preserve"><value>حوالة مصرفية</value></data>
+  <data name="Payout_Cash" xml:space="preserve"><value>تسليم نقدي</value></data>
+  <data name="Payout_QiCard" xml:space="preserve"><value>كي كارد / الرافدين</value></data>
+  <data name="Payout_ZainCash" xml:space="preserve"><value>محفظة زين كاش</value></data>
+  <data name="Problem_alert.not_found" xml:space="preserve"><value>التنبيه غير موجود.</value></data>
+  <data name="Problem_automation.stale" xml:space="preserve"><value>عدّل شخص آخر هذه القواعد. حدّث الصفحة وأعد المحاولة.</value></data>
+  <data name="Problem_courier.code_taken" xml:space="preserve"><value>يوجد مندوب آخر يستخدم الرمز {0}.</value></data>
+  <data name="Problem_courier.not_found" xml:space="preserve"><value>المندوب غير موجود.</value></data>
+  <data name="Problem_courier.stale" xml:space="preserve"><value>تم تعديل بيانات المندوب من قِبل مستخدم آخر. أعد التحميل وحاول مجدداً.</value></data>
+  <data name="Problem_customs.domestic_not_supported" xml:space="preserve"><value>البيانات الجمركية مخصصة للشحنات الدولية فقط.</value></data>
+  <data name="Problem_customs.stale" xml:space="preserve"><value>قام مستخدم آخر بتعديل هذا البيان الجمركي</value></data>
+  <data name="Problem_customs.everification_required" xml:space="preserve"><value>لا يمكن الإفراج الجمركي قبل إدخال رقم تصريحة أسيكودا وإتمام التحقق الإلكتروني الإلزامي لشهادة المنشأ والفاتورة التجارية.</value></data>
+  <data name="Problem_customs.hold_reason_required" xml:space="preserve"><value>يجب ذكر سبب الحجز الجمركي.</value></data>
+  <data name="Problem_finance.nothing_to_settle" xml:space="preserve"><value>لا توجد طلبات مسلّمة غير مسددة لهذا المتجر.</value></data>
+  <data name="Problem_finance.settlement_not_found" xml:space="preserve"><value>كشف التسوية غير موجود.</value></data>
+  <data name="Problem_if_match_required" xml:space="preserve"><value>ترويسة ⁦If-Match⁩ مطلوبة</value></data>
+  <data name="Problem_message.not_found" xml:space="preserve"><value>الرسالة غير موجودة.</value></data>
+  <data name="Problem_request.closed" xml:space="preserve"><value>الطلب {0} مغلق بالفعل.</value></data>
+  <data name="Problem_request.duplicate" xml:space="preserve"><value>يوجد طلب مفتوح من النوع نفسه لهذه الشحنة.</value></data>
+  <data name="Problem_request.not_allowed" xml:space="preserve"><value>لا يمكن «{0}» والطلب في حالة «{1}».</value></data>
+  <data name="Problem_request.not_found" xml:space="preserve"><value>الطلب غير موجود.</value></data>
+  <data name="Problem_request.verification_failed" xml:space="preserve"><value>الأرقام لا تطابق رقم الموبايل المسجّل في الطلب.</value></data>
+  <data name="Problem_request.verification_locked" xml:space="preserve"><value>محاولات خاطئة كثيرة لهذا الطلب. لحماية الزبون أوقفنا التعديل من صفحة التتبع لمدة 24 ساعة، يرجى الاتصال بخدمة العملاء.</value></data>
+  <data name="Problem_return.manifest_not_found" xml:space="preserve"><value>الكشف غير موجود.</value></data>
+  <data name="Problem_return.mixed_hubs" xml:space="preserve"><value>سلّم مرتجعات مركز واحد في كل مرة.</value></data>
+  <data name="Problem_return.mixed_sellers" xml:space="preserve"><value>سلّم مرتجعات تاجر واحد في كل مرة.</value></data>
+  <data name="Problem_scan.unknown_hub" xml:space="preserve"><value>مركز غير معروف: {0}.</value></data>
+  <data name="Problem_scan.unsupported" xml:space="preserve"><value>استخدم شاشة المرتجعات لهذه الخطوة.</value></data>
+  <data name="Problem_shipment.already_returning" xml:space="preserve"><value>الشحنة قيد الإرجاع بالفعل.</value></data>
+  <data name="Problem_shipment.awaiting_confirmation" xml:space="preserve"><value>لم يؤكد الزبون هذا الطلب بعد. أكّده أولاً من شاشة التأكيدات.</value></data>
+  <data name="Problem_shipment.cod_currency" xml:space="preserve"><value>يجب إدخال مبلغ الدفع عند الاستلام مع العملة.</value></data>
+  <data name="Problem_shipment.confirmation_not_pending" xml:space="preserve"><value>هذا الطلب ليس بانتظار التأكيد.</value></data>
+  <data name="Problem_shipment.courier_required" xml:space="preserve"><value>اختر المندوب الذي سيستلم الشحنة.</value></data>
+  <data name="Problem_shipment.declared_currency" xml:space="preserve"><value>القيمة المصرّح بها تحتاج إلى عملة.</value></data>
+  <data name="Problem_shipment.domestic_address" xml:space="preserve"><value>التوصيل المحلي يحتاج إلى محافظة الزبون وعنوانه ورقم موبايله.</value></data>
+  <data name="Problem_shipment.event_in_future" xml:space="preserve"><value>لا يمكن تسجيل حدث بتاريخ مستقبلي.</value></data>
+  <data name="Problem_shipment.event_out_of_order" xml:space="preserve"><value>لا يمكن أن يكون الحدث أقدم من الحدث السابق.</value></data>
+  <data name="Problem_shipment.failure_reason_required" xml:space="preserve"><value>اختر سبب تعذّر التسليم.</value></data>
+  <data name="Problem_shipment.invalid_transition" xml:space="preserve"><value>لا يمكن نقل شحنة حالتها «{0}» إلى «{1}».</value></data>
+  <data name="Problem_shipment.merchant_not_found" xml:space="preserve"><value>المتجر المحدد غير موجود أو غير فعّال.</value></data>
+  <data name="Problem_shipment.mode_required" xml:space="preserve"><value>وسيلة النقل مطلوبة.</value></data>
+  <data name="Problem_shipment.not_changeable" xml:space="preserve"><value>لم يعد بالإمكان تعديل هذا الطلب ({0}).</value></data>
+  <data name="Problem_shipment.not_found" xml:space="preserve"><value>الشحنة غير موجودة</value></data>
+  <data name="Problem_shipment.not_in_warehouse" xml:space="preserve"><value>هذه الشحنة ليست في المخزن.</value></data>
+  <data name="Problem_shipment.return_not_at_hub" xml:space="preserve"><value>يمكن تسليم المرتجعات الموجودة في المركز فقط.</value></data>
+  <data name="Problem_shipment.same_origin_destination" xml:space="preserve"><value>يجب أن يختلف المنشأ عن الوجهة.</value></data>
+  <data name="Problem_shipment.stale" xml:space="preserve"><value>قام مستخدم آخر بتعديل الشحنة</value></data>
+  <data name="Problem_shipment.stale_detail" xml:space="preserve"><value>أعد تحميل الشحنة وحاول مرة أخرى.</value></data>
+  <data name="Problem_shipment.tracking_not_found" xml:space="preserve"><value>لا توجد شحنة برقم التتبع {0}.</value></data>
+  <data name="Problem_shipment.with_courier" xml:space="preserve"><value>الشحنة مع المندوب الآن. سجّل نتيجة التوصيل أولاً.</value></data>
+  <data name="Problem_shipment.wrong_hub_for_dispatch" xml:space="preserve"><value>يجب نقل الشحنة أولاً إلى {0}.</value></data>
+  <data name="Problem_transfer.already_loading" xml:space="preserve"><value>الشاحنة {0} قيد التحميل على هذا المسار.</value></data>
+  <data name="Problem_transfer.empty" xml:space="preserve"><value>امسح شحنة واحدة على الأقل قبل مغادرة الشاحنة.</value></data>
+  <data name="Problem_transfer.invalid_lane" xml:space="preserve"><value>اختر مركزين مختلفين.</value></data>
+  <data name="Problem_transfer.not_found" xml:space="preserve"><value>كشف الشاحنة غير موجود.</value></data>
+  <data name="Problem_transfer.not_in_transit" xml:space="preserve"><value>الشاحنة {0} ليست في الطريق.</value></data>
+  <data name="Problem_transfer.not_loading" xml:space="preserve"><value>الشاحنة {0} غادرت بالفعل.</value></data>
+  <data name="Problem_transfer.not_on_manifest" xml:space="preserve"><value>الشحنة {0} غير موجودة في كشف الشاحنة {1}.</value></data>
+  <data name="Problem_transfer.stale" xml:space="preserve"><value>عدّل شخص آخر هذه الشاحنة. حدّث الصفحة وأعد المحاولة.</value></data>
+  <data name="Problem_transfer.unknown_hub" xml:space="preserve"><value>المركز {0} غير فعّال في شبكتك.</value></data>
+  <data name="Problem_transfer.wrong_lane" xml:space="preserve"><value>الشحنة {0} ليست مخصصة لهذه الشاحنة.</value></data>
+  <data name="Problem_warehouse.coverage_conflict" xml:space="preserve"><value>هذه المحافظات يغطيها مخزن آخر: {0}. أكّد لنقلها إلى هذا المخزن.</value></data>
+  <data name="Problem_warehouse.invalid_governorate" xml:space="preserve"><value>محافظة غير معروفة: {0}.</value></data>
+  <data name="Problem_warehouse.invalid_phone" xml:space="preserve"><value>أدخل رقم هاتف عراقي صحيحاً.</value></data>
+  <data name="Problem_warehouse.last_active" xml:space="preserve"><value>يجب أن يبقى مخزن واحد فعّالاً على الأقل.</value></data>
+  <data name="Problem_warehouse.not_empty" xml:space="preserve"><value>قبل إيقافه انقل الطرود الموجودة فيه ({0}) وأنهِ شاحناته ({1}).</value></data>
+  <data name="Problem_warehouse.not_found" xml:space="preserve"><value>المخزن غير موجود.</value></data>
+  <data name="Problem_warehouse.primary_inactive" xml:space="preserve"><value>يجب أن يبقى المخزن الرئيسي فعّالاً.</value></data>
+  <data name="Problem_warehouse.primary_required" xml:space="preserve"><value>اجعل مخزناً آخر هو المخزن الرئيسي أولاً.</value></data>
+  <data name="Problem_warehouse.stale" xml:space="preserve"><value>عدّل مستخدم آخر هذا المخزن. أعد التحميل وحاول مجدداً.</value></data>
+  <data name="Problem_warehouse.tag_locked" xml:space="preserve"><value>رمز التوجيه {0} مطبوع على البوليصات ولا يمكن تغييره.</value></data>
+  <data name="Problem_warehouse.tag_taken" xml:space="preserve"><value>يوجد مخزن آخر يستخدم رمز التوجيه {0}.</value></data>
+  <data name="Request_Cancel" xml:space="preserve"><value>إلغاء الطلب</value></data>
+  <data name="Request_ChangeAddress" xml:space="preserve"><value>تغيير العنوان</value></data>
+  <data name="Request_ChangePhone" xml:space="preserve"><value>تغيير رقم الهاتف</value></data>
+  <data name="Request_Complaint" xml:space="preserve"><value>شكوى</value></data>
+  <data name="Request_Reschedule" xml:space="preserve"><value>تغيير موعد التوصيل</value></data>
+  <data name="Request_Return" xml:space="preserve"><value>إرجاع الطلب</value></data>
+  <data name="RequestSource_Customer" xml:space="preserve"><value>الزبون</value></data>
+  <data name="RequestSource_Seller" xml:space="preserve"><value>المتجر</value></data>
+  <data name="RequestSource_Staff" xml:space="preserve"><value>الموظفون</value></data>
+  <data name="RequestSource_System" xml:space="preserve"><value>النظام</value></data>
+  <data name="RequestStatus_InProgress" xml:space="preserve"><value>قيد المعالجة</value></data>
+  <data name="RequestStatus_Open" xml:space="preserve"><value>جديد</value></data>
+  <data name="RequestStatus_Rejected" xml:space="preserve"><value>مرفوض</value></data>
+  <data name="RequestStatus_Resolved" xml:space="preserve"><value>تم الحل</value></data>
+  <data name="Return_CustomerRefused" xml:space="preserve"><value>رفض الزبون الاستلام</value></data>
+  <data name="Return_CustomerReturn" xml:space="preserve"><value>إرجاع من الزبون</value></data>
+  <data name="Return_Damaged" xml:space="preserve"><value>تالفة</value></data>
+  <data name="Return_MaxAttemptsReached" xml:space="preserve"><value>استنفاد محاولات التوصيل</value></data>
+  <data name="Return_Other" xml:space="preserve"><value>سبب آخر</value></data>
+  <data name="Return_SellerCancelled" xml:space="preserve"><value>ألغاه المتجر</value></data>
+  <data name="Return_WrongAddress" xml:space="preserve"><value>عنوان خاطئ</value></data>
+  <data name="Rule_AlertRaised" xml:space="preserve"><value>تنبيه جديد</value></data>
+  <data name="Rule_AlertResolved" xml:space="preserve"><value>زوال تنبيه</value></data>
+  <data name="Rule_AutoCancel" xml:space="preserve"><value>إلغاء تلقائي</value></data>
+  <data name="Rule_AutoReschedule" xml:space="preserve"><value>إعادة جدولة تلقائية</value></data>
+  <data name="Rule_AutoReturn" xml:space="preserve"><value>إرجاع تلقائي</value></data>
+  <data name="Rule_ConfirmationRequested" xml:space="preserve"><value>طلب تأكيد</value></data>
+  <data name="Rule_NotificationQueued" xml:space="preserve"><value>رسالة للزبون</value></data>
+  <data name="Rule_PlanTransfer" xml:space="preserve"><value>إضافة إلى شاحنة</value></data>
+  <data name="Rule_RequestApplied" xml:space="preserve"><value>تنفيذ طلب تلقائياً</value></data>
+  <data name="Rule_TransferClosed" xml:space="preserve"><value>إغلاق كشف شاحنة</value></data>
+  <data name="Scan_Deliver" xml:space="preserve"><value>تسليم للزبون</value></data>
+  <data name="Scan_Dispatch" xml:space="preserve"><value>تسليم للمندوب</value></data>
+  <data name="Scan_Fail" xml:space="preserve"><value>محاولة فاشلة</value></data>
+  <data name="Scan_HandOver" xml:space="preserve"><value>تسليم للمتجر</value></data>
+  <data name="Scan_Load" xml:space="preserve"><value>تحميل الشاحنة</value></data>
+  <data name="Scan_Receive" xml:space="preserve"><value>استلام</value></data>
+  <data name="Scan_Unload" xml:space="preserve"><value>تفريغ الشاحنة</value></data>
+  <data name="Scan_Verify" xml:space="preserve"><value>فحص</value></data>
+  <data name="Service_Domestic" xml:space="preserve"><value>توصيل محلي</value></data>
+  <data name="Service_International" xml:space="preserve"><value>دولي</value></data>
+  <data name="Severity_Critical" xml:space="preserve"><value>حرج</value></data>
+  <data name="Severity_Info" xml:space="preserve"><value>معلومة</value></data>
+  <data name="Severity_Warning" xml:space="preserve"><value>تحذير</value></data>
+  <data name="Stage_AtOrigin" xml:space="preserve"><value>في مكتب المنشأ</value></data>
+  <data name="Stage_AtWarehouse" xml:space="preserve"><value>في المخزن</value></data>
+  <data name="Stage_Customs" xml:space="preserve"><value>الجمارك</value></data>
+  <data name="Stage_Delivered" xml:space="preserve"><value>تم التسليم</value></data>
+  <data name="Stage_InTransit" xml:space="preserve"><value>في الطريق</value></data>
+  <data name="Stage_OrderPlaced" xml:space="preserve"><value>تم الطلب</value></data>
+  <data name="Stage_OutForDelivery" xml:space="preserve"><value>مع المندوب</value></data>
+  <data name="Stage_PickedUp" xml:space="preserve"><value>تم الاستلام</value></data>
+  <data name="Status_ArrivedPortOfEntry" xml:space="preserve"><value>وصلت إلى منفذ الدخول</value></data>
+  <data name="Status_AtDestinationWarehouse" xml:space="preserve"><value>في مخزن الوجهة</value></data>
+  <data name="Status_AtWarehouse" xml:space="preserve"><value>في المخزن</value></data>
+  <data name="Status_Booked" xml:space="preserve"><value>تم إنشاء الطلب</value></data>
+  <data name="Status_Cancelled" xml:space="preserve"><value>ملغاة</value></data>
+  <data name="Status_Consolidated" xml:space="preserve"><value>تم التجميع</value></data>
+  <data name="Status_CustomsHold" xml:space="preserve"><value>محتجزة في الجمارك</value></data>
+  <data name="Status_CustomsPending" xml:space="preserve"><value>في الجمارك</value></data>
+  <data name="Status_Delivered" xml:space="preserve"><value>تم التسليم</value></data>
+  <data name="Status_DeliveryFailed" xml:space="preserve"><value>تعذّر التسليم</value></data>
+  <data name="Status_DepartedOrigin" xml:space="preserve"><value>غادرت بلد المنشأ</value></data>
+  <data name="Status_Draft" xml:space="preserve"><value>مسودة</value></data>
+  <data name="Status_InTransit" xml:space="preserve"><value>في الطريق</value></data>
+  <data name="Status_InTransitToHub" xml:space="preserve"><value>في الطريق بين المراكز</value></data>
+  <data name="Status_OutForDelivery" xml:space="preserve"><value>خرجت مع المندوب</value></data>
+  <data name="Status_PickedUp" xml:space="preserve"><value>تم الاستلام من المرسل</value></data>
+  <data name="Status_ReadyForDispatch" xml:space="preserve"><value>جاهزة للإرسال</value></data>
+  <data name="Status_ReceivedAtOrigin" xml:space="preserve"><value>وصلت إلى مكتب المنشأ</value></data>
+  <data name="Status_Released" xml:space="preserve"><value>تم الإفراج الجمركي</value></data>
+  <data name="Status_ReturnAtHub" xml:space="preserve"><value>مرتجع جاهز للتسليم</value></data>
+  <data name="Status_Returned" xml:space="preserve"><value>أُعيدت إلى المتجر</value></data>
+  <data name="Status_ReturnInitiated" xml:space="preserve"><value>قيد الإرجاع</value></data>
+  <data name="Status_ReturnInTransit" xml:space="preserve"><value>مرتجع في الطريق</value></data>
+  <data name="Template_ConfirmOrder" xml:space="preserve"><value>تأكيد الطلب</value></data>
+  <data name="Template_Delivered" xml:space="preserve"><value>تم التسليم</value></data>
+  <data name="Template_DeliveryFailed" xml:space="preserve"><value>تعذّر التوصيل</value></data>
+  <data name="Template_OutForDelivery" xml:space="preserve"><value>خرج للتوصيل</value></data>
+  <data name="Template_RequestReceived" xml:space="preserve"><value>استلام الطلب</value></data>
+  <data name="Template_Rescheduled" xml:space="preserve"><value>موعد توصيل جديد</value></data>
+  <data name="Template_ReturnStarted" xml:space="preserve"><value>بدء الإرجاع</value></data>
+  <data name="Transfer_InTransit" xml:space="preserve"><value>في الطريق</value></data>
+  <data name="Transfer_Loading" xml:space="preserve"><value>قيد التحميل</value></data>
+  <data name="Transfer_Received" xml:space="preserve"><value>وصلت</value></data>
+  <data name="TransferItem_Loaded" xml:space="preserve"><value>محمّلة</value></data>
+  <data name="TransferItem_Missing" xml:space="preserve"><value>مفقودة</value></data>
+  <data name="TransferItem_Planned" xml:space="preserve"><value>مخططة</value></data>
+  <data name="TransferItem_Received" xml:space="preserve"><value>تم تفريغها</value></data>
+  <data name="Vehicle_HeavyTruck" xml:space="preserve"><value>شاحنة ثقيلة</value></data>
+  <data name="Vehicle_LightTruck" xml:space="preserve"><value>شاحنة خفيفة (كيا/بيك أب)</value></data>
+  <data name="Vehicle_Motorcycle" xml:space="preserve"><value>دراجة نارية</value></data>
+  <data name="Vehicle_Van" xml:space="preserve"><value>فان توصيل</value></data>
+  <data name="Category_Fashion" xml:space="preserve"><value>أزياء وملابس</value></data>
+  <data name="Category_ShoesAndBags" xml:space="preserve"><value>أحذية وحقائب</value></data>
+  <data name="Category_Beauty" xml:space="preserve"><value>تجميل وعطور</value></data>
+  <data name="Category_Electronics" xml:space="preserve"><value>موبايلات وإلكترونيات</value></data>
+  <data name="Category_Accessories" xml:space="preserve"><value>ساعات وإكسسوارات</value></data>
+  <data name="Category_KidsAndToys" xml:space="preserve"><value>أطفال وألعاب</value></data>
+  <data name="Category_HomeAndKitchen" xml:space="preserve"><value>منزل ومطبخ</value></data>
+  <data name="Category_Books" xml:space="preserve"><value>كتب وقرطاسية</value></data>
+  <data name="Category_Food" xml:space="preserve"><value>أطعمة وحلويات</value></data>
+  <data name="Category_Health" xml:space="preserve"><value>صحة ومكمّلات</value></data>
+  <data name="Category_Other" xml:space="preserve"><value>أخرى</value></data>
+</root>

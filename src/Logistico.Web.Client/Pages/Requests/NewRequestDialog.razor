@@ -1,0 +1,167 @@
+@* Records a request taken by phone or from a seller. Finds the order by tracking number or uses the given one. *@
+@inject OperationsApi Operations
+@inject ShipmentsApi Shipments
+
+<Dialog IsOpen="IsOpen" IsOpenChanged="IsOpenChanged" Title="@L["Requests_New"]" Icon="inbox" Width="600px">
+    <ChildContent>
+        @if (shipment is null)
+        {
+            <form @onsubmit="FindAsync">
+                <FormField TValue="string" Label="@L["Col_Tracking"]" Helper="@L["FindOrderHint"]">
+                    <div class="bp6-control-group bp6-fill">
+                        <div class="bp6-input-group bp6-fill">
+                            <span class="bp6-icon bp6-icon-standard bp6-icon-search"></span>
+                            <input class="bp6-input lx-upper" dir="ltr" placeholder="LX26…" @bind="lookup" autocomplete="off" />
+                        </div>
+                        <Button Type="submit" Icon="search" Text="@L["Search"]" Loading="busy" />
+                    </div>
+                </FormField>
+            </form>
+        }
+        else
+        {
+            <div class="lx-row lx-mb" style="justify-content:space-between">
+                <Cell Title="@shipment.ConsigneeName"><SubContent><span class="lx-code" style="font-weight:500">@shipment.TrackingNumber</span> · @Fmt.Place(shipment.DestinationCode)</SubContent></Cell>
+                <StatusTag Status="shipment.Status" />
+            </div>
+            <EditForm Model="draft" OnValidSubmit="CreateAsync" id="request-form">
+                <DataAnnotationsValidator />
+                <div class="lx-form-grid">
+                    <FormField Label="@L["Col_Type"]" Field="() => draft.Type" CssClass="lx-span-2">
+                        <SegmentedControl TValue="RequestType" Options="TypeOptions" Value="draft.Type" ValueChanged="@(t => draft.Type = t)" Fill="true" Small="true" />
+                    </FormField>
+                    @switch (draft.Type)
+                    {
+                        case RequestType.Reschedule:
+                            <FormField Label="@L["Field_PreferredDate"]" Required="true" Field="() => draft.PreferredDate" CssClass="lx-span-2">
+                                <InputDate class="bp6-input bp6-fill" @bind-Value="draft.PreferredDate" />
+                            </FormField>
+                            break;
+                        case RequestType.ChangeAddress:
+                            <FormField Label="@L["Field_Governorate"]" Field="() => draft.NewGovernorate">
+                                <span class="bp6-html-select bp6-fill">
+                                    <InputSelect @bind-Value="draft.NewGovernorate">
+                                        <option value="">@L["SameGovernorate"]</option>
+                                        @foreach (var g in IraqGovernorates.All)
+                                        {
+                                            <option value="@g.Code">@g.Name</option>
+                                        }
+                                    </InputSelect>
+                                    <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                                </span>
+                            </FormField>
+                            <FormField Label="@L["Field_Area"]" Field="() => draft.NewCity">
+                                <InputText class="bp6-input bp6-fill" @bind-Value="draft.NewCity" />
+                            </FormField>
+                            <FormField Label="@L["Field_Address"]" Required="true" Field="() => draft.NewAddress" CssClass="lx-span-2">
+                                <InputText class="bp6-input bp6-fill" @bind-Value="draft.NewAddress" />
+                            </FormField>
+                            <FormField Label="@L["Field_Landmark"]" Hint="@L["Optional"]" Field="() => draft.NewLandmark" CssClass="lx-span-2">
+                                <InputText class="bp6-input bp6-fill" @bind-Value="draft.NewLandmark" />
+                            </FormField>
+                            break;
+                        case RequestType.ChangePhone:
+                            <FormField Label="@L["Field_NewPhone"]" Required="true" Field="() => draft.NewPhone" CssClass="lx-span-2">
+                                <InputText class="bp6-input bp6-fill" type="tel" dir="ltr" placeholder="0770 123 4567" @bind-Value="draft.NewPhone" />
+                            </FormField>
+                            break;
+                    }
+                    <FormField Label="@L["Col_Details"]" Required="@(draft.Type == RequestType.Complaint)" Hint="@(draft.Type == RequestType.Complaint ? null : L["Optional"].Value)" Field="() => draft.Details" CssClass="lx-span-2">
+                        <InputTextArea class="bp6-input bp6-fill" rows="3" @bind-Value="draft.Details" />
+                    </FormField>
+                    <FormField Label="@L["Col_Source"]" Field="() => draft.Source" CssClass="lx-span-2">
+                        <SegmentedControl TValue="RequestSource" Options="SourceOptions" Value="draft.Source" ValueChanged="@(s => draft.Source = s)" Small="true" />
+                    </FormField>
+                </div>
+            </EditForm>
+        }
+        @if (error is not null)
+        {
+            <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mt">@error</Callout>
+        }
+    </ChildContent>
+    <Footer>
+        <Button Text="@L["Cancel"]" OnClick="@(() => IsOpenChanged.InvokeAsync(false))" />
+        @if (shipment is not null)
+        {
+            <Button Type="submit" form="request-form" Intent="Intent.Primary" Icon="tick" Text="@L["Save"]" Loading="busy" />
+        }
+    </Footer>
+</Dialog>
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public Guid? ShipmentId { get; set; }
+    [Parameter] public EventCallback<ServiceRequestItem> OnCreated { get; set; }
+
+    private ShipmentDetails? shipment;
+    private CreateServiceRequest draft = new();
+    private string? lookup;
+    private string? error;
+    private bool busy;
+    private bool wasOpen;
+
+    private IReadOnlyList<SegmentOption<RequestType>> TypeOptions =>
+        Enum.GetValues<RequestType>().Select(t => new SegmentOption<RequestType>(t, ShipmentTexts.Of(t), DomainIcons.Of(t))).ToList();
+
+    private IReadOnlyList<SegmentOption<RequestSource>> SourceOptions =>
+        [new(RequestSource.Staff, ShipmentTexts.Of(RequestSource.Staff)), new(RequestSource.Seller, ShipmentTexts.Of(RequestSource.Seller))];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsOpen && !wasOpen)
+        {
+            draft = new CreateServiceRequest { PreferredDate = DateTimeOffset.Now.Date.AddDays(1) };
+            error = null;
+            lookup = null;
+            shipment = ShipmentId is { } id ? await Shipments.GetAsync(id) : null;
+            draft.ShipmentId = shipment?.Id;
+        }
+
+        wasOpen = IsOpen;
+    }
+
+    private async Task FindAsync()
+    {
+        var number = TrackingNumber.Normalize(lookup ?? "");
+        if (number.Length == 0)
+        {
+            return;
+        }
+
+        busy = true;
+        error = null;
+        try
+        {
+            var found = await Shipments.ListAsync(new ShipmentQuery { Q = number, PageSize = 1 });
+            shipment = found.Items.Count == 1 ? await Shipments.GetAsync(found.Items[0].Id) : null;
+            draft.ShipmentId = shipment?.Id;
+            error = shipment is null ? L["NoShipments"].Value : null;
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private async Task CreateAsync()
+    {
+        busy = true;
+        error = null;
+        try
+        {
+            var created = await Operations.CreateRequestAsync(draft);
+            await IsOpenChanged.InvokeAsync(false);
+            await OnCreated.InvokeAsync(created);
+        }
+        catch (ApiException ex)
+        {
+            error = ex.UserMessage;
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+}

@@ -1,0 +1,36 @@
+@* Where a parcel is and where it must go: "BGW → BSR" (or just "BSR ✓" when it is already there). *@
+@{
+    var current = HubCatalog.Find(Current);
+    var target = HubCatalog.Find(Target);
+}
+<span class="lx-lane" title="@Title(current, target)">
+    @if (ShipmentLifecycle.IsOnLineHaul(Status))
+    {
+        <Icon Name="drive-time" CssClass="lx-intent-primary" />
+        <span>@(target?.RoutingTag ?? "—")</span>
+    }
+    else if (current is null)
+    {
+        <span class="bp6-text-muted">@(target?.RoutingTag ?? "—")</span>
+    }
+    else if (target is null || current.Code == target.Code)
+    {
+        <span>@current.RoutingTag</span>
+        <Icon Name="tick" CssClass="lx-intent-success" />
+    }
+    else
+    {
+        <span>@current.RoutingTag</span>
+        <span class="lx-lane-arrow">→</span>
+        <span class="lx-intent-warning">@target.RoutingTag</span>
+    }
+</span>
+
+@code {
+    [Parameter] public string? Current { get; set; }
+    [Parameter] public string? Target { get; set; }
+    [Parameter] public ShipmentStatus Status { get; set; }
+
+    private string Title(HubInfo? current, HubInfo? target) =>
+        current is null ? target?.Name ?? "" : target is null || current.Code == target.Code ? current.Name : $"{current.Name} {Bidi.Arrow} {target.Name}";
+}

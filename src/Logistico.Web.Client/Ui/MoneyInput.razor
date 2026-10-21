@@ -1,0 +1,24 @@
+@* An IQD amount: whole dinars, steps of 250, the currency shown after the number. *@
+<div class="@Bp.Cls("bp6-input-group", "lx-money-input", Bp.When(Small, "bp6-small"), Bp.When(!Small, "bp6-fill"))">
+    <input class="@Bp.Cls("bp6-input", Bp.When(Small, "bp6-small"))" type="number" min="0" step="250" dir="ltr" inputmode="numeric"
+           value="@Value.ToString("0", CultureInfo.InvariantCulture)" @onchange="ChangedAsync" aria-label="@Label" />
+    <span class="bp6-input-action lx-input-suffix">@L["Iqd"]</span>
+</div>
+
+@code {
+    [Parameter] public decimal Value { get; set; }
+    [Parameter] public EventCallback<decimal> ValueChanged { get; set; }
+    [Parameter] public bool Small { get; set; }
+    [Parameter] public string? Label { get; set; }
+
+    private Task ChangedAsync(ChangeEventArgs e)
+    {
+        if (!decimal.TryParse(e.Value?.ToString(), NumberStyles.Number, CultureInfo.InvariantCulture, out var amount) || amount < 0)
+        {
+            return Task.CompletedTask;
+        }
+
+        Value = Math.Round(amount);
+        return ValueChanged.InvokeAsync(Value);
+    }
+}

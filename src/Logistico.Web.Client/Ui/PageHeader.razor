@@ -1,0 +1,62 @@
+@inject NavigationManager Navigation
+
+<header class="lx-page-header">
+    <div class="lx-page-header-main">
+        @if (Breadcrumbs is { Count: > 0 })
+        {
+            <ul class="bp6-breadcrumbs lx-breadcrumbs">
+                @foreach (var (text, href) in Breadcrumbs)
+                {
+                    <li><a class="bp6-breadcrumb" href="@href">@text</a></li>
+                }
+                <li><span class="bp6-breadcrumb bp6-breadcrumb-current">@Title</span></li>
+            </ul>
+        }
+        <div class="lx-page-title-row">
+            @if (Icon is not null)
+            {
+                <span class="lx-page-icon"><Icon Name="@Icon" Large="true" /></span>
+            }
+            <div>
+                @if (Breadcrumbs is not { Count: > 0 } && Eyebrow is { } eyebrow)
+                {
+                    <span class="lx-page-eyebrow">@eyebrow</span>
+                }
+                <h1 class="bp6-heading lx-page-title">@Title @TitleExtra</h1>
+                @if (Subtitle is not null)
+                {
+                    <div class="bp6-text-muted lx-page-subtitle">@Subtitle</div>
+                }
+            </div>
+        </div>
+    </div>
+    @if (Actions is not null)
+    {
+        <div class="lx-page-actions">@Actions</div>
+    }
+</header>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public IReadOnlyList<(string Text, string Href)>? Breadcrumbs { get; set; }
+    [Parameter] public RenderFragment? TitleExtra { get; set; }
+    [Parameter] public RenderFragment? Actions { get; set; }
+
+    /// <summary>The menu group of the current page ("Operations", "Hubs & trucks"…): the longest menu link the address starts with.</summary>
+    private string? Eyebrow
+    {
+        get
+        {
+            var path = Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].TrimEnd('/');
+            var group = AppNavigation.Groups
+                .SelectMany(g => g.Items.Select(item => (Group: g, item.Href)))
+                .Where(x => path == x.Href || (x.Href.Length > 0 && path.StartsWith(x.Href + "/", StringComparison.OrdinalIgnoreCase)))
+                .OrderByDescending(x => x.Href.Length)
+                .Select(x => x.Group)
+                .FirstOrDefault();
+            return group is null ? null : L[group.TitleKey].Value;
+        }
+    }
+}

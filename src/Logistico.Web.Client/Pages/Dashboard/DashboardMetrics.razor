@@ -1,0 +1,46 @@
+@{
+    var (avgNumber, avgUnit) = Fmt.Duration(Overview.AvgDeliveryHours.Value, L);
+}
+
+<div class="lx-kpis lx-kpis-4 lx-dashboard-primary-kpis">
+    <KpiCard Icon="shopping-cart" Label="@L["Kpi_Booked"]" Value="@Fmt.Number((int)Overview.Booked.Value)" Intent="Intent.Primary"
+             Change="Overview.Booked.ChangePercent" Trend="@(Overview.Daily.Select(d => d.Booked).ToList())" Href="shipments?service=Domestic&sort=createdAt&desc=true" />
+    <KpiCard Icon="tick-circle" Label="@L["Kpi_Delivered"]" Value="@Fmt.Number((int)Overview.Delivered.Value)" Intent="Intent.Success"
+             Change="Overview.Delivered.ChangePercent" Trend="@(Overview.Daily.Select(d => d.Delivered).ToList())" Href="shipments?status=Delivered" />
+    <KpiCard Icon="endorsed" Label="@L["Kpi_SuccessRate"]" Value="@Fmt.Percent(Overview.SuccessRate.Value)" Intent="@RateIntent(Overview.SuccessRate.Value, 90, 80)"
+             Change="Overview.SuccessRate.ChangePoints" ChangeInPoints="true" Hint="@L["Kpi_SuccessRateHint"]" />
+    <KpiCard Icon="dollar" Label="@L["Kpi_CodCollectedPeriod"]" Amount="Overview.CodCollectedIqd.Value" Currency="IQD" Intent="Intent.Success"
+             Change="Overview.CodCollectedIqd.ChangePercent" Href="@(canFinance ? "finance" : null)" />
+</div>
+
+<div class="lx-dashboard-health lx-card" role="list" aria-label="@L["PerformanceDetails"]">
+    <HealthMetric Icon="flag" Label="@L["Kpi_FirstAttempt"]" Value="@Fmt.Percent(Overview.FirstAttemptRate.Value)"
+                  Change="Overview.FirstAttemptRate.ChangePoints" ChangeInPoints="true" Intent="@RateIntent(Overview.FirstAttemptRate.Value, 85, 70)"
+                  Hint="@L["Kpi_FirstAttemptHint"]" />
+    <HealthMetric Icon="time" Label="@L["Kpi_OnTime"]" Value="@Fmt.Percent(Overview.OnTimeRate.Value)"
+                  Change="Overview.OnTimeRate.ChangePoints" ChangeInPoints="true" Intent="@RateIntent(Overview.OnTimeRate.Value, 90, 75)"
+                  Hint="@L["Kpi_OnTimeHint"]" />
+    <HealthMetric Icon="stopwatch" Label="@L["Kpi_AvgDelivery"]" Value="@avgNumber" Unit="@avgUnit"
+                  Change="Overview.AvgDeliveryHours.ChangePercent" HigherIsBetter="false" Intent="Intent.Primary" Hint="@L["Kpi_AvgDeliveryHint"]" />
+    <HealthMetric Icon="undo" Label="@L["Kpi_ReturnRate"]" Value="@Fmt.Percent(Overview.ReturnRate.Value)"
+                  Change="Overview.ReturnRate.ChangePoints" ChangeInPoints="true" HigherIsBetter="false"
+                  Intent="@(Overview.ReturnRate.Value <= 10 ? Intent.Success : Overview.ReturnRate.Value <= 20 ? Intent.Warning : Intent.Danger)" />
+    @* Customers rate delivered orders from the tracking page; the average only means something once there are ratings. *@
+    <HealthMetric Icon="star" Label="@L["Kpi_Rating"]" Value="@(Overview.Ratings > 0 ? Fmt.Number(Overview.AverageRating!.Value, 1) : "—")"
+                  Unit="@(Overview.Ratings > 0 ? "/ 5" : null)"
+                  Intent="@(Overview.Ratings == 0 ? Intent.None : RateIntent(Overview.AverageRating!.Value, 4.5m, 3.5m))"
+                  Hint="@(Overview.Ratings > 0 ? L.Count("RatingsN", Overview.Ratings) : L["NoRatingsPeriod"].Value)" />
+</div>
+
+@code {
+    private bool canFinance;
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    [Parameter, EditorRequired] public AnalyticsOverview Overview { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync() => canFinance = await AuthState.CanAsync(StaffPolicies.Finance);
+
+    private static Intent RateIntent(decimal value, decimal good, decimal fair) =>
+        value >= good ? Intent.Success : value >= fair ? Intent.Warning : Intent.Danger;
+}

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Public language of the Merchants (sellers) module. No server dependencies. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Logistico.SharedKernel\Logistico.SharedKernel.csproj" />
+  </ItemGroup>
+
+</Project>

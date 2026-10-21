@@ -1,0 +1,21 @@
+<div class="@Bp.Cls("bp6-callout", Bp.IntentClass(Intent), "lx-callout", CssClass)" role="@(Intent == Intent.Danger ? "alert" : null)">
+    @if (Icon is not null)
+    {
+        <Icon Name="@Icon" CssClass="lx-callout-icon" />
+    }
+    <div class="lx-callout-body">
+        @if (Title is not null)
+        {
+            <h5 class="bp6-heading">@Title</h5>
+        }
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter] public Intent Intent { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

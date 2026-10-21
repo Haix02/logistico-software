@@ -1,0 +1,156 @@
+@page "/transfers"
+@inject OperationsApi Operations
+@inject OpsState Ops
+@inject NavigationManager Navigation
+@inject Toaster Toaster
+
+<PageTitle>@L["Nav_Transfers"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["TransfersTitle"]" Subtitle="@L["TransfersSubtitle"]" Icon="drive-time">
+    <Actions>
+        <LinkButton Href="shipments?needsTransfer=true" Icon="th" Text="@L["View_NeedsTruck"]" />
+        <Allowed Policy="@StaffPolicies.Operate">
+            <Button Icon="add" Text="@L["Transfers_New"]" Intent="Intent.Primary" OnClick="@(() => openDialog = true)" />
+        </Allowed>
+    </Actions>
+</PageHeader>
+
+@if (result is not null)
+{
+    <div class="lx-kpis">
+        <KpiCard Icon="box" Label="@L["Kpi_ParcelsWaiting"]" Value="@Fmt.Number(result.ParcelsWaiting)" Intent="@(result.ParcelsWaiting > 0 ? Intent.Warning : Intent.Success)" Href="shipments?needsTransfer=true" Hint="@L["Kpi_ParcelsWaitingHint"]" />
+        <KpiCard Icon="cube-add" Label="@L["Kpi_TrucksLoading"]" Value="@Fmt.Number(result.Loading)" Intent="Intent.Primary" Href="transfers?status=Loading" />
+        <KpiCard Icon="drive-time" Label="@L["Kpi_TrucksOnRoad"]" Value="@Fmt.Number(result.InTransit)" Intent="Intent.Primary" Href="transfers?status=InTransit" />
+        <KpiCard Icon="time" Label="@L["Kpi_TrucksLate"]" Value="@Fmt.Number(result.Overdue)" Intent="@(result.Overdue > 0 ? Intent.Danger : Intent.Success)" Href="transfers?overdue=true" />
+    </div>
+}
+
+<div class="lx-chips lx-mb">
+    <a class="@Bp.Cls("lx-chip", Bp.When(Status is null && Overdue != true, "lx-chip-active"))" href="transfers">@L["All"]</a>
+    @foreach (var s in Enum.GetValues<TransferStatus>())
+    {
+        <a class="@Bp.Cls("lx-chip", Bp.When(Status == s.ToString(), "lx-chip-active"))" href="@($"transfers?status={s}")">@ShipmentTexts.Of(s)</a>
+    }
+    <a class="@Bp.Cls("lx-chip", Bp.When(Overdue == true, "lx-chip-active"))" href="transfers?overdue=true"><Icon Name="time" /> @L["Late"]</a>
+</div>
+
+<div class="lx-toolbar lx-card lx-mb">
+    <SearchInput CssClass="lx-toolbar-search" Value="@Q" Placeholder="@L["TransfersSearch"]" OnSearch="@(text => Go(q: text ?? ""))" />
+    <HtmlSelect Value="@Hub" ValueChanged="@(v => Go(hub: v ?? ""))" Label="@L["Col_Hub"]">
+        <option value="">@L["AllHubs"]</option>
+        @foreach (var h in HubCatalog.All)
+        {
+            <option value="@h.Code">@h.RoutingTag · @h.Name</option>
+        }
+    </HtmlSelect>
+</div>
+
+<TransferTable Items="result?.Items" Loading="loading">
+    <Footer>
+        @if (result is not null)
+        {
+            <Pager Page="result.Page" PageSize="result.PageSize" Total="result.TotalCount" OnPage="@(p => Go(page: p))" OnPageSize="@(s => Go(pageSize: s))" />
+        }
+    </Footer>
+</TransferTable>
+
+<Dialog @bind-IsOpen="openDialog" Title="@L["Transfers_New"]" Icon="drive-time" Width="520px">
+    <ChildContent>
+        <EditForm Model="draft" OnValidSubmit="OpenTruckAsync" id="truck-form">
+            <DataAnnotationsValidator />
+            <div class="lx-form-grid">
+                <FormField Label="@L["Field_FromHub"]" Required="true" Field="() => draft.FromHubCode">
+                    <HtmlSelect Value="@draft.FromHubCode" ValueChanged="@(v => draft.FromHubCode = v ?? "")" Fill="true">
+                        @foreach (var h in HubCatalog.All)
+                        {
+                            <option value="@h.Code">@h.RoutingTag · @h.Name</option>
+                        }
+                    </HtmlSelect>
+                </FormField>
+                <FormField Label="@L["Field_ToHub"]" Required="true" Field="() => draft.ToHubCode">
+                    <HtmlSelect Value="@draft.ToHubCode" ValueChanged="@(v => draft.ToHubCode = v ?? "")" Fill="true">
+                        @foreach (var h in HubCatalog.All)
+                        {
+                            <option value="@h.Code">@h.RoutingTag · @h.Name</option>
+                        }
+                    </HtmlSelect>
+                </FormField>
+                <FormField Label="@L["Field_VehiclePlate"]" Hint="@L["Optional"]" Field="() => draft.VehiclePlate">
+                    <InputText class="bp6-input bp6-fill lx-upper" dir="ltr" @bind-Value="draft.VehiclePlate" placeholder="BG-55102" />
+                </FormField>
+                <FormField Label="@L["Col_Driver"]" Hint="@L["Optional"]" Field="() => draft.DriverName">
+                    <InputText class="bp6-input bp6-fill" @bind-Value="draft.DriverName" />
+                </FormField>
+                <Switch @bind-Value="draft.PlanWaiting" Label="@L["PlanWaitingParcels"]" CssClass="lx-span-2" />
+            </div>
+            @if (error is not null)
+            {
+                <Callout Intent="Intent.Danger" Icon="error">@error</Callout>
+            }
+        </EditForm>
+    </ChildContent>
+    <Footer>
+        <Button Text="@L["Cancel"]" OnClick="@(() => openDialog = false)" />
+        <Button Type="submit" form="truck-form" Intent="Intent.Primary" Icon="tick" Text="@L["Transfers_New"]" Loading="saving" />
+    </Footer>
+</Dialog>
+
+@code {
+    [SupplyParameterFromQuery(Name = "status")] public string? Status { get; set; }
+    [SupplyParameterFromQuery(Name = "hub")] public string? Hub { get; set; }
+    [SupplyParameterFromQuery(Name = "overdue")] public bool? Overdue { get; set; }
+    [SupplyParameterFromQuery(Name = "q")] public string? Q { get; set; }
+    [SupplyParameterFromQuery(Name = "page")] public int? Page { get; set; }
+    [SupplyParameterFromQuery(Name = "pageSize")] public int? PageSize { get; set; }
+    [SupplyParameterFromQuery(Name = "new")] public int? New { get; set; }
+
+    private TransferListResult? result;
+    private CreateTransferRequest draft = new();
+    private bool loading = true;
+    private bool openDialog;
+    private bool saving;
+    private string? error;
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        openDialog = New == 1 && await AuthState.CanAsync(StaffPolicies.Operate);
+        loading = true;
+        try
+        {
+            result = await Operations.ListTransfersAsync(
+                Enum.TryParse<TransferStatus>(Status, out var status) ? status : null, Hub, Overdue, Q, Page ?? 1, PageSize ?? 25);
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private void Go(string? q = null, string? hub = null, int? page = null, int? pageSize = null)
+    {
+        Navigation.NavigateTo(Url.With("transfers", ("status", Status), ("overdue", Overdue), ("hub", hub ?? Hub), ("q", q ?? Q), ("page", page), ("pageSize", pageSize ?? PageSize)));
+    }
+
+    private async Task OpenTruckAsync()
+    {
+        saving = true;
+        error = null;
+        try
+        {
+            var truck = await Operations.OpenTransferAsync(draft);
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["TruckOpened"], truck.Number));
+            await Ops.RefreshAsync();
+            Navigation.NavigateTo($"transfers/{truck.Id}");
+        }
+        catch (ApiException ex)
+        {
+            error = ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

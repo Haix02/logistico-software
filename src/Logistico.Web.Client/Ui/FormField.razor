@@ -1,0 +1,74 @@
+@typeparam TValue
+@implements IDisposable
+
+<div class="@Bp.Cls("bp6-form-group", Bp.When(HasError, "bp6-intent-danger"), CssClass)">
+    @if (Label is not null)
+    {
+        <label class="bp6-label" for="@For">
+            @Label
+            @if (Required)
+            {
+                <span class="lx-required" aria-hidden="true">*</span>
+            }
+            @if (Hint is not null)
+            {
+                <span class="bp6-text-muted lx-label-hint">@Hint</span>
+            }
+        </label>
+    }
+    <div class="bp6-form-content">
+        @ChildContent
+        @if (HasError)
+        {
+            <div class="bp6-form-helper-text">
+                @foreach (var message in Messages)
+                {
+                    <div>@message</div>
+                }
+            </div>
+        }
+        else if (Helper is not null)
+        {
+            <div class="bp6-form-helper-text">@Helper</div>
+        }
+    </div>
+</div>
+
+@code {
+    [CascadingParameter] private EditContext? EditContext { get; set; }
+
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Hint { get; set; }
+    [Parameter] public string? Helper { get; set; }
+    [Parameter] public string? For { get; set; }
+    [Parameter] public bool Required { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+
+    /// <summary>The bound model property, used to show its validation messages.</summary>
+    [Parameter] public System.Linq.Expressions.Expression<Func<TValue>>? Field { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private IEnumerable<string> Messages =>
+        EditContext is not null && Field is not null ? EditContext.GetValidationMessages(FieldIdentifier.Create(Field)) : [];
+
+    private bool HasError => Messages.Any();
+
+    protected override void OnInitialized()
+    {
+        if (EditContext is not null)
+        {
+            EditContext.OnValidationStateChanged += OnValidationStateChanged;
+        }
+    }
+
+    private void OnValidationStateChanged(object? sender, ValidationStateChangedEventArgs e) => StateHasChanged();
+
+    public void Dispose()
+    {
+        if (EditContext is not null)
+        {
+            EditContext.OnValidationStateChanged -= OnValidationStateChanged;
+        }
+    }
+}

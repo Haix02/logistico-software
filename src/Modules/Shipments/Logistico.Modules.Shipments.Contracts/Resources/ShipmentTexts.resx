@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Alert_ConfirmationOverdue" xml:space="preserve"><value>Confirmation overdue</value></data>
+  <data name="Alert_Misrouted" xml:space="preserve"><value>At the wrong hub</value></data>
+  <data name="Alert_MissingInTransfer" xml:space="preserve"><value>Missing from a truck</value></data>
+  <data name="Alert_OutForDeliveryOverdue" xml:space="preserve"><value>With the courier too long</value></data>
+  <data name="Alert_PickupOverdue" xml:space="preserve"><value>Pickup overdue</value></data>
+  <data name="Alert_PromiseMissed" xml:space="preserve"><value>Delivery date missed</value></data>
+  <data name="Alert_RequestOverdue" xml:space="preserve"><value>Request waiting too long</value></data>
+  <data name="Alert_ReturnNotCollected" xml:space="preserve"><value>Return not collected</value></data>
+  <data name="Alert_TransferOverdue" xml:space="preserve"><value>Truck is late</value></data>
+  <data name="Alert_WarehouseDwell" xml:space="preserve"><value>Too long on the shelf</value></data>
+  <data name="AutoCancelReason" xml:space="preserve"><value>Not confirmed by the customer in time</value></data>
+  <data name="Confirmation_Confirmed" xml:space="preserve"><value>Confirmed by the customer</value></data>
+  <data name="Confirmation_Declined" xml:space="preserve"><value>Declined by the customer</value></data>
+  <data name="Confirmation_NotRequired" xml:space="preserve"><value>Not needed</value></data>
+  <data name="Confirmation_Pending" xml:space="preserve"><value>Awaiting confirmation</value></data>
+  <data name="ConfirmationMode_AllOrders" xml:space="preserve"><value>Every order</value></data>
+  <data name="ConfirmationMode_Off" xml:space="preserve"><value>Off</value></data>
+  <data name="ConfirmationMode_RiskyCustomers" xml:space="preserve"><value>Customers with returns</value></data>
+  <data name="ConfirmationOutcome_Confirmed" xml:space="preserve"><value>Confirmed</value></data>
+  <data name="ConfirmationOutcome_Declined" xml:space="preserve"><value>Declined</value></data>
+  <data name="ConfirmationOutcome_NoAnswer" xml:space="preserve"><value>No answer</value></data>
+  <data name="CustomerRisk_High" xml:space="preserve"><value>High return risk</value></data>
+  <data name="CustomerRisk_Low" xml:space="preserve"><value>Reliable</value></data>
+  <data name="CustomerRisk_Medium" xml:space="preserve"><value>Some returns</value></data>
+  <data name="CustomerRisk_New" xml:space="preserve"><value>New customer</value></data>
+  <data name="Edit_Address" xml:space="preserve"><value>address</value></data>
+  <data name="Edit_Cod" xml:space="preserve"><value>cash on delivery</value></data>
+  <data name="Edit_Fee" xml:space="preserve"><value>delivery fee</value></data>
+  <data name="Edit_Governorate" xml:space="preserve"><value>governorate</value></data>
+  <data name="Edit_Items" xml:space="preserve"><value>contents</value></data>
+  <data name="Edit_Name" xml:space="preserve"><value>name</value></data>
+  <data name="Edit_Notes" xml:space="preserve"><value>notes</value></data>
+  <data name="Edit_Phone" xml:space="preserve"><value>mobile</value></data>
+  <data name="Edit_Reference" xml:space="preserve"><value>seller's order no.</value></data>
+  <data name="Failure_CustomerRefused" xml:space="preserve"><value>Customer refused the parcel</value></data>
+  <data name="Failure_CustomerRescheduled" xml:space="preserve"><value>Customer asked for another day</value></data>
+  <data name="Failure_NoAnswer" xml:space="preserve"><value>Customer did not answer</value></data>
+  <data name="Failure_Other" xml:space="preserve"><value>Other reason</value></data>
+  <data name="Failure_Unreachable" xml:space="preserve"><value>Phone switched off / unreachable</value></data>
+  <data name="Failure_WrongAddress" xml:space="preserve"><value>Wrong or incomplete address</value></data>
+  <data name="HubKind_Branch" xml:space="preserve"><value>Branch</value></data>
+  <data name="HubKind_Fulfilment" xml:space="preserve"><value>Fulfilment store</value></data>
+  <data name="HubKind_SortingHub" xml:space="preserve"><value>Sorting hub</value></data>
+  <data name="Lane_Blue" xml:space="preserve"><value>Blue lane (post-audit)</value></data>
+  <data name="Lane_Green" xml:space="preserve"><value>Green lane (immediate release)</value></data>
+  <data name="Lane_Red" xml:space="preserve"><value>Red lane (physical inspection)</value></data>
+  <data name="Lane_Unassigned" xml:space="preserve"><value>Unassigned</value></data>
+  <data name="Lane_Yellow" xml:space="preserve"><value>Yellow lane (document check)</value></data>
+  <data name="Message_Pending" xml:space="preserve"><value>To send</value></data>
+  <data name="Message_Sent" xml:space="preserve"><value>Sent</value></data>
+  <data name="Message_Skipped" xml:space="preserve"><value>Skipped</value></data>
+  <data name="Mode_Air" xml:space="preserve"><value>Air</value></data>
+  <data name="Mode_Courier" xml:space="preserve"><value>Courier</value></data>
+  <data name="Mode_Road" xml:space="preserve"><value>Road</value></data>
+  <data name="Mode_SeaFcl" xml:space="preserve"><value>Sea FCL</value></data>
+  <data name="Mode_SeaLcl" xml:space="preserve"><value>Sea LCL</value></data>
+  <data name="Payout_BankTransfer" xml:space="preserve"><value>Bank transfer</value></data>
+  <data name="Payout_Cash" xml:space="preserve"><value>Cash payout</value></data>
+  <data name="Payout_QiCard" xml:space="preserve"><value>QiCard / Rafidain</value></data>
+  <data name="Payout_ZainCash" xml:space="preserve"><value>ZainCash wallet</value></data>
+  <data name="Problem_alert.not_found" xml:space="preserve"><value>Alert not found.</value></data>
+  <data name="Problem_automation.stale" xml:space="preserve"><value>Someone else changed these rules. Reload and try again.</value></data>
+  <data name="Problem_courier.code_taken" xml:space="preserve"><value>Another courier already uses code {0}.</value></data>
+  <data name="Problem_courier.not_found" xml:space="preserve"><value>Courier not found.</value></data>
+  <data name="Problem_courier.stale" xml:space="preserve"><value>Courier was updated by another user. Reload and try again.</value></data>
+  <data name="Problem_customs.domestic_not_supported" xml:space="preserve"><value>Customs declarations apply only to international shipments.</value></data>
+  <data name="Problem_customs.stale" xml:space="preserve"><value>Someone else changed this declaration</value></data>
+  <data name="Problem_customs.everification_required" xml:space="preserve"><value>Cannot release from customs until the ASYCUDA declaration number is entered and both Certificate of Origin (CoO) and Commercial Invoice are electronically verified.</value></data>
+  <data name="Problem_customs.hold_reason_required" xml:space="preserve"><value>A hold reason is required when placing a shipment on customs hold.</value></data>
+  <data name="Problem_finance.nothing_to_settle" xml:space="preserve"><value>This seller has no unsettled delivered cash-on-delivery orders.</value></data>
+  <data name="Problem_finance.settlement_not_found" xml:space="preserve"><value>Settlement not found.</value></data>
+  <data name="Problem_if_match_required" xml:space="preserve"><value>If-Match header required</value></data>
+  <data name="Problem_message.not_found" xml:space="preserve"><value>Message not found.</value></data>
+  <data name="Problem_request.closed" xml:space="preserve"><value>Request {0} is already closed.</value></data>
+  <data name="Problem_request.duplicate" xml:space="preserve"><value>There is already an open request of this kind for this order.</value></data>
+  <data name="Problem_request.not_allowed" xml:space="preserve"><value>“{0}” is not possible while the order is “{1}”.</value></data>
+  <data name="Problem_request.not_found" xml:space="preserve"><value>Request not found.</value></data>
+  <data name="Problem_request.verification_failed" xml:space="preserve"><value>The digits do not match the mobile number on this order.</value></data>
+  <data name="Problem_request.verification_locked" xml:space="preserve"><value>Too many wrong answers for this order. To protect the customer, changes from the tracking page are paused for 24 hours; please call customer care.</value></data>
+  <data name="Problem_return.manifest_not_found" xml:space="preserve"><value>Manifest not found.</value></data>
+  <data name="Problem_return.mixed_hubs" xml:space="preserve"><value>Hand over parcels from one hub at a time.</value></data>
+  <data name="Problem_return.mixed_sellers" xml:space="preserve"><value>Hand over one seller's parcels at a time.</value></data>
+  <data name="Problem_scan.unknown_hub" xml:space="preserve"><value>Unknown hub {0}.</value></data>
+  <data name="Problem_scan.unsupported" xml:space="preserve"><value>Use the returns screen for this step.</value></data>
+  <data name="Problem_shipment.already_returning" xml:space="preserve"><value>This parcel is already being returned.</value></data>
+  <data name="Problem_shipment.awaiting_confirmation" xml:space="preserve"><value>The customer has not confirmed this order yet. Confirm it first (Confirmations).</value></data>
+  <data name="Problem_shipment.cod_currency" xml:space="preserve"><value>Cash-on-delivery amount and currency must be given together.</value></data>
+  <data name="Problem_shipment.confirmation_not_pending" xml:space="preserve"><value>This order is not waiting for confirmation.</value></data>
+  <data name="Problem_shipment.courier_required" xml:space="preserve"><value>Choose the courier taking the parcel.</value></data>
+  <data name="Problem_shipment.declared_currency" xml:space="preserve"><value>Declared value needs a currency.</value></data>
+  <data name="Problem_shipment.domestic_address" xml:space="preserve"><value>Domestic deliveries need the customer's governorate, address and mobile number.</value></data>
+  <data name="Problem_shipment.event_in_future" xml:space="preserve"><value>A milestone cannot be recorded in the future.</value></data>
+  <data name="Problem_shipment.event_out_of_order" xml:space="preserve"><value>A milestone cannot be earlier than the previous one.</value></data>
+  <data name="Problem_shipment.failure_reason_required" xml:space="preserve"><value>Choose why the delivery failed.</value></data>
+  <data name="Problem_shipment.invalid_transition" xml:space="preserve"><value>A shipment that is '{0}' cannot move to '{1}'.</value></data>
+  <data name="Problem_shipment.merchant_not_found" xml:space="preserve"><value>The selected seller does not exist or is inactive.</value></data>
+  <data name="Problem_shipment.mode_required" xml:space="preserve"><value>Transport mode is required.</value></data>
+  <data name="Problem_shipment.not_changeable" xml:space="preserve"><value>This order can no longer be changed ({0}).</value></data>
+  <data name="Problem_shipment.not_found" xml:space="preserve"><value>Shipment not found</value></data>
+  <data name="Problem_shipment.not_in_warehouse" xml:space="preserve"><value>This parcel is not in the warehouse.</value></data>
+  <data name="Problem_shipment.return_not_at_hub" xml:space="preserve"><value>Only returns waiting at the hub can be handed over.</value></data>
+  <data name="Problem_shipment.same_origin_destination" xml:space="preserve"><value>Origin and destination must differ.</value></data>
+  <data name="Problem_shipment.stale" xml:space="preserve"><value>The shipment was changed by someone else</value></data>
+  <data name="Problem_shipment.stale_detail" xml:space="preserve"><value>Reload the shipment and try again.</value></data>
+  <data name="Problem_shipment.tracking_not_found" xml:space="preserve"><value>No shipment with tracking number {0}.</value></data>
+  <data name="Problem_shipment.with_courier" xml:space="preserve"><value>This parcel is out for delivery. Record the delivery result first.</value></data>
+  <data name="Problem_shipment.wrong_hub_for_dispatch" xml:space="preserve"><value>This parcel must first travel to {0}.</value></data>
+  <data name="Problem_transfer.already_loading" xml:space="preserve"><value>Truck {0} is already loading on this route.</value></data>
+  <data name="Problem_transfer.empty" xml:space="preserve"><value>Scan at least one parcel onto the truck before it leaves.</value></data>
+  <data name="Problem_transfer.invalid_lane" xml:space="preserve"><value>Choose two different hubs.</value></data>
+  <data name="Problem_transfer.not_found" xml:space="preserve"><value>Truck manifest not found.</value></data>
+  <data name="Problem_transfer.not_in_transit" xml:space="preserve"><value>Truck {0} is not on the road.</value></data>
+  <data name="Problem_transfer.not_loading" xml:space="preserve"><value>Truck {0} has already left.</value></data>
+  <data name="Problem_transfer.not_on_manifest" xml:space="preserve"><value>Parcel {0} is not on truck {1}.</value></data>
+  <data name="Problem_transfer.stale" xml:space="preserve"><value>Someone else updated this truck. Reload and try again.</value></data>
+  <data name="Problem_transfer.unknown_hub" xml:space="preserve"><value>Hub {0} is not active in your network.</value></data>
+  <data name="Problem_transfer.wrong_lane" xml:space="preserve"><value>Parcel {0} is not waiting for this truck.</value></data>
+  <data name="Problem_warehouse.coverage_conflict" xml:space="preserve"><value>These governorates are covered by another warehouse: {0}. Confirm to move them here.</value></data>
+  <data name="Problem_warehouse.invalid_governorate" xml:space="preserve"><value>Unknown governorate {0}.</value></data>
+  <data name="Problem_warehouse.invalid_phone" xml:space="preserve"><value>Enter a valid Iraqi phone number.</value></data>
+  <data name="Problem_warehouse.last_active" xml:space="preserve"><value>At least one warehouse must stay active.</value></data>
+  <data name="Problem_warehouse.not_empty" xml:space="preserve"><value>Before retiring it, move its {0} parcels and finish its {1} trucks.</value></data>
+  <data name="Problem_warehouse.not_found" xml:space="preserve"><value>Warehouse not found.</value></data>
+  <data name="Problem_warehouse.primary_inactive" xml:space="preserve"><value>The main warehouse must stay active.</value></data>
+  <data name="Problem_warehouse.primary_required" xml:space="preserve"><value>Make another warehouse the main one first.</value></data>
+  <data name="Problem_warehouse.stale" xml:space="preserve"><value>This warehouse was changed by another user. Reload and try again.</value></data>
+  <data name="Problem_warehouse.tag_locked" xml:space="preserve"><value>The routing tag {0} is printed on labels and cannot change.</value></data>
+  <data name="Problem_warehouse.tag_taken" xml:space="preserve"><value>Another warehouse already uses the routing tag {0}.</value></data>
+  <data name="Request_Cancel" xml:space="preserve"><value>Cancel the order</value></data>
+  <data name="Request_ChangeAddress" xml:space="preserve"><value>Change address</value></data>
+  <data name="Request_ChangePhone" xml:space="preserve"><value>Change phone number</value></data>
+  <data name="Request_Complaint" xml:space="preserve"><value>Complaint</value></data>
+  <data name="Request_Reschedule" xml:space="preserve"><value>New delivery day</value></data>
+  <data name="Request_Return" xml:space="preserve"><value>Return the order</value></data>
+  <data name="RequestSource_Customer" xml:space="preserve"><value>Customer</value></data>
+  <data name="RequestSource_Seller" xml:space="preserve"><value>Seller</value></data>
+  <data name="RequestSource_Staff" xml:space="preserve"><value>Staff</value></data>
+  <data name="RequestSource_System" xml:space="preserve"><value>System</value></data>
+  <data name="RequestStatus_InProgress" xml:space="preserve"><value>In progress</value></data>
+  <data name="RequestStatus_Open" xml:space="preserve"><value>New</value></data>
+  <data name="RequestStatus_Rejected" xml:space="preserve"><value>Rejected</value></data>
+  <data name="RequestStatus_Resolved" xml:space="preserve"><value>Done</value></data>
+  <data name="Return_CustomerRefused" xml:space="preserve"><value>Customer refused</value></data>
+  <data name="Return_CustomerReturn" xml:space="preserve"><value>Customer sent it back</value></data>
+  <data name="Return_Damaged" xml:space="preserve"><value>Damaged</value></data>
+  <data name="Return_MaxAttemptsReached" xml:space="preserve"><value>Delivery attempts used up</value></data>
+  <data name="Return_Other" xml:space="preserve"><value>Other reason</value></data>
+  <data name="Return_SellerCancelled" xml:space="preserve"><value>Cancelled by the seller</value></data>
+  <data name="Return_WrongAddress" xml:space="preserve"><value>Wrong address</value></data>
+  <data name="Rule_AlertRaised" xml:space="preserve"><value>Alert raised</value></data>
+  <data name="Rule_AlertResolved" xml:space="preserve"><value>Alert cleared</value></data>
+  <data name="Rule_AutoCancel" xml:space="preserve"><value>Cancelled automatically</value></data>
+  <data name="Rule_AutoReschedule" xml:space="preserve"><value>Rescheduled automatically</value></data>
+  <data name="Rule_AutoReturn" xml:space="preserve"><value>Automatic return</value></data>
+  <data name="Rule_ConfirmationRequested" xml:space="preserve"><value>Confirmation requested</value></data>
+  <data name="Rule_NotificationQueued" xml:space="preserve"><value>Message to customer</value></data>
+  <data name="Rule_PlanTransfer" xml:space="preserve"><value>Planned on a truck</value></data>
+  <data name="Rule_RequestApplied" xml:space="preserve"><value>Request applied</value></data>
+  <data name="Rule_TransferClosed" xml:space="preserve"><value>Truck manifest closed</value></data>
+  <data name="Scan_Deliver" xml:space="preserve"><value>Delivered</value></data>
+  <data name="Scan_Dispatch" xml:space="preserve"><value>To courier</value></data>
+  <data name="Scan_Fail" xml:space="preserve"><value>Failed attempt</value></data>
+  <data name="Scan_HandOver" xml:space="preserve"><value>Hand to seller</value></data>
+  <data name="Scan_Load" xml:space="preserve"><value>Load truck</value></data>
+  <data name="Scan_Receive" xml:space="preserve"><value>Receive</value></data>
+  <data name="Scan_Unload" xml:space="preserve"><value>Unload truck</value></data>
+  <data name="Scan_Verify" xml:space="preserve"><value>Check</value></data>
+  <data name="Service_Domestic" xml:space="preserve"><value>Domestic delivery</value></data>
+  <data name="Service_International" xml:space="preserve"><value>International</value></data>
+  <data name="Severity_Critical" xml:space="preserve"><value>Critical</value></data>
+  <data name="Severity_Info" xml:space="preserve"><value>Info</value></data>
+  <data name="Severity_Warning" xml:space="preserve"><value>Warning</value></data>
+  <data name="Stage_AtOrigin" xml:space="preserve"><value>At origin office</value></data>
+  <data name="Stage_AtWarehouse" xml:space="preserve"><value>In warehouse</value></data>
+  <data name="Stage_Customs" xml:space="preserve"><value>Customs</value></data>
+  <data name="Stage_Delivered" xml:space="preserve"><value>Delivered</value></data>
+  <data name="Stage_InTransit" xml:space="preserve"><value>On the way</value></data>
+  <data name="Stage_OrderPlaced" xml:space="preserve"><value>Order placed</value></data>
+  <data name="Stage_OutForDelivery" xml:space="preserve"><value>Out for delivery</value></data>
+  <data name="Stage_PickedUp" xml:space="preserve"><value>Picked up</value></data>
+  <data name="Status_ArrivedPortOfEntry" xml:space="preserve"><value>Arrived at port of entry</value></data>
+  <data name="Status_AtDestinationWarehouse" xml:space="preserve"><value>At destination warehouse</value></data>
+  <data name="Status_AtWarehouse" xml:space="preserve"><value>At our warehouse</value></data>
+  <data name="Status_Booked" xml:space="preserve"><value>Order placed</value></data>
+  <data name="Status_Cancelled" xml:space="preserve"><value>Cancelled</value></data>
+  <data name="Status_Consolidated" xml:space="preserve"><value>Consolidated</value></data>
+  <data name="Status_CustomsHold" xml:space="preserve"><value>Customs hold</value></data>
+  <data name="Status_CustomsPending" xml:space="preserve"><value>In customs</value></data>
+  <data name="Status_Delivered" xml:space="preserve"><value>Delivered</value></data>
+  <data name="Status_DeliveryFailed" xml:space="preserve"><value>Delivery attempt failed</value></data>
+  <data name="Status_DepartedOrigin" xml:space="preserve"><value>Departed origin</value></data>
+  <data name="Status_Draft" xml:space="preserve"><value>Draft</value></data>
+  <data name="Status_InTransit" xml:space="preserve"><value>In transit</value></data>
+  <data name="Status_InTransitToHub" xml:space="preserve"><value>Between hubs</value></data>
+  <data name="Status_OutForDelivery" xml:space="preserve"><value>Out for delivery</value></data>
+  <data name="Status_PickedUp" xml:space="preserve"><value>Picked up</value></data>
+  <data name="Status_ReadyForDispatch" xml:space="preserve"><value>Ready for dispatch</value></data>
+  <data name="Status_ReceivedAtOrigin" xml:space="preserve"><value>Received at origin</value></data>
+  <data name="Status_Released" xml:space="preserve"><value>Released by customs</value></data>
+  <data name="Status_ReturnAtHub" xml:space="preserve"><value>Return ready for seller</value></data>
+  <data name="Status_Returned" xml:space="preserve"><value>Returned to seller</value></data>
+  <data name="Status_ReturnInitiated" xml:space="preserve"><value>Return in progress</value></data>
+  <data name="Status_ReturnInTransit" xml:space="preserve"><value>Returning between hubs</value></data>
+  <data name="Template_ConfirmOrder" xml:space="preserve"><value>Confirm your order</value></data>
+  <data name="Template_Delivered" xml:space="preserve"><value>Delivered</value></data>
+  <data name="Template_DeliveryFailed" xml:space="preserve"><value>Delivery failed</value></data>
+  <data name="Template_OutForDelivery" xml:space="preserve"><value>Out for delivery</value></data>
+  <data name="Template_RequestReceived" xml:space="preserve"><value>Request received</value></data>
+  <data name="Template_Rescheduled" xml:space="preserve"><value>New delivery day</value></data>
+  <data name="Template_ReturnStarted" xml:space="preserve"><value>Return started</value></data>
+  <data name="Transfer_InTransit" xml:space="preserve"><value>On the road</value></data>
+  <data name="Transfer_Loading" xml:space="preserve"><value>Loading</value></data>
+  <data name="Transfer_Received" xml:space="preserve"><value>Arrived</value></data>
+  <data name="TransferItem_Loaded" xml:space="preserve"><value>Loaded</value></data>
+  <data name="TransferItem_Missing" xml:space="preserve"><value>Missing</value></data>
+  <data name="TransferItem_Planned" xml:space="preserve"><value>Planned</value></data>
+  <data name="TransferItem_Received" xml:space="preserve"><value>Unloaded</value></data>
+  <data name="Vehicle_HeavyTruck" xml:space="preserve"><value>Heavy truck</value></data>
+  <data name="Vehicle_LightTruck" xml:space="preserve"><value>Light truck</value></data>
+  <data name="Vehicle_Motorcycle" xml:space="preserve"><value>Motorcycle</value></data>
+  <data name="Vehicle_Van" xml:space="preserve"><value>Delivery van</value></data>
+  <data name="Category_Fashion" xml:space="preserve"><value>Fashion &amp; clothing</value></data>
+  <data name="Category_ShoesAndBags" xml:space="preserve"><value>Shoes &amp; bags</value></data>
+  <data name="Category_Beauty" xml:space="preserve"><value>Beauty &amp; perfume</value></data>
+  <data name="Category_Electronics" xml:space="preserve"><value>Phones &amp; electronics</value></data>
+  <data name="Category_Accessories" xml:space="preserve"><value>Watches &amp; accessories</value></data>
+  <data name="Category_KidsAndToys" xml:space="preserve"><value>Kids &amp; toys</value></data>
+  <data name="Category_HomeAndKitchen" xml:space="preserve"><value>Home &amp; kitchen</value></data>
+  <data name="Category_Books" xml:space="preserve"><value>Books &amp; stationery</value></data>
+  <data name="Category_Food" xml:space="preserve"><value>Food &amp; sweets</value></data>
+  <data name="Category_Health" xml:space="preserve"><value>Health &amp; supplements</value></data>
+  <data name="Category_Other" xml:space="preserve"><value>Other</value></data>
+</root>

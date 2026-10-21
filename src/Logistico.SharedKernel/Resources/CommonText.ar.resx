@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Validation_Choice" xml:space="preserve"><value>اختر أحد الخيارات المعروضة.</value></data>
+  <data name="Validation_Currency" xml:space="preserve"><value>استخدم رمز عملة مثل IQD أو USD.</value></data>
+  <data name="Validation_DateWindow" xml:space="preserve"><value>اختر تاريخاً من اليوم وحتى 14 يوماً قادمة.</value></data>
+  <data name="Validation_Email" xml:space="preserve"><value>أدخل بريداً إلكترونياً صحيحاً.</value></data>
+  <data name="Validation_Governorate" xml:space="preserve"><value>اختر المحافظة.</value></data>
+  <data name="Validation_Incoterm" xml:space="preserve"><value>مصطلح تجاري (Incoterm) غير معروف.</value></data>
+  <data name="Validation_InsideIraq" xml:space="preserve"><value>اختر موقعاً داخل العراق (اضغط على الخريطة).</value></data>
+  <data name="Validation_InstagramHandle" xml:space="preserve"><value>اسم حساب انستغرام يتكون من أحرف وأرقام ونقاط وشرطات سفلية (30 كحد أقصى).</value></data>
+  <data name="Validation_IraqiMobile" xml:space="preserve"><value>أدخل رقم موبايل عراقي، مثال: ⁦0770 123 4567⁩.</value></data>
+  <data name="Validation_LocationCode" xml:space="preserve"><value>استخدم رمز موقع من 3 إلى 5 أحرف (⁦UN/LOCODE⁩ أو IATA)، مثال: CNSHA.</value></data>
+  <data name="Validation_MaxLength" xml:space="preserve"><value>الحد الأقصى {1} حرفاً.</value></data>
+  <data name="Validation_NoFriday" xml:space="preserve"><value>لا يوجد توصيل يوم الجمعة. يرجى اختيار يوم آخر.</value></data>
+  <data name="Validation_Phone" xml:space="preserve"><value>يجب أن يحتوي رقم الهاتف على 7 إلى 20 رقماً، ويمكن أن يبدأ بـ +.</value></data>
+  <data name="Validation_PhoneLast4" xml:space="preserve"><value>أدخل آخر 4 أرقام من رقم الموبايل المسجّل في الطلب.</value></data>
+  <data name="Validation_Range" xml:space="preserve"><value>أدخل قيمة بين {1} و {2}.</value></data>
+  <data name="Validation_Required" xml:space="preserve"><value>هذا الحقل مطلوب.</value></data>
+  <data name="Validation_RoutingTag" xml:space="preserve"><value>استخدم 3 أحرف إنجليزية، مثل ⁦NJF⁩.</value></data>
+  <data name="Validation_Role" xml:space="preserve"><value>اختر أحد الأدوار: مدير، عمليات، مالية أو مشاهدة فقط.</value></data>
+  <data name="Validation_PasswordLength" xml:space="preserve"><value>يجب أن تتكون كلمة المرور من 10 أحرف على الأقل.</value></data>
+</root>

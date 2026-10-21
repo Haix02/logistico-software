@@ -1,0 +1,91 @@
+<section class="@Bp.Cls("bp6-section", "bp6-compact", "lx-section", Bp.When(Collapsible, "lx-section-collapsible"), Bp.When(collapsed, "bp6-section-collapsed"), Bp.When(!Padded, "lx-section-flush"), CssClass)">
+    @if (Title is not null || Actions is not null)
+    {
+        <div class="bp6-section-header">
+            @if (Collapsible)
+            {
+                <button type="button" class="bp6-section-header-left lx-section-toggle" @onclick="ToggleAsync" aria-expanded="@(!collapsed)">
+                    @HeaderContent
+                </button>
+            }
+            else
+            {
+                <div class="bp6-section-header-left">
+                    @HeaderContent
+                </div>
+            }
+            @if (Actions is not null || Collapsible)
+            {
+                <div class="bp6-section-header-right">
+                    @Actions
+                    @if (Collapsible)
+                    {
+                        <Button Minimal="true" Small="true" Icon="@(collapsed ? "chevron-down" : "chevron-up")" Title="@L["ToggleSection"]" OnClick="ToggleAsync" />
+                    }
+                </div>
+            }
+        </div>
+    }
+    @if (!collapsed)
+    {
+        <div class="@Bp.Cls("bp6-section-card", "bp6-card", Bp.When(Padded, "lx-section-padded"))">
+            @ChildContent
+        </div>
+    }
+</section>
+
+@code {
+    private bool collapsed;
+
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public bool Padded { get; set; } = true;
+    [Parameter] public bool Collapsible { get; set; }
+    [Parameter] public bool StartCollapsed { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+    [Parameter] public RenderFragment? TitleExtra { get; set; }
+    [Parameter] public RenderFragment? Actions { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private RenderFragment HeaderContent => builder =>
+    {
+        var sequence = 0;
+        if (Icon is not null)
+        {
+            builder.OpenComponent<Icon>(sequence++);
+            builder.AddAttribute(sequence++, "Name", Icon);
+            builder.AddAttribute(sequence++, "CssClass", "lx-section-icon");
+            builder.CloseComponent();
+        }
+
+        builder.OpenElement(sequence++, "div");
+        builder.AddAttribute(sequence++, "class", "lx-stack");
+        builder.AddAttribute(sequence++, "style", "gap:0");
+        builder.OpenElement(sequence++, "h6");
+        builder.AddAttribute(sequence++, "class", "bp6-heading bp6-section-header-title");
+        builder.AddContent(sequence++, Title);
+        builder.AddContent(sequence++, " ");
+        builder.AddContent(sequence++, TitleExtra);
+        builder.CloseElement();
+        if (Subtitle is not null)
+        {
+            builder.OpenElement(sequence++, "div");
+            builder.AddAttribute(sequence++, "class", "bp6-text-muted bp6-section-header-sub-title");
+            builder.AddContent(sequence++, Subtitle);
+            builder.CloseElement();
+        }
+
+        builder.CloseElement();
+    };
+
+    protected override void OnInitialized() => collapsed = Collapsible && StartCollapsed;
+
+    private void ToggleAsync()
+    {
+        if (Collapsible)
+        {
+            collapsed = !collapsed;
+        }
+    }
+}

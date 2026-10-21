@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="AppName" xml:space="preserve"><value>لوجستيكو</value></data>
+  <data name="Email" xml:space="preserve"><value>البريد الإلكتروني</value></data>
+  <data name="ForgotPassword" xml:space="preserve"><value>نسيت كلمة المرور؟</value></data>
+  <data name="Identity_DuplicateEmail" xml:space="preserve"><value>البريد {0} مستخدم مسبقاً.</value></data>
+  <data name="Identity_DuplicateUserName" xml:space="preserve"><value>الحساب {0} موجود مسبقاً.</value></data>
+  <data name="Identity_InvalidEmail" xml:space="preserve"><value>{0} ليس بريداً إلكترونياً صحيحاً.</value></data>
+  <data name="Identity_InvalidToken" xml:space="preserve"><value>انتهت صلاحية هذا الرابط. يرجى البدء من جديد.</value></data>
+  <data name="Identity_InvalidUserName" xml:space="preserve"><value>{0} ليس اسم مستخدم صحيحاً.</value></data>
+  <data name="Identity_PasswordMismatch" xml:space="preserve"><value>كلمة المرور غير صحيحة.</value></data>
+  <data name="Identity_PasswordRequiresDigit" xml:space="preserve"><value>يجب أن تحتوي كلمة المرور على رقم (0–9).</value></data>
+  <data name="Identity_PasswordRequiresLower" xml:space="preserve"><value>يجب أن تحتوي كلمة المرور على حرف إنجليزي صغير (a–z).</value></data>
+  <data name="Identity_PasswordRequiresNonAlphanumeric" xml:space="preserve"><value>يجب أن تحتوي كلمة المرور على رمز مثل # أو !.</value></data>
+  <data name="Identity_PasswordRequiresUniqueChars" xml:space="preserve"><value>يجب أن تستخدم كلمة المرور {0} أحرف مختلفة على الأقل.</value></data>
+  <data name="Identity_PasswordRequiresUpper" xml:space="preserve"><value>يجب أن تحتوي كلمة المرور على حرف إنجليزي كبير (A–Z).</value></data>
+  <data name="Identity_PasswordTooShort" xml:space="preserve"><value>يجب ألا تقل كلمة المرور عن {0} أحرف.</value></data>
+  <data name="InvalidEmail" xml:space="preserve"><value>أدخل بريداً إلكترونياً صحيحاً.</value></data>
+  <data name="InvalidLogin" xml:space="preserve"><value>البريد الإلكتروني أو كلمة المرور غير صحيحة.</value></data>
+  <data name="Language" xml:space="preserve"><value>English</value></data>
+  <data name="Or" xml:space="preserve"><value>أو</value></data>
+  <data name="Password" xml:space="preserve"><value>كلمة المرور</value></data>
+  <data name="Problem_team.email_taken" xml:space="preserve"><value>هذا البريد الإلكتروني مستخدم لحساب آخر.</value></data>
+  <data name="Problem_team.last_admin" xml:space="preserve"><value>يجب أن يبقى للشركة مدير نظام فعّال واحد على الأقل.</value></data>
+  <data name="Problem_team.not_found" xml:space="preserve"><value>عضو الفريق غير موجود.</value></data>
+  <data name="Register" xml:space="preserve"><value>إنشاء حساب</value></data>
+  <data name="RememberMe" xml:space="preserve"><value>تذكرني</value></data>
+  <data name="Required" xml:space="preserve"><value>هذا الحقل مطلوب.</value></data>
+  <data name="ResendConfirmation" xml:space="preserve"><value>إعادة إرسال رسالة التأكيد</value></data>
+  <data name="SignInButton" xml:space="preserve"><value>دخول</value></data>
+  <data name="SignInSubtitle" xml:space="preserve"><value>دخول موظفي لوجستيكو.</value></data>
+  <data name="SignInTitle" xml:space="preserve"><value>تسجيل الدخول</value></data>
+  <data name="SignInWithPasskey" xml:space="preserve"><value>الدخول بمفتاح المرور (Passkey)</value></data>
+  <data name="Tagline" xml:space="preserve"><value>الشحن والتخزين والتوصيل في كل العراق</value></data>
+  <data name="TrackShipment" xml:space="preserve"><value>تتبع شحنة</value></data>
+  <data name="Forbidden" xml:space="preserve"><value>صلاحياتك لا تسمح بهذا الإجراء. اطلب الصلاحية من مدير النظام.</value></data>
+  <data name="Problem_team.self" xml:space="preserve"><value>لا يمكنك تغيير صلاحيات حسابك أو قفله من هنا.</value></data>
+  <data name="TooManyRequests" xml:space="preserve"><value>محاولات كثيرة من هذا الاتصال. انتظر دقيقة ثم أعد المحاولة.</value></data>
+  <data name="SignInHeroTitle" xml:space="preserve"><value>توصيل العراق، يُدار بالبيانات</value></data>
+  <data name="SignInHeroText" xml:space="preserve"><value>طلبات المتاجر الإلكترونية إلى كل محافظة: مسح المخازن والشاحنات بين المدن والدفع عند الاستلام وما يريده الزبائن، في نظام واحد مفتوح المصدر.</value></data>
+  <data name="SignInPoint1" xml:space="preserve"><value>خريطة حيّة لكل محافظة ومخزن وشاحنة</value></data>
+  <data name="SignInPoint2" xml:space="preserve"><value>ذكاء الطلب: ماذا يطلب الزبائن وأين ومتى</value></data>
+  <data name="SignInPoint3" xml:space="preserve"><value>تسوية مبالغ الدفع عند الاستلام مع التجار شحنةً بشحنة</value></data>
+  <data name="OpenSourceLine" xml:space="preserve"><value>مفتوح المصدر · Apache-2.0</value></data>
+</root>

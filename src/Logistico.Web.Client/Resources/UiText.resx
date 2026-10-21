@@ -1,0 +1,1091 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Action_PlaceHold" xml:space="preserve"><value>Place on customs hold</value></data>
+  <data name="Action_RegisterAsycuda" xml:space="preserve"><value>Register &amp; move to In Customs</value></data>
+  <data name="Action_ReleaseCustoms" xml:space="preserve"><value>Verify &amp; release shipment</value></data>
+  <data name="Action_SaveDeclaration" xml:space="preserve"><value>Save declaration</value></data>
+  <data name="ActionBarcodesSubtitle" xml:space="preserve"><value>Print this sheet at the packing bench so operators can switch modes, hubs, and bins with their barcode gun</value></data>
+  <data name="ActionBarcodesTitle" xml:space="preserve"><value>Hands-free action barcodes (scan or click to execute)</value></data>
+  <data name="Active" xml:space="preserve"><value>Active</value></data>
+  <data name="ActiveCourier" xml:space="preserve"><value>Active courier (available for dispatch)</value></data>
+  <data name="ActiveSeller" xml:space="preserve"><value>Active seller (can receive new orders)</value></data>
+  <data name="ActivityLog" xml:space="preserve"><value>Activity log</value></data>
+  <data name="Add" xml:space="preserve"><value>Add</value></data>
+  <data name="AddressPlaceholder" xml:space="preserve"><value>Mahalla, zuqaq, house number</value></data>
+  <data name="AddWarehouse" xml:space="preserve"><value>Add warehouse</value></data>
+  <data name="Ago_Days" xml:space="preserve"><value>{0} days ago</value></data>
+  <data name="Ago_Days_One" xml:space="preserve"><value>1 day ago</value></data>
+  <data name="Ago_Hours" xml:space="preserve"><value>{0} h ago</value></data>
+  <data name="Ago_Hours_One" xml:space="preserve"><value>1 h ago</value></data>
+  <data name="Ago_JustNow" xml:space="preserve"><value>just now</value></data>
+  <data name="Ago_Minutes" xml:space="preserve"><value>{0} min ago</value></data>
+  <data name="Ago_Minutes_One" xml:space="preserve"><value>1 min ago</value></data>
+  <data name="Alerts_Title" xml:space="preserve"><value>Alerts</value></data>
+  <data name="All" xml:space="preserve"><value>All</value></data>
+  <data name="AllGovernorates" xml:space="preserve"><value>All governorates</value></data>
+  <data name="AllHubs" xml:space="preserve"><value>All hubs</value></data>
+  <data name="AllLanes" xml:space="preserve"><value>All selectivity lanes</value></data>
+  <data name="AllOffices" xml:space="preserve"><value>All customs offices</value></data>
+  <data name="AllSellers" xml:space="preserve"><value>All sellers</value></data>
+  <data name="AllSources" xml:space="preserve"><value>All sources</value></data>
+  <data name="AllStatuses" xml:space="preserve"><value>All statuses</value></data>
+  <data name="AllTypes" xml:space="preserve"><value>All types</value></data>
+  <data name="AmountToPay" xml:space="preserve"><value>Amount to pay on delivery</value></data>
+  <data name="AnySeller" xml:space="preserve"><value>Any seller</value></data>
+  <data name="ApplyAndResolve" xml:space="preserve"><value>Apply to the order</value></data>
+  <data name="AppName" xml:space="preserve"><value>Logistico</value></data>
+  <data name="AreaPlaceholder" xml:space="preserve"><value>e.g. Karrada, Mansour</value></data>
+  <data name="Arrived" xml:space="preserve"><value>Arrived</value></data>
+  <data name="ArrivedAt" xml:space="preserve"><value>Arrived {0}</value></data>
+  <data name="AtOurHubIn" xml:space="preserve"><value>At our hub in {0}</value></data>
+  <data name="Attempts" xml:space="preserve"><value>Delivery attempts</value></data>
+  <data name="AttemptsN" xml:space="preserve"><value>{0} attempts</value></data>
+  <data name="AttemptsN_One" xml:space="preserve"><value>1 attempt</value></data>
+  <data name="AutoCancelledN" xml:space="preserve"><value>{0} cancelled automatically</value></data>
+  <data name="AutomationRan" xml:space="preserve"><value>Automation checked everything just now</value></data>
+  <data name="AutomationSubtitle" xml:space="preserve"><value>Rules that run every minute: returns, new delivery days, trucks, alerts and customer messages.</value></data>
+  <data name="AutomationTitle" xml:space="preserve"><value>Automation &amp; alerts</value></data>
+  <data name="AwaitingConfirmationNotice" xml:space="preserve"><value>Waiting for the customer to confirm (asked {0}). It cannot be collected until then.</value></data>
+  <data name="Awb_CollectCash" xml:space="preserve"><value>COLLECT COD CASH</value></data>
+  <data name="Awb_Consignee" xml:space="preserve"><value>DELIVER TO (CONSIGNEE)</value></data>
+  <data name="Awb_Prepaid" xml:space="preserve"><value>PREPAID — NO CASH TO COLLECT</value></data>
+  <data name="Awb_Shipper" xml:space="preserve"><value>FROM (SELLER / SHIPPER)</value></data>
+  <data name="Back" xml:space="preserve"><value>Back</value></data>
+  <data name="BatchBookedToast" xml:space="preserve"><value>{0} orders booked and ready for printing</value></data>
+  <data name="BatchPastePlaceholder" xml:space="preserve"><value>Paste one order per line: Name - 0770... - Governorate &amp; Address - Landmark - Items - COD amount</value></data>
+  <data name="BatchPasteSubtitle" xml:space="preserve"><value>Paste one order per line (or blocks separated by blank lines) to book and print labels in one click</value></data>
+  <data name="BatchPasteTitle" xml:space="preserve"><value>Paste multiple orders (WhatsApp / Excel)</value></data>
+  <data name="BatchSampleAction" xml:space="preserve"><value>Load 4 sample Iraqi orders</value></data>
+  <data name="Board_Booked" xml:space="preserve"><value>New &amp; incoming</value></data>
+  <data name="BookBatchN" xml:space="preserve"><value>Book {0} orders</value></data>
+  <data name="BookBatchN_One" xml:space="preserve"><value>Book 1 order</value></data>
+  <data name="BookShipment" xml:space="preserve"><value>Book shipment</value></data>
+  <data name="BulkDispatch" xml:space="preserve"><value>Dispatch to courier</value></data>
+  <data name="BulkDone" xml:space="preserve"><value>Batch complete: {0} succeeded, {1} skipped</value></data>
+  <data name="BulkLoad" xml:space="preserve"><value>Load on truck</value></data>
+  <data name="BulkPrintAwb" xml:space="preserve"><value>Print 4×6" labels</value></data>
+  <data name="BulkReceive" xml:space="preserve"><value>Receive to hub</value></data>
+  <data name="ByGovernorate" xml:space="preserve"><value>By governorate</value></data>
+  <data name="CameraNotSupported" xml:space="preserve"><value>Camera barcode detection requires Chrome, Edge, or Android browser with camera permission enabled.</value></data>
+  <data name="CameraScan" xml:space="preserve"><value>Scan with camera</value></data>
+  <data name="CameraScanHint" xml:space="preserve"><value>Point your phone or webcam at a Code-128 or QR barcode label. Scans are processed automatically.</value></data>
+  <data name="CameraScanTitle" xml:space="preserve"><value>Camera barcode scanner</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="CancelAfterPickupHint" xml:space="preserve"><value>We already have the parcel: it will travel back to the seller as a return.</value></data>
+  <data name="CancelBeforePickupHint" xml:space="preserve"><value>The order has not been collected yet: it will be cancelled.</value></data>
+  <data name="CancelOrder" xml:space="preserve"><value>Cancel order</value></data>
+  <data name="CancelReasonPlaceholder" xml:space="preserve"><value>e.g. the seller cancelled, the customer ordered twice</value></data>
+  <data name="Capability_Care" xml:space="preserve"><value>Confirmation calls, customer requests and messages</value></data>
+  <data name="ChangedBy" xml:space="preserve"><value>Changed {0} by {1}</value></data>
+  <data name="Chargeable" xml:space="preserve"><value>Chargeable weight</value></data>
+  <data name="ChargeableRule" xml:space="preserve"><value>Rule</value></data>
+  <data name="ChooseCourier" xml:space="preserve"><value>Choose a courier…</value></data>
+  <data name="ChooseCourierFirst" xml:space="preserve"><value>Choose the courier first.</value></data>
+  <data name="ChooseGovernorate" xml:space="preserve"><value>Choose governorate…</value></data>
+  <data name="ChooseReason" xml:space="preserve"><value>Choose a reason…</value></data>
+  <data name="ChooseSeller" xml:space="preserve"><value>Choose a seller…</value></data>
+  <data name="ChooseSellerFirst" xml:space="preserve"><value>Choose the seller this order belongs to.</value></data>
+  <data name="Clear" xml:space="preserve"><value>Clear</value></data>
+  <data name="ClearedAutomatically" xml:space="preserve"><value>Cleared automatically</value></data>
+  <data name="ClearFilters" xml:space="preserve"><value>Clear filters</value></data>
+  <data name="ClearSelection" xml:space="preserve"><value>Clear</value></data>
+  <data name="Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Closed" xml:space="preserve"><value>Closed</value></data>
+  <data name="CloseManifest" xml:space="preserve"><value>Close manifest</value></data>
+  <data name="CloseManifestMissing" xml:space="preserve"><value>{0} parcels were not scanned off this truck. Closing the manifest marks them as missing and raises alerts.</value></data>
+  <data name="CloseManifestMissing_One" xml:space="preserve"><value>1 parcel was not scanned off this truck. Closing the manifest marks it as missing and raises an alert.</value></data>
+  <data name="CloseManifestOk" xml:space="preserve"><value>Every parcel was unloaded. Close the manifest?</value></data>
+  <data name="CodHelper" xml:space="preserve"><value>What the courier collects from the customer. Leave empty if prepaid.</value></data>
+  <data name="CodTotal" xml:space="preserve"><value>Cash on delivery</value></data>
+  <data name="Col_Action" xml:space="preserve"><value>Action</value></data>
+  <data name="Col_Age" xml:space="preserve"><value>In this status</value></data>
+  <data name="Col_Alert" xml:space="preserve"><value>Alert</value></data>
+  <data name="Col_AvgDelivery" xml:space="preserve"><value>Avg. time</value></data>
+  <data name="Col_CashOnRun" xml:space="preserve"><value>Cash on run (IQD)</value></data>
+  <data name="Col_Cod" xml:space="preserve"><value>COD</value></data>
+  <data name="Col_Compliance" xml:space="preserve"><value>E-verification</value></data>
+  <data name="Col_Created" xml:space="preserve"><value>Created</value></data>
+  <data name="Col_Customer" xml:space="preserve"><value>Customer</value></data>
+  <data name="Col_Declaration" xml:space="preserve"><value>ASYCUDA no.</value></data>
+  <data name="Col_Delivered" xml:space="preserve"><value>Delivered</value></data>
+  <data name="Col_DeliveredToday" xml:space="preserve"><value>Delivered today</value></data>
+  <data name="Col_DeliveredUnsettled" xml:space="preserve"><value>Delivered (unsettled)</value></data>
+  <data name="Col_DeliveryFees" xml:space="preserve"><value>Delivery fees</value></data>
+  <data name="Col_Destination" xml:space="preserve"><value>Destination</value></data>
+  <data name="Col_Details" xml:space="preserve"><value>Details</value></data>
+  <data name="Col_Driver" xml:space="preserve"><value>Driver</value></data>
+  <data name="Col_Due" xml:space="preserve"><value>Waiting</value></data>
+  <data name="Col_DutiesIqd" xml:space="preserve"><value>Duties &amp; fees (IQD)</value></data>
+  <data name="Col_Eta" xml:space="preserve"><value>Expected</value></data>
+  <data name="Col_GrossCod" xml:space="preserve"><value>Gross COD collected</value></data>
+  <data name="Col_Hub" xml:space="preserve"><value>Hub</value></data>
+  <data name="Col_InProgressCod" xml:space="preserve"><value>In progress COD</value></data>
+  <data name="Col_Lane" xml:space="preserve"><value>Selectivity lane</value></data>
+  <data name="Col_Manifest" xml:space="preserve"><value>Manifest</value></data>
+  <data name="Col_Message" xml:space="preserve"><value>Message</value></data>
+  <data name="Col_NetPayout" xml:space="preserve"><value>Net seller payout</value></data>
+  <data name="Col_Office" xml:space="preserve"><value>Customs office</value></data>
+  <data name="Col_Orders" xml:space="preserve"><value>Orders</value></data>
+  <data name="Col_OutNow" xml:space="preserve"><value>With courier now</value></data>
+  <data name="Col_PayoutMethod" xml:space="preserve"><value>Payout method</value></data>
+  <data name="Col_Raised" xml:space="preserve"><value>Raised</value></data>
+  <data name="Col_Rating" xml:space="preserve"><value>Rating</value></data>
+  <data name="Col_Request" xml:space="preserve"><value>Request</value></data>
+  <data name="Col_Route" xml:space="preserve"><value>Route</value></data>
+  <data name="Col_Seller" xml:space="preserve"><value>Seller / shipper</value></data>
+  <data name="Col_Service" xml:space="preserve"><value>Service</value></data>
+  <data name="Col_SettledAt" xml:space="preserve"><value>Settled at</value></data>
+  <data name="Col_SettlementNo" xml:space="preserve"><value>Settlement no.</value></data>
+  <data name="Col_Shipment" xml:space="preserve"><value>Shipment</value></data>
+  <data name="Col_Source" xml:space="preserve"><value>From</value></data>
+  <data name="Col_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Col_Subject" xml:space="preserve"><value>About</value></data>
+  <data name="Col_SuccessRate" xml:space="preserve"><value>Success</value></data>
+  <data name="Col_Text" xml:space="preserve"><value>Text</value></data>
+  <data name="Col_Time" xml:space="preserve"><value>Time</value></data>
+  <data name="Col_Timing" xml:space="preserve"><value>Timing</value></data>
+  <data name="Col_Tracking" xml:space="preserve"><value>Tracking number</value></data>
+  <data name="Col_Truck" xml:space="preserve"><value>Truck</value></data>
+  <data name="Col_Type" xml:space="preserve"><value>Type</value></data>
+  <data name="Col_Vehicle" xml:space="preserve"><value>Vehicle &amp; plate</value></data>
+  <data name="Col_Waiting" xml:space="preserve"><value>For</value></data>
+  <data name="Col_WaitingFor" xml:space="preserve"><value>Waiting since</value></data>
+  <data name="CollapseMenu" xml:space="preserve"><value>Collapse menu</value></data>
+  <data name="Collected" xml:space="preserve"><value>Collected</value></data>
+  <data name="Confirm" xml:space="preserve"><value>Confirm</value></data>
+  <data name="ConfirmationRecordedN" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="ConfirmationRules" xml:space="preserve"><value>Confirmation rules</value></data>
+  <data name="ConfirmationSearch" xml:space="preserve"><value>Tracking no., mobile or customer name…</value></data>
+  <data name="ConfirmationsSubtitle" xml:space="preserve"><value>Cash-on-delivery orders waiting for the customer to confirm before we collect them. Calling first saves trips and returns.</value></data>
+  <data name="ConfirmationsTitle" xml:space="preserve"><value>Order confirmation</value></data>
+  <data name="ConfirmedNotice" xml:space="preserve"><value>Confirmed by {0}. Ready for pickup.</value></data>
+  <data name="ConfirmSettlement" xml:space="preserve"><value>Confirm &amp; record payout</value></data>
+  <data name="ConfirmWhatsApp" xml:space="preserve"><value>Hello {0}, your order from {1} ({2}) is ready to send. Please confirm it here: {3}</value></data>
+  <data name="Copied" xml:space="preserve"><value>Copied to clipboard</value></data>
+  <data name="Copy" xml:space="preserve"><value>Copy</value></data>
+  <data name="CopyLink" xml:space="preserve"><value>Copy link</value></data>
+  <data name="CopyTrackingLink" xml:space="preserve"><value>Copy tracking link</value></data>
+  <data name="CourierLeaderboard" xml:space="preserve"><value>Couriers</value></data>
+  <data name="CourierPlaceholder" xml:space="preserve"><value>Courier name or code</value></data>
+  <data name="CourierSaved" xml:space="preserve"><value>Courier “{0}” saved</value></data>
+  <data name="CoverageHint" xml:space="preserve"><value>Orders for these governorates are delivered from this warehouse, and their sellers' parcels are collected here.</value></data>
+  <data name="CoverageMap" xml:space="preserve"><value>Coverage map</value></data>
+  <data name="CoverageMovesN" xml:space="preserve"><value>Moving to this warehouse: {0}</value></data>
+  <data name="CoveredByN" xml:space="preserve"><value>Served today by {0}</value></data>
+  <data name="Covers" xml:space="preserve"><value>Serves</value></data>
+  <data name="CoversNothing" xml:space="preserve"><value>No governorates</value></data>
+  <data name="Created" xml:space="preserve"><value>Created</value></data>
+  <data name="CreateOrder" xml:space="preserve"><value>Create delivery order</value></data>
+  <data name="CriticalN" xml:space="preserve"><value>{0} critical</value></data>
+  <data name="CurrentlyAt" xml:space="preserve"><value>Now at</value></data>
+  <data name="Customer_ActiveN" xml:space="preserve"><value>This customer has {0} orders on the way.</value></data>
+  <data name="Customer_ActiveN_One" xml:space="preserve"><value>This customer has an order on the way.</value></data>
+  <data name="Customer_AddressUsed" xml:space="preserve"><value>Address filled</value></data>
+  <data name="Customer_DuplicateN" xml:space="preserve"><value>Possible duplicate: this customer already has {0} open orders, one from this seller.</value></data>
+  <data name="Customer_DuplicateN_One" xml:space="preserve"><value>Possible duplicate: this customer already has an open order from this seller.</value></data>
+  <data name="Customer_LastOrder" xml:space="preserve"><value>Last order {0}</value></data>
+  <data name="Customer_New" xml:space="preserve"><value>New customer</value></data>
+  <data name="Customer_NewHint" xml:space="preserve"><value>No earlier orders with this number.</value></data>
+  <data name="Customer_Refused" xml:space="preserve"><value>refused</value></data>
+  <data name="Customer_Returned" xml:space="preserve"><value>returned</value></data>
+  <data name="Customer_UseAddress" xml:space="preserve"><value>Use this address</value></data>
+  <data name="CustomerHistory" xml:space="preserve"><value>Customer history</value></data>
+  <data name="CustomerMessages" xml:space="preserve"><value>Customer messages</value></data>
+  <data name="CustomerPays" xml:space="preserve"><value>Customer pays</value></data>
+  <data name="CustomerRequestHint_Cancel" xml:space="preserve"><value>Before we collect it</value></data>
+  <data name="CustomerRequestHint_ChangeAddress" xml:space="preserve"><value>Wrong or new address</value></data>
+  <data name="CustomerRequestHint_ChangePhone" xml:space="preserve"><value>Reach me on another number</value></data>
+  <data name="CustomerRequestHint_Complaint" xml:space="preserve"><value>Tell us what went wrong</value></data>
+  <data name="CustomerRequestHint_Reschedule" xml:space="preserve"><value>Pick a day that suits you</value></data>
+  <data name="CustomerRequestHint_Return" xml:space="preserve"><value>Send it back to the shop</value></data>
+  <data name="CustomsDialogTitle" xml:space="preserve"><value>ASYCUDA declaration — {0}</value></data>
+  <data name="CustomsSaved" xml:space="preserve"><value>Customs declaration updated for {0}</value></data>
+  <data name="CustomsSearchPlaceholder" xml:space="preserve"><value>Search by tracking no., ASYCUDA declaration no., importer or HS code…</value></data>
+  <data name="CustomsSubtitle" xml:space="preserve"><value>International freight declarations, mandatory Iraqi e-verification (CoO &amp; Invoice), selectivity lanes and SAD XML export</value></data>
+  <data name="CustomsTitle" xml:space="preserve"><value>Customs &amp; ASYCUDA World</value></data>
+  <data name="DailyVolume" xml:space="preserve"><value>Daily volume</value></data>
+  <data name="DailyVolumeHint" xml:space="preserve"><value>{0} – {1}, domestic orders</value></data>
+  <data name="DashboardTitle" xml:space="preserve"><value>Operations overview</value></data>
+  <data name="Date" xml:space="preserve"><value>Date</value></data>
+  <data name="Days" xml:space="preserve"><value>days</value></data>
+  <data name="DaysN" xml:space="preserve"><value>{0} days</value></data>
+  <data name="DaysN_One" xml:space="preserve"><value>1 day</value></data>
+  <data name="DeclineOrder" xml:space="preserve"><value>Customer declined</value></data>
+  <data name="DeclineOrderHint" xml:space="preserve"><value>The order will be cancelled and stays with the seller.</value></data>
+  <data name="DeclineReasonPlaceholder" xml:space="preserve"><value>e.g. changed their mind, wrong item</value></data>
+  <data name="Delivered" xml:space="preserve"><value>Delivered</value></data>
+  <data name="DeliveredOn" xml:space="preserve"><value>Delivered on</value></data>
+  <data name="DeliveringTo" xml:space="preserve"><value>Delivering to</value></data>
+  <data name="Depart" xml:space="preserve"><value>Truck departs</value></data>
+  <data name="DepartConfirm" xml:space="preserve"><value>{0} loaded parcels will leave for {1}. Parcels that were only planned stay at the hub.</value></data>
+  <data name="DepartConfirm_One" xml:space="preserve"><value>1 loaded parcel will leave for {1}. Parcels that were only planned stay at the hub.</value></data>
+  <data name="Departed" xml:space="preserve"><value>Departed</value></data>
+  <data name="DepartsTonight" xml:space="preserve"><value>Loading — next departure 08:00 or 21:00</value></data>
+  <data name="DestinationHub" xml:space="preserve"><value>Destination hub</value></data>
+  <data name="Dispatch" xml:space="preserve"><value>Dispatch</value></data>
+  <data name="DispatchedWith" xml:space="preserve"><value>Out for delivery with {0}</value></data>
+  <data name="DomesticPipeline" xml:space="preserve"><value>Local deliveries by stage</value></data>
+  <data name="DomesticPipelineHint" xml:space="preserve"><value>Instagram and online shop orders</value></data>
+  <data name="DownloadSadXml" xml:space="preserve"><value>Download ASYCUDA SAD XML</value></data>
+  <data name="DownloadStatement" xml:space="preserve"><value>Statement CSV</value></data>
+  <data name="DropOff" xml:space="preserve"><value>Seller drops off</value></data>
+  <data name="Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="EditCourier" xml:space="preserve"><value>Edit courier</value></data>
+  <data name="EditMovesHub" xml:space="preserve"><value>The parcel will be delivered from {0}.</value></data>
+  <data name="EditOrder" xml:space="preserve"><value>Edit order</value></data>
+  <data name="EditOrderHint" xml:space="preserve"><value>Corrections are allowed until the parcel is out with a courier. Every change is kept in the order's history with your name.</value></data>
+  <data name="EditOrderN" xml:space="preserve"><value>Edit {0}</value></data>
+  <data name="EditSeller" xml:space="preserve"><value>Edit seller</value></data>
+  <data name="EditWarehouseN" xml:space="preserve"><value>Edit {0}</value></data>
+  <data name="EtaAt" xml:space="preserve"><value>Expected {0}</value></data>
+  <data name="ExpectedArrival" xml:space="preserve"><value>Expected arrival</value></data>
+  <data name="ExpectedBy" xml:space="preserve"><value>Expected by</value></data>
+  <data name="ExportCsv" xml:space="preserve"><value>Export CSV</value></data>
+  <data name="FailedAttempt" xml:space="preserve"><value>Failed</value></data>
+  <data name="FailedAttemptCallout" xml:space="preserve"><value>Delivery attempt {0} failed: {1}.</value></data>
+  <data name="FailedAttemptsN" xml:space="preserve"><value>{0} failed attempts</value></data>
+  <data name="FailedAttemptsN_One" xml:space="preserve"><value>1 failed attempt</value></data>
+  <data name="FailureReasons" xml:space="preserve"><value>Why deliveries fail</value></data>
+  <data name="FailureReasonsHint" xml:space="preserve"><value>Failed attempts in the period</value></data>
+  <data name="FailureWillReschedule" xml:space="preserve"><value>Attempt {0} of {1}. It will be retried on the next working day.</value></data>
+  <data name="FailureWillReturn" xml:space="preserve"><value>This is the last attempt ({0}). The parcel will go back to the seller automatically.</value></data>
+  <data name="Field_Address" xml:space="preserve"><value>Address</value></data>
+  <data name="Field_Area" xml:space="preserve"><value>Area / district</value></data>
+  <data name="Field_AssessedDutyIqd" xml:space="preserve"><value>Assessed duty (IQD at 1,310)</value></data>
+  <data name="Field_AssessmentNo" xml:space="preserve"><value>Assessment notice no.</value></data>
+  <data name="Field_BrokerName" xml:space="preserve"><value>Customs broker / declarant</value></data>
+  <data name="Field_CancelReason" xml:space="preserve"><value>Reason</value></data>
+  <data name="Field_CocNumber" xml:space="preserve"><value>COSQC Certificate of Conformity (COC)</value></data>
+  <data name="Field_Cod" xml:space="preserve"><value>Cash on delivery</value></data>
+  <data name="Field_Consignee" xml:space="preserve"><value>Consignee (importer)</value></data>
+  <data name="Field_ConsigneePhone" xml:space="preserve"><value>Consignee phone</value></data>
+  <data name="Field_ContactName" xml:space="preserve"><value>Contact person</value></data>
+  <data name="Field_CooEVerified" xml:space="preserve"><value>CoO electronically verified (Iraqi Single Window)</value></data>
+  <data name="Field_CooNumber" xml:space="preserve"><value>Certificate of Origin (CoO) no.</value></data>
+  <data name="Field_CountryOfOrigin" xml:space="preserve"><value>Country of origin (ISO-2)</value></data>
+  <data name="Field_Courier" xml:space="preserve"><value>Courier</value></data>
+  <data name="Field_CourierCode" xml:space="preserve"><value>Courier code</value></data>
+  <data name="Field_Currency" xml:space="preserve"><value>Currency</value></data>
+  <data name="Field_CustomerName" xml:space="preserve"><value>Customer name</value></data>
+  <data name="Field_CustomerPhone" xml:space="preserve"><value>Customer mobile</value></data>
+  <data name="Field_CustomsOffice" xml:space="preserve"><value>Customs clearance office</value></data>
+  <data name="Field_CustomsValueUsd" xml:space="preserve"><value>Customs value (USD)</value></data>
+  <data name="Field_DeclarationNo" xml:space="preserve"><value>ASYCUDA registration no.</value></data>
+  <data name="Field_DeclaredValue" xml:space="preserve"><value>Declared value</value></data>
+  <data name="Field_DeliveryFee" xml:space="preserve"><value>Delivery fee</value></data>
+  <data name="Field_Destination" xml:space="preserve"><value>Destination</value></data>
+  <data name="Field_DutyRate" xml:space="preserve"><value>Tariff rate (%)</value></data>
+  <data name="Field_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Field_FailureReason" xml:space="preserve"><value>Why did it fail?</value></data>
+  <data name="Field_FirstPassword" xml:space="preserve"><value>First password</value></data>
+  <data name="Field_FromHub" xml:space="preserve"><value>From hub</value></data>
+  <data name="Field_Governorate" xml:space="preserve"><value>Governorate</value></data>
+  <data name="Field_HoldReason" xml:space="preserve"><value>Customs hold reason</value></data>
+  <data name="Field_HouseBill" xml:space="preserve"><value>House bill no.</value></data>
+  <data name="Field_HowWeGetIt" xml:space="preserve"><value>Collection</value></data>
+  <data name="Field_HsCode" xml:space="preserve"><value>HS tariff code</value></data>
+  <data name="Field_Incoterm" xml:space="preserve"><value>Incoterm</value></data>
+  <data name="Field_Instagram" xml:space="preserve"><value>Instagram</value></data>
+  <data name="Field_InvoiceEVerified" xml:space="preserve"><value>Commercial invoice electronically verified</value></data>
+  <data name="Field_InvoiceNumber" xml:space="preserve"><value>Commercial invoice no.</value></data>
+  <data name="Field_Items" xml:space="preserve"><value>Contents</value></data>
+  <data name="Field_Kind" xml:space="preserve"><value>Type</value></data>
+  <data name="Field_Landmark" xml:space="preserve"><value>Nearest landmark</value></data>
+  <data name="Field_Location" xml:space="preserve"><value>Position on the map</value></data>
+  <data name="Field_Manager" xml:space="preserve"><value>Manager</value></data>
+  <data name="Field_Mode" xml:space="preserve"><value>Transport mode</value></data>
+  <data name="Field_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Field_NameAr" xml:space="preserve"><value>Name in Arabic</value></data>
+  <data name="Field_NameEn" xml:space="preserve"><value>Name in English</value></data>
+  <data name="Field_NewAddress" xml:space="preserve"><value>New address</value></data>
+  <data name="Field_NewPassword" xml:space="preserve"><value>New password</value></data>
+  <data name="Field_NewPhone" xml:space="preserve"><value>New mobile number</value></data>
+  <data name="Field_Notes" xml:space="preserve"><value>Notes</value></data>
+  <data name="Field_OpeningHours" xml:space="preserve"><value>Opening hours</value></data>
+  <data name="Field_OrderRef" xml:space="preserve"><value>Seller's order no.</value></data>
+  <data name="Field_Origin" xml:space="preserve"><value>Origin</value></data>
+  <data name="Field_PayoutMethod" xml:space="preserve"><value>Payout method</value></data>
+  <data name="Field_PayoutRef" xml:space="preserve"><value>Receipt / transfer reference</value></data>
+  <data name="Field_Phone" xml:space="preserve"><value>Mobile</value></data>
+  <data name="Field_PhoneLast4" xml:space="preserve"><value>Last 4 digits of your mobile</value></data>
+  <data name="Field_PickupAddress" xml:space="preserve"><value>Pickup address</value></data>
+  <data name="Field_Pieces" xml:space="preserve"><value>Pieces</value></data>
+  <data name="Field_PreferredDate" xml:space="preserve"><value>Delivery day</value></data>
+  <data name="Field_Promised" xml:space="preserve"><value>Promised delivery</value></data>
+  <data name="Field_ReceiptNo" xml:space="preserve"><value>Treasury receipt no.</value></data>
+  <data name="Field_Regime" xml:space="preserve"><value>Customs regime</value></data>
+  <data name="Field_ReturnReason" xml:space="preserve"><value>Reason</value></data>
+  <data name="Field_RoutingTag" xml:space="preserve"><value>Routing tag</value></data>
+  <data name="Field_Seal" xml:space="preserve"><value>Seal number</value></data>
+  <data name="Field_SelectivityLane" xml:space="preserve"><value>Selectivity lane</value></data>
+  <data name="Field_Seller" xml:space="preserve"><value>Seller (shop)</value></data>
+  <data name="Field_Shelf" xml:space="preserve"><value>Shelf</value></data>
+  <data name="Field_ShelfCapacity" xml:space="preserve"><value>Shelf capacity (parcels)</value></data>
+  <data name="Field_Shipper" xml:space="preserve"><value>Shipper</value></data>
+  <data name="Field_ShopName" xml:space="preserve"><value>Shop name</value></data>
+  <data name="Field_TaxAndFeesIqd" xml:space="preserve"><value>Stamp &amp; port fees (IQD)</value></data>
+  <data name="Field_ToHub" xml:space="preserve"><value>To hub</value></data>
+  <data name="Field_Truck" xml:space="preserve"><value>Truck</value></data>
+  <data name="Field_VehiclePlate" xml:space="preserve"><value>Plate number</value></data>
+  <data name="Field_VehicleType" xml:space="preserve"><value>Vehicle type</value></data>
+  <data name="Field_VolumeCbm" xml:space="preserve"><value>Volume (m³)</value></data>
+  <data name="Field_WeightKg" xml:space="preserve"><value>Weight (kg)</value></data>
+  <data name="FinanceSubtitle" xml:space="preserve"><value>Reconcile cash collected from customers, deduct delivery fees and remit net payouts to sellers</value></data>
+  <data name="FinanceTitle" xml:space="preserve"><value>Finance &amp; COD settlements</value></data>
+  <data name="FindOrderHint" xml:space="preserve"><value>Scan or type the tracking number</value></data>
+  <data name="FleetSubtitle" xml:space="preserve"><value>Manage delivery couriers, vehicles, active governorate runs and cash held on the road</value></data>
+  <data name="FleetTitle" xml:space="preserve"><value>Fleet &amp; couriers</value></data>
+  <data name="FromShop" xml:space="preserve"><value>From {0}</value></data>
+  <data name="GlobalSearchPlaceholder" xml:space="preserve"><value>Tracking no., phone, customer or shop…</value></data>
+  <data name="GovernoratePerformance" xml:space="preserve"><value>By governorate</value></data>
+  <data name="HandedOver" xml:space="preserve"><value>{0} parcels handed over — manifest {1}</value></data>
+  <data name="HandedOver_One" xml:space="preserve"><value>1 parcel handed over — manifest {1}</value></data>
+  <data name="HandedOverBy" xml:space="preserve"><value>Handed over by</value></data>
+  <data name="Handled" xml:space="preserve"><value>Handled</value></data>
+  <data name="HandOver" xml:space="preserve"><value>Hand over to seller</value></data>
+  <data name="HandOverHint" xml:space="preserve"><value>Untick parcels the seller does not take today. A manifest is printed for signature.</value></data>
+  <data name="HandOverN" xml:space="preserve"><value>Hand over {0} parcels</value></data>
+  <data name="HandOverN_One" xml:space="preserve"><value>Hand over 1 parcel</value></data>
+  <data name="HandOverTo" xml:space="preserve"><value>Hand returns to {0}</value></data>
+  <data name="Headline_BetweenCities" xml:space="preserve"><value>On a truck to your city</value></data>
+  <data name="Headline_Booked" xml:space="preserve"><value>Your order has been registered</value></data>
+  <data name="Headline_Cancelled" xml:space="preserve"><value>This order was cancelled</value></data>
+  <data name="Headline_Customs" xml:space="preserve"><value>Your shipment is going through customs</value></data>
+  <data name="Headline_Delivered" xml:space="preserve"><value>Delivered — thank you!</value></data>
+  <data name="Headline_Failed" xml:space="preserve"><value>We could not deliver today</value></data>
+  <data name="Headline_InTransit" xml:space="preserve"><value>Your shipment is on its way</value></data>
+  <data name="Headline_OutForDelivery" xml:space="preserve"><value>Out for delivery — arriving today</value></data>
+  <data name="Headline_PickedUp" xml:space="preserve"><value>We collected your parcel from the shop</value></data>
+  <data name="Headline_Returned" xml:space="preserve"><value>The parcel is being returned to the seller</value></data>
+  <data name="Headline_Warehouse" xml:space="preserve"><value>Your parcel is at our warehouse</value></data>
+  <data name="HistoryShort" xml:space="preserve"><value>{0} delivered · {1} returned</value></data>
+  <data name="Hours" xml:space="preserve"><value>hours</value></data>
+  <data name="HoursN" xml:space="preserve"><value>{0} h</value></data>
+  <data name="HoursN_One" xml:space="preserve"><value>1 h</value></data>
+  <data name="HubLine" xml:space="preserve"><value>{0} on shelves · {1} waiting for a truck · {2} coming</value></data>
+  <data name="HubRadar" xml:space="preserve"><value>Hub radar</value></data>
+  <data name="HubRadarTitle" xml:space="preserve"><value>Hub radar — latest scans across Iraq</value></data>
+  <data name="Hubs" xml:space="preserve"><value>Hubs</value></data>
+  <data name="HubsHint" xml:space="preserve"><value>Click a hub to see its shelves</value></data>
+  <data name="HubSwitched" xml:space="preserve"><value>Hub changed to {0}</value></data>
+  <data name="Inactive" xml:space="preserve"><value>Inactive</value></data>
+  <data name="InboundParcels" xml:space="preserve"><value>On trucks to it</value></data>
+  <data name="InboundTrucks" xml:space="preserve"><value>Trucks coming here</value></data>
+  <data name="InboundTrucksHint" xml:space="preserve"><value>Parcels on the road to this hub</value></data>
+  <data name="InternationalPipeline" xml:space="preserve"><value>International shipments by status</value></data>
+  <data name="InvalidTrackingNumber" xml:space="preserve"><value>That doesn't look like a Logistico tracking number. Please check the digits.</value></data>
+  <data name="Iqd" xml:space="preserve"><value>IQD</value></data>
+  <data name="IqdHint" xml:space="preserve"><value>IQD</value></data>
+  <data name="ItemsPlaceholder" xml:space="preserve"><value>What is in the parcel?</value></data>
+  <data name="Journey" xml:space="preserve"><value>Journey</value></data>
+  <data name="Kg" xml:space="preserve"><value>kg</value></data>
+  <data name="Kpi_ActionsToday" xml:space="preserve"><value>Automatic actions today</value></data>
+  <data name="Kpi_ActiveCouriers" xml:space="preserve"><value>Active couriers</value></data>
+  <data name="Kpi_ActiveParcels" xml:space="preserve"><value>Active parcels</value></data>
+  <data name="Kpi_ActiveWarehouses" xml:space="preserve"><value>Active warehouses</value></data>
+  <data name="Kpi_AssessedDuties" xml:space="preserve"><value>Assessed duties &amp; fees</value></data>
+  <data name="Kpi_AutoReschedules" xml:space="preserve"><value>Rescheduled today</value></data>
+  <data name="Kpi_AutoReturns" xml:space="preserve"><value>Auto returns today</value></data>
+  <data name="Kpi_AvgDelivery" xml:space="preserve"><value>Average delivery time</value></data>
+  <data name="Kpi_AvgDeliveryHint" xml:space="preserve"><value>From order to doorstep</value></data>
+  <data name="Kpi_AwaitingConfirmation" xml:space="preserve"><value>Waiting for confirmation</value></data>
+  <data name="Kpi_AwaitingDeclaration" xml:space="preserve"><value>Awaiting declaration</value></data>
+  <data name="Kpi_Booked" xml:space="preserve"><value>New orders</value></data>
+  <data name="Kpi_CashWithCouriers" xml:space="preserve"><value>COD with couriers</value></data>
+  <data name="Kpi_CodCollected" xml:space="preserve"><value>COD collected</value></data>
+  <data name="Kpi_CodCollectedPeriod" xml:space="preserve"><value>Cash collected</value></data>
+  <data name="Kpi_CodToCollect" xml:space="preserve"><value>COD to collect</value></data>
+  <data name="Kpi_ConfirmationOverdue" xml:space="preserve"><value>Waiting too long</value></data>
+  <data name="Kpi_ConfirmedToday" xml:space="preserve"><value>Confirmed today</value></data>
+  <data name="Kpi_CustomsHold" xml:space="preserve"><value>On customs hold</value></data>
+  <data name="Kpi_DeclinedToday" xml:space="preserve"><value>Cancelled today</value></data>
+  <data name="Kpi_Delivered" xml:space="preserve"><value>Delivered</value></data>
+  <data name="Kpi_DeliveredToday" xml:space="preserve"><value>Delivered today</value></data>
+  <data name="Kpi_DeliveryRevenue" xml:space="preserve"><value>Delivery fee revenue</value></data>
+  <data name="Kpi_FailedAttempts" xml:space="preserve"><value>Failed attempts</value></data>
+  <data name="Kpi_FirstAttempt" xml:space="preserve"><value>First-attempt delivery</value></data>
+  <data name="Kpi_FirstAttemptHint" xml:space="preserve"><value>Delivered without a failed attempt</value></data>
+  <data name="Kpi_InClearance" xml:space="preserve"><value>In customs clearance</value></data>
+  <data name="Kpi_InProgress" xml:space="preserve"><value>In progress</value></data>
+  <data name="Kpi_InWarehouse" xml:space="preserve"><value>In warehouse</value></data>
+  <data name="Kpi_Late" xml:space="preserve"><value>Late</value></data>
+  <data name="Kpi_MessagesPending" xml:space="preserve"><value>Messages to send</value></data>
+  <data name="Kpi_NetPayableToSellers" xml:space="preserve"><value>Net payable to sellers</value></data>
+  <data name="Kpi_OnTime" xml:space="preserve"><value>On time</value></data>
+  <data name="Kpi_OnTimeHint" xml:space="preserve"><value>Delivered by the promised date</value></data>
+  <data name="Kpi_OnTrucks" xml:space="preserve"><value>On trucks</value></data>
+  <data name="Kpi_OpenAlerts" xml:space="preserve"><value>Open alerts</value></data>
+  <data name="Kpi_OpenRequests" xml:space="preserve"><value>Open requests</value></data>
+  <data name="Kpi_OutForDelivery" xml:space="preserve"><value>With couriers</value></data>
+  <data name="Kpi_OverdueRequests" xml:space="preserve"><value>Overdue requests</value></data>
+  <data name="Kpi_ParcelsWaiting" xml:space="preserve"><value>Waiting for a truck</value></data>
+  <data name="Kpi_ParcelsWaitingHint" xml:space="preserve"><value>At the wrong hub, not on a truck yet</value></data>
+  <data name="Kpi_PendingCodCollection" xml:space="preserve"><value>COD in pipeline</value></data>
+  <data name="Kpi_Rating" xml:space="preserve"><value>Customer rating</value></data>
+  <data name="Kpi_ReleasedCustoms" xml:space="preserve"><value>Released by customs</value></data>
+  <data name="Kpi_Returned" xml:space="preserve"><value>Returns</value></data>
+  <data name="Kpi_ReturnedThisMonth" xml:space="preserve"><value>Returned this month</value></data>
+  <data name="Kpi_ReturnRate" xml:space="preserve"><value>Return rate</value></data>
+  <data name="Kpi_ReturnsAtHub" xml:space="preserve"><value>Ready for sellers</value></data>
+  <data name="Kpi_ReturnsAtHubHint" xml:space="preserve"><value>At the seller's hub</value></data>
+  <data name="Kpi_ReturnsOnTrucks" xml:space="preserve"><value>On return trucks</value></data>
+  <data name="Kpi_ReturnsOverdue" xml:space="preserve"><value>Not collected in time</value></data>
+  <data name="Kpi_ReturnsStarted" xml:space="preserve"><value>Returns started</value></data>
+  <data name="Kpi_ReturnsStartedHint" xml:space="preserve"><value>With couriers or at a hub</value></data>
+  <data name="Kpi_ShelfUse" xml:space="preserve"><value>Shelf use</value></data>
+  <data name="Kpi_SuccessRate" xml:space="preserve"><value>Delivery success</value></data>
+  <data name="Kpi_SuccessRateHint" xml:space="preserve"><value>Delivered out of delivered + returned</value></data>
+  <data name="Kpi_TotalOrders" xml:space="preserve"><value>Total orders</value></data>
+  <data name="Kpi_TotalSettled" xml:space="preserve"><value>Settled to sellers</value></data>
+  <data name="Kpi_TrucksLate" xml:space="preserve"><value>Late trucks</value></data>
+  <data name="Kpi_TrucksLoading" xml:space="preserve"><value>Trucks loading</value></data>
+  <data name="Kpi_TrucksOnRoad" xml:space="preserve"><value>Trucks on the road</value></data>
+  <data name="Kpi_TrucksPlanned" xml:space="preserve"><value>Parcels planned on trucks</value></data>
+  <data name="Kpi_Uncovered" xml:space="preserve"><value>Governorates without a warehouse</value></data>
+  <data name="Kpi_UnsettledCod" xml:space="preserve"><value>Collected (unsettled)</value></data>
+  <data name="LandmarkPlaceholder" xml:space="preserve"><value>e.g. near Al-Mansour Mall</value></data>
+  <data name="LaneTip" xml:space="preserve"><value>Trucks: {0} · parcels on the road: {1} · loading: {2}</value></data>
+  <data name="LastRun" xml:space="preserve"><value>Last run {0}</value></data>
+  <data name="Late" xml:space="preserve"><value>Late</value></data>
+  <data name="LeftAt" xml:space="preserve"><value>Left {0}</value></data>
+  <data name="LiveNow" xml:space="preserve"><value>Right now</value></data>
+  <data name="LoadAutoHint" xml:space="preserve"><value>Leave on automatic: each scanned parcel goes on the truck to its own hub.</value></data>
+  <data name="LoadedOfPlanned" xml:space="preserve"><value>{0} loaded · {1} still to load</value></data>
+  <data name="LocationHint" xml:space="preserve"><value>Click the map to drop the pin, or use the governorate's centre.</value></data>
+  <data name="LocodeHelper" xml:space="preserve"><value>UN/LOCODE or airport code, e.g. CNSHA, TRIST, AEDXB</value></data>
+  <data name="MainWarehouseTag" xml:space="preserve"><value>Main</value></data>
+  <data name="ManifestEmpty" xml:space="preserve"><value>No parcels on this truck yet</value></data>
+  <data name="ManifestNotFound" xml:space="preserve"><value>Manifest not found</value></data>
+  <data name="ManifestTitle" xml:space="preserve"><value>Return manifest {0}</value></data>
+  <data name="Map_Active" xml:space="preserve"><value>Active</value></data>
+  <data name="Map_High" xml:space="preserve"><value>more</value></data>
+  <data name="Map_HubAlerts" xml:space="preserve"><value>Hub with alerts</value></data>
+  <data name="Map_Low" xml:space="preserve"><value>fewer</value></data>
+  <data name="Map_Measure" xml:space="preserve"><value>Show</value></data>
+  <data name="Map_TruckLate" xml:space="preserve"><value>Late truck</value></data>
+  <data name="Map_TrucksMoving" xml:space="preserve"><value>Trucks on the road</value></data>
+  <data name="MarkHandled" xml:space="preserve"><value>Handled</value></data>
+  <data name="MarkResolved" xml:space="preserve"><value>Mark resolved</value></data>
+  <data name="Menu" xml:space="preserve"><value>Menu</value></data>
+  <data name="MessagesHint" xml:space="preserve"><value>Messages are written automatically; send them on WhatsApp with one click.</value></data>
+  <data name="MisroutedN" xml:space="preserve"><value>{0} at the wrong hub</value></data>
+  <data name="MisroutedToast" xml:space="preserve"><value>⚠ Misrouted parcel at {0}: {1} belongs to {2}</value></data>
+  <data name="MisrouteHint" xml:space="preserve"><value>Wrong hub — send it to {0}.</value></data>
+  <data name="MissingHint" xml:space="preserve"><value>Search the truck and the origin hub. Scanning the parcel anywhere clears the alert.</value></data>
+  <data name="MissingN" xml:space="preserve"><value>{0} missing</value></data>
+  <data name="Mode_BatchOrders" xml:space="preserve"><value>Batch paste</value></data>
+  <data name="Mode_Dispatch" xml:space="preserve"><value>To courier</value></data>
+  <data name="Mode_Load" xml:space="preserve"><value>Load truck</value></data>
+  <data name="Mode_Receive" xml:space="preserve"><value>Receive</value></data>
+  <data name="Mode_SingleOrder" xml:space="preserve"><value>Single order</value></data>
+  <data name="Mode_Verify" xml:space="preserve"><value>Check route</value></data>
+  <data name="ModeSwitched" xml:space="preserve"><value>Mode: {0}</value></data>
+  <data name="MoreActions" xml:space="preserve"><value>More actions</value></data>
+  <data name="MoveCoverageConfirm" xml:space="preserve"><value>Move and save</value></data>
+  <data name="MoveCoverageMessage" xml:space="preserve"><value>{0} will be served by this warehouse. Parcels already on their way keep their route; new orders go through here.</value></data>
+  <data name="MoveCoverageTitle" xml:space="preserve"><value>Move coverage</value></data>
+  <data name="MyAccount" xml:space="preserve"><value>My account</value></data>
+  <data name="Nav_AdminSection" xml:space="preserve"><value>Administration</value></data>
+  <data name="Nav_Automation" xml:space="preserve"><value>Automation &amp; alerts</value></data>
+  <data name="Nav_BusinessSection" xml:space="preserve"><value>Sellers &amp; money</value></data>
+  <data name="Nav_CareSection" xml:space="preserve"><value>Customer care</value></data>
+  <data name="Nav_Confirmations" xml:space="preserve"><value>Order confirmation</value></data>
+  <data name="Nav_Customs" xml:space="preserve"><value>Customs (ASYCUDA)</value></data>
+  <data name="Nav_Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="Nav_Finance" xml:space="preserve"><value>Finance &amp; COD</value></data>
+  <data name="Nav_Fleet" xml:space="preserve"><value>Fleet &amp; GPS</value></data>
+  <data name="Nav_HubsSection" xml:space="preserve"><value>Hubs &amp; trucks</value></data>
+  <data name="Nav_Network" xml:space="preserve"><value>Iraq network map</value></data>
+  <data name="Nav_NewInternational" xml:space="preserve"><value>New international shipment</value></data>
+  <data name="Nav_NewOrder" xml:space="preserve"><value>New delivery order</value></data>
+  <data name="Nav_Operations" xml:space="preserve"><value>Operations</value></data>
+  <data name="Nav_Pricing" xml:space="preserve"><value>Delivery prices</value></data>
+  <data name="Nav_PrintLabels" xml:space="preserve"><value>Thermal AWB &amp; barcodes</value></data>
+  <data name="Nav_Requests" xml:space="preserve"><value>Requests</value></data>
+  <data name="Nav_Returns" xml:space="preserve"><value>Returns</value></data>
+  <data name="Nav_Sellers" xml:space="preserve"><value>Sellers</value></data>
+  <data name="Nav_Shipments" xml:space="preserve"><value>Shipments</value></data>
+  <data name="Nav_Team" xml:space="preserve"><value>Team &amp; access</value></data>
+  <data name="Nav_Track" xml:space="preserve"><value>Track a shipment</value></data>
+  <data name="Nav_Transfers" xml:space="preserve"><value>Trucks between hubs</value></data>
+  <data name="Nav_Warehouse" xml:space="preserve"><value>Hub station</value></data>
+  <data name="Nav_Warehouses" xml:space="preserve"><value>Warehouses &amp; branches</value></data>
+  <data name="NeedChange" xml:space="preserve"><value>Need to change something?</value></data>
+  <data name="NeedsAttention" xml:space="preserve"><value>Needs attention</value></data>
+  <data name="NeedsAttentionHint" xml:space="preserve"><value>Failed deliveries and customs holds</value></data>
+  <data name="NeedsTruckNotice" xml:space="preserve"><value>At {0}; it must go by truck to {1}.</value></data>
+  <data name="NetworkSubtitle" xml:space="preserve"><value>Every parcel across Iraq: where it is, what is late, and which trucks are on the road.</value></data>
+  <data name="NetworkTitle" xml:space="preserve"><value>Iraq network map</value></data>
+  <data name="NewCourier" xml:space="preserve"><value>New courier</value></data>
+  <data name="NewInternationalSubtitle" xml:space="preserve"><value>Freight into Iraq by sea, air or road</value></data>
+  <data name="NewInternationalTitle" xml:space="preserve"><value>New international shipment</value></data>
+  <data name="NewOrder" xml:space="preserve"><value>New order</value></data>
+  <data name="NewOrderSubtitle" xml:space="preserve"><value>A shop (e.g. on Instagram) sends a parcel to its customer — we collect, store, deliver and collect the cash.</value></data>
+  <data name="NewOrderTitle" xml:space="preserve"><value>New delivery order</value></data>
+  <data name="NewSeller" xml:space="preserve"><value>New seller</value></data>
+  <data name="NextAttempt" xml:space="preserve"><value>Next attempt</value></data>
+  <data name="NextHubHint" xml:space="preserve"><value>Goes next to {0} by truck.</value></data>
+  <data name="NextStep" xml:space="preserve"><value>Next step</value></data>
+  <data name="NoActivity" xml:space="preserve"><value>Nothing yet</value></data>
+  <data name="NoAlerts" xml:space="preserve"><value>No alerts — everything is on time</value></data>
+  <data name="NoAnswer" xml:space="preserve"><value>No answer</value></data>
+  <data name="NoAnswerN" xml:space="preserve"><value>{0} calls without answer</value></data>
+  <data name="NoAnswerN_One" xml:space="preserve"><value>1 call without answer</value></data>
+  <data name="NoConfirmationsWaiting" xml:space="preserve"><value>Nothing to confirm</value></data>
+  <data name="NoConfirmationsWaitingHint" xml:space="preserve"><value>New orders that need confirmation appear here.</value></data>
+  <data name="NoCouriers" xml:space="preserve"><value>No couriers match these filters</value></data>
+  <data name="NoDataPeriod" xml:space="preserve"><value>No data in this period</value></data>
+  <data name="NoFailuresPeriod" xml:space="preserve"><value>No failed attempts in this period</value></data>
+  <data name="NoFridayHint" xml:space="preserve"><value>No deliveries on Friday</value></data>
+  <data name="NoInboundTrucks" xml:space="preserve"><value>No trucks on the way here</value></data>
+  <data name="NoMessages" xml:space="preserve"><value>No messages</value></data>
+  <data name="NoOrdersYet" xml:space="preserve"><value>No orders yet</value></data>
+  <data name="NoRatingsPeriod" xml:space="preserve"><value>No customer ratings in this period yet</value></data>
+  <data name="NoRequests" xml:space="preserve"><value>No requests</value></data>
+  <data name="NoReturnsTravelling" xml:space="preserve"><value>No returns on the way</value></data>
+  <data name="NoReturnsWaiting" xml:space="preserve"><value>No returns waiting</value></data>
+  <data name="NoReturnsWaitingHint" xml:space="preserve"><value>Returns appear here when they reach the seller's hub.</value></data>
+  <data name="NoScansYet" xml:space="preserve"><value>Scan a parcel to start</value></data>
+  <data name="NoSellers" xml:space="preserve"><value>No sellers found</value></data>
+  <data name="NoSettlementsYet" xml:space="preserve"><value>No settlements recorded yet</value></data>
+  <data name="NoShipments" xml:space="preserve"><value>No shipments match these filters</value></data>
+  <data name="NoShipmentsFound" xml:space="preserve"><value>No parcels here</value></data>
+  <data name="NoShipmentsHint" xml:space="preserve"><value>Try a different search or clear the filters.</value></data>
+  <data name="NotCovered" xml:space="preserve"><value>Not covered</value></data>
+  <data name="NotesPlaceholder" xml:space="preserve"><value>Call before arriving, fragile…</value></data>
+  <data name="NotFoundText" xml:space="preserve"><value>The page you are looking for does not exist.</value></data>
+  <data name="NotFoundTitle" xml:space="preserve"><value>Page not found</value></data>
+  <data name="NothingNeedsAttention" xml:space="preserve"><value>Nothing needs attention right now</value></data>
+  <data name="NothingWaitingForTruck" xml:space="preserve"><value>Nothing waiting for a truck</value></data>
+  <data name="NoTrucks" xml:space="preserve"><value>No trucks yet</value></data>
+  <data name="NoUnsettledBalances" xml:space="preserve"><value>All delivered COD orders have been settled</value></data>
+  <data name="OnATruck" xml:space="preserve"><value>On a truck</value></data>
+  <data name="OnShelves" xml:space="preserve"><value>On the shelves</value></data>
+  <data name="OnShelvesHint" xml:space="preserve"><value>Every parcel in this hub now</value></data>
+  <data name="OnShelvesN" xml:space="preserve"><value>{0} on shelves</value></data>
+  <data name="OnTheWayTo" xml:space="preserve"><value>On the way to {0}</value></data>
+  <data name="Open" xml:space="preserve"><value>Open</value></data>
+  <data name="OpenCustoms" xml:space="preserve"><value>Customs &amp; ASYCUDA</value></data>
+  <data name="Opened" xml:space="preserve"><value>Opened</value></data>
+  <data name="OpeningHoursPlaceholder" xml:space="preserve"><value>Sat–Thu 8:00–20:00</value></data>
+  <data name="OpenRequestsNotice" xml:space="preserve"><value>{0} open requests on this order</value></data>
+  <data name="OpenRequestsNotice_One" xml:space="preserve"><value>1 open request on this order</value></data>
+  <data name="OpenRunsheet" xml:space="preserve"><value>Runsheet &amp; ePOD</value></data>
+  <data name="OpenShipment" xml:space="preserve"><value>Open shipment</value></data>
+  <data name="OpenStation" xml:space="preserve"><value>Scan station</value></data>
+  <data name="OpenTruck" xml:space="preserve"><value>Open the truck</value></data>
+  <data name="Optional" xml:space="preserve"><value>(optional)</value></data>
+  <data name="OrderCancelled" xml:space="preserve"><value>Order cancelled</value></data>
+  <data name="OrderCreated" xml:space="preserve"><value>Order created — tracking number {0}</value></data>
+  <data name="OrderUpdated" xml:space="preserve"><value>Order updated</value></data>
+  <data name="OriginHub" xml:space="preserve"><value>Seller's hub</value></data>
+  <data name="OtherLanguage" xml:space="preserve"><value>العربية</value></data>
+  <data name="Pager_Label" xml:space="preserve"><value>Pages</value></data>
+  <data name="Pager_Next" xml:space="preserve"><value>Next page</value></data>
+  <data name="Pager_None" xml:space="preserve"><value>No results</value></data>
+  <data name="Pager_Of" xml:space="preserve"><value>of</value></data>
+  <data name="Pager_Page" xml:space="preserve"><value>Page</value></data>
+  <data name="Pager_PageSize" xml:space="preserve"><value>Rows</value></data>
+  <data name="Pager_Previous" xml:space="preserve"><value>Previous page</value></data>
+  <data name="Pager_Showing" xml:space="preserve"><value>Showing</value></data>
+  <data name="Palette_Actions" xml:space="preserve"><value>Actions</value></data>
+  <data name="Palette_AllResults" xml:space="preserve"><value>Show all {0} results</value></data>
+  <data name="Palette_Error" xml:space="preserve"><value>Shipment and seller search is temporarily unavailable.</value></data>
+  <data name="Palette_Move" xml:space="preserve"><value>move</value></data>
+  <data name="Palette_NoResults" xml:space="preserve"><value>Nothing found</value></data>
+  <data name="Palette_Open" xml:space="preserve"><value>open</value></data>
+  <data name="Palette_Pages" xml:space="preserve"><value>Pages</value></data>
+  <data name="Palette_Placeholder" xml:space="preserve"><value>Tracking no., phone, customer, seller or a page…</value></data>
+  <data name="Palette_ResultCount" xml:space="preserve"><value>{0} search results</value></data>
+  <data name="Palette_Retry" xml:space="preserve"><value>Retry</value></data>
+  <data name="Palette_ScanParcel" xml:space="preserve"><value>Scan a parcel at a hub</value></data>
+  <data name="Palette_Searching" xml:space="preserve"><value>Searching shipments and sellers…</value></data>
+  <data name="Palette_Sellers" xml:space="preserve"><value>Sellers</value></data>
+  <data name="Palette_Shipments" xml:space="preserve"><value>Shipments</value></data>
+  <data name="Palette_Title" xml:space="preserve"><value>Search and commands</value></data>
+  <data name="Palette_TypeMore" xml:space="preserve"><value>Type at least two characters to search shipments and sellers.</value></data>
+  <data name="Parcels" xml:space="preserve"><value>Parcels</value></data>
+  <data name="ParcelsHere" xml:space="preserve"><value>Parcels here</value></data>
+  <data name="ParcelsN" xml:space="preserve"><value>{0} parcels</value></data>
+  <data name="ParcelsN_One" xml:space="preserve"><value>1 parcel</value></data>
+  <data name="ParcelsUnit" xml:space="preserve"><value>parcels</value></data>
+  <data name="ParcelsUnit_One" xml:space="preserve"><value>parcel</value></data>
+  <data name="ParseBatchAction" xml:space="preserve"><value>Parse orders</value></data>
+  <data name="PerformanceDetails" xml:space="preserve"><value>Performance breakdown</value></data>
+  <data name="PerformanceDetailsHint" xml:space="preserve"><value>Compare the sellers, governorates and couriers behind the headline numbers</value></data>
+  <data name="Period" xml:space="preserve"><value>Period</value></data>
+  <data name="Period_30" xml:space="preserve"><value>30 days</value></data>
+  <data name="Period_7" xml:space="preserve"><value>7 days</value></data>
+  <data name="Period_90" xml:space="preserve"><value>90 days</value></data>
+  <data name="Period_Today" xml:space="preserve"><value>Today</value></data>
+  <data name="PhoneHelper" xml:space="preserve"><value>Iraqi mobile, e.g. 0770 123 4567</value></data>
+  <data name="PhoneLast4Hint" xml:space="preserve"><value>So we know it is you</value></data>
+  <data name="Pickup" xml:space="preserve"><value>We pick up</value></data>
+  <data name="PlannedNotLoaded" xml:space="preserve"><value>{0} parcels planned but not scanned</value></data>
+  <data name="PlannedNotLoaded_One" xml:space="preserve"><value>1 parcel planned but not scanned</value></data>
+  <data name="PlannedNotLoadedHint" xml:space="preserve"><value>Scan them onto the truck before it leaves, or they stay at the hub for the next truck.</value></data>
+  <data name="PlannedOnTruckHint" xml:space="preserve"><value>Put it on the truck to {0} ({1}).</value></data>
+  <data name="PlanWaitingParcels" xml:space="preserve"><value>Add every parcel already waiting for this route</value></data>
+  <data name="PointsUnit" xml:space="preserve"><value>pt</value></data>
+  <data name="Price_Breakdown" xml:space="preserve"><value>{0} base</value></data>
+  <data name="Price_DiscountPart" xml:space="preserve"><value>− {0}% seller discount</value></data>
+  <data name="Price_WeightPart" xml:space="preserve"><value>+ {0} weight</value></data>
+  <data name="PricesSaved" xml:space="preserve"><value>Prices saved. New orders use them now.</value></data>
+  <data name="Pricing_Basics" xml:space="preserve"><value>Basics</value></data>
+  <data name="Pricing_ByGovernorate" xml:space="preserve"><value>Price by destination</value></data>
+  <data name="Pricing_ByGovernorateHint" xml:space="preserve"><value>For customers outside the seller's governorate, grouped by the warehouse that delivers.</value></data>
+  <data name="Pricing_Calculator" xml:space="preserve"><value>Price check</value></data>
+  <data name="Pricing_CalculatorHint" xml:space="preserve"><value>See what a parcel will cost before saving.</value></data>
+  <data name="Pricing_Change" xml:space="preserve"><value>vs standard</value></data>
+  <data name="Pricing_Default" xml:space="preserve"><value>Other governorates (default)</value></data>
+  <data name="Pricing_DefaultHint" xml:space="preserve"><value>Used when a governorate has no price of its own.</value></data>
+  <data name="Pricing_Discount" xml:space="preserve"><value>Discount</value></data>
+  <data name="Pricing_ExtraKg" xml:space="preserve"><value>Each extra kilogram</value></data>
+  <data name="Pricing_ExtraKgHint" xml:space="preserve"><value>Added for every started kilogram above the allowance.</value></data>
+  <data name="Pricing_From" xml:space="preserve"><value>Seller in</value></data>
+  <data name="Pricing_IncludedWeight" xml:space="preserve"><value>Weight included</value></data>
+  <data name="Pricing_IncludedWeightHint" xml:space="preserve"><value>Parcels up to this weight pay the base price.</value></data>
+  <data name="Pricing_NoDiscounts" xml:space="preserve"><value>No seller discounts</value></data>
+  <data name="Pricing_NoDiscountsHint" xml:space="preserve"><value>Every seller pays the list price.</value></data>
+  <data name="Pricing_Price" xml:space="preserve"><value>Price</value></data>
+  <data name="Pricing_SameGovernorate" xml:space="preserve"><value>Inside the seller's governorate</value></data>
+  <data name="Pricing_SameGovernorateHint" xml:space="preserve"><value>Customer in the same governorate as the seller.</value></data>
+  <data name="Pricing_Sellers" xml:space="preserve"><value>Seller discounts</value></data>
+  <data name="Pricing_SellersHint" xml:space="preserve"><value>Special prices for big sellers: a percentage off every delivery.</value></data>
+  <data name="Pricing_SetAll" xml:space="preserve"><value>All:</value></data>
+  <data name="Pricing_To" xml:space="preserve"><value>Customer in</value></data>
+  <data name="Pricing_WeightCharge" xml:space="preserve"><value>Extra weight</value></data>
+  <data name="PricingSubtitle" xml:space="preserve"><value>What sellers pay per parcel. New orders are priced from this list automatically.</value></data>
+  <data name="PricingTitle" xml:space="preserve"><value>Delivery prices</value></data>
+  <data name="PrintAwbLabel" xml:space="preserve"><value>Print 4×6" AWB</value></data>
+  <data name="PrintLabelsSubtitle" xml:space="preserve"><value>ISO Code-128 barcodes, hub routing blocks (BGW / BSR / EBL), and COD collection banners for 100×150mm thermal printers</value></data>
+  <data name="PrintLabelsTitle" xml:space="preserve"><value>4×6" Thermal AWB labels &amp; action barcodes</value></data>
+  <data name="PrintManifest" xml:space="preserve"><value>Print manifest</value></data>
+  <data name="PrintNow" xml:space="preserve"><value>Print labels (4×6")</value></data>
+  <data name="PromisedBy" xml:space="preserve"><value>Promised by</value></data>
+  <data name="PublicFooter" xml:space="preserve"><value>Logistico — shipping and delivery across Iraq</value></data>
+  <data name="PublicPage" xml:space="preserve"><value>Customer page</value></data>
+  <data name="QuickDispatchHint" xml:space="preserve"><value>Select a courier and scan or enter a tracking number to hand off the parcel immediately.</value></data>
+  <data name="QuickDispatchTitle" xml:space="preserve"><value>Quick courier dispatch</value></data>
+  <data name="QuickViews" xml:space="preserve"><value>Quick views</value></data>
+  <data name="RatingsN" xml:space="preserve"><value>{0} ratings in this period</value></data>
+  <data name="RatingsN_Few" xml:space="preserve"><value>{0} ratings in this period</value></data>
+  <data name="RatingsN_Many" xml:space="preserve"><value>{0} ratings in this period</value></data>
+  <data name="RatingsN_One" xml:space="preserve"><value>1 rating in this period</value></data>
+  <data name="RatingsN_Two" xml:space="preserve"><value>2 ratings in this period</value></data>
+  <data name="ReadyForCourierHint" xml:space="preserve"><value>Ready for a courier.</value></data>
+  <data name="ReadyForSellers" xml:space="preserve"><value>Ready for sellers</value></data>
+  <data name="Receive" xml:space="preserve"><value>Receive</value></data>
+  <data name="ReceivedByHint" xml:space="preserve"><value>Name of the person collecting for the seller</value></data>
+  <data name="ReceivedByName" xml:space="preserve"><value>Received by</value></data>
+  <data name="RecentOrders" xml:space="preserve"><value>Recent orders</value></data>
+  <data name="RecordedBy" xml:space="preserve"><value>By</value></data>
+  <data name="RecordUpdate" xml:space="preserve"><value>Update status</value></data>
+  <data name="RecordUpdateHint" xml:space="preserve"><value>Only the steps that are possible from the current status are shown.</value></data>
+  <data name="Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Reject" xml:space="preserve"><value>Reject</value></data>
+  <data name="Reload" xml:space="preserve"><value>Reload</value></data>
+  <data name="RemoteScanToast" xml:space="preserve"><value>{0}: {1} — {2}</value></data>
+  <data name="Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="RequestAppliedText" xml:space="preserve"><value>Done — your order has been updated.</value></data>
+  <data name="RequestCreated" xml:space="preserve"><value>Request {0} recorded</value></data>
+  <data name="RequestPendingText" xml:space="preserve"><value>We are handling your request.</value></data>
+  <data name="RequestQueuedText" xml:space="preserve"><value>Our team will handle it shortly and contact you if needed.</value></data>
+  <data name="RequestReceivedTitle" xml:space="preserve"><value>Request {0} received</value></data>
+  <data name="RequestRejected" xml:space="preserve"><value>Request {0} rejected</value></data>
+  <data name="RequestResolved" xml:space="preserve"><value>Request {0} resolved</value></data>
+  <data name="Requests_New" xml:space="preserve"><value>Record a customer request</value></data>
+  <data name="RequestsSearch" xml:space="preserve"><value>Request no., tracking no. or text…</value></data>
+  <data name="RequestsSubtitle" xml:space="preserve"><value>What customers and sellers ask for: new days, addresses, cancellations, returns and complaints.</value></data>
+  <data name="RequestsTitle" xml:space="preserve"><value>Customer requests</value></data>
+  <data name="RescheduledNotice" xml:space="preserve"><value>Next delivery attempt: {0}</value></data>
+  <data name="RescheduleTo" xml:space="preserve"><value>New day: {0}</value></data>
+  <data name="Resolution" xml:space="preserve"><value>Note</value></data>
+  <data name="Resolved" xml:space="preserve"><value>Resolved</value></data>
+  <data name="ResolveWithoutChange" xml:space="preserve"><value>Resolve without change</value></data>
+  <data name="RetiredWarehouses" xml:space="preserve"><value>Retired warehouses</value></data>
+  <data name="RetireHint" xml:space="preserve"><value>A retired warehouse keeps its history. Its governorates go to the nearest active warehouse. It must be empty first.</value></data>
+  <data name="ReturnedNotice" xml:space="preserve"><value>Returned to the seller ({0}) — manifest {1}</value></data>
+  <data name="ReturnedToSellers" xml:space="preserve"><value>Returned</value></data>
+  <data name="ReturningNotice" xml:space="preserve"><value>Going back to the seller ({0}) via {1}</value></data>
+  <data name="ReturnParcel" xml:space="preserve"><value>Return</value></data>
+  <data name="ReturnReasons" xml:space="preserve"><value>Why parcels come back</value></data>
+  <data name="ReturnRules" xml:space="preserve"><value>Return rules</value></data>
+  <data name="ReturnsForSellers" xml:space="preserve"><value>Returns for sellers</value></data>
+  <data name="ReturnsForSellersHint" xml:space="preserve"><value>Waiting to be handed back</value></data>
+  <data name="ReturnsOnTheWay" xml:space="preserve"><value>On the way back</value></data>
+  <data name="ReturnsSubtitle" xml:space="preserve"><value>Parcels going back to sellers: automatic after failed attempts or refusal, handed over against a signed manifest.</value></data>
+  <data name="ReturnStarted" xml:space="preserve"><value>Return started</value></data>
+  <data name="ReturnsTitle" xml:space="preserve"><value>Returns</value></data>
+  <data name="Risk_High" xml:space="preserve"><value>High return risk</value></data>
+  <data name="Risk_HighAdvice" xml:space="preserve"><value>Several earlier orders came back. Confirm the order and the address before collecting, or ask the seller for a deposit.</value></data>
+  <data name="Risk_Low" xml:space="preserve"><value>Reliable</value></data>
+  <data name="Risk_Medium" xml:space="preserve"><value>Some returns</value></data>
+  <data name="Risk_MediumAdvice" xml:space="preserve"><value>Confirm the order by phone before collecting it.</value></data>
+  <data name="Risk_New" xml:space="preserve"><value>New</value></data>
+  <data name="RoleHint_Admin" xml:space="preserve"><value>Everything, including prices, automation rules, warehouses, open data and the team.</value></data>
+  <data name="RoleHint_CustomerSupport" xml:space="preserve"><value>The call desk: confirmation calls, customer requests and messages; reads everything outside finance.</value></data>
+  <data name="RoleHint_Finance" xml:space="preserve"><value>Delivery prices and seller payouts; reads everything else.</value></data>
+  <data name="RoleHint_Operations" xml:space="preserve"><value>The daily work: orders, hub scans, trucks, couriers, returns, customer requests and customs.</value></data>
+  <data name="RoleHint_Viewer" xml:space="preserve"><value>Reads dashboards, lists and insights; changes nothing.</value></data>
+  <data name="Role_Admin" xml:space="preserve"><value>Administrator</value></data>
+  <data name="Role_CustomerSupport" xml:space="preserve"><value>Customer support</value></data>
+  <data name="Role_Finance" xml:space="preserve"><value>Finance</value></data>
+  <data name="Role_Operations" xml:space="preserve"><value>Operations</value></data>
+  <data name="Role_Viewer" xml:space="preserve"><value>Viewer</value></data>
+  <data name="Route" xml:space="preserve"><value>Route</value></data>
+  <data name="RoutingTagHint" xml:space="preserve"><value>3 English letters printed on labels, e.g. KRK. It cannot change later.</value></data>
+  <data name="Rule_AutoCancel" xml:space="preserve"><value>Cancel unconfirmed orders after</value></data>
+  <data name="Rule_AutoCancelHint" xml:space="preserve"><value>0 = never cancel automatically.</value></data>
+  <data name="Rule_AutoRequests" xml:space="preserve"><value>Apply simple customer requests</value></data>
+  <data name="Rule_AutoRequestsHint" xml:space="preserve"><value>New day, new phone, address in the same governorate, cancel before pickup</value></data>
+  <data name="Rule_AutoReschedule" xml:space="preserve"><value>Reschedule failed attempts</value></data>
+  <data name="Rule_AutoRescheduleHint" xml:space="preserve"><value>Try again on the next working day (Fridays skipped)</value></data>
+  <data name="Rule_AutoTrucks" xml:space="preserve"><value>Plan trucks automatically</value></data>
+  <data name="Rule_AutoTrucksHint" xml:space="preserve"><value>Parcels at the wrong hub go on the next truck for their route</value></data>
+  <data name="Rule_ConfirmHours" xml:space="preserve"><value>Alert when not confirmed after</value></data>
+  <data name="Rule_ConfirmHoursHint" xml:space="preserve"><value>Staff are asked to call the customer.</value></data>
+  <data name="Rule_ConfirmMode" xml:space="preserve"><value>Which orders need confirmation</value></data>
+  <data name="Rule_ConfirmModeHint" xml:space="preserve"><value>“Customers with returns” asks only those whose earlier parcels came back.</value></data>
+  <data name="Rule_Courier" xml:space="preserve"><value>With a courier</value></data>
+  <data name="Rule_CourierHint" xml:space="preserve"><value>Alert when a parcel stays with a courier longer than</value></data>
+  <data name="Rule_Dwell" xml:space="preserve"><value>On a shelf</value></data>
+  <data name="Rule_DwellHint" xml:space="preserve"><value>Alert when a parcel waits at a hub longer than</value></data>
+  <data name="Rule_LineHaul" xml:space="preserve"><value>Late truck</value></data>
+  <data name="Rule_LineHaulHint" xml:space="preserve"><value>Extra time on top of the road time before a truck is late</value></data>
+  <data name="Rule_MaxAttempts" xml:space="preserve"><value>Return after failed attempts</value></data>
+  <data name="Rule_MaxAttemptsHint" xml:space="preserve"><value>The parcel goes back to the seller after this many attempts</value></data>
+  <data name="Rule_Notify" xml:space="preserve"><value>Message customers</value></data>
+  <data name="Rule_NotifyHint" xml:space="preserve"><value>Out for delivery, failed attempt, new day, delivered, return</value></data>
+  <data name="Rule_PickupSla" xml:space="preserve"><value>Pickup</value></data>
+  <data name="Rule_PickupSlaHint" xml:space="preserve"><value>Alert when an order is not collected within</value></data>
+  <data name="Rule_RequestSla" xml:space="preserve"><value>Requests</value></data>
+  <data name="Rule_RequestSlaHint" xml:space="preserve"><value>Customer requests should be answered within</value></data>
+  <data name="Rule_ReturnCollection" xml:space="preserve"><value>Return collection</value></data>
+  <data name="Rule_ReturnCollectionHint" xml:space="preserve"><value>Alert when a seller does not collect a return within</value></data>
+  <data name="Rule_ReturnOnRefusal" xml:space="preserve"><value>Return when refused</value></data>
+  <data name="Rule_ReturnOnRefusalHint" xml:space="preserve"><value>A customer refusal starts the return straight away</value></data>
+  <data name="RuleDivisor" xml:space="preserve"><value>Volumetric: L×W×H (cm) ÷ {0}</value></data>
+  <data name="Rules" xml:space="preserve"><value>Rules</value></data>
+  <data name="Rules_Confirmation" xml:space="preserve"><value>Order confirmation</value></data>
+  <data name="Rules_ConfirmationHint" xml:space="preserve"><value>Ask customers to confirm cash-on-delivery orders before pickup</value></data>
+  <data name="Rules_Delivery" xml:space="preserve"><value>Deliveries &amp; customers</value></data>
+  <data name="Rules_Network" xml:space="preserve"><value>Trucks &amp; time limits</value></data>
+  <data name="RuleSea" xml:space="preserve"><value>Sea: weight or measure, 1 m³ = 1,000 kg</value></data>
+  <data name="RulesSaved" xml:space="preserve"><value>Rules saved</value></data>
+  <data name="RunNow" xml:space="preserve"><value>Run now</value></data>
+  <data name="RunsheetEmpty" xml:space="preserve"><value>No parcels with this courier now</value></data>
+  <data name="RunsheetTitle" xml:space="preserve"><value>Driver runsheet &amp; ePOD — {0}</value></data>
+  <data name="SameGovernorate" xml:space="preserve"><value>Same governorate</value></data>
+  <data name="SameSeller" xml:space="preserve"><value>Same seller</value></data>
+  <data name="Sample_Baghdad" xml:space="preserve"><value>Sample: Baghdad DM</value></data>
+  <data name="Sample_Basra" xml:space="preserve"><value>Sample: Basra DM</value></data>
+  <data name="Sample_Erbil" xml:space="preserve"><value>Sample: Erbil DM</value></data>
+  <data name="Save" xml:space="preserve"><value>Save</value></data>
+  <data name="SaveAs" xml:space="preserve"><value>Save as “{0}”</value></data>
+  <data name="SaveChanges" xml:space="preserve"><value>Save changes</value></data>
+  <data name="Saved" xml:space="preserve"><value>Saved</value></data>
+  <data name="SavePrices" xml:space="preserve"><value>Save prices</value></data>
+  <data name="SaveRules" xml:space="preserve"><value>Save rules</value></data>
+  <data name="ScanMode" xml:space="preserve"><value>Scan mode</value></data>
+  <data name="ScanOrType" xml:space="preserve"><value>Scan or type the tracking number, then press Enter</value></data>
+  <data name="ScansN" xml:space="preserve"><value>{0} scans</value></data>
+  <data name="ScansN_One" xml:space="preserve"><value>1 scan</value></data>
+  <data name="ScanToLoad" xml:space="preserve"><value>Scan parcels onto the truck at {0}</value></data>
+  <data name="ScanToUnload" xml:space="preserve"><value>Scan parcels off the truck at {0}</value></data>
+  <data name="Search" xml:space="preserve"><value>Search</value></data>
+  <data name="SearchPlaceholder" xml:space="preserve"><value>Search by tracking no., phone, customer, shop or order no.…</value></data>
+  <data name="Sec_AsycudaHeader" xml:space="preserve"><value>ASYCUDA World declaration</value></data>
+  <data name="Sec_Cargo" xml:space="preserve"><value>Cargo and value</value></data>
+  <data name="Sec_Customer" xml:space="preserve"><value>Customer</value></data>
+  <data name="Sec_Delivery" xml:space="preserve"><value>Delivery</value></data>
+  <data name="Sec_IraqCompliance" xml:space="preserve"><value>Mandatory Iraq e-verification &amp; conformity</value></data>
+  <data name="Sec_Parcel" xml:space="preserve"><value>Parcel</value></data>
+  <data name="Sec_ParcelAndMoney" xml:space="preserve"><value>Parcel and payment</value></data>
+  <data name="Sec_Parties" xml:space="preserve"><value>Shipper and consignee</value></data>
+  <data name="Sec_Payment" xml:space="preserve"><value>Payment</value></data>
+  <data name="Sec_Route" xml:space="preserve"><value>Route and mode</value></data>
+  <data name="Sec_Routing" xml:space="preserve"><value>Route across Iraq</value></data>
+  <data name="Sec_Seller" xml:space="preserve"><value>Seller</value></data>
+  <data name="Sec_Shipper" xml:space="preserve"><value>Shipper</value></data>
+  <data name="Sec_ValuationAndDuties" xml:space="preserve"><value>Valuation &amp; duties (CBI rate 1 USD = 1,310 IQD)</value></data>
+  <data name="SelectedN" xml:space="preserve"><value>{0} selected</value></data>
+  <data name="SellerBalancesSubtitle" xml:space="preserve"><value>Delivered cash-on-delivery orders not yet remitted to the seller</value></data>
+  <data name="SellerBalancesTitle" xml:space="preserve"><value>Seller balances awaiting payout</value></data>
+  <data name="SellerCreated" xml:space="preserve"><value>Seller “{0}” added</value></data>
+  <data name="SellerNotFound" xml:space="preserve"><value>Seller not found</value></data>
+  <data name="SellerReceives" xml:space="preserve"><value>Seller receives</value></data>
+  <data name="SellerSearchPlaceholder" xml:space="preserve"><value>Search by shop name, Instagram handle or phone…</value></data>
+  <data name="SellersSubtitle" xml:space="preserve"><value>Instagram and online shops whose parcels we deliver</value></data>
+  <data name="SellersTitle" xml:space="preserve"><value>Sellers</value></data>
+  <data name="SendRequest" xml:space="preserve"><value>Send request</value></data>
+  <data name="SendWhatsApp" xml:space="preserve"><value>Send to customer</value></data>
+  <data name="ServedBy" xml:space="preserve"><value>Served by {0}</value></data>
+  <data name="SettleDialogTitle" xml:space="preserve"><value>Settle COD payout — {0}</value></data>
+  <data name="SettlementCreated" xml:space="preserve"><value>Settlement {0} recorded — net payout {1}</value></data>
+  <data name="SettlementsHistorySubtitle" xml:space="preserve"><value>Remittance batches paid out to sellers with downloadable CSV statements</value></data>
+  <data name="SettlementsHistoryTitle" xml:space="preserve"><value>Completed seller settlements</value></data>
+  <data name="SettlePayout" xml:space="preserve"><value>Settle payout</value></data>
+  <data name="Shelf" xml:space="preserve"><value>Shelf</value></data>
+  <data name="ShelfCapacityHint" xml:space="preserve"><value>Used to warn before shelves fill up.</value></data>
+  <data name="ShelfHelper" xml:space="preserve"><value>Where the parcel is placed, e.g. A-01-2</value></data>
+  <data name="ShelfSwitched" xml:space="preserve"><value>Shelf set to {0}</value></data>
+  <data name="ShelfUseN" xml:space="preserve"><value>{0} of {1}</value></data>
+  <data name="ShelfUseNoCapacity" xml:space="preserve"><value>Set capacities to see it</value></data>
+  <data name="Shipment" xml:space="preserve"><value>Shipment</value></data>
+  <data name="ShipmentBooked" xml:space="preserve"><value>Shipment booked — tracking number {0}</value></data>
+  <data name="ShipmentNotFound" xml:space="preserve"><value>Shipment not found</value></data>
+  <data name="ShipmentNotFoundHint" xml:space="preserve"><value>It may belong to another company or the link is wrong.</value></data>
+  <data name="ShipmentsSubtitle" xml:space="preserve"><value>Every parcel and shipment, from order to delivery</value></data>
+  <data name="ShipmentsTitle" xml:space="preserve"><value>Shipments</value></data>
+  <data name="Shortcuts_Palette" xml:space="preserve"><value>Search &amp; commands</value></data>
+  <data name="Shortcuts_Scanner" xml:space="preserve"><value>Scan a barcode anywhere to open the parcel</value></data>
+  <data name="Shortcuts_Search" xml:space="preserve"><value>Search</value></data>
+  <data name="Shortcuts_Title" xml:space="preserve"><value>Keyboard shortcuts</value></data>
+  <data name="SignatureHub" xml:space="preserve"><value>Hub staff signature</value></data>
+  <data name="SignatureSeller" xml:space="preserve"><value>Seller signature</value></data>
+  <data name="SignOut" xml:space="preserve"><value>Sign out</value></data>
+  <data name="Skip" xml:space="preserve"><value>Skip</value></data>
+  <data name="SmartPasteAction" xml:space="preserve"><value>Auto-fill form</value></data>
+  <data name="SmartPasteHelper" xml:space="preserve"><value>Supports Arabic &amp; English digits, Iraqi governorates, landmarks and COD (e.g. 45 الف or 45,000)</value></data>
+  <data name="SmartPastePlaceholder" xml:space="preserve"><value>Example: Sara Mohammed - 07701234567 - Baghdad Mansour 14 Ramadan St - near Al-Saa restaurant - Black dress - 45,000</value></data>
+  <data name="SmartPasteSubtitle" xml:space="preserve"><value>Paste the customer message to auto-fill name, Iraqi mobile, governorate, landmark and COD</value></data>
+  <data name="SmartPasteTitle" xml:space="preserve"><value>Smart WhatsApp / Instagram DM paste</value></data>
+  <data name="SoundMuted" xml:space="preserve"><value>Audio muted</value></data>
+  <data name="SoundOn" xml:space="preserve"><value>Scanner &amp; hub audio ON</value></data>
+  <data name="Source_Customs" xml:space="preserve"><value>customs</value></data>
+  <data name="Source_Scan" xml:space="preserve"><value>scan</value></data>
+  <data name="Source_System" xml:space="preserve"><value>system</value></data>
+  <data name="Source_User" xml:space="preserve"><value>manual</value></data>
+  <data name="StaffSignIn" xml:space="preserve"><value>Staff sign in</value></data>
+  <data name="StandardPrices" xml:space="preserve"><value>Standard prices</value></data>
+  <data name="StartReturn" xml:space="preserve"><value>Return to seller</value></data>
+  <data name="StartReturnHint" xml:space="preserve"><value>The parcel travels back to the seller's hub and waits there for hand-over. Cash on delivery is not collected.</value></data>
+  <data name="StatusesN" xml:space="preserve"><value>{0} statuses</value></data>
+  <data name="StatusesN_One" xml:space="preserve"><value>1 status</value></data>
+  <data name="StatusGroup_Delivery" xml:space="preserve"><value>Delivery</value></data>
+  <data name="StatusGroup_International" xml:space="preserve"><value>International</value></data>
+  <data name="StatusGroup_Returns" xml:space="preserve"><value>Returns &amp; cancellations</value></data>
+  <data name="StatusUpdated" xml:space="preserve"><value>{0} is now “{1}”</value></data>
+  <data name="StickyHint" xml:space="preserve"><value>(kept for the next scans)</value></data>
+  <data name="Summary" xml:space="preserve"><value>Summary</value></data>
+  <data name="SwitchLanguage" xml:space="preserve"><value>Switch language</value></data>
+  <data name="Tab_ActionSheet" xml:space="preserve"><value>Warehouse action barcodes</value></data>
+  <data name="Tab_AwbLabels" xml:space="preserve"><value>Shipment AWB labels</value></data>
+  <data name="Tab_QuickCommands" xml:space="preserve"><value>Quick commands</value></data>
+  <data name="TakeRequest" xml:space="preserve"><value>I'll handle it</value></data>
+  <data name="Team_LockedOutUntil" xml:space="preserve"><value>Wrong passwords: locked until {0}</value></data>
+  <data name="Team_PasswordSet" xml:space="preserve"><value>New password set for {0}.</value></data>
+  <data name="Team_SetPassword" xml:space="preserve"><value>Set password</value></data>
+  <data name="Team_SetPasswordHelper" xml:space="preserve"><value>Open sessions of this account end within a minute. Share the new password privately.</value></data>
+  <data name="Team_SetPasswordTitle" xml:space="preserve"><value>New password for {0}</value></data>
+  <data name="TodayAtHub" xml:space="preserve"><value>Today at {0}</value></data>
+  <data name="ToDispatch" xml:space="preserve"><value>Ready for couriers</value></data>
+  <data name="ToDispatchHint" xml:space="preserve"><value>Their customers are in this hub's area</value></data>
+  <data name="ToggleSection" xml:space="preserve"><value>Show or hide</value></data>
+  <data name="ToggleTheme" xml:space="preserve"><value>Dark / light theme</value></data>
+  <data name="TooManyRequests" xml:space="preserve"><value>Too many lookups. Please wait a minute and try again.</value></data>
+  <data name="TopSellers" xml:space="preserve"><value>Top sellers</value></data>
+  <data name="Track" xml:space="preserve"><value>Track</value></data>
+  <data name="Track_ConfirmAction" xml:space="preserve"><value>Yes, send it</value></data>
+  <data name="Track_Confirmed" xml:space="preserve"><value>Thank you! Your order is confirmed and on its way to you soon.</value></data>
+  <data name="Track_ConfirmText" xml:space="preserve"><value>The seller asked us to confirm before we collect your parcel. Enter the last 4 digits of your mobile.</value></data>
+  <data name="Track_ConfirmTitle" xml:space="preserve"><value>Please confirm your order</value></data>
+  <data name="Track_DeclineAction" xml:space="preserve"><value>Cancel my order</value></data>
+  <data name="Track_Declined" xml:space="preserve"><value>Your order was cancelled. Nothing will be delivered.</value></data>
+  <data name="Track_RateComment" xml:space="preserve"><value>Anything else you would like us to know? (optional)</value></data>
+  <data name="Track_RateCommentLow" xml:space="preserve"><value>What went wrong? We will ask customer care to call you.</value></data>
+  <data name="Track_Rated" xml:space="preserve"><value>Thank you for rating your delivery.</value></data>
+  <data name="Track_RatedLow" xml:space="preserve"><value>Thank you. Customer care will review this and contact you.</value></data>
+  <data name="Track_RateSend" xml:space="preserve"><value>Send rating</value></data>
+  <data name="Track_RateTitle" xml:space="preserve"><value>How was your delivery?</value></data>
+  <data name="Track_WrongDigits" xml:space="preserve"><value>These digits do not match the mobile number on the order.</value></data>
+  <data name="TrackingNotFound" xml:space="preserve"><value>No shipment found with that tracking number.</value></data>
+  <data name="TrackIntro" xml:space="preserve"><value>Enter the tracking number from your message or receipt.</value></data>
+  <data name="TrackTitle" xml:space="preserve"><value>Track your parcel</value></data>
+  <data name="Transfers_New" xml:space="preserve"><value>Open a truck</value></data>
+  <data name="TransfersSearch" xml:space="preserve"><value>Truck no., plate, driver or tracking no.…</value></data>
+  <data name="TransfersSubtitle" xml:space="preserve"><value>Line-haul trucks between hubs. Parcels are planned automatically; scan them on and off.</value></data>
+  <data name="TransfersTitle" xml:space="preserve"><value>Trucks between hubs</value></data>
+  <data name="Trend_Booked" xml:space="preserve"><value>New orders</value></data>
+  <data name="Trend_Delivered" xml:space="preserve"><value>Delivered</value></data>
+  <data name="Trend_Failed" xml:space="preserve"><value>Failed attempts</value></data>
+  <data name="Trend_Returned" xml:space="preserve"><value>Returns</value></data>
+  <data name="TruckAuto" xml:space="preserve"><value>Automatic — the truck for the parcel's destination</value></data>
+  <data name="TruckDeparted" xml:space="preserve"><value>{0} is on the road</value></data>
+  <data name="TruckDetails" xml:space="preserve"><value>Truck</value></data>
+  <data name="TruckNotFound" xml:space="preserve"><value>Truck not found</value></data>
+  <data name="TruckOpened" xml:space="preserve"><value>{0} is loading</value></data>
+  <data name="TrucksOnRoad" xml:space="preserve"><value>Routes</value></data>
+  <data name="UncoveredHint" xml:space="preserve"><value>Their parcels go to the nearest warehouse: {0}. Add coverage to route them deliberately.</value></data>
+  <data name="UncoveredTitle" xml:space="preserve"><value>Some governorates have no warehouse</value></data>
+  <data name="UnhandledError" xml:space="preserve"><value>Something went wrong.</value></data>
+  <data name="ServiceUnavailable" xml:space="preserve"><value>We cannot reach the service right now. Check your connection and try again.</value></data>
+  <data name="StarsN" xml:space="preserve"><value>{0} stars</value></data>
+  <data name="StarsN_One" xml:space="preserve"><value>1 star</value></data>
+  <data name="Unit_Days" xml:space="preserve"><value>days</value></data>
+  <data name="Unit_Hours" xml:space="preserve"><value>h</value></data>
+  <data name="Unload" xml:space="preserve"><value>Unload</value></data>
+  <data name="UnloadedOfOnBoard" xml:space="preserve"><value>{0} of {1} unloaded</value></data>
+  <data name="UpdatedByAt" xml:space="preserve"><value>Last changed by {0} · {1}</value></data>
+  <data name="UseGovernorateCentre" xml:space="preserve"><value>Governorate centre</value></data>
+  <data name="ValidOrders" xml:space="preserve"><value>Ready to book</value></data>
+  <data name="View" xml:space="preserve"><value>View</value></data>
+  <data name="View_CustomsHold" xml:space="preserve"><value>Customs hold</value></data>
+  <data name="View_Failed" xml:space="preserve"><value>Failed attempts</value></data>
+  <data name="View_InWarehouse" xml:space="preserve"><value>On shelves</value></data>
+  <data name="View_Kanban" xml:space="preserve"><value>Pipeline board</value></data>
+  <data name="View_Late" xml:space="preserve"><value>Late</value></data>
+  <data name="View_NeedsTruck" xml:space="preserve"><value>Need a truck</value></data>
+  <data name="View_PickupPending" xml:space="preserve"><value>Waiting for pickup</value></data>
+  <data name="View_Returns" xml:space="preserve"><value>Returns</value></data>
+  <data name="View_Table" xml:space="preserve"><value>Table</value></data>
+  <data name="View_WithCourier" xml:space="preserve"><value>With couriers</value></data>
+  <data name="ViewAll" xml:space="preserve"><value>View all</value></data>
+  <data name="VsPrevious" xml:space="preserve"><value>vs previous period</value></data>
+  <data name="VsPreviousPeriod" xml:space="preserve"><value>Compared with the same number of days before</value></data>
+  <data name="WaitingForTruck" xml:space="preserve"><value>Waiting for a truck</value></data>
+  <data name="WaitingForTruckHint" xml:space="preserve"><value>They must travel to another hub</value></data>
+  <data name="WaitingSince" xml:space="preserve"><value>Oldest arrived {0}</value></data>
+  <data name="WarehouseActive" xml:space="preserve"><value>Warehouse is active</value></data>
+  <data name="WarehouseAddressPlaceholder" xml:space="preserve"><value>Area, street, nearest landmark</value></data>
+  <data name="WarehouseCoverage" xml:space="preserve"><value>Governorates it serves</value></data>
+  <data name="WarehouseCreatedN" xml:space="preserve"><value>{0} was added</value></data>
+  <data name="WarehouseEmpty" xml:space="preserve"><value>The warehouse is empty</value></data>
+  <data name="WarehouseIdentity" xml:space="preserve"><value>Identity</value></data>
+  <data name="WarehouseLocation" xml:space="preserve"><value>Location</value></data>
+  <data name="WarehouseMain" xml:space="preserve"><value>Main warehouse (takes parcels that match no other)</value></data>
+  <data name="WarehouseOperations" xml:space="preserve"><value>Operations</value></data>
+  <data name="WarehouseSavedN" xml:space="preserve"><value>{0} was saved</value></data>
+  <data name="WarehousesSubtitle" xml:space="preserve"><value>Your sorting hubs, branches and stores across Iraq, which governorates each one serves, and how busy they are now.</value></data>
+  <data name="WarehousesTitle" xml:space="preserve"><value>Warehouses &amp; branches</value></data>
+  <data name="WarehouseSubtitle" xml:space="preserve"><value>Scan parcels in, onto trucks and out to couriers. Pick your hub first.</value></data>
+  <data name="WarehouseTitle" xml:space="preserve"><value>Hub station</value></data>
+  <data name="WeTriedToDeliver" xml:space="preserve"><value>We tried to deliver your parcel</value></data>
+  <data name="WeWillTryAgain" xml:space="preserve"><value>Our courier will contact you to arrange a new time.</value></data>
+  <data name="WhatsAppMessage" xml:space="preserve"><value>Hello {0}, your order from {1} is on its way with Logistico. Tracking number: {2}. Track it here: {3}</value></data>
+  <data name="WhereNow" xml:space="preserve"><value>Where it is now</value></data>
+  <data name="WithCourier" xml:space="preserve"><value>With {0}</value></data>
+  <data name="Nav_IntelligenceSection" xml:space="preserve"><value>Intelligence</value></data>
+  <data name="Nav_Insights" xml:space="preserve"><value>Demand intelligence</value></data>
+  <data name="Insights_Title" xml:space="preserve"><value>Iraq demand intelligence</value></data>
+  <data name="Insights_Subtitle" xml:space="preserve"><value>What customers across Iraq order, where and when, and how those orders end</value></data>
+  <data name="Period_365" xml:space="preserve"><value>12 months</value></data>
+  <data name="Insights_OpenData" xml:space="preserve"><value>Open data (CSV)</value></data>
+  <data name="Insights_OpenDataHint" xml:space="preserve"><value>Anonymised totals you can publish: no names, phones or addresses, and groups under 10 orders are left out.</value></data>
+  <data name="Insights_NoData" xml:space="preserve"><value>No domestic orders in this period</value></data>
+  <data name="Insights_NoDataHint" xml:space="preserve"><value>Choose a longer period, or book delivery orders to start learning what your customers want.</value></data>
+  <data name="Insights_Orders" xml:space="preserve"><value>Orders</value></data>
+  <data name="Insights_AvgBasket" xml:space="preserve"><value>Average basket</value></data>
+  <data name="Insights_AvgBasketHint" xml:space="preserve"><value>Cash on delivery per order</value></data>
+  <data name="Insights_Customers" xml:space="preserve"><value>Customers</value></data>
+  <data name="Insights_CustomersHint" xml:space="preserve"><value>Different mobile numbers</value></data>
+  <data name="Insights_RepeatShare" xml:space="preserve"><value>Orders from repeat customers</value></data>
+  <data name="Insights_RepeatHint" xml:space="preserve"><value>Customers who ordered twice or more: {0}</value></data>
+  <data name="Insights_Findings" xml:space="preserve"><value>Key findings</value></data>
+  <data name="Insights_FindingsHint" xml:space="preserve"><value>Worked out automatically from this period's orders</value></data>
+  <data name="Finding_None" xml:space="preserve"><value>Not enough orders in this period for findings yet.</value></data>
+  <data name="Finding_TopCategory" xml:space="preserve"><value>{0} is what customers order most: {1} of all orders.</value></data>
+  <data name="Finding_Growth" xml:space="preserve"><value>Orders to {0} grew {1} compared with the previous period.</value></data>
+  <data name="Finding_WeakGovernorate" xml:space="preserve"><value>{0} has the lowest delivery success ({1}). The most common failure there: {2}.</value></data>
+  <data name="Finding_WeakGovernorateNoReason" xml:space="preserve"><value>{0} has the lowest delivery success ({1}).</value></data>
+  <data name="Finding_BasketRisk" xml:space="preserve"><value>Orders of {0} come back {1}× as often as average ({2} against {3}). Confirm them with the customer before pickup.</value></data>
+  <data name="Finding_RiskyCategory" xml:space="preserve"><value>{0} has the highest return rate ({1}).</value></data>
+  <data name="Finding_PeakTime" xml:space="preserve"><value>Customers order most on {0} around {1}. Plan confirmation calls and pickups for the next morning.</value></data>
+  <data name="Finding_Loyalty" xml:space="preserve"><value>Repeat customers place {0} of orders, and {1} of their orders are delivered against {2} for first-time customers.</value></data>
+  <data name="Insights_DemandMap" xml:space="preserve"><value>Demand across Iraq</value></data>
+  <data name="Insights_DemandMapHint" xml:space="preserve"><value>By the customer's governorate · click one for details</value></data>
+  <data name="Measure_Orders" xml:space="preserve"><value>Orders</value></data>
+  <data name="Measure_Success" xml:space="preserve"><value>Success</value></data>
+  <data name="Measure_Basket" xml:space="preserve"><value>Basket</value></data>
+  <data name="Measure_Hours" xml:space="preserve"><value>Delivery time</value></data>
+  <data name="Map_Better" xml:space="preserve"><value>better</value></data>
+  <data name="Map_Worse" xml:space="preserve"><value>worse</value></data>
+  <data name="Insights_Governorates" xml:space="preserve"><value>Governorates</value></data>
+  <data name="Insights_Previous" xml:space="preserve"><value>previous period</value></data>
+  <data name="ViewOrders" xml:space="preserve"><value>View orders</value></data>
+  <data name="Col_Growth" xml:space="preserve"><value>Growth</value></data>
+  <data name="Col_AvgBasket" xml:space="preserve"><value>Avg basket</value></data>
+  <data name="Col_TopCategory" xml:space="preserve"><value>Top category</value></data>
+  <data name="Col_TopFailure" xml:space="preserve"><value>Main failure reason</value></data>
+  <data name="Col_Category" xml:space="preserve"><value>Category</value></data>
+  <data name="Col_ReturnRate" xml:space="preserve"><value>Returns</value></data>
+  <data name="Col_RefusalRate" xml:space="preserve"><value>Refused</value></data>
+  <data name="Col_TradeLane" xml:space="preserve"><value>Lane</value></data>
+  <data name="Insights_Categories" xml:space="preserve"><value>What customers buy</value></data>
+  <data name="Insights_CategoriesHint" xml:space="preserve"><value>Recognised from the item descriptions on orders</value></data>
+  <data name="Insights_OrderTimes" xml:space="preserve"><value>When Iraq orders</value></data>
+  <data name="Insights_OrderTimesHint" xml:space="preserve"><value>Orders by weekday and hour, Baghdad time</value></data>
+  <data name="Insights_Baskets" xml:space="preserve"><value>Basket size and refusals</value></data>
+  <data name="Insights_BasketsHint" xml:space="preserve"><value>Cash on delivery per order, and how often each size comes back</value></data>
+  <data name="Basket_NoCod" xml:space="preserve"><value>Prepaid (no cash on delivery)</value></data>
+  <data name="Basket_Under" xml:space="preserve"><value>Under {0}</value></data>
+  <data name="Basket_Between" xml:space="preserve"><value>{0} – {1}</value></data>
+  <data name="Basket_Over" xml:space="preserve"><value>{0} or more</value></data>
+  <data name="Insights_Lanes" xml:space="preserve"><value>Busiest trade lanes</value></data>
+  <data name="Insights_LanesHint" xml:space="preserve"><value>Seller's governorate → customer's governorate</value></data>
+  <data name="Insights_SameCity" xml:space="preserve"><value>same governorate</value></data>
+  <data name="Insights_Terms" xml:space="preserve"><value>Most requested products</value></data>
+  <data name="Insights_TermsHint" xml:space="preserve"><value>The words orders mention most, by number of orders</value></data>
+  <data name="Insights_Loyalty" xml:space="preserve"><value>First-time and repeat customers</value></data>
+  <data name="Insights_LoyaltyHint" xml:space="preserve"><value>Customers who ordered twice or more in the period, against everyone else</value></data>
+  <data name="Loyalty_FirstTime" xml:space="preserve"><value>One order</value></data>
+  <data name="Loyalty_Repeat" xml:space="preserve"><value>Repeat customers</value></data>
+  <data name="Insights_DataNote" xml:space="preserve"><value>Domestic orders booked in the period, cancelled ones excluded. Customers are counted by mobile number; categories are recognised automatically from Arabic and English item descriptions. Success = delivered ÷ (delivered + returned).</value></data>
+  <data name="OrdersN" xml:space="preserve"><value>{0} orders</value></data>
+  <data name="OrdersN_One" xml:space="preserve"><value>1 order</value></data>
+  <data name="Role_None" xml:space="preserve"><value>No access yet</value></data>
+  <data name="NoAccess_Title" xml:space="preserve"><value>Not available for your role</value></data>
+  <data name="NoAccess_Text" xml:space="preserve"><value>Your role ({0}) cannot open this page. Ask an administrator of your company if you need it.</value></data>
+  <data name="NoAccess_WaitingTitle" xml:space="preserve"><value>Waiting for access</value></data>
+  <data name="NoAccess_WaitingText" xml:space="preserve"><value>You are signed in, but your account has no role yet. An administrator of your company gives you one under Team &amp; access; then reload this page.</value></data>
+  <data name="Team_Subtitle" xml:space="preserve"><value>Who can sign in to your company's Logistico and what each role may do. The server enforces every rule.</value></data>
+  <data name="Team_Add" xml:space="preserve"><value>Add member</value></data>
+  <data name="Team_Members" xml:space="preserve"><value>Members with a role</value></data>
+  <data name="Team_Member" xml:space="preserve"><value>Member</value></data>
+  <data name="Team_Empty" xml:space="preserve"><value>Nobody here yet</value></data>
+  <data name="Team_TwoFactor" xml:space="preserve"><value>Two-step sign-in</value></data>
+  <data name="Team_On" xml:space="preserve"><value>On</value></data>
+  <data name="Team_Off" xml:space="preserve"><value>Off</value></data>
+  <data name="Team_Locked" xml:space="preserve"><value>Locked</value></data>
+  <data name="Team_You" xml:space="preserve"><value>You</value></data>
+  <data name="Team_SelfHint" xml:space="preserve"><value>You cannot change your own role or lock yourself; another administrator can.</value></data>
+  <data name="Team_RoleOf" xml:space="preserve"><value>Role of {0}</value></data>
+  <data name="Team_Lock" xml:space="preserve"><value>Lock</value></data>
+  <data name="Team_Unlock" xml:space="preserve"><value>Unlock</value></data>
+  <data name="Team_LockTitle" xml:space="preserve"><value>Lock this account?</value></data>
+  <data name="Team_LockMessage" xml:space="preserve"><value>{0} will not be able to sign in. Sessions already open end within a minute.</value></data>
+  <data name="Team_LockedToast" xml:space="preserve"><value>{0} is locked</value></data>
+  <data name="Team_UnlockedToast" xml:space="preserve"><value>{0} can sign in again</value></data>
+  <data name="Team_RemoveTitle" xml:space="preserve"><value>Take away access?</value></data>
+  <data name="Team_RemoveMessage" xml:space="preserve"><value>{0} will keep the account but see no company data until someone gives them a role again.</value></data>
+  <data name="Team_RemoveConfirm" xml:space="preserve"><value>Take away access</value></data>
+  <data name="Team_RoleChanged" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Team_Added" xml:space="preserve"><value>{0} can now sign in. Share the first password privately.</value></data>
+  <data name="Team_Matrix" xml:space="preserve"><value>What each role can do</value></data>
+  <data name="Team_MatrixHint" xml:space="preserve"><value>Pages and buttons a role cannot use are hidden, and the API refuses them too.</value></data>
+  <data name="Team_Capability" xml:space="preserve"><value>Capability</value></data>
+  <data name="Capability_Read" xml:space="preserve"><value>See dashboards, parcels, maps and insights</value></data>
+  <data name="Capability_Operate" xml:space="preserve"><value>Book and edit orders, scan at hubs, trucks, couriers and returns</value></data>
+  <data name="Capability_Export" xml:space="preserve"><value>Download customer lists (CSV)</value></data>
+  <data name="Capability_Finance" xml:space="preserve"><value>Delivery prices and seller payouts</value></data>
+  <data name="Capability_Administer" xml:space="preserve"><value>Automation rules, warehouses, open data and the team</value></data>
+  <data name="Field_Role" xml:space="preserve"><value>Role</value></data>
+  <data name="FirstPasswordHelper" xml:space="preserve"><value>At least 10 characters with upper and lower case, a digit and a symbol. They change it under My account after signing in.</value></data>
+  <data name="Generate" xml:space="preserve"><value>Generate</value></data>
+  <data name="Yes" xml:space="preserve"><value>Yes</value></data>
+  <data name="No" xml:space="preserve"><value>No</value></data>
+  <data name="ViewOnly" xml:space="preserve"><value>View only. {0} can change this.</value></data>
+  <data name="ListSeparator" xml:space="preserve"><value>, </value></data>
+  <data name="ListAnd" xml:space="preserve"><value> and </value></data>
+  <data name="Track_HelpNumberTitle" xml:space="preserve"><value>Where is my number?</value></data>
+  <data name="Track_HelpNumberText" xml:space="preserve"><value>In the SMS or WhatsApp message about your order, and on the parcel's label. It starts with LX.</value></data>
+  <data name="Track_HelpChangeTitle" xml:space="preserve"><value>Change it yourself</value></data>
+  <data name="Track_HelpChangeText" xml:space="preserve"><value>Pick another day, a new address or another phone. You confirm with the last 4 digits of your phone number.</value></data>
+  <data name="Track_HelpConfirmTitle" xml:space="preserve"><value>Confirm and rate</value></data>
+  <data name="Track_HelpConfirmText" xml:space="preserve"><value>Confirm your order before it ships, and tell us how the delivery went.</value></data>
+</root>

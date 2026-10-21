@@ -1,0 +1,284 @@
+@* Side panel to add or edit a warehouse: identity, location (click the map), contact, capacity, coverage and status. *@
+@inject OperationsApi Operations
+@inject Confirmer Confirm
+@inject Toaster Toaster
+
+<Drawer IsOpen="IsOpen" IsOpenChanged="IsOpenChanged" Title="@(Existing is null ? L["AddWarehouse"] : string.Format(CultureInfo.CurrentCulture, L["EditWarehouseN"], Existing.Name))"
+        Icon="office" Width="760px">
+    <ChildContent>
+        <EditForm Model="model" OnValidSubmit="SaveAsync" Context="form" id="warehouse-form">
+            <DataAnnotationsValidator />
+            <EditableBy Policy="@StaffPolicies.Administer">
+                <ServerErrors @ref="serverErrors" />
+
+                <h4 class="lx-form-section">@L["WarehouseIdentity"]</h4>
+                <div class="lx-form-grid lx-form-grid-3">
+                    <FormField Label="@L["Field_RoutingTag"]" Required="true" Helper="@L["RoutingTagHint"]" Field="() => model.RoutingTag">
+                        <InputText class="bp6-input bp6-fill lx-mono lx-upper" @bind-Value="model.RoutingTag" maxlength="3" dir="ltr" placeholder="KRK"
+                                   disabled="@(Existing is not null)" autocomplete="off" />
+                    </FormField>
+                    <FormField Label="@L["Field_NameAr"]" Required="true" Field="() => model.NameAr">
+                        <InputText class="bp6-input bp6-fill" @bind-Value="model.NameAr" dir="rtl" placeholder="فرع كركوك" />
+                    </FormField>
+                    <FormField Label="@L["Field_NameEn"]" Required="true" Field="() => model.NameEn">
+                        <InputText class="bp6-input bp6-fill" @bind-Value="model.NameEn" dir="ltr" placeholder="Kirkuk Branch" />
+                    </FormField>
+                </div>
+                <FormField TValue="string" Label="@L["Field_Kind"]">
+                    <SegmentedControl TValue="HubKind" Options="KindOptions" Value="model.Kind" ValueChanged="@(v => model.Kind = v)" Label="@L["Field_Kind"]" Fill="true" />
+                </FormField>
+
+                <h4 class="lx-form-section">@L["WarehouseLocation"]</h4>
+                <div class="lx-editor-map-layout">
+                    <div>
+                        <FormField Label="@L["Field_Governorate"]" Required="true" Field="() => model.Governorate">
+                            <span class="bp6-html-select bp6-fill">
+                                <InputSelect @bind-Value="model.Governorate" @bind-Value:after="GovernorateChanged">
+                                    <option value="">@L["ChooseGovernorate"]</option>
+                                    @foreach (var g in IraqGovernorates.All.OrderBy(g => g.Name, StringComparer.CurrentCulture))
+                                    {
+                                        <option value="@g.Code">@g.Name</option>
+                                    }
+                                </InputSelect>
+                                <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                            </span>
+                        </FormField>
+                        <FormField Label="@L["Field_Address"]" Hint="@L["Optional"]" Field="() => model.Address">
+                            <InputTextArea class="bp6-input bp6-fill" rows="2" @bind-Value="model.Address" placeholder="@L["WarehouseAddressPlaceholder"]" />
+                        </FormField>
+                        <FormField Label="@L["Field_Location"]" Helper="@L["LocationHint"]" Field="() => model.Latitude">
+                            <div class="lx-row">
+                                <Tag Icon="map-marker" Minimal="true"><bdi dir="ltr">@Coordinates</bdi></Tag>
+                                <Button Small="true" Minimal="true" Icon="locate" Text="@L["UseGovernorateCentre"]" OnClick="UseCentre" Disabled="@string.IsNullOrEmpty(model.Governorate)" />
+                            </div>
+                        </FormField>
+                    </div>
+                    <div class="lx-editor-map">
+                        <CoverageMap Hubs="PreviewHubs" Editing="@PreviewCode" Pin="Pin" OnPick="Pick" Compact="true" />
+                    </div>
+                </div>
+
+                <h4 class="lx-form-section">@L["WarehouseCoverage"]</h4>
+                <p class="bp6-text-muted lx-small" style="margin-top:0">@L["CoverageHint"]</p>
+                <div class="lx-chip-grid" role="group" aria-label="@L["WarehouseCoverage"]">
+                    @foreach (var g in IraqGovernorates.All.OrderBy(g => g.Name, StringComparer.CurrentCulture))
+                    {
+                        var on = model.Covers.Contains(g.Code);
+                        var owner = OwnerOf(g.Code);
+                        <button type="button" class="@Bp.Cls("lx-chip", Bp.When(on, "lx-chip-on"), Bp.When(on && owner is not null, "lx-chip-moving"))"
+                                aria-pressed="@(on ? "true" : "false")" @onclick="@(() => Toggle(g.Code))"
+                                title="@(owner is null ? L["NotCovered"].Value : string.Format(CultureInfo.CurrentCulture, L["CoveredByN"], owner.DisplayLabel))">
+                            <Icon Name="@(on ? "tick" : "small-plus")" />
+                            <span>@g.Name</span>
+                            @if (owner is not null)
+                            {
+                                <span class="lx-chip-count"><bdi>@owner.RoutingTag</bdi></span>
+                            }
+                        </button>
+                    }
+                </div>
+                @if (Moves.Count > 0)
+                {
+                    <Callout Intent="Intent.Warning" Icon="swap-horizontal" CssClass="lx-mt">
+                        @string.Format(CultureInfo.CurrentCulture, L["CoverageMovesN"], string.Join("، ", Moves.Select(m => $"{IraqGovernorates.NameOrCode(m.Governorate)} ← {m.From.RoutingTag}")))
+                    </Callout>
+                }
+
+                <h4 class="lx-form-section">@L["WarehouseOperations"]</h4>
+                <div class="lx-form-grid lx-form-grid-3">
+                    <FormField Label="@L["Field_Manager"]" Hint="@L["Optional"]" Field="() => model.ManagerName">
+                        <InputText class="bp6-input bp6-fill" @bind-Value="model.ManagerName" />
+                    </FormField>
+                    <FormField Label="@L["Field_Phone"]" Hint="@L["Optional"]" Field="() => model.Phone">
+                        <InputText class="bp6-input bp6-fill" @bind-Value="model.Phone" type="tel" dir="ltr" placeholder="0770 123 4567" />
+                    </FormField>
+                    <FormField Label="@L["Field_OpeningHours"]" Hint="@L["Optional"]" Field="() => model.OpeningHours">
+                        <InputText class="bp6-input bp6-fill" @bind-Value="model.OpeningHours" placeholder="@L["OpeningHoursPlaceholder"]" />
+                    </FormField>
+                    <FormField Label="@L["Field_ShelfCapacity"]" Hint="@L["Optional"]" Helper="@L["ShelfCapacityHint"]" Field="() => model.ShelfCapacity">
+                        <InputNumber class="bp6-input bp6-fill" @bind-Value="model.ShelfCapacity" min="0" dir="ltr" />
+                    </FormField>
+                    <FormField Label="@L["Field_Notes"]" Hint="@L["Optional"]" Field="() => model.Notes" CssClass="lx-span-2">
+                        <InputText class="bp6-input bp6-fill" @bind-Value="model.Notes" />
+                    </FormField>
+                </div>
+                <div class="lx-stack" style="gap:6px">
+                    <Switch Value="model.IsActive" ValueChanged="@(v => model.IsActive = v)" Label="@L["WarehouseActive"]" Disabled="@(Existing?.IsPrimary == true)" />
+                    <Switch Value="model.IsPrimary" ValueChanged="@(v => { model.IsPrimary = v; if (v) { model.IsActive = true; } })" Label="@L["WarehouseMain"]"
+                            Disabled="@(Existing?.IsPrimary == true)" />
+                    @if (!model.IsActive && Existing?.IsActive == true)
+                    {
+                        <Callout Intent="Intent.Warning" Icon="warning-sign">@L["RetireHint"]</Callout>
+                    }
+                </div>
+
+                @if (error is not null)
+                {
+                    <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mt">@error</Callout>
+                }
+            </EditableBy>
+        </EditForm>
+    </ChildContent>
+    <Footer>
+        @if (Existing is not null)
+        {
+            <span class="bp6-text-muted lx-small">@string.Format(CultureInfo.CurrentCulture, L["UpdatedByAt"], Existing.UpdatedBy ?? "—", Fmt.DateTime(Existing.UpdatedAt))</span>
+        }
+        <span class="lx-spacer"></span>
+        <Button Text="@L["Cancel"]" OnClick="@(() => IsOpenChanged.InvokeAsync(false))" />
+        <Allowed Policy="@StaffPolicies.Administer">
+            <Button Type="submit" Intent="Intent.Primary" Icon="tick" Text="@L["Save"]" Loading="saving" Attributes="@(new Dictionary<string, object> { ["form"] = "warehouse-form" })" />
+        </Allowed>
+    </Footer>
+</Drawer>
+
+@code {
+    private WarehouseRequest model = new();
+    private ServerErrors? serverErrors;
+    private string? error;
+    private bool saving;
+    private Guid? loadedFor;
+
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+
+    /// <summary>The warehouse to edit; null to add one.</summary>
+    [Parameter] public WarehouseDetails? Existing { get; set; }
+
+    /// <summary>All warehouses (for coverage owners and the map).</summary>
+    [Parameter] public IReadOnlyList<WarehouseDetails> All { get; set; } = [];
+
+    [Parameter] public EventCallback<WarehouseDetails> OnSaved { get; set; }
+
+    private IReadOnlyList<SegmentOption<HubKind>> KindOptions =>
+        [new(HubKind.SortingHub, ShipmentTexts.Of(HubKind.SortingHub), "office"), new(HubKind.Branch, ShipmentTexts.Of(HubKind.Branch), "shop"), new(HubKind.Fulfilment, ShipmentTexts.Of(HubKind.Fulfilment), "box")];
+
+    private string PreviewCode => IraqHubs.CodeFor(string.IsNullOrWhiteSpace(model.RoutingTag) ? "NEW" : model.RoutingTag);
+
+    private (double Latitude, double Longitude)? Pin => model.Latitude > 0 ? (model.Latitude, model.Longitude) : null;
+
+    private string Coordinates => model.Latitude > 0
+        ? string.Create(CultureInfo.InvariantCulture, $"{model.Latitude:0.0000}, {model.Longitude:0.0000}")
+        : "—";
+
+    /// <summary>The network as it would look after saving: this warehouse with its new coverage, the others without what it takes.</summary>
+    private IReadOnlyList<HubInfo> PreviewHubs
+    {
+        get
+        {
+            var mine = new HubInfo(PreviewCode, model.RoutingTag.ToUpperInvariant(), model.Governorate, model.NameAr, model.NameEn)
+            {
+                Kind = model.Kind, Latitude = model.Latitude, Longitude = model.Longitude, Covers = model.IsActive ? [.. model.Covers] : [],
+            };
+            var others = All.Where(w => w.IsActive && w.Id != Existing?.Id)
+                .Select(w => new HubInfo(w.Code, w.RoutingTag, w.Governorate, w.NameAr, w.NameEn)
+                {
+                    Kind = w.Kind, Latitude = w.Latitude, Longitude = w.Longitude, Covers = [.. w.Covers.Where(c => !model.Covers.Contains(c))],
+                });
+            return [.. others, mine];
+        }
+    }
+
+    private List<(string Governorate, WarehouseDetails From)> Moves =>
+        model.Covers.Select(g => (Governorate: g, From: OwnerOf(g))).Where(m => m.From is not null).Select(m => (m.Governorate, m.From!)).ToList();
+
+    protected override void OnParametersSet()
+    {
+        if (!IsOpen)
+        {
+            loadedFor = null;
+            return;
+        }
+
+        var key = Existing?.Id ?? Guid.Empty;
+        if (loadedFor == key)
+        {
+            return;
+        }
+
+        loadedFor = key;
+        error = null;
+        model = Existing is null ? new WarehouseRequest { Kind = HubKind.Branch, IsActive = true } : WarehouseRequest.From(Existing);
+    }
+
+    private WarehouseDetails? OwnerOf(string governorate) =>
+        All.FirstOrDefault(w => w.IsActive && w.Id != Existing?.Id && w.Covers.Contains(governorate, StringComparer.OrdinalIgnoreCase));
+
+    private void Toggle(string governorate)
+    {
+        if (!model.Covers.Remove(governorate))
+        {
+            model.Covers.Add(governorate);
+        }
+    }
+
+    private void GovernorateChanged()
+    {
+        if (model.Latitude <= 0)
+        {
+            UseCentre();
+        }
+
+        // A new warehouse usually serves its own governorate.
+        if (Existing is null && !string.IsNullOrEmpty(model.Governorate) && model.Covers.Count == 0)
+        {
+            model.Covers.Add(model.Governorate);
+        }
+    }
+
+    private void UseCentre()
+    {
+        if (IraqGovernorates.Find(model.Governorate) is { } g)
+        {
+            model.Latitude = g.Latitude;
+            model.Longitude = g.Longitude;
+        }
+    }
+
+    private void Pick((double Latitude, double Longitude, string? Governorate) point)
+    {
+        model.Latitude = point.Latitude;
+        model.Longitude = point.Longitude;
+        if (string.IsNullOrEmpty(model.Governorate) && point.Governorate is { } g)
+        {
+            model.Governorate = g;
+            GovernorateChanged();
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        error = null;
+        var moves = Moves;
+        if (moves.Count > 0)
+        {
+            var names = string.Join("، ", moves.Select(m => $"{IraqGovernorates.NameOrCode(m.Governorate)} ({m.From.RoutingTag})"));
+            if (!await Confirm.AskAsync(L["MoveCoverageTitle"], string.Format(CultureInfo.CurrentCulture, L["MoveCoverageMessage"], names), L["MoveCoverageConfirm"], Intent.Warning, "swap-horizontal"))
+            {
+                return;
+            }
+        }
+
+        model.TakeOverCoverage = moves.Count > 0;
+        model.RoutingTag = model.RoutingTag.Trim().ToUpperInvariant();
+        saving = true;
+        try
+        {
+            var saved = Existing is null
+                ? await Operations.CreateWarehouseAsync(model)
+                : await Operations.UpdateWarehouseAsync(Existing.Id, model, Existing.Version);
+            await Operations.RefreshNetworkAsync();
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L[Existing is null ? "WarehouseCreatedN" : "WarehouseSavedN"], saved.Name));
+            await OnSaved.InvokeAsync(saved);
+            await IsOpenChanged.InvokeAsync(false);
+        }
+        catch (ApiException ex)
+        {
+            error = serverErrors?.Show(ex) ?? ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

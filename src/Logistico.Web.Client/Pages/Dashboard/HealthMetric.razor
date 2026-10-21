@@ -1,0 +1,22 @@
+<div class="@Bp.Cls("lx-health-metric", Intent == Intent.None ? null : $"lx-health-{Intent.ToString().ToLowerInvariant()}")" role="listitem" title="@Hint">
+    <span class="lx-health-icon"><Icon Name="@Icon" /></span>
+    <div class="lx-health-copy">
+        <span class="lx-health-label">@Label</span>
+        <span class="lx-health-value"><bdi dir="ltr">@Value</bdi>@if (!string.IsNullOrWhiteSpace(Unit)){<small>@Unit</small>}</span>
+    </div>
+    <MetricDelta Change="Change" ChangeInPoints="ChangeInPoints" HigherIsBetter="HigherIsBetter" Compact="true" />
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Icon { get; set; } = "dashboard";
+    [Parameter, EditorRequired] public string Label { get; set; } = "";
+    [Parameter, EditorRequired] public string Value { get; set; } = "";
+    [Parameter] public string? Unit { get; set; }
+    [Parameter] public decimal? Change { get; set; }
+    [Parameter] public bool ChangeInPoints { get; set; }
+    [Parameter] public bool HigherIsBetter { get; set; } = true;
+    [Parameter] public Intent Intent { get; set; }
+
+    /// <summary>What the number means, shown on hover.</summary>
+    [Parameter] public string? Hint { get; set; }
+}

@@ -1,0 +1,57 @@
+<ol class="lx-timeline">
+    @for (var i = 0; i < Entries.Count; i++)
+    {
+        var e = Entries[i];
+        var first = i == 0;
+        <li class="@Bp.Cls("lx-timeline-item", Bp.When(first, "lx-timeline-latest"), "lx-timeline-" + StatusTag.IntentOf(e.Status).ToString().ToLowerInvariant())">
+            <div class="lx-timeline-dot"><Icon Name="@StatusTag.IconOf(e.Status)" /></div>
+            <div class="lx-timeline-content">
+                <div class="lx-timeline-head">
+                    <span class="lx-timeline-title">@ShipmentTexts.Of(e.Status)</span>
+                    <span class="bp6-text-muted lx-timeline-when" title="@Fmt.DateTime(e.OccurredAt)">@Fmt.DateTime(e.OccurredAt)</span>
+                </div>
+                @if (e.FailureReason is { } reason)
+                {
+                    <div class="lx-timeline-reason"><Icon Name="info-sign" /> @ShipmentTexts.Of(reason)</div>
+                }
+                <div class="lx-timeline-meta">
+                    @if (!string.IsNullOrEmpty(e.Location))
+                    {
+                        <span><Icon Name="@(HubCatalog.Find(e.Location) is null ? "map-marker" : "office")" /> <Mixed Text="@Fmt.Location(e.Location)" /></span>
+                    }
+                    @if (Internal && !string.IsNullOrEmpty(e.WarehouseBin))
+                    {
+                        <span><Icon Name="box" /> @L["Shelf"] <b dir="ltr">@e.WarehouseBin</b></span>
+                    }
+                    @if (Internal && !string.IsNullOrEmpty(e.CourierName))
+                    {
+                        <span><Icon Name="truck" /> <Mixed Text="@e.CourierName" /></span>
+                    }
+                    @if (Internal && !string.IsNullOrEmpty(e.RecordedBy))
+                    {
+                        <span class="bp6-text-muted"><Icon Name="@(e.Source == "system" ? "automatic-updates" : "person")" /> <Mixed Text="@e.RecordedBy" /> · @SourceText(e.Source)</span>
+                    }
+                </div>
+                @if (Internal && !string.IsNullOrEmpty(e.Notes))
+                {
+                    <div class="lx-timeline-notes"><Mixed Text="@e.Notes" /></div>
+                }
+            </div>
+        </li>
+    }
+</ol>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<TimelineEntry> Entries { get; set; } = [];
+
+    /// <summary>Shows shelf, courier, notes and who recorded each step (staff view).</summary>
+    [Parameter] public bool Internal { get; set; }
+
+    private string SourceText(string? source) => source switch
+    {
+        "scan" => L["Source_Scan"],
+        "system" => L["Source_System"],
+        "customs" => L["Source_Customs"],
+        _ => L["Source_User"],
+    };
+}

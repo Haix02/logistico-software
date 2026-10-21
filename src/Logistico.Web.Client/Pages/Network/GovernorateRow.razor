@@ -1,0 +1,22 @@
+@if (Href is null)
+{
+    <li class="lx-list-item">@Body</li>
+}
+else
+{
+    <li><a class="lx-list-item" href="@Href">@Body</a></li>
+}
+
+@code {
+    [Parameter, EditorRequired] public string Icon { get; set; } = "";
+    [Parameter, EditorRequired] public string Text { get; set; } = "";
+    [Parameter] public int Value { get; set; }
+    [Parameter] public string? Href { get; set; }
+    [Parameter] public string Tone { get; set; } = "primary";
+
+    private RenderFragment Body => @<text>
+        <span class="@($"lx-list-icon lx-list-icon-{Tone}")"><Icon Name="@Icon" /></span>
+        <span class="lx-list-body"><span class="lx-list-title">@Text</span></span>
+        <span class="lx-kpi-number" style="font-size:18px">@Fmt.Number(Value)</span>
+    </text>;
+}

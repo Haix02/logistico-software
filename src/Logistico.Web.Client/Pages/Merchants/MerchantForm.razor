@@ -1,0 +1,54 @@
+@* Create/edit form for a seller, shown inside a dialog. *@
+<EditForm Model="Model" OnValidSubmit="OnSubmit" Context="form" id="@FormId">
+    <DataAnnotationsValidator />
+    <div class="lx-form-grid">
+        <FormField Label="@L["Field_ShopName"]" Required="true" Field="() => Model.Name">
+            <InputText class="bp6-input bp6-fill" @bind-Value="Model.Name" />
+        </FormField>
+        <FormField Label="@L["Field_Instagram"]" Hint="@L["Optional"]" Field="() => Model.InstagramHandle">
+            <div class="bp6-input-group bp6-fill">
+                <span class="bp6-icon bp6-icon-standard bp6-icon-at"></span>
+                <InputText class="bp6-input" @bind-Value="Model.InstagramHandle" dir="ltr" placeholder="lamar.boutique" />
+            </div>
+        </FormField>
+        <FormField Label="@L["Field_ContactName"]" Required="true" Field="() => Model.ContactName">
+            <InputText class="bp6-input bp6-fill" @bind-Value="Model.ContactName" />
+        </FormField>
+        <FormField Label="@L["Field_Phone"]" Required="true" Helper="@L["PhoneHelper"]" Field="() => Model.Phone">
+            <InputText class="bp6-input bp6-fill" @bind-Value="Model.Phone" type="tel" dir="ltr" placeholder="0770 123 4567" />
+        </FormField>
+        <FormField Label="@L["Field_Governorate"]" Required="true" Field="() => Model.Governorate">
+            <span class="bp6-html-select bp6-fill">
+                <InputSelect @bind-Value="Model.Governorate">
+                    @foreach (var g in IraqGovernorates.All)
+                    {
+                        <option value="@g.Code">@g.Name</option>
+                    }
+                </InputSelect>
+                <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+            </span>
+        </FormField>
+        <FormField Label="@L["Field_PickupAddress"]" Hint="@L["Optional"]" Field="() => Model.Address">
+            <InputText class="bp6-input bp6-fill" @bind-Value="Model.Address" />
+        </FormField>
+        <FormField Label="@L["Field_Notes"]" Hint="@L["Optional"]" Field="() => Model.Notes" CssClass="lx-span-2">
+            <InputTextArea class="bp6-input bp6-fill" rows="2" @bind-Value="Model.Notes" />
+        </FormField>
+        <label class="bp6-control bp6-switch lx-span-2">
+            <InputCheckbox class="bp6-control-input" @bind-Value="Model.IsActive" />
+            <span class="bp6-control-indicator"></span>
+            @L["ActiveSeller"]
+        </label>
+    </div>
+    @if (Error is not null)
+    {
+        <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mt">@Error</Callout>
+    }
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired] public MerchantRequest Model { get; set; } = new();
+    [Parameter, EditorRequired] public string FormId { get; set; } = "merchant-form";
+    [Parameter] public EventCallback OnSubmit { get; set; }
+    [Parameter] public string? Error { get; set; }
+}

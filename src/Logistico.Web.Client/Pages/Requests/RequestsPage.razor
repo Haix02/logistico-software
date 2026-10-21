@@ -1,0 +1,319 @@
+@page "/requests"
+@inject OperationsApi Operations
+@inject ShipmentsApi Shipments
+@inject OpsState Ops
+@inject NavigationManager Navigation
+@inject Toaster Toaster
+
+<PageTitle>@L["Nav_Requests"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["RequestsTitle"]" Subtitle="@L["RequestsSubtitle"]" Icon="inbox">
+    <Actions>
+        <Allowed Policy="@StaffPolicies.Care">
+            <Button Icon="add" Text="@L["Requests_New"]" Intent="Intent.Primary" OnClick="@(() => OpenNew(null))" />
+        </Allowed>
+    </Actions>
+</PageHeader>
+
+@if (result is not null)
+{
+    <div class="lx-kpis">
+        <KpiCard Icon="inbox" Label="@L["Kpi_OpenRequests"]" Value="@Fmt.Number(result.OpenCount)" Intent="Intent.Primary" Href="requests" />
+        <KpiCard Icon="time" Label="@L["Kpi_OverdueRequests"]" Value="@Fmt.Number(result.OverdueCount)" Intent="@(result.OverdueCount > 0 ? Intent.Danger : Intent.Success)" Href="requests?overdue=true" />
+        @foreach (var type in result.OpenByType.OrderByDescending(t => t.Count).Take(3))
+        {
+            <KpiCard Icon="@DomainIcons.Of(type.Type)" Label="@ShipmentTexts.Of(type.Type)" Value="@Fmt.Number(type.Count)" Href="@($"requests?type={type.Type}")" />
+        }
+    </div>
+}
+
+<div class="lx-table-card">
+    <div class="lx-toolbar">
+        <SearchInput CssClass="lx-toolbar-search" Value="@Q" Placeholder="@L["RequestsSearch"]" OnSearch="@(text => Go(q: text ?? ""))" />
+        <SegmentedControl TValue="string" Options="StatusOptions" Value="@(Status ?? "open")" ValueChanged="@(v => Go(status: v))" Label="@L["Col_Status"]" />
+        <HtmlSelect Value="@Type" ValueChanged="@(v => Go(type: v ?? ""))" Label="@L["Col_Type"]">
+            <option value="">@L["AllTypes"]</option>
+            @foreach (var t in Enum.GetValues<RequestType>())
+            {
+                <option value="@t">@ShipmentTexts.Of(t)</option>
+            }
+        </HtmlSelect>
+        <HtmlSelect Value="@Source" ValueChanged="@(v => Go(source: v ?? ""))" Label="@L["Col_Source"]">
+            <option value="">@L["AllSources"]</option>
+            @foreach (var s in Enum.GetValues<RequestSource>())
+            {
+                <option value="@s">@ShipmentTexts.Of(s)</option>
+            }
+        </HtmlSelect>
+        @if (Overdue == true)
+        {
+            <Tag Intent="Intent.Danger" Icon="time" Large="true">@L["Kpi_OverdueRequests"]</Tag>
+        }
+    </div>
+    <DataTable TItem="ServiceRequestItem" Items="result?.Items" Loading="loading" ColumnCount="7" OnRowClick="Open" EmptyIcon="inbox" EmptyTitle="@L["NoRequests"]"
+               RowClass="@(r => r.IsOverdue ? "lx-row-danger" : null)">
+        <Header>
+            <th>@L["Col_Request"]</th>
+            <th>@L["Col_Shipment"]</th>
+            <th>@L["Col_Details"]</th>
+            <th>@L["Col_Source"]</th>
+            <th>@L["Col_Due"]</th>
+            <th>@L["Col_Status"]</th>
+        </Header>
+        <Row Context="r">
+            <td>
+                <Cell Sub="@r.Number">
+                    <TitleContent><span class="lx-row" style="gap:6px"><Icon Name="@DomainIcons.Of(r.Type)" /> @ShipmentTexts.Of(r.Type)</span></TitleContent>
+                </Cell>
+            </td>
+            <td><Cell Title="@r.ConsigneeName"><SubContent><span class="lx-code" style="font-weight:500">@r.TrackingNumber</span></SubContent></Cell></td>
+            <td><Cell CssClass="lx-cell-wide" Title="@Summary(r)" Sub="@ShipmentTexts.Of(r.ShipmentStatus)" /></td>
+            <td><Tag Intent="@(r.Source == RequestSource.Customer ? Intent.Primary : Intent.None)">@ShipmentTexts.Of(r.Source)</Tag></td>
+            <td class="@Bp.Cls("lx-nowrap", Bp.When(r.IsOverdue, "lx-intent-danger"))">
+                @if (r.ResolvedAt is { } done)
+                {
+                    <span class="bp6-text-muted">@Fmt.Date(done)</span>
+                }
+                else
+                {
+                    @Fmt.Ago(r.CreatedAt, L)
+                }
+            </td>
+            <td><Tag Intent="@IntentOf(r.Status)">@ShipmentTexts.Of(r.Status)</Tag></td>
+        </Row>
+    </DataTable>
+    @if (result is not null)
+    {
+        <Pager Page="result.Page" PageSize="result.PageSize" Total="result.TotalCount" OnPage="@(p => Go(page: p))" OnPageSize="@(s => Go(pageSize: s))" />
+    }
+</div>
+
+<Drawer IsOpen="current is not null" IsOpenChanged="@(open => { if (!open) current = null; })" Title="@(current is null ? "" : $"{ShipmentTexts.Of(current.Type)} · {current.Number}")"
+        Icon="@(current is null ? "inbox" : DomainIcons.Of(current.Type))" Width="520px">
+    <ChildContent>
+        @if (current is { } r)
+        {
+            <div class="lx-stack" style="gap:14px">
+                <div class="lx-row-wrap">
+                    <Tag Large="true" Intent="@IntentOf(r.Status)">@ShipmentTexts.Of(r.Status)</Tag>
+                    <Tag Large="true">@ShipmentTexts.Of(r.Source)</Tag>
+                    @if (r.IsOverdue)
+                    {
+                        <Tag Large="true" Intent="Intent.Danger" Icon="time">@L["Late"]</Tag>
+                    }
+                </div>
+                <dl class="lx-props">
+                    <dt>@L["Col_Shipment"]</dt><dd><a class="lx-code" href="@($"shipments/{r.ShipmentId}")">@r.TrackingNumber</a> · <Mixed Text="@r.ConsigneeName" /></dd>
+                    <dt>@L["Col_Status"]</dt><dd><StatusTag Status="r.ShipmentStatus" /></dd>
+                    @if (r.MerchantName is not null)
+                    {
+                        <dt>@L["Col_Seller"]</dt><dd><Mixed Text="@r.MerchantName" /></dd>
+                    }
+                    @if (r.PreferredDate is { } date)
+                    {
+                        <dt>@L["Field_PreferredDate"]</dt><dd>@Fmt.Date(date)</dd>
+                    }
+                    @if (r.NewAddress is not null)
+                    {
+                        <dt>@L["Field_NewAddress"]</dt><dd><Mixed Text="@($"{Fmt.Place(r.NewGovernorate)} {r.NewCity} — {r.NewAddress} {r.NewLandmark}")" /></dd>
+                    }
+                    @if (r.NewPhone is not null)
+                    {
+                        <dt>@L["Field_NewPhone"]</dt><dd><PhoneText Value="@r.NewPhone" /></dd>
+                    }
+                    @if (r.Details is not null)
+                    {
+                        <dt>@L["Col_Details"]</dt><dd><Mixed Text="@r.Details" /></dd>
+                    }
+                    <dt>@L["Created"]</dt><dd>@Fmt.DateTime(r.CreatedAt) · <Mixed Text="@(r.CreatedBy ?? "—")" /></dd>
+                    <dt>@L["Col_Due"]</dt><dd class="@Bp.When(r.IsOverdue, "lx-intent-danger")">@Fmt.DateTime(r.DueAt)</dd>
+                    @if (r.ResolvedAt is { } resolvedAt)
+                    {
+                        <dt>@L["Resolved"]</dt><dd>@Fmt.DateTime(resolvedAt) · <Mixed Text="@(r.ResolvedBy ?? "—")" /></dd>
+                    }
+                    @if (r.Resolution is not null)
+                    {
+                        <dt>@L["Resolution"]</dt><dd><Mixed Text="@r.Resolution" /></dd>
+                    }
+                </dl>
+                @if (r.Status is RequestStatus.Open or RequestStatus.InProgress)
+                {
+                    <FormField TValue="string" Label="@L["Resolution"]" Hint="@L["Optional"]">
+                        <textarea class="bp6-input bp6-fill" rows="2" @bind="note"></textarea>
+                    </FormField>
+                    @if (error is not null)
+                    {
+                        <Callout Intent="Intent.Danger" Icon="error">@error</Callout>
+                    }
+                }
+            </div>
+        }
+    </ChildContent>
+    <Footer>
+        @if (current is { Status: RequestStatus.Open or RequestStatus.InProgress } r && canCare)
+        {
+            @if (r.Status == RequestStatus.Open)
+            {
+                <Button Icon="person" Text="@L["TakeRequest"]" Minimal="true" Loading="saving" OnClick="@(() => StartAsync(r))" />
+            }
+            <Button Icon="cross" Text="@L["Reject"]" Intent="Intent.Danger" Outlined="true" Loading="saving" OnClick="@(() => ResolveAsync(r, RequestStatus.Rejected, false))" />
+            @if (r.Type != RequestType.Complaint)
+            {
+                <Button Icon="tick" Text="@L["ResolveWithoutChange"]" Loading="saving" OnClick="@(() => ResolveAsync(r, RequestStatus.Resolved, false))" />
+                <Button Icon="tick-circle" Text="@L["ApplyAndResolve"]" Intent="Intent.Primary" Loading="saving" OnClick="@(() => ResolveAsync(r, RequestStatus.Resolved, true))" />
+            }
+            else
+            {
+                <Button Icon="tick-circle" Text="@L["MarkResolved"]" Intent="Intent.Primary" Loading="saving" OnClick="@(() => ResolveAsync(r, RequestStatus.Resolved, false))" />
+            }
+        }
+    </Footer>
+</Drawer>
+
+<NewRequestDialog @bind-IsOpen="newOpen" ShipmentId="newShipmentId" OnCreated="CreatedAsync" />
+
+@code {
+    [SupplyParameterFromQuery(Name = "status")] public string? Status { get; set; }
+    [SupplyParameterFromQuery(Name = "type")] public string? Type { get; set; }
+    [SupplyParameterFromQuery(Name = "source")] public string? Source { get; set; }
+    [SupplyParameterFromQuery(Name = "overdue")] public bool? Overdue { get; set; }
+    [SupplyParameterFromQuery(Name = "q")] public string? Q { get; set; }
+    [SupplyParameterFromQuery(Name = "page")] public int? Page { get; set; }
+    [SupplyParameterFromQuery(Name = "pageSize")] public int? PageSize { get; set; }
+    [SupplyParameterFromQuery(Name = "new")] public int? New { get; set; }
+    [SupplyParameterFromQuery(Name = "shipmentId")] public Guid? ShipmentId { get; set; }
+
+    private ServiceRequestList? result;
+    private ServiceRequestItem? current;
+    private Guid? newShipmentId;
+    private bool loading = true;
+    private bool saving;
+    private bool canCare;
+    private bool newOpen;
+    private string? note;
+    private string? error;
+
+    private IReadOnlyList<SegmentOption<string>> StatusOptions =>
+        [new("open", L["Open"]), new("closed", L["Closed"]), new("all", L["All"])];
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        canCare = await AuthState.CanAsync(StaffPolicies.Care);
+        if (New == 1 && canCare)
+        {
+            OpenNew(ShipmentId);
+        }
+
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        loading = true;
+        try
+        {
+            result = await Operations.ListRequestsAsync(new ServiceRequestQuery
+            {
+                Status = (Status ?? "open") switch
+                {
+                    "open" => [RequestStatus.Open, RequestStatus.InProgress],
+                    "closed" => [RequestStatus.Resolved, RequestStatus.Rejected],
+                    _ => null,
+                },
+                Type = Enum.TryParse<RequestType>(Type, out var type) ? type : null,
+                Source = Enum.TryParse<RequestSource>(Source, out var source) ? source : null,
+                Overdue = Overdue,
+                Q = Q,
+                Page = Page,
+                PageSize = PageSize,
+            });
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private void Go(string? q = null, string? status = null, string? type = null, string? source = null, int? page = null, int? pageSize = null) =>
+        Navigation.NavigateTo(Url.With("requests", ("status", status ?? Status), ("type", type ?? Type), ("source", source ?? Source),
+            ("overdue", Overdue), ("q", q ?? Q), ("page", page), ("pageSize", pageSize ?? PageSize)));
+
+    private void Open(ServiceRequestItem r)
+    {
+        current = r;
+        note = null;
+        error = null;
+    }
+
+    private void OpenNew(Guid? shipmentId)
+    {
+        newShipmentId = shipmentId;
+        newOpen = true;
+    }
+
+    private async Task CreatedAsync(ServiceRequestItem created)
+    {
+        Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["RequestCreated"], created.Number));
+        await LoadAsync();
+        await Ops.RefreshAsync();
+    }
+
+    private async Task StartAsync(ServiceRequestItem r)
+    {
+        saving = true;
+        try
+        {
+            await Operations.StartRequestAsync(r.Id);
+            await LoadAsync();
+            current = result?.Items.FirstOrDefault(i => i.Id == r.Id) ?? current;
+        }
+        catch (ApiException ex)
+        {
+            error = ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private async Task ResolveAsync(ServiceRequestItem r, RequestStatus outcome, bool apply)
+    {
+        saving = true;
+        error = null;
+        try
+        {
+            await Operations.ResolveRequestAsync(r.Id, new ResolveServiceRequest { Outcome = outcome, Apply = apply, Note = note });
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, outcome == RequestStatus.Rejected ? L["RequestRejected"] : L["RequestResolved"], r.Number));
+            current = null;
+            await LoadAsync();
+            await Ops.RefreshAsync();
+        }
+        catch (ApiException ex)
+        {
+            error = ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private string Summary(ServiceRequestItem r) => r.Type switch
+    {
+        RequestType.Reschedule => string.Format(CultureInfo.CurrentCulture, L["RescheduleTo"], Fmt.Date(r.PreferredDate)),
+        RequestType.ChangeAddress => $"{Fmt.Place(r.NewGovernorate)} {r.NewCity} — {r.NewAddress}".Trim(' ', '—'),
+        RequestType.ChangePhone => IraqPhone.Display(r.NewPhone),
+        _ => r.Details ?? "—",
+    };
+
+    private static Intent IntentOf(RequestStatus status) => status switch
+    {
+        RequestStatus.Open => Intent.Warning,
+        RequestStatus.InProgress => Intent.Primary,
+        RequestStatus.Resolved => Intent.Success,
+        _ => Intent.None,
+    };
+}

@@ -1,0 +1,168 @@
+@page "/shipments/labels"
+@attribute [Authorize(Policy = StaffPolicies.Operate)]
+@inject ShipmentsApi Shipments
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>@L["PrintLabelsTitle"] · @L["AppName"]</PageTitle>
+
+<div class="lx-no-print">
+    <PageHeader Title="@L["PrintLabelsTitle"]" Subtitle="@L["PrintLabelsSubtitle"]" Icon="barcode">
+        <Actions>
+            <SegmentedControl TValue="bool" Options="SheetOptions" Value="showActionSheet" ValueChanged="@(v => showActionSheet = v)" Label="@L["PrintLabelsTitle"]" />
+            <Button Intent="Intent.Primary" Icon="print" Text="@L["PrintNow"]" OnClick="PrintAsync" />
+        </Actions>
+    </PageHeader>
+
+    @if (!showActionSheet)
+    {
+        <div class="lx-toolbar lx-card lx-mb">
+            <form class="lx-toolbar-search" @onsubmit="LoadAsync">
+                <div class="bp6-input-group bp6-fill">
+                    <span class="bp6-icon bp6-icon-standard bp6-icon-search"></span>
+                    <input class="bp6-input" type="search" placeholder="@L["SearchPlaceholder"]" @bind="search" />
+                    <Button Type="submit" Minimal="true" Icon="search" CssClass="bp6-input-action" />
+                </div>
+            </form>
+            <span class="bp6-text-muted lx-small">@L.Count("ParcelsN", items.Count)</span>
+        </div>
+    }
+</div>
+
+@if (loading)
+{
+    <div class="bp6-card lx-pad"><span class="bp6-text-muted">…</span></div>
+}
+else if (showActionSheet)
+{
+    <Section Title="@L["ActionBarcodesTitle"]" Subtitle="@L["ActionBarcodesSubtitle"]" Icon="flash">
+        <div class="lx-awb-grid">
+            @foreach (var cmd in HubCatalog.ActionBarcodes)
+            {
+                <div class="lx-awb-label">
+                    <div class="lx-awb-top">
+                        <div>
+                            <div class="lx-awb-brand">@L["AppName"]</div>
+                            <div class="lx-awb-service">@cmd.Label</div>
+                        </div>
+                        <div class="lx-awb-hub-box">CMD</div>
+                    </div>
+                    <div class="lx-awb-barcode">
+                        @((MarkupString)Code128Barcode.ToSvg(cmd.Code, 58, true))
+                    </div>
+                    <div class="lx-awb-meta">
+                        <span>STATION ACTION BARCODE</span>
+                        <span class="lx-mono">@cmd.Code</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </Section>
+}
+else
+{
+    <div class="lx-awb-grid">
+        @foreach (var s in items)
+        {
+            var hub = HubCatalog.ResolveDestinationHub(s.DestinationCode);
+            <div class="lx-awb-label">
+                <div class="lx-awb-top">
+                    <div>
+                        <div class="lx-awb-brand">@L["AppName"]</div>
+                        <div class="lx-awb-service">@ShipmentTexts.Of(s.ServiceType) · @ShipmentTexts.Of(s.Mode)</div>
+                        <div class="lx-small">@Fmt.Place(s.OriginCode) → @Fmt.Place(s.DestinationCode)</div>
+                    </div>
+                    <div class="lx-awb-hub-box" title="@hub.Name">@hub.RoutingTag</div>
+                </div>
+
+                <div class="lx-awb-cod">
+                    @if (s.CodAmount is > 0)
+                    {
+                        <span>@L["Awb_CollectCash"]</span>
+                        <span dir="ltr">@Fmt.Money(s.CodAmount, s.CodCurrency)</span>
+                    }
+                    else
+                    {
+                        <span>@L["Awb_Prepaid"]</span>
+                        <span>0 IQD</span>
+                    }
+                </div>
+
+                <div class="lx-awb-section">
+                    <div class="lx-awb-label-caption">@L["Awb_Shipper"]</div>
+                    <div><b>@(s.MerchantName ?? s.ShipperName)</b> (@Fmt.Place(s.OriginCode))</div>
+                    @if (!string.IsNullOrWhiteSpace(s.ExternalReference))
+                    {
+                        <div class="lx-mono">Ref: @s.ExternalReference</div>
+                    }
+                </div>
+
+                <div class="lx-awb-section">
+                    <div class="lx-awb-label-caption">@L["Awb_Consignee"]</div>
+                    <div class="lx-awb-consignee">@s.ConsigneeName</div>
+                    @if (!string.IsNullOrWhiteSpace(s.ConsigneePhone))
+                    {
+                        <div class="lx-mono" dir="ltr"><b>@IraqPhone.Display(s.ConsigneePhone)</b></div>
+                    }
+                    <div><b>@Fmt.Place(s.DestinationCode)</b> @(string.IsNullOrWhiteSpace(s.DestinationCity) ? "" : $"— {s.DestinationCity}")</div>
+                </div>
+
+                <div class="lx-awb-barcode">
+                    @((MarkupString)Code128Barcode.ToSvg(s.TrackingNumber, 56, true))
+                </div>
+
+                <div class="lx-awb-meta">
+                    <span dir="ltr">@s.Pieces pcs · @Fmt.Number(s.ChargeableWeightKg, 1) kg</span>
+                    <span dir="ltr">Bin: @(s.WarehouseBin ?? hub.RoutingTag)</span>
+                    <span dir="ltr">@Fmt.Date(s.CreatedAt)</span>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "q")] public string? Q { get; set; }
+    [SupplyParameterFromQuery(Name = "tab")] public string? Tab { get; set; }
+
+    private List<ShipmentListItem> items = [];
+    private string? search;
+    private bool loading = true;
+    private bool showActionSheet;
+
+    private IReadOnlyList<SegmentOption<bool>> SheetOptions => [new(false, L["Tab_AwbLabels"], "barcode"), new(true, L["Tab_ActionSheet"], "flash")];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        search = Q;
+        showActionSheet = string.Equals(Tab, "actions", StringComparison.OrdinalIgnoreCase);
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        loading = true;
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(search) && search.Contains(','))
+            {
+                var tokens = search.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .Take(ShipmentQuery.MaxPageSize)
+                    .ToList();
+                items = (await Shipments.GetExactAsync(tokens)).ToList();
+            }
+            else
+            {
+                var page = await Shipments.ListAsync(new ShipmentQuery { Q = search, PageSize = 12 });
+                items = page.Items.ToList();
+            }
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private async Task PrintAsync() => await JS.InvokeVoidAsync("lx.print");
+}

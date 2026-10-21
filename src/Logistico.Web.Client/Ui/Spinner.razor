@@ -1,0 +1,23 @@
+<div class="bp6-spinner" role="progressbar" aria-busy="true">
+    <div class="bp6-spinner-animation">
+        <svg width="@Size" height="@Size" stroke-width="@StrokeWidth" viewBox="@ViewBox">
+            <path class="bp6-spinner-track" d="M 50,50 m 0,-45 a 45,45 0 1 1 0,90 a 45,45 0 1 1 0,-90"></path>
+            <path class="bp6-spinner-head" d="M 50,50 m 0,-45 a 45,45 0 1 1 0,90 a 45,45 0 1 1 0,-90" pathLength="280" stroke-dasharray="280 280" stroke-dashoffset="210"></path>
+        </svg>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int Size { get; set; } = 50;
+
+    private string StrokeWidth => (Size <= 20 ? 16 : Size <= 50 ? 8 : 4).ToString(CultureInfo.InvariantCulture);
+    private string ViewBox
+    {
+        get
+        {
+            var sw = Size <= 20 ? 16.0 : Size <= 50 ? 8.0 : 4.0;
+            var pad = sw / 2;
+            return string.Create(CultureInfo.InvariantCulture, $"{-pad} {-pad} {100 + sw} {100 + sw}");
+        }
+    }
+}

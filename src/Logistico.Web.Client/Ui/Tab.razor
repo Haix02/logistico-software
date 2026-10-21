@@ -1,0 +1,34 @@
+@implements IDisposable
+
+@code {
+    private (string Title, string? Icon, int? Count, Intent CountIntent) shown;
+
+    [CascadingParameter] public Tabs Parent { get; set; } = default!;
+
+    [Parameter, EditorRequired] public string Id { get; set; } = "";
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public int? Count { get; set; }
+    [Parameter] public Intent CountIntent { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    protected override void OnInitialized()
+    {
+        shown = (Title, Icon, Count, CountIntent);
+        Parent.Add(this);
+    }
+
+    // Re-render the tab strip only when what it shows changed; refreshing unconditionally would loop forever
+    // (the strip re-renders its tabs, which would ask it to re-render again).
+    protected override void OnParametersSet()
+    {
+        var current = (Title, Icon, Count, CountIntent);
+        if (current != shown)
+        {
+            shown = current;
+            Parent.Refresh();
+        }
+    }
+
+    public void Dispose() => Parent.Remove(this);
+}

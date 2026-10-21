@@ -1,0 +1,604 @@
+@page "/orders/new"
+@attribute [Authorize(Policy = StaffPolicies.Operate)]
+@inject ShipmentsApi Shipments
+@inject MerchantsApi Merchants
+@inject OpsState Ops
+@inject NavigationManager Navigation
+@inject Toaster Toaster
+
+<PageTitle>@L["NewOrderTitle"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["NewOrderTitle"]" Subtitle="@L["NewOrderSubtitle"]" Icon="shopping-cart" Breadcrumbs="@([(L["Nav_Shipments"].Value, "shipments")])">
+    <Actions>
+        <SegmentedControl TValue="bool" Options="OrderModeOptions" Value="batchMode" ValueChanged="@(v => { batchMode = v; serverError = null; })" Label="@L["NewOrderTitle"]" />
+    </Actions>
+</PageHeader>
+
+@if (!batchMode)
+{
+    <EditForm Model="model" OnValidSubmit="SubmitAsync" Context="form">
+        <DataAnnotationsValidator />
+        <div class="lx-form-layout">
+            <div class="lx-stack" style="gap:0;min-width:0">
+                <Section Title="@L["SmartPasteTitle"]" Subtitle="@L["SmartPasteSubtitle"]" Icon="flash">
+                    <div class="lx-stack" style="gap:10px">
+                        <div class="lx-chips">
+                            <button type="button" class="lx-chip" @onclick="@(() => LoadSingleSample(SampleBaghdadDm))">
+                                <Icon Name="send-message" /> @L["Sample_Baghdad"]
+                            </button>
+                            <button type="button" class="lx-chip" @onclick="@(() => LoadSingleSample(SampleBasraDm))">
+                                <Icon Name="send-message" /> @L["Sample_Basra"]
+                            </button>
+                            <button type="button" class="lx-chip" @onclick="@(() => LoadSingleSample(SampleErbilDm))">
+                                <Icon Name="send-message" /> @L["Sample_Erbil"]
+                            </button>
+                        </div>
+                        <div class="bp6-control-group bp6-fill">
+                            <textarea class="bp6-input bp6-fill" rows="2" @bind="smartPasteText" @bind:event="oninput" placeholder="@L["SmartPastePlaceholder"]"></textarea>
+                        </div>
+                        <div class="lx-row" style="justify-content:space-between">
+                            <span class="bp6-text-muted lx-small">@L["SmartPasteHelper"]</span>
+                            <div class="lx-row" style="gap:8px">
+                                @if (!string.IsNullOrWhiteSpace(smartPasteText))
+                                {
+                                    <Button Small="true" Minimal="true" Icon="cross" Text="@L["Clear"]" OnClick="@(() => smartPasteText = "")" />
+                                }
+                                <Button Small="true" Intent="Intent.Primary" Icon="flash" Text="@L["SmartPasteAction"]"
+                                        Disabled="@string.IsNullOrWhiteSpace(smartPasteText)" OnClick="ApplySmartPaste" />
+                            </div>
+                        </div>
+                    </div>
+                </Section>
+
+                <Section Title="@L["Sec_Seller"]" Icon="shop">
+                    <div class="lx-form-grid">
+                        <FormField Label="@L["Field_Seller"]" Required="true" Field="() => model.MerchantId" CssClass="lx-span-2">
+                            <div class="bp6-control-group bp6-fill">
+                                <span class="bp6-html-select bp6-fill">
+                                    <InputSelect @bind-Value="model.MerchantId" @bind-Value:after="MerchantChanged">
+                                        <option value="">@L["ChooseSeller"]</option>
+                                        @foreach (var m in merchants)
+                                        {
+                                            <option value="@m.Id">@m.Name@(m.InstagramHandle is null ? "" : $" · @{m.InstagramHandle}")</option>
+                                        }
+                                    </InputSelect>
+                                    <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                                </span>
+                                <LinkButton Href="merchants?new=1" Icon="add" Tip="@L["NewSeller"]" />
+                            </div>
+                        </FormField>
+                        <FormField Label="@L["Field_OrderRef"]" Hint="@L["Optional"]" Field="() => model.ExternalReference">
+                            <InputText class="bp6-input bp6-fill" @bind-Value="model.ExternalReference" placeholder="IG-1234" dir="ltr" />
+                        </FormField>
+                        <FormField Label="@L["Field_HowWeGetIt"]" Field="() => model.PickupRequired">
+                            <SegmentedControl TValue="bool" Options="HandOverOptions" Value="model.PickupRequired" ValueChanged="@(v => model.PickupRequired = v)" Fill="true" />
+                        </FormField>
+                    </div>
+                </Section>
+
+                <Section Title="@L["Sec_Customer"]" Icon="person">
+                    <div class="lx-form-grid">
+                        <FormField Label="@L["Field_CustomerName"]" Required="true" Field="() => model.ConsigneeName">
+                            <InputText class="bp6-input bp6-fill" @bind-Value="model.ConsigneeName" autocomplete="off" />
+                        </FormField>
+                        <FormField Label="@L["Field_CustomerPhone"]" Required="true" Helper="@L["PhoneHelper"]" Field="() => model.ConsigneePhone">
+                            <div class="bp6-input-group bp6-fill">
+                                <InputText class="bp6-input" @bind-Value="model.ConsigneePhone" @bind-Value:after="PhoneChangedAsync"
+                                           type="tel" dir="ltr" placeholder="0770 123 4567" autocomplete="off" />
+                                @if (lookingUp)
+                                {
+                                    <span class="bp6-input-action lx-input-suffix"><Spinner Size="16" /></span>
+                                }
+                            </div>
+                        </FormField>
+                        <div class="lx-span-2">
+                            <CustomerCard Profile="customer" MerchantId="model.MerchantId" CurrentAddress="@model.DeliveryAddress" OnUseAddress="UseCustomerAddress" />
+                        </div>
+                        <FormField Label="@L["Field_Governorate"]" Required="true" Field="() => model.DestinationCode">
+                            <span class="bp6-html-select bp6-fill">
+                                <InputSelect @bind-Value="model.DestinationCode" @bind-Value:after="RecalculateTariff">
+                                    <option value="">@L["ChooseGovernorate"]</option>
+                                    @foreach (var g in IraqGovernorates.All)
+                                    {
+                                        <option value="@g.Code">@g.Name</option>
+                                    }
+                                </InputSelect>
+                                <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                            </span>
+                        </FormField>
+                        <FormField Label="@L["Field_Area"]" Field="() => model.DestinationCity">
+                            <InputText class="bp6-input bp6-fill" @bind-Value="model.DestinationCity" placeholder="@L["AreaPlaceholder"]" />
+                        </FormField>
+                        <FormField Label="@L["Field_Address"]" Required="true" Field="() => model.DeliveryAddress" CssClass="lx-span-2">
+                            <InputText class="bp6-input bp6-fill" @bind-Value="model.DeliveryAddress" placeholder="@L["AddressPlaceholder"]" />
+                        </FormField>
+                        <FormField Label="@L["Field_Landmark"]" Hint="@L["Optional"]" Field="() => model.Landmark" CssClass="lx-span-2">
+                            <InputText class="bp6-input bp6-fill" @bind-Value="model.Landmark" placeholder="@L["LandmarkPlaceholder"]" />
+                        </FormField>
+                    </div>
+                </Section>
+
+                <Section Title="@L["Sec_Parcel"]" Icon="box">
+                    <div class="lx-form-grid lx-form-grid-3">
+                        <FormField Label="@L["Field_Items"]" Field="() => model.ItemsDescription" CssClass="lx-span-all">
+                            <InputText class="bp6-input bp6-fill" @bind-Value="model.ItemsDescription" placeholder="@L["ItemsPlaceholder"]" />
+                        </FormField>
+                        <FormField Label="@L["Field_Pieces"]" Field="() => model.Pieces">
+                            <InputNumber class="bp6-input bp6-fill" @bind-Value="model.Pieces" min="1" />
+                        </FormField>
+                        <FormField Label="@L["Field_WeightKg"]" Field="() => model.GrossWeightKg">
+                            <InputNumber class="bp6-input bp6-fill" @bind-Value="model.GrossWeightKg" @bind-Value:after="RecalculateTariff" step="0.1" min="0" />
+                        </FormField>
+                        <FormField Label="@L["Field_DeliveryFee"]" Hint="@L["IqdHint"]" Field="() => model.DeliveryFee">
+                            <InputNumber class="bp6-input bp6-fill" @bind-Value="model.DeliveryFee" step="250" min="0" />
+                        </FormField>
+                    </div>
+                </Section>
+
+                <Section Title="@L["Sec_Payment"]" Icon="dollar">
+                    <div class="lx-form-grid">
+                        <FormField Label="@L["Field_Cod"]" Helper="@L["CodHelper"]" Field="() => model.CodAmount">
+                            <div class="bp6-input-group bp6-fill">
+                                <InputNumber class="bp6-input" @bind-Value="model.CodAmount" step="250" min="0" />
+                                <span class="bp6-input-action lx-input-suffix">@L["Iqd"]</span>
+                            </div>
+                        </FormField>
+                        <FormField Label="@L["Field_Notes"]" Hint="@L["Optional"]" Field="() => model.Notes">
+                            <InputTextArea class="bp6-input bp6-fill" rows="2" @bind-Value="model.Notes" placeholder="@L["NotesPlaceholder"]" />
+                        </FormField>
+                    </div>
+                </Section>
+            </div>
+
+            <aside class="lx-form-side">
+                <Section Title="@L["Summary"]" Icon="clipboard">
+                    <dl class="lx-props">
+                        <dt>@L["Field_Seller"]</dt>
+                        <dd>@(SelectedMerchant?.Name ?? "—")</dd>
+                        <dt>@L["Route"]</dt>
+                        <dd>@Fmt.Place(model.OriginCode) @Bidi.Arrow @(string.IsNullOrEmpty(model.DestinationCode) ? "—" : Fmt.Place(model.DestinationCode))</dd>
+                        <dt>@L["DestinationHub"]</dt>
+                        <dd>@(string.IsNullOrEmpty(model.DestinationCode) ? "—" : Fmt.Hub(HubCatalog.ResolveDestinationHub(model.DestinationCode).Code))</dd>
+                        <dt>@L["PromisedBy"]</dt>
+                        <dd>@(Promise is { } p ? Fmt.Date(p) : "—")</dd>
+                        <dt>@L["CustomerPays"]</dt>
+                        <dd class="lx-strong">@Fmt.Money(model.CodAmount ?? 0, "IQD")</dd>
+                        <dt>@L["Field_DeliveryFee"]</dt>
+                        <dd>
+                            @Fmt.Money(model.DeliveryFee ?? 0, "IQD")
+                            @if (model.DeliveryFee == CurrentQuote.Fee)
+                            {
+                                <div class="bp6-text-muted lx-small">@PriceBreakdown(CurrentQuote)</div>
+                            }
+                        </dd>
+                        <dt>@L["SellerReceives"]</dt>
+                        <dd class="lx-strong">@Fmt.Money((model.CodAmount ?? 0) - (model.DeliveryFee ?? 0), "IQD")</dd>
+                    </dl>
+                    @if (serverError is not null)
+                    {
+                        <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mt">@serverError</Callout>
+                    }
+                    <Button Type="submit" Intent="Intent.Primary" Large="true" Fill="true" Icon="tick" Text="@L["CreateOrder"]" Loading="saving" CssClass="lx-mt" />
+                    <LinkButton Href="shipments" Minimal="true" Text="@L["Cancel"]" CssClass="lx-mt bp6-fill" />
+                </Section>
+            </aside>
+        </div>
+    </EditForm>
+}
+else
+{
+    <div class="lx-form-layout">
+        <div class="lx-stack" style="gap:0;min-width:0">
+            <Section Title="@L["Sec_Seller"]" Icon="shop">
+                <div class="lx-form-grid">
+                    <FormField TValue="Guid?" Label="@L["Field_Seller"]" Required="true" CssClass="lx-span-2">
+                        <div class="bp6-control-group bp6-fill">
+                            <span class="bp6-html-select bp6-fill">
+                                <InputSelect @bind-Value="model.MerchantId" @bind-Value:after="MerchantChanged">
+                                    <option value="">@L["ChooseSeller"]</option>
+                                    @foreach (var m in merchants)
+                                    {
+                                        <option value="@m.Id">@m.Name@(m.InstagramHandle is null ? "" : $" · @{m.InstagramHandle}")</option>
+                                    }
+                                </InputSelect>
+                                <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                            </span>
+                            <LinkButton Href="merchants?new=1" Icon="add" Tip="@L["NewSeller"]" />
+                        </div>
+                    </FormField>
+                    <FormField TValue="bool" Label="@L["Field_HowWeGetIt"]">
+                        <SegmentedControl TValue="bool" Options="HandOverOptions" Value="model.PickupRequired" ValueChanged="@(v => model.PickupRequired = v)" Fill="true" />
+                    </FormField>
+                </div>
+            </Section>
+
+            <Section Title="@L["BatchPasteTitle"]" Subtitle="@L["BatchPasteSubtitle"]" Icon="th">
+                <div class="lx-stack" style="gap:10px">
+                    <div class="lx-row" style="justify-content:space-between">
+                        <button type="button" class="lx-chip" @onclick="LoadBatchSample">
+                            <Icon Name="flash" /> @L["BatchSampleAction"]
+                        </button>
+                        <Button Small="true" Intent="Intent.Primary" Icon="tick" Text="@L["ParseBatchAction"]"
+                                Disabled="@string.IsNullOrWhiteSpace(batchRawText)" OnClick="ParseBatch" />
+                    </div>
+                    <textarea class="bp6-input bp6-fill" rows="5" @bind="batchRawText" @bind:event="oninput" placeholder="@L["BatchPastePlaceholder"]"></textarea>
+                </div>
+            </Section>
+
+            @if (batchDrafts.Count > 0)
+            {
+                <Section Title="@L.Count("ParcelsN", batchDrafts.Count)" Icon="clipboard" Padded="false">
+                    <div class="lx-table-wrap">
+                        <table class="bp6-html-table bp6-compact bp6-interactive lx-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>@L["Field_CustomerName"]</th>
+                                    <th>@L["Field_CustomerPhone"]</th>
+                                    <th>@L["Field_Governorate"]</th>
+                                    <th>@L["Field_Address"]</th>
+                                    <th>@L["Field_Items"]</th>
+                                    <th>@L["Field_Cod"]</th>
+                                    <th>@L["Field_DeliveryFee"]</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (var i = 0; i < batchDrafts.Count; i++)
+                                {
+                                    var row = batchDrafts[i];
+                                    var index = i;
+                                    <tr>
+                                        <td>
+                                            <Icon Name="@(row.IsValid ? "tick-circle" : "warning-sign")"
+                                                  Intent="@(row.IsValid ? Intent.Success : Intent.Warning)" />
+                                        </td>
+                                        <td>
+                                            <input class="bp6-input bp6-small bp6-fill" @bind="row.ConsigneeName" />
+                                        </td>
+                                        <td>
+                                            <input class="bp6-input bp6-small" dir="ltr" style="width:130px" @bind="row.ConsigneePhone" />
+                                        </td>
+                                        <td>
+                                            <span class="bp6-html-select bp6-small">
+                                                <select value="@row.DestinationCode" @onchange="@(e => UpdateBatchRowGovernorate(row, e.Value?.ToString()))">
+                                                    @foreach (var g in IraqGovernorates.All)
+                                                    {
+                                                        <option value="@g.Code">@g.Name</option>
+                                                    }
+                                                </select>
+                                                <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <input class="bp6-input bp6-small bp6-fill" @bind="row.DeliveryAddress" />
+                                        </td>
+                                        <td>
+                                            <input class="bp6-input bp6-small bp6-fill" @bind="row.ItemsDescription" />
+                                        </td>
+                                        <td>
+                                            <input type="number" class="bp6-input bp6-small" dir="ltr" style="width:105px" step="250" min="0" @bind="row.CodAmount" />
+                                        </td>
+                                        <td class="lx-nowrap">@Fmt.Money(row.DeliveryFee, "IQD")</td>
+                                        <td>
+                                            <Button Small="true" Minimal="true" Icon="cross" OnClick="@(() => batchDrafts.RemoveAt(index))" />
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </Section>
+            }
+        </div>
+
+        <aside class="lx-form-side">
+            <Section Title="@L["Summary"]" Icon="clipboard">
+                <dl class="lx-props">
+                    <dt>@L["Field_Seller"]</dt>
+                    <dd>@(SelectedMerchant?.Name ?? "—")</dd>
+                    <dt>@L["ValidOrders"]</dt>
+                    <dd class="lx-strong">@Fmt.Number(ValidBatchOrders.Count) / @Fmt.Number(batchDrafts.Count)</dd>
+                    <dt>@L["CustomerPays"]</dt>
+                    <dd class="lx-strong">@Fmt.Money(ValidBatchOrders.Sum(o => o.CodAmount), "IQD")</dd>
+                    <dt>@L["Field_DeliveryFee"]</dt>
+                    <dd>@Fmt.Money(ValidBatchOrders.Sum(o => o.DeliveryFee), "IQD")</dd>
+                    <dt>@L["SellerReceives"]</dt>
+                    <dd class="lx-strong">@Fmt.Money(ValidBatchOrders.Sum(o => o.CodAmount - o.DeliveryFee), "IQD")</dd>
+                </dl>
+
+                @if (serverError is not null)
+                {
+                    <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mt">@serverError</Callout>
+                }
+
+                @if (lastBookedNumbers.Count > 0)
+                {
+                    <Callout Intent="Intent.Success" Icon="tick-circle" CssClass="lx-mt">
+                        <div>@string.Format(CultureInfo.CurrentCulture, L["BatchBookedToast"], Fmt.Number(lastBookedNumbers.Count))</div>
+                        <div class="lx-callout-actions">
+                            <LinkButton Href="@($"shipments/labels?q={Uri.EscapeDataString(string.Join(',', lastBookedNumbers))}")"
+                                        Intent="Intent.Success" Icon="print" Text="@L["BulkPrintAwb"]" />
+                        </div>
+                    </Callout>
+                }
+
+                <Button Intent="Intent.Primary" Large="true" Fill="true" Icon="tick"
+                        Text="@L.Count("BookBatchN", ValidBatchOrders.Count)"
+                        Disabled="@(ValidBatchOrders.Count == 0)" Loading="saving" CssClass="lx-mt"
+                        OnClick="SubmitBatchAsync" />
+                <LinkButton Href="shipments" Minimal="true" Text="@L["Cancel"]" CssClass="lx-mt bp6-fill" />
+            </Section>
+        </aside>
+    </div>
+}
+
+@code {
+    private const string SampleBaghdadDm = "سارة محمد - 07701234567 - بغداد المنصور شارع 14 رمضان - قرب مطعم الساعة - فستان أسود وحقيبة - 45 الف";
+    private const string SampleBasraDm = "علي حسن البصري - 07809876543 - البصرة العشار شارع الوطن - مقابل فندق شط العرب - عطر شانيل رجالي - 65,000";
+    private const string SampleErbilDm = "دلشاد كريم - 07504567890 - اربيل عنكاوا شارع المنتزه - مجاور كافيه لافندر - ساعة ذكية وسماعة - 85 الف";
+
+    [SupplyParameterFromQuery(Name = "merchantId")] public Guid? PreselectedMerchant { get; set; }
+    [SupplyParameterFromQuery(Name = "batch")] public bool? Batch { get; set; }
+
+    private IReadOnlyList<SegmentOption<bool>> OrderModeOptions =>
+        [new(false, L["Mode_SingleOrder"], "shopping-cart"), new(true, L["Mode_BatchOrders"], "th")];
+
+    private IReadOnlyList<SegmentOption<bool>> HandOverOptions =>
+        [new(true, L["Pickup"], "hand-up"), new(false, L["DropOff"], "import")];
+
+    private readonly CreateShipmentRequest model = new()
+    {
+        ServiceType = ServiceType.Domestic,
+        Mode = TransportMode.Road,
+        OriginCode = "IQ-BG",
+        CodCurrency = "IQD",
+        DeliveryFee = 5000,
+        GrossWeightKg = 1,
+    };
+
+    private IReadOnlyList<MerchantLookupItem> merchants = [];
+    private List<ParsedOrderDraft> batchDrafts = [];
+    private List<string> lastBookedNumbers = [];
+    private string smartPasteText = "";
+    private string batchRawText = "";
+    private bool batchMode;
+    private bool saving;
+    private string? serverError;
+    private CustomerProfile? customer;
+    private string? lookedUpPhone;
+    private bool lookingUp;
+    private RateCard prices = new();
+
+    /// <summary>The company's price for this seller and destination (the standard prices until the list has loaded).</summary>
+    private PriceQuote Quote(string? destination, decimal weightKg) => prices.Quote(model.OriginCode, destination, weightKg, model.MerchantId);
+
+    private PriceQuote CurrentQuote => Quote(string.IsNullOrWhiteSpace(model.DestinationCode) ? model.OriginCode : model.DestinationCode, model.GrossWeightKg);
+
+    private MerchantLookupItem? SelectedMerchant => merchants.FirstOrDefault(m => m.Id == model.MerchantId);
+
+    private IReadOnlyList<ParsedOrderDraft> ValidBatchOrders => batchDrafts.Where(d => d.IsValid).ToList();
+
+    private DateTimeOffset? Promise =>
+        IraqGovernorates.IsKnown(model.DestinationCode) ? DeliveryPromise.Estimate(model.OriginCode, model.DestinationCode, DateTimeOffset.UtcNow) : null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        batchMode = Batch == true;
+        var pricesTask = Shipments.GetPricingAsync();
+        merchants = await Merchants.LookupAsync();
+        prices = await pricesTask;
+        if (PreselectedMerchant is { } id && merchants.Any(m => m.Id == id))
+        {
+            model.MerchantId = id;
+            MerchantChanged();
+        }
+        else if (merchants.Count > 0)
+        {
+            model.MerchantId = merchants[0].Id;
+            MerchantChanged();
+        }
+    }
+
+    private void MerchantChanged()
+    {
+        if (SelectedMerchant is { } m)
+        {
+            model.OriginCode = m.Governorate;
+            RecalculateTariff();
+            foreach (var row in batchDrafts)
+            {
+                row.DeliveryFee = Quote(row.DestinationCode, 1m).Fee;
+            }
+        }
+    }
+
+    private void RecalculateTariff()
+    {
+        var dest = string.IsNullOrWhiteSpace(model.DestinationCode) ? model.OriginCode : model.DestinationCode;
+        model.DeliveryFee = Quote(dest, model.GrossWeightKg).Fee;
+    }
+
+    private string PriceBreakdown(PriceQuote quote)
+    {
+        var parts = new List<string> { string.Format(CultureInfo.CurrentCulture, L["Price_Breakdown"], Fmt.Money(quote.BaseFee, "IQD")) };
+        if (quote.WeightCharge > 0)
+        {
+            parts.Add(string.Format(CultureInfo.CurrentCulture, L["Price_WeightPart"], Fmt.Money(quote.WeightCharge, "IQD")));
+        }
+
+        if (quote.DiscountPercent > 0)
+        {
+            parts.Add(string.Format(CultureInfo.CurrentCulture, L["Price_DiscountPart"], Fmt.Number(quote.DiscountPercent, 0)));
+        }
+
+        return string.Join(" ", parts);
+    }
+
+    /// <summary>Once the mobile number is complete, show the customer's history, risk and saved address.</summary>
+    private async Task PhoneChangedAsync()
+    {
+        var phone = Logistico.SharedKernel.Iraq.IraqPhone.Normalize(model.ConsigneePhone);
+        if (phone == lookedUpPhone)
+        {
+            return;
+        }
+
+        lookedUpPhone = phone;
+        customer = null;
+        if (phone is null)
+        {
+            return;
+        }
+
+        lookingUp = true;
+        try
+        {
+            customer = await Shipments.LookupCustomerAsync(phone);
+
+            // A returning customer: fill what the operator has not typed yet.
+            if (customer is { Orders: > 0 } && string.IsNullOrWhiteSpace(model.ConsigneeName))
+            {
+                model.ConsigneeName = customer.Name ?? "";
+            }
+        }
+        catch (ApiException)
+        {
+            // History is a convenience; the order can be booked without it.
+        }
+        finally
+        {
+            lookingUp = false;
+        }
+    }
+
+    private void UseCustomerAddress(CustomerProfile profile)
+    {
+        model.ConsigneeName = string.IsNullOrWhiteSpace(model.ConsigneeName) ? profile.Name ?? "" : model.ConsigneeName;
+        model.DestinationCode = profile.Governorate ?? model.DestinationCode;
+        model.DestinationCity = profile.City;
+        model.DeliveryAddress = profile.Address;
+        model.Landmark = profile.Landmark;
+        RecalculateTariff();
+    }
+
+    private async Task LoadSingleSample(string sample)
+    {
+        smartPasteText = sample;
+        await ApplySmartPaste();
+    }
+
+    private async Task ApplySmartPaste()
+    {
+        if (string.IsNullOrWhiteSpace(smartPasteText))
+        {
+            return;
+        }
+
+        var parsed = SmartOrderParser.ParseSingle(smartPasteText, model.OriginCode);
+        model.ConsigneeName = parsed.ConsigneeName;
+        model.ConsigneePhone = parsed.ConsigneePhone;
+        model.DestinationCode = parsed.DestinationCode;
+        model.DestinationCity = parsed.DestinationCity;
+        model.DeliveryAddress = parsed.DeliveryAddress;
+        model.Landmark = parsed.Landmark;
+        model.ItemsDescription = parsed.ItemsDescription;
+        model.CodAmount = parsed.CodAmount;
+        RecalculateTariff();
+        await PhoneChangedAsync();
+    }
+
+    private void LoadBatchSample()
+    {
+        batchRawText = string.Join(Environment.NewLine,
+            SampleBaghdadDm,
+            SampleBasraDm,
+            SampleErbilDm,
+            "حيدر الكربلائي - 07712223344 - كربلاء حي الحسين - قرب مستشفى الكفيل - جهاز مساج محمول - 35 الف");
+        ParseBatch();
+    }
+
+    private void ParseBatch()
+    {
+        lastBookedNumbers.Clear();
+        serverError = null;
+        batchDrafts = SmartOrderParser.ParseBatch(batchRawText, model.OriginCode).ToList();
+        foreach (var row in batchDrafts)
+        {
+            row.DeliveryFee = Quote(row.DestinationCode, 1m).Fee;
+        }
+    }
+
+    private void UpdateBatchRowGovernorate(ParsedOrderDraft row, string? govCode)
+    {
+        row.DestinationCode = govCode ?? "IQ-BG";
+        row.DeliveryFee = Quote(row.DestinationCode, 1m).Fee;
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (model.MerchantId is null)
+        {
+            serverError = L["ChooseSellerFirst"];
+            return;
+        }
+
+        saving = true;
+        serverError = null;
+        try
+        {
+            var created = await Shipments.CreateAsync(model);
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["OrderCreated"], created.TrackingNumber));
+            await Ops.RefreshAsync();
+            Navigation.NavigateTo($"shipments/{created.Id}");
+        }
+        catch (ApiException ex)
+        {
+            serverError = ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private async Task SubmitBatchAsync()
+    {
+        if (model.MerchantId is null)
+        {
+            serverError = L["ChooseSellerFirst"];
+            return;
+        }
+
+        var valid = ValidBatchOrders;
+        if (valid.Count == 0)
+        {
+            return;
+        }
+
+        saving = true;
+        serverError = null;
+        try
+        {
+            var response = await Shipments.BulkBookAsync(new BulkBookOrdersRequest
+            {
+                MerchantId = model.MerchantId,
+                PickupRequired = model.PickupRequired,
+                Orders = valid.ToList(),
+            });
+            lastBookedNumbers = response.Orders.Select(o => o.TrackingNumber).ToList();
+            batchDrafts.Clear();
+            batchRawText = "";
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["BatchBookedToast"], Fmt.Number(response.BookedCount)));
+            await Ops.RefreshAsync();
+        }
+        catch (ApiException ex)
+        {
+            serverError = ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

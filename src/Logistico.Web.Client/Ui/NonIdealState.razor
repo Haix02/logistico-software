@@ -1,0 +1,18 @@
+<div class="bp6-non-ideal-state lx-non-ideal">
+    <div class="bp6-non-ideal-state-visual">
+        <Icon Name="@Icon" Large="true" CssClass="lx-non-ideal-icon" />
+    </div>
+    <h4 class="bp6-heading">@Title</h4>
+    @if (Description is not null)
+    {
+        <div class="bp6-text-muted">@Description</div>
+    }
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public string Icon { get; set; } = "search";
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter] public string? Description { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

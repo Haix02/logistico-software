@@ -1,0 +1,44 @@
+@inherits LayoutComponentBase
+@using System.Globalization
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<ServerText> T
+
+@* Server-rendered frame for sign-in and account pages (they run without the WebAssembly client). *@
+<div class="lx-account">
+    <nav class="bp6-navbar bp6-dark lx-topbar">
+        <div class="bp6-navbar-group lx-topbar-start">
+            <a class="lx-brand" href="/">
+                <span class="lx-logo" aria-hidden="true"></span>
+                <span class="lx-brand-name">@T["AppName"]</span>
+            </a>
+        </div>
+        <div class="bp6-navbar-group lx-topbar-end">
+            <a class="bp6-button bp6-minimal" href="track">
+                <span class="bp6-icon-standard bp6-icon-path-search"></span>
+                <span class="bp6-button-text">@T["TrackShipment"]</span>
+            </a>
+            <a class="bp6-button bp6-minimal" href="@SwitchUrl">
+                <span class="bp6-icon-standard bp6-icon-translate"></span>
+                <span class="bp6-button-text">@T["Language"]</span>
+            </a>
+        </div>
+    </nav>
+    <main class="lx-account-main">
+        @Body
+    </main>
+</div>
+
+@code {
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    private string SwitchUrl
+    {
+        get
+        {
+            var target = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar" ? Logistico.SharedKernel.AppCultures.English : Logistico.SharedKernel.AppCultures.Arabic;
+            var returnUrl = HttpContext.Request.Path + HttpContext.Request.QueryString;
+            return $"/culture?c={target}&returnUrl={Uri.EscapeDataString(returnUrl)}";
+        }
+    }
+}

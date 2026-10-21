@@ -1,0 +1,28 @@
+@* Signed in, but the role does not open this page — or the account has no role yet and waits for an administrator. *@
+@using System.Security.Claims
+@inject AccountApi Account
+@inject NavigationManager Navigation
+
+<PageTitle>@(waiting ? L["NoAccess_WaitingTitle"] : L["NoAccess_Title"]) · @L["AppName"]</PageTitle>
+
+@if (waiting)
+{
+    <NonIdealState Icon="time" Title="@L["NoAccess_WaitingTitle"]" Description="@L["NoAccess_WaitingText"]">
+        <div class="lx-row">
+            <Button Icon="refresh" Text="@L["Reload"]" Intent="Intent.Primary" OnClick="@(() => Navigation.Refresh(forceReload: true))" />
+            <Button Icon="log-out" Text="@L["SignOut"]" OnClick="Account.SignOutAsync" />
+        </div>
+    </NonIdealState>
+}
+else
+{
+    <NonIdealState Icon="lock" Title="@L["NoAccess_Title"]" Description="@string.Format(CultureInfo.CurrentCulture, L["NoAccess_Text"], L["Role_" + (User.StaffRole() ?? "None")])">
+        <LinkButton Href="" Icon="home" Text="@L["Nav_Dashboard"]" Intent="Intent.Primary" />
+    </NonIdealState>
+}
+
+@code {
+    private bool waiting => !User.IsStaff();
+
+    [Parameter, EditorRequired] public ClaimsPrincipal User { get; set; } = default!;
+}

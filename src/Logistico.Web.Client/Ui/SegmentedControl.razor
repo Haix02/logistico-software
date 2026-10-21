@@ -1,0 +1,33 @@
+@typeparam TValue
+<div class="@Bp.Cls("bp6-segmented-control", Fill ? "bp6-fill" : "bp6-inline", Bp.When(Large, "bp6-large"), CssClass)" role="radiogroup" aria-label="@Label">
+    @foreach (var option in Options)
+    {
+        var selected = EqualityComparer<TValue>.Default.Equals(option.Value, Value);
+        <button type="button" role="radio" aria-checked="@(selected ? "true" : "false")"
+                class="@Bp.Cls("bp6-button", selected ? "bp6-intent-primary" : "bp6-minimal", Bp.When(Small, "bp6-small"), Bp.When(Large, "bp6-large"))"
+                @onclick="@(() => SelectAsync(option.Value))">
+            @if (option.Icon is not null)
+            {
+                <Icon Name="@option.Icon" />
+            }
+            <span class="bp6-button-text">@option.Text</span>
+        </button>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<SegmentOption<TValue>> Options { get; set; } = [];
+    [Parameter] public TValue? Value { get; set; }
+    [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public bool Fill { get; set; }
+    [Parameter] public bool Small { get; set; }
+    [Parameter] public bool Large { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+
+    private Task SelectAsync(TValue value)
+    {
+        Value = value;
+        return ValueChanged.InvokeAsync(value);
+    }
+}

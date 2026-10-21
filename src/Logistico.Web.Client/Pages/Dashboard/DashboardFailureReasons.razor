@@ -1,0 +1,27 @@
+<Section Title="@L["FailureReasons"]" Subtitle="@L["FailureReasonsHint"]" Icon="issue" CssClass="lx-dashboard-reasons">
+    @if (Reasons.Count == 0)
+    {
+        <NonIdealState Icon="tick-circle" Title="@L["NoFailuresPeriod"]" />
+    }
+    else
+    {
+        var max = Reasons.Max(r => r.Count);
+        <div class="lx-bars">
+            @foreach (var reason in Reasons.Take(6))
+            {
+                <div class="lx-bar-row">
+                    <span class="lx-bar-label" title="@ShipmentTexts.Of(reason.Reason)">@ShipmentTexts.Of(reason.Reason)</span>
+                    <span class="lx-bar-track"><span class="lx-bar-fill lx-bar-fill-warning" style="@Width(reason.Count, max)"></span></span>
+                    <strong class="lx-bar-value">@Fmt.Number(reason.Count)</strong>
+                </div>
+            }
+        </div>
+    }
+</Section>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<ReasonCount> Reasons { get; set; } = [];
+
+    private static string Width(int value, int max) =>
+        string.Create(CultureInfo.InvariantCulture, $"width:{Math.Max(2, value * 100.0 / Math.Max(1, max)):0.#}%");
+}

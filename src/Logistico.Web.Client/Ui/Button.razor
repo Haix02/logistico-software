@@ -1,0 +1,50 @@
+<button type="@Type"
+        class="@Bp.Cls("bp6-button", Bp.IntentClass(Intent), Bp.When(Minimal, "bp6-minimal"), Bp.When(Outlined, "bp6-outlined"), Bp.When(Small, "bp6-small"), Bp.When(Large, "bp6-large"), Bp.When(Fill, "bp6-fill"), Bp.When(Active, "bp6-active"), Bp.When(Loading, "bp6-loading"), Bp.When(Disabled, "bp6-disabled"), Bp.When(Tip is not null, "lx-tip"), CssClass)"
+        disabled="@(Disabled || Loading)"
+        title="@(Tip is null ? Title : null)"
+        data-tip="@Tip"
+        aria-label="@(AriaLabel ?? (Text is null && ChildContent is null ? Tip ?? Title : null))"
+        @onclick="OnClick"
+        @attributes="Attributes">
+    @if (Loading)
+    {
+        <span class="bp6-button-spinner"><Spinner Size="16" /></span>
+    }
+    @if (Icon is not null)
+    {
+        <Icon Name="@Icon" />
+    }
+    @if (Text is not null || ChildContent is not null)
+    {
+        <span class="bp6-button-text">@Text@ChildContent</span>
+    }
+    @if (RightIcon is not null)
+    {
+        <Icon Name="@RightIcon" />
+    }
+</button>
+
+@code {
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public string? RightIcon { get; set; }
+    [Parameter] public Intent Intent { get; set; }
+    [Parameter] public bool Minimal { get; set; }
+    [Parameter] public bool Outlined { get; set; }
+    [Parameter] public bool Small { get; set; }
+    [Parameter] public bool Large { get; set; }
+    [Parameter] public bool Fill { get; set; }
+    [Parameter] public bool Active { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool Loading { get; set; }
+    [Parameter] public string Type { get; set; } = "button";
+    [Parameter] public string? Title { get; set; }
+
+    /// <summary>Styled tooltip (Blueprint look) instead of the browser's title tooltip; use for icon-only buttons.</summary>
+    [Parameter] public string? Tip { get; set; }
+    [Parameter] public string? AriaLabel { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public IDictionary<string, object>? Attributes { get; set; }
+}

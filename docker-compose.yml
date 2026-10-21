@@ -1,0 +1,50 @@
+# Try Logistico on any machine with Docker: PostgreSQL + the app, migrated and filled with demo data.
+#
+#   docker compose up --build
+#   open http://localhost:5210   (admin@logistico.local / Logistico#2026)
+#
+# This stack is for evaluation and development. It runs in the Development environment (plain HTTP,
+# detailed errors, demo data, self-registration) — never expose it to the internet as is.
+# For production, see docs/05-infrastructure-and-deployment.md and docs/10-security-and-compliance.md.
+
+name: logistico
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: logistico
+      POSTGRES_PASSWORD: logistico_dev
+      POSTGRES_DB: logistico
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U logistico -d logistico"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Logistico: Host=db;Port=5432;Database=logistico;Username=logistico;Password=logistico_dev
+      Database__MigrateOnStartup: "true"
+      Seed__AdminEmail: admin@logistico.local
+      Seed__AdminPassword: "Logistico#2026"
+      Seed__DemoShipments: "600"
+      Seed__DemoTeam: "true"
+    ports:
+      - "5210:8080"
+    volumes:
+      - data-protection-keys:/keys
+    healthcheck:
+      # The runtime image has no shell or curl; the host's /health/ready endpoint is checked from outside instead.
+      disable: true
+
+volumes:
+  db-data:
+  data-protection-keys:

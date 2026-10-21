@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Logistico.SharedKernel/Logistico.SharedKernel.csproj" />
+    <Project Path="src/Logistico.Web.Client/Logistico.Web.Client.csproj" />
+    <Project Path="src/Logistico.Web/Logistico.Web.csproj" />
+    <Project Path="src/Modules/Shipments/Logistico.Modules.Shipments.Contracts/Logistico.Modules.Shipments.Contracts.csproj" />
+    <Project Path="src/Modules/Shipments/Logistico.Modules.Shipments/Logistico.Modules.Shipments.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Merchants/">
+    <Project Path="src/Modules/Merchants/Logistico.Modules.Merchants.Contracts/Logistico.Modules.Merchants.Contracts.csproj" />
+    <Project Path="src/Modules/Merchants/Logistico.Modules.Merchants/Logistico.Modules.Merchants.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Shipments/" />
+  <Folder Name="/tests/">
+    <Project Path="tests/Logistico.ArchitectureTests/Logistico.ArchitectureTests.csproj" />
+    <Project Path="tests/Logistico.Modules.Shipments.Tests/Logistico.Modules.Shipments.Tests.csproj" />
+    <Project Path="tests/Logistico.Web.IntegrationTests/Logistico.Web.IntegrationTests.csproj" />
+  </Folder>
+</Solution>

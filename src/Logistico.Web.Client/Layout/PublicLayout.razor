@@ -1,0 +1,38 @@
+@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+
+<div class="lx-public">
+    <nav class="bp6-navbar bp6-dark lx-topbar">
+        <div class="bp6-navbar-group lx-topbar-start">
+            <a class="lx-brand" href="track">
+                <span class="lx-logo" aria-hidden="true"></span>
+                <span class="lx-brand-name">@L["AppName"]</span>
+            </a>
+        </div>
+        <div class="bp6-navbar-group lx-topbar-end">
+            <Button Minimal="true" Icon="translate" Text="@L["OtherLanguage"]" OnClick="SwitchLanguage" />
+            <LinkButton Href="Account/Login" Minimal="true" Icon="log-in" Text="@L["StaffSignIn"]" />
+        </div>
+    </nav>
+    <main class="lx-public-main">
+        @Body
+    </main>
+    <footer class="lx-public-footer bp6-text-muted">@L["PublicFooter"]</footer>
+</div>
+
+<ToastHost />
+
+<div id="blazor-error-ui" data-nosnippet>
+    @L["UnhandledError"]
+    <a href="." class="reload">@L["Reload"]</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
+    private void SwitchLanguage()
+    {
+        var target = AppCultures.IsArabic ? AppCultures.English : AppCultures.Arabic;
+        var returnUrl = "/" + Navigation.ToBaseRelativePath(Navigation.Uri);
+        Navigation.NavigateTo($"culture?c={target}&returnUrl={Uri.EscapeDataString(returnUrl)}", forceLoad: true);
+    }
+}

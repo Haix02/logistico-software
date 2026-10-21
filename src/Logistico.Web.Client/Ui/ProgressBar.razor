@@ -1,0 +1,14 @@
+<div class="@Bp.Cls("bp6-progress-bar", Bp.When(!Animate, "bp6-no-stripes"), Bp.When(!Animate, "bp6-no-animation"), Bp.IntentClass(Intent), CssClass)"
+     role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="@Percent">
+    <div class="bp6-progress-meter" style="@($"width:{Percent.ToString(CultureInfo.InvariantCulture)}%")"></div>
+</div>
+
+@code {
+    /// <summary>0–1.</summary>
+    [Parameter] public double Value { get; set; }
+    [Parameter] public Intent Intent { get; set; } = Intent.Primary;
+    [Parameter] public bool Animate { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+
+    private int Percent => (int)Math.Round(Math.Clamp(Value, 0, 1) * 100);
+}

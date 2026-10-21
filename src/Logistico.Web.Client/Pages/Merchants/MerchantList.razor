@@ -1,0 +1,137 @@
+@page "/merchants"
+@inject MerchantsApi Merchants
+@inject NavigationManager Navigation
+@inject Toaster Toaster
+
+<PageTitle>@L["Nav_Sellers"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["SellersTitle"]" Subtitle="@L["SellersSubtitle"]" Icon="shop">
+    <Actions>
+        <Allowed Policy="@StaffPolicies.Operate">
+            <Button Icon="add" Text="@L["NewSeller"]" Intent="Intent.Primary" OnClick="OpenNew" />
+        </Allowed>
+    </Actions>
+</PageHeader>
+
+<div class="lx-toolbar lx-card lx-mb">
+    <form class="lx-toolbar-search" @onsubmit="SearchAsync">
+        <div class="bp6-input-group bp6-fill">
+            <span class="bp6-icon bp6-icon-standard bp6-icon-search"></span>
+            <input class="bp6-input" type="search" placeholder="@L["SellerSearchPlaceholder"]" @bind="q" aria-label="@L["SellerSearchPlaceholder"]" />
+        </div>
+    </form>
+</div>
+
+<div class="bp6-card lx-table-card">
+    <DataTable TItem="MerchantListItem" Items="result?.Items" Loading="loading" ColumnCount="6" OnRowClick="Open" EmptyIcon="shop" EmptyTitle="@L["NoSellers"]">
+        <Header>
+            <th>@L["Field_ShopName"]</th>
+            <th>@L["Field_Instagram"]</th>
+            <th>@L["Field_ContactName"]</th>
+            <th>@L["Field_Phone"]</th>
+            <th>@L["Field_Governorate"]</th>
+            <th>@L["Col_Status"]</th>
+        </Header>
+        <Row Context="m">
+            <td class="lx-strong">@m.Name</td>
+            <td dir="ltr">@(m.InstagramHandle is null ? "—" : "@" + m.InstagramHandle)</td>
+            <td>@m.ContactName</td>
+            <td dir="ltr">@IraqPhone.Display(m.Phone)</td>
+            <td>@Fmt.Place(m.Governorate)</td>
+            <td><Tag Intent="@(m.IsActive ? Intent.Success : Intent.None)">@(m.IsActive ? L["Active"] : L["Inactive"])</Tag></td>
+        </Row>
+    </DataTable>
+    @if (result is not null)
+    {
+        <Pager Page="result.Page" PageSize="result.PageSize" Total="result.TotalCount" OnPage="PageAsync" OnPageSize="PageSizeAsync" />
+    }
+</div>
+
+<Dialog @bind-IsOpen="dialogOpen" Title="@L["NewSeller"]" Icon="shop" Width="720px">
+    <ChildContent>
+        <MerchantForm Model="draft" FormId="new-merchant" OnSubmit="CreateAsync" Error="@error" />
+    </ChildContent>
+    <Footer>
+        <Button Text="@L["Cancel"]" OnClick="@(() => dialogOpen = false)" />
+        <Button Type="submit" form="new-merchant" Intent="Intent.Primary" Icon="tick" Text="@L["Save"]" Loading="saving" />
+    </Footer>
+</Dialog>
+
+@code {
+    [SupplyParameterFromQuery(Name = "new")] public int? NewFlag { get; set; }
+
+    private PagedResult<MerchantListItem>? result;
+    private string? q;
+    private int page = 1;
+    private int pageSize = 25;
+    private bool loading;
+    private bool dialogOpen;
+    private bool saving;
+    private string? error;
+    private MerchantRequest draft = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+        if (NewFlag == 1)
+        {
+            OpenNew();
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        loading = true;
+        result = await Merchants.ListAsync(q, page, pageSize);
+        loading = false;
+    }
+
+    private Task SearchAsync()
+    {
+        page = 1;
+        return LoadAsync();
+    }
+
+    private Task PageAsync(int p)
+    {
+        page = p;
+        return LoadAsync();
+    }
+
+    private Task PageSizeAsync(int size)
+    {
+        pageSize = size;
+        page = 1;
+        return LoadAsync();
+    }
+
+    private void OpenNew()
+    {
+        draft = new MerchantRequest();
+        error = null;
+        dialogOpen = true;
+    }
+
+    private async Task CreateAsync()
+    {
+        saving = true;
+        error = null;
+        try
+        {
+            var id = await Merchants.CreateAsync(draft);
+            dialogOpen = false;
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["SellerCreated"], draft.Name));
+            Navigation.NavigateTo($"merchants/{id}");
+        }
+        catch (ApiException ex)
+        {
+            error = ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private void Open(MerchantListItem m) => Navigation.NavigateTo($"merchants/{m.Id}");
+}

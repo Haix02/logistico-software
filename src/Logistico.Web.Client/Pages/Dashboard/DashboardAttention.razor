@@ -1,0 +1,31 @@
+<Section Title="@L["NeedsAttention"]" Subtitle="@L["NeedsAttentionHint"]" Icon="notifications" Padded="false" CssClass="lx-dashboard-attention">
+    <Actions>
+        <LinkButton Href="automation" Minimal="true" Small="true" Text="@L["ViewAll"]" RightIcon="@Bidi.ChevronForward" />
+    </Actions>
+    <ChildContent>
+        @if (Items.Count == 0)
+        {
+            <NonIdealState Icon="tick-circle" Title="@L["NothingNeedsAttention"]" />
+        }
+        else
+        {
+            <ol class="lx-list lx-attention-list">
+                @foreach (var item in Items)
+                {
+                    <li>
+                        <a class="lx-list-item" href="@item.Href">
+                            <span class="@($"lx-list-icon lx-list-icon-{item.Tone}")"><Icon Name="@item.Icon" /></span>
+                            <span class="lx-list-body"><span class="lx-list-title">@item.Text</span></span>
+                            <strong class="lx-attention-count">@Fmt.Number(item.Count)</strong>
+                            <Icon Name="@Bidi.ChevronForward" CssClass="lx-attention-chevron" />
+                        </a>
+                    </li>
+                }
+            </ol>
+        }
+    </ChildContent>
+</Section>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<DashboardAttentionItem> Items { get; set; } = [];
+}

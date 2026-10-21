@@ -1,0 +1,89 @@
+@* Blueprint-style popover anchored to its trigger. Placed with fixed positioning (lx.place) so it is never clipped by
+   scrolling tables, flips upward near the bottom of the screen and mirrors in Arabic. Closes on outside click or Esc. *@
+@inject IJSRuntime JS
+
+<span class="@Bp.Cls("lx-popover-host", CssClass)" @ref="host" @onkeydown="KeyAsync">
+    @if (Target is not null)
+    {
+        @Target(this)
+    }
+    else
+    {
+        <Button Text="@Text" Icon="@Icon" RightIcon="@(RightIcon ?? (Text is null ? null : "caret-down"))" Minimal="Minimal" Small="Small" Outlined="Outlined"
+                Intent="Intent" Active="IsOpen" Title="@Title" OnClick="ToggleAsync" aria-haspopup="true" aria-expanded="@(IsOpen ? "true" : "false")">@ButtonContent</Button>
+    }
+    @if (IsOpen)
+    {
+        <div class="lx-backdrop" @onclick="CloseAsync"></div>
+        <div class="@Bp.Cls("lx-popover", PopoverClass)" @ref="pop" role="dialog" style="@(Width is null ? null : $"width:{Width}")">
+            <CascadingValue Value="this" IsFixed="true">@ChildContent</CascadingValue>
+        </div>
+    }
+</span>
+
+@code {
+    private ElementReference host;
+    private ElementReference pop;
+    private bool placed;
+
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+
+    /// <summary>Custom trigger; receives the popover so it can call <see cref="ToggleAsync"/>.</summary>
+    [Parameter] public RenderFragment<Popover>? Target { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? ButtonContent { get; set; }
+
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public string? RightIcon { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public bool Minimal { get; set; }
+    [Parameter] public bool Small { get; set; }
+    [Parameter] public bool Outlined { get; set; }
+    [Parameter] public Intent Intent { get; set; }
+
+    /// <summary>"end" (default) aligns the popover with the trigger's inline-end edge; "start" with its inline-start edge.</summary>
+    [Parameter] public string Align { get; set; } = "end";
+    [Parameter] public string? Width { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+    [Parameter] public string? PopoverClass { get; set; }
+
+    public async Task ToggleAsync()
+    {
+        IsOpen = !IsOpen;
+        placed = false;
+        await IsOpenChanged.InvokeAsync(IsOpen);
+    }
+
+    public async Task CloseAsync()
+    {
+        if (!IsOpen)
+        {
+            return;
+        }
+
+        IsOpen = false;
+        await IsOpenChanged.InvokeAsync(false);
+        StateHasChanged();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!IsOpen)
+        {
+            placed = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (IsOpen && !placed)
+        {
+            placed = true;
+            await JS.InvokeVoidAsync("lx.place", host, pop, Align);
+        }
+    }
+
+    private Task KeyAsync(KeyboardEventArgs e) => e.Key == "Escape" ? CloseAsync() : Task.CompletedTask;
+}

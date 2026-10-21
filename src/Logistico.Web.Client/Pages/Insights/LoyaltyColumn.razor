@@ -1,0 +1,18 @@
+@* One side of the first-time vs repeat comparison: customers, orders and how their orders ended. *@
+<div class="@Bp.Cls("lx-loyalty-col", Bp.When(Highlight, "lx-loyalty-col-highlight"))">
+    <div class="lx-loyalty-title">@Title</div>
+    <div class="lx-loyalty-big">@Fmt.Number(Customers)</div>
+    <div class="lx-muted lx-small">@L["Insights_Customers"]</div>
+    <dl class="lx-props lx-loyalty-props">
+        <dt>@L["Col_Orders"]</dt><dd>@Fmt.Number(Outcome.Orders)</dd>
+        <dt>@L["Col_SuccessRate"]</dt><dd><RateTag Value="Outcome.SuccessRate" /></dd>
+        <dt>@L["Col_ReturnRate"]</dt><dd>@Fmt.Percent(Outcome.ReturnRate)</dd>
+    </dl>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter, EditorRequired] public LoyaltyOutcome Outcome { get; set; } = default!;
+    [Parameter] public int Customers { get; set; }
+    [Parameter] public bool Highlight { get; set; }
+}

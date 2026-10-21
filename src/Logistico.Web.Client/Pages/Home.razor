@@ -1,0 +1,262 @@
+@page "/"
+@implements IDisposable
+@inject ShipmentsApi Shipments
+@inject OperationsApi Operations
+@inject OpsState Ops
+@inject IJSRuntime JS
+
+<PageTitle>@L["Nav_Dashboard"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["DashboardTitle"]" Subtitle="@DateTimeOffset.Now.ToString("dddd، d MMMM yyyy", CultureInfo.CurrentCulture)" Icon="dashboard">
+    <Actions>
+        <SegmentedControl TValue="int" Options="PeriodOptions" Value="days" ValueChanged="PeriodChangedAsync" Label="@L["Period"]" />
+        <Button Icon="refresh" Minimal="true" Tip="@L["Refresh"]" Loading="loading" OnClick="ReloadAsync" />
+        <Allowed Policy="@StaffPolicies.Operate">
+            <LinkButton Href="orders/new" Icon="add" Text="@L["NewOrder"]" Intent="Intent.Primary" CssClass="lx-hide-sm" />
+        </Allowed>
+    </Actions>
+</PageHeader>
+
+@if (summary is not null && network is not null)
+{
+    <DashboardPulse Summary="summary" Network="network" />
+}
+else
+{
+    <div class="bp6-skeleton lx-dashboard-pulse-skeleton"></div>
+}
+
+@if (error is not null)
+{
+    <Callout Intent="Intent.Danger" Icon="error" Title="@L["UnhandledError"]" CssClass="lx-dashboard-error">
+        <p>@error</p>
+        <div class="lx-callout-actions">
+            <Button Icon="refresh" Text="@L["Refresh"]" Intent="Intent.Primary" Loading="loading" OnClick="ReloadAsync" />
+        </div>
+    </Callout>
+}
+else if (analytics is null || summary is null || network is null)
+{
+    <div class="lx-dashboard-skeleton" aria-hidden="true">
+        <div class="lx-kpis lx-kpis-4">
+            @for (var i = 0; i < 4; i++)
+            {
+                <div class="bp6-skeleton lx-skeleton-block"></div>
+            }
+        </div>
+        <div class="bp6-skeleton lx-dashboard-panel-skeleton"></div>
+        <div class="lx-dashboard-main-grid">
+            <div class="bp6-skeleton lx-dashboard-chart-skeleton"></div>
+            <div class="bp6-skeleton lx-dashboard-chart-skeleton"></div>
+        </div>
+    </div>
+}
+else
+{
+    <main class="lx-dashboard">
+        <DashboardMetrics Overview="analytics" />
+
+        <div class="lx-dashboard-main-grid">
+            <Section Title="@L["DailyVolume"]" Subtitle="@string.Format(CultureInfo.CurrentCulture, L["DailyVolumeHint"], Fmt.Date(analytics.From), Fmt.Date(analytics.To))" Icon="timeline-bar-chart" CssClass="lx-dashboard-trend-section">
+                <TrendChart Days="analytics.Daily" AriaLabel="@L["DailyVolume"]" />
+            </Section>
+            <DashboardAttention Items="AttentionItems" />
+        </div>
+
+        <div class="lx-dashboard-operations-grid">
+            <DashboardPipeline Summary="summary" Analytics="analytics" />
+            <DashboardFailureReasons Reasons="analytics.FailureReasons" />
+        </div>
+
+        <DashboardPerformance Overview="analytics" />
+        <DashboardInternationalPipeline Items="InternationalPipeline" />
+    </main>
+}
+
+@code {
+    private readonly CancellationTokenSource lifetime = new();
+    private CancellationTokenSource? periodLoad;
+    private ShipmentsSummary? summary;
+    private NetworkOverview? network;
+    private AlertList? alerts;
+    private AnalyticsOverview? analytics;
+    private int days = 7;
+    private bool loading = true;
+    private string? error;
+
+    private IReadOnlyList<SegmentOption<int>> PeriodOptions =>
+        [new(1, L["Period_Today"]), new(7, L["Period_7"]), new(30, L["Period_30"]), new(90, L["Period_90"])];
+
+    private IReadOnlyList<DashboardAttentionItem> AttentionItems
+    {
+        get
+        {
+            var items = new List<DashboardAttentionItem>();
+            if (alerts is not null)
+            {
+                items.AddRange(alerts.OpenByKind.Select(kind =>
+                {
+                    var critical = kind.Kind is AlertKind.OutForDeliveryOverdue or AlertKind.MissingInTransfer;
+                    return new DashboardAttentionItem(
+                        DomainIcons.Of(kind.Kind),
+                        ShipmentTexts.Of(kind.Kind),
+                        kind.Count,
+                        "automation?tab=alerts",
+                        critical ? "danger" : "warning",
+                        critical ? 0 : 1);
+                }));
+            }
+
+            if (Ops.Counters is { } counters)
+            {
+                Add(counters.OpenRequests, "inbox", L["Kpi_OpenRequests"], "requests", counters.OverdueRequests > 0 ? "danger" : "primary", counters.OverdueRequests > 0 ? 0 : 2);
+                Add(counters.ParcelsWaitingForTruck, "drive-time", L["View_NeedsTruck"], "shipments?needsTransfer=true", "warning", 1);
+                Add(counters.ReturnsAtHub, "undo", L["ReturnsForSellers"], "returns", "warning", 2);
+                Add(counters.PendingMessages, "chat", L["Kpi_MessagesPending"], "automation?tab=messages", "primary", 3);
+            }
+
+            return items.OrderBy(item => item.Priority).ThenByDescending(item => item.Count).Take(6).ToList();
+
+            void Add(int count, string icon, string text, string href, string tone, int priority)
+            {
+                if (count > 0)
+                {
+                    items.Add(new DashboardAttentionItem(icon, text, count, href, tone, priority));
+                }
+            }
+        }
+    }
+
+    private IReadOnlyList<(ShipmentStatus Status, int Count)> InternationalPipeline
+    {
+        get
+        {
+            if (summary is null)
+            {
+                return [];
+            }
+
+            var counts = summary.Counts
+                .Where(item => item.ServiceType == ServiceType.International)
+                .ToDictionary(item => item.Status, item => item.Count);
+            return ShipmentLifecycle.For(ServiceType.International).Keys
+                .Where(status => status is not ShipmentStatus.Draft && counts.ContainsKey(status))
+                .Select(status => (status, counts[status]))
+                .ToList();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RestorePeriodAsync();
+        await LoadDashboardAsync();
+    }
+
+    private async Task RestorePeriodAsync()
+    {
+        try
+        {
+            if (int.TryParse(await JS.InvokeAsync<string?>("lx.getPref", "dashboard.days"), out var saved) && saved is 1 or 7 or 30 or 90)
+            {
+                days = saved;
+            }
+        }
+        catch (JSException)
+        {
+            // Preferences are optional; the dashboard remains usable when browser storage is unavailable.
+        }
+    }
+
+    private async Task LoadDashboardAsync()
+    {
+        periodLoad?.Cancel();
+        loading = true;
+        error = null;
+        try
+        {
+            var ct = lifetime.Token;
+            var summaryTask = Shipments.GetSummaryAsync(ct: ct);
+            var networkTask = Operations.GetNetworkAsync(ct);
+            var alertsTask = Operations.ListAlertsAsync(pageSize: 1, ct: ct);
+            var analyticsTask = Operations.GetAnalyticsAsync(days, ct);
+
+            await Task.WhenAll(summaryTask, networkTask, alertsTask, analyticsTask, Ops.RefreshAsync());
+            summary = await summaryTask;
+            network = await networkTask;
+            alerts = await alertsTask;
+            analytics = await analyticsTask;
+        }
+        catch (OperationCanceledException) when (lifetime.IsCancellationRequested)
+        {
+        }
+        catch (ApiException ex)
+        {
+            error = ex.UserMessage;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            error = L["ServiceUnavailable"];
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private async Task PeriodChangedAsync(int value)
+    {
+        if (value == days && analytics is not null)
+        {
+            return;
+        }
+
+        days = value;
+        try
+        {
+            await JS.InvokeVoidAsync("lx.setPref", "dashboard.days", value.ToString(CultureInfo.InvariantCulture));
+        }
+        catch (JSException)
+        {
+        }
+
+        periodLoad?.Cancel();
+        periodLoad?.Dispose();
+        periodLoad = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token);
+        var currentLoad = periodLoad;
+        analytics = null;
+        error = null;
+        loading = true;
+        try
+        {
+            analytics = await Operations.GetAnalyticsAsync(days, currentLoad.Token);
+        }
+        catch (OperationCanceledException) when (currentLoad.IsCancellationRequested)
+        {
+        }
+        catch (ApiException ex)
+        {
+            error = ex.UserMessage;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            error = L["ServiceUnavailable"];
+        }
+        finally
+        {
+            if (ReferenceEquals(currentLoad, periodLoad))
+            {
+                loading = false;
+            }
+        }
+    }
+
+    private Task ReloadAsync() => LoadDashboardAsync();
+
+    public void Dispose()
+    {
+        periodLoad?.Cancel();
+        periodLoad?.Dispose();
+        lifetime.Cancel();
+        lifetime.Dispose();
+    }
+}

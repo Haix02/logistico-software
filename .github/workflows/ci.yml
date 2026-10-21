@@ -1,0 +1,142 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build-and-test:
+    name: Build & test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: logistico
+          POSTGRES_PASSWORD: logistico_ci
+          POSTGRES_DB: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U logistico"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    env:
+      LOGISTICO_TEST_DB: Host=localhost;Port=5432;Database=logistico_test;Username=logistico;Password=logistico_ci
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          global-json-file: global.json
+
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj', 'dotnet-tools.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      # NuGet audit runs during restore; known-vulnerable packages fail the build (warnings are errors).
+      - name: Restore
+        run: |
+          dotnet restore Logistico.slnx
+          dotnet tool restore
+
+      - name: Check formatting
+        run: dotnet format Logistico.slnx --verify-no-changes --severity warn --no-restore
+
+      - name: Build
+        run: dotnet build Logistico.slnx -c Release --no-restore
+
+      - name: Test (unit, architecture, API integration on PostgreSQL)
+        run: dotnet test Logistico.slnx -c Release --no-build --logger trx --results-directory TestResults
+
+      - name: Check that EF Core migrations match the model
+        run: |
+          for ctx in "src/Logistico.Web:ApplicationDbContext" "src/Modules/Shipments/Logistico.Modules.Shipments:ShipmentsDbContext" "src/Modules/Merchants/Logistico.Modules.Merchants:MerchantsDbContext"; do
+            # Note: for dotnet-ef, -c means --context; the build configuration needs the long option.
+            dotnet ef migrations has-pending-model-changes --no-build --configuration Release \
+              --project "${ctx%%:*}" --startup-project src/Logistico.Web --context "${ctx##*:}"
+          done
+        env:
+          ConnectionStrings__Logistico: ${{ env.LOGISTICO_TEST_DB }}
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: test-results
+          path: TestResults
+
+  docker:
+    name: Docker image (docker compose)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      # The Dockerfile behind `docker compose up` must keep working for people trying Logistico without the .NET SDK.
+      - name: Build the image
+        run: docker build --tag logistico-web:ci .
+
+  package:
+    name: Package (container image + migration bundles)
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          global-json-file: global.json
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish container image (.NET SDK container support, no Dockerfile)
+        run: >
+          dotnet publish src/Logistico.Web -c Release -t:PublishContainer
+          -p:ContainerRegistry=ghcr.io
+          -p:ContainerRepository=${{ github.repository_owner }}/logistico-web
+          -p:ContainerImageTags='"${{ github.sha }};main"'
+
+      # Production applies migrations from these bundles before the new version starts (docs/11-ci-cd-and-devops.md).
+      - name: Build EF Core migration bundles
+        run: |
+          dotnet tool restore
+          dotnet ef migrations bundle --project src/Logistico.Web --startup-project src/Logistico.Web \
+            --context ApplicationDbContext -o out/migrate-identity --self-contained -r linux-x64
+          dotnet ef migrations bundle --project src/Modules/Shipments/Logistico.Modules.Shipments --startup-project src/Logistico.Web \
+            --context ShipmentsDbContext -o out/migrate-shipments --self-contained -r linux-x64
+          dotnet ef migrations bundle --project src/Modules/Merchants/Logistico.Modules.Merchants --startup-project src/Logistico.Web \
+            --context MerchantsDbContext -o out/migrate-merchants --self-contained -r linux-x64
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: migration-bundles
+          path: out/

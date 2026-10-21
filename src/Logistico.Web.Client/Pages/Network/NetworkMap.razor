@@ -1,0 +1,182 @@
+@page "/network"
+@implements IDisposable
+@inject OperationsApi Operations
+@inject NavigationManager Navigation
+
+<PageTitle>@L["Nav_Network"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["NetworkTitle"]" Subtitle="@L["NetworkSubtitle"]" Icon="map">
+    <Actions>
+        <SegmentedControl TValue="string" Options="MeasureOptions" Value="measure" ValueChanged="@(v => measure = v)" Label="@L["Map_Measure"]" />
+        <Button Icon="refresh" Minimal="true" Tip="@L["Refresh"]" Loading="loading" OnClick="LoadAsync" />
+    </Actions>
+</PageHeader>
+
+@if (network is null)
+{
+    <Skeleton Block="true" Lines="2" />
+}
+else
+{
+    <div class="lx-kpis">
+        <KpiCard Icon="box" Label="@L["Kpi_ActiveParcels"]" Value="@Fmt.Number(network.ActiveTotal)" Intent="Intent.Primary" Href="shipments" />
+        <KpiCard Icon="drive-time" Label="@L["Kpi_OnTrucks"]" Value="@Fmt.Number(network.OnTrucks)" Intent="Intent.Primary" Href="transfers?status=InTransit" />
+        <KpiCard Icon="time" Label="@L["Kpi_Late"]" Value="@Fmt.Number(network.Late)" Intent="@(network.Late > 0 ? Intent.Warning : Intent.Success)" Href="shipments?late=true" />
+        <KpiCard Icon="notifications" Label="@L["Kpi_OpenAlerts"]" Value="@Fmt.Number(network.OpenAlerts)" Intent="@(network.OpenAlerts > 0 ? Intent.Danger : Intent.Success)" Href="automation" />
+    </div>
+
+    <div class="lx-map-layout">
+        <div class="lx-card lx-map-card">
+            <IraqMap Governorates="network.Governorates" Hubs="network.Hubs" Lanes="network.Lanes" Measure="MeasureFn" Selected="@selected"
+                     OnSelect="@(code => selected = code)" OnHub="@(code => Navigation.NavigateTo($"shipments?hub={code}&inWarehouse=true"))" />
+        </div>
+
+        <div class="lx-stack" style="gap:18px">
+            @if (Selected is { } g)
+            {
+                var name = IraqGovernorates.Find(g.Code)?.Name ?? g.Code;
+                <Section Title="@name" Subtitle="@string.Format(CultureInfo.CurrentCulture, L["ServedBy"], HubCatalog.ResolveDestinationHub(g.Code).Name)" Icon="map-marker" Padded="false">
+                    <Actions><Button Minimal="true" Small="true" Icon="cross" Tip="@L["Close"]" OnClick="@(() => selected = null)" /></Actions>
+                    <ChildContent>
+                        <ul class="lx-list">
+                            <GovernorateRow Icon="box" Text="@L["Kpi_ActiveParcels"]" Value="g.Active" Href="@($"shipments?governorate={g.Code}")" />
+                            <GovernorateRow Icon="office" Text="@L["View_InWarehouse"]" Value="g.AtHub" Href="@($"shipments?governorate={g.Code}&inWarehouse=true")" />
+                            <GovernorateRow Icon="truck" Text="@L["View_WithCourier"]" Value="g.OutForDelivery" Href="@($"shipments?governorate={g.Code}&status=OutForDelivery")" />
+                            <GovernorateRow Icon="warning-sign" Text="@L["View_Failed"]" Value="g.Failed" Href="@($"shipments?governorate={g.Code}&status=DeliveryFailed")" Tone="warning" />
+                            <GovernorateRow Icon="time" Text="@L["View_Late"]" Value="g.Late" Href="@($"shipments?governorate={g.Code}&late=true")" Tone="danger" />
+                            <GovernorateRow Icon="undo" Text="@L["View_Returns"]" Value="g.Returning" Href="@($"shipments?governorate={g.Code}&status=ReturnInitiated&status=ReturnInTransit&status=ReturnAtHub")" />
+                            <GovernorateRow Icon="tick-circle" Text="@L["Kpi_DeliveredToday"]" Value="g.DeliveredToday" Tone="success" />
+                        </ul>
+                    </ChildContent>
+                </Section>
+            }
+
+            <Section Title="@L["Hubs"]" Subtitle="@L["HubsHint"]" Icon="office" Padded="false">
+                <ul class="lx-list">
+                    @foreach (var hub in network.Hubs)
+                    {
+                        var info = HubCatalog.FindOrDefault(hub.HubCode);
+                        <li>
+                            <a class="lx-list-item" href="@($"shipments?hub={hub.HubCode}&inWarehouse=true")">
+                                <span class="@Bp.Cls("lx-list-icon", hub.OpenAlerts > 0 ? "lx-list-icon-danger" : "lx-list-icon-primary")"><span class="lx-code" style="font-size:11px">@info.RoutingTag</span></span>
+                                <span class="lx-list-body">
+                                    <span class="lx-list-title">@info.Name</span>
+                                    <span class="lx-list-sub">
+                                        @string.Format(CultureInfo.CurrentCulture, L["HubLine"], Fmt.Number(hub.OnShelves), Fmt.Number(hub.ToTransfer), Fmt.Number(hub.Inbound))
+                                    </span>
+                                </span>
+                                @if (hub.OpenAlerts > 0)
+                                {
+                                    <Tag Intent="Intent.Danger" Icon="notifications" Round="true">@Fmt.Number(hub.OpenAlerts)</Tag>
+                                }
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </Section>
+
+            <Section Title="@L["TrucksOnRoad"]" Icon="drive-time" Padded="false">
+                <Actions><LinkButton Href="transfers" Minimal="true" Small="true" Text="@L["ViewAll"]" RightIcon="@Bidi.ChevronForward" /></Actions>
+                <ChildContent>
+                    <ul class="lx-list">
+                        @foreach (var lane in network.Lanes.OrderByDescending(l => l.Overdue).ThenByDescending(l => l.Parcels + l.Waiting))
+                        {
+                            <li class="lx-list-item">
+                                <span class="@Bp.Cls("lx-list-icon", lane.Overdue ? "lx-list-icon-danger" : lane.Trucks > 0 ? "lx-list-icon-primary" : "lx-list-icon-warning")"><Icon Name="drive-time" /></span>
+                                <span class="lx-list-body">
+                                    <span class="lx-list-title"><HubRoute Current="@lane.FromHubCode" Target="@lane.ToHubCode" /></span>
+                                    <span class="lx-list-sub">@string.Format(CultureInfo.CurrentCulture, L["LaneTip"], Fmt.Number(lane.Trucks), Fmt.Number(lane.Parcels), Fmt.Number(lane.Waiting))</span>
+                                </span>
+                                @if (lane.Overdue)
+                                {
+                                    <Tag Intent="Intent.Danger">@L["Late"]</Tag>
+                                }
+                            </li>
+                        }
+                        @if (network.Lanes.Count == 0)
+                        {
+                            <li><NonIdealState Icon="drive-time" Title="@L["NoTrucks"]" /></li>
+                        }
+                    </ul>
+                </ChildContent>
+            </Section>
+        </div>
+    </div>
+
+    <Section Title="@L["ByGovernorate"]" Icon="th-list" Padded="false" CssClass="lx-mt-lg">
+        <div class="lx-card-pad lx-bars">
+            @{ var max = Math.Max(1, network.Governorates.Select(MeasureFn).DefaultIfEmpty(0).Max()); }
+            @foreach (var g in network.Governorates.OrderByDescending(MeasureFn))
+            {
+                var value = MeasureFn(g);
+                <a class="lx-bar-row" href="@($"shipments?governorate={g.Code}")">
+                    <span class="lx-ellipsis">@(IraqGovernorates.Find(g.Code)?.Name ?? g.Code)</span>
+                    <span class="lx-bar-track"><span class="@Bp.Cls("lx-bar-fill", measure is "late" or "failed" ? "lx-bar-fill-warning" : null)" style="@($"width:{(value * 100.0 / max).ToString("0.#", CultureInfo.InvariantCulture)}%")"></span></span>
+                    <span class="lx-bar-value">@Fmt.Number(value)</span>
+                </a>
+            }
+        </div>
+    </Section>
+}
+
+@code {
+    private NetworkOverview? network;
+    private string measure = "active";
+    private string? selected;
+    private bool loading;
+    private CancellationTokenSource? refresh;
+
+    private GovernorateLoad? Selected => selected is null ? null : network?.Governorates.FirstOrDefault(g => g.Code == selected) ?? new GovernorateLoad(selected, 0, 0, 0, 0, 0, 0, 0);
+
+    private IReadOnlyList<SegmentOption<string>> MeasureOptions =>
+    [
+        new("active", L["Map_Active"], "box"),
+        new("courier", L["View_WithCourier"], "truck"),
+        new("late", L["View_Late"], "time"),
+        new("failed", L["View_Failed"], "warning-sign"),
+        new("returns", L["View_Returns"], "undo"),
+    ];
+
+    private Func<GovernorateLoad, int> MeasureFn => measure switch
+    {
+        "courier" => g => g.OutForDelivery,
+        "late" => g => g.Late,
+        "failed" => g => g.Failed,
+        "returns" => g => g.Returning,
+        _ => g => g.Active,
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+        refresh = new CancellationTokenSource();
+        var token = refresh.Token;
+        _ = Task.Run(async () =>
+        {
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
+            while (await timer.WaitForNextTickAsync(token))
+            {
+                await InvokeAsync(LoadAsync);
+            }
+        }, token);
+    }
+
+    private async Task LoadAsync()
+    {
+        loading = true;
+        try
+        {
+            network = await Operations.GetNetworkAsync();
+        }
+        catch (Exception ex) when (ex is HttpRequestException or ApiException)
+        {
+        }
+        finally
+        {
+            loading = false;
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose() => refresh?.Cancel();
+}

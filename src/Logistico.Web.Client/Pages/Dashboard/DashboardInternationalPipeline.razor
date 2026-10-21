@@ -1,0 +1,19 @@
+@if (Items.Count > 0)
+{
+    <Section Title="@L["InternationalPipeline"]" Icon="globe" Collapsible="true" StartCollapsed="true" CssClass="lx-dashboard-international">
+        <div class="lx-chips">
+            @foreach (var (status, count) in Items)
+            {
+                <a class="lx-chip" href="@($"shipments?service=International&status={status}")">
+                    <Icon Name="@StatusTag.IconOf(status)" />
+                    <span>@ShipmentTexts.Of(status)</span>
+                    <strong class="lx-chip-count">@Fmt.Number(count)</strong>
+                </a>
+            }
+        </div>
+    </Section>
+}
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<(ShipmentStatus Status, int Count)> Items { get; set; } = [];
+}

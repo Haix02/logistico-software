@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Validation_Choice" xml:space="preserve"><value>Choose one of the listed options.</value></data>
+  <data name="Validation_Currency" xml:space="preserve"><value>Use a currency code such as IQD or USD.</value></data>
+  <data name="Validation_DateWindow" xml:space="preserve"><value>Choose a date from today up to 14 days ahead.</value></data>
+  <data name="Validation_Email" xml:space="preserve"><value>Enter a valid email address.</value></data>
+  <data name="Validation_Governorate" xml:space="preserve"><value>Choose a governorate.</value></data>
+  <data name="Validation_Incoterm" xml:space="preserve"><value>Unknown Incoterm.</value></data>
+  <data name="Validation_InsideIraq" xml:space="preserve"><value>Choose a location inside Iraq (click the map).</value></data>
+  <data name="Validation_InstagramHandle" xml:space="preserve"><value>Instagram handles use letters, numbers, dots and underscores (max 30).</value></data>
+  <data name="Validation_IraqiMobile" xml:space="preserve"><value>Enter an Iraqi mobile number, e.g. 0770 123 4567.</value></data>
+  <data name="Validation_LocationCode" xml:space="preserve"><value>Use a 3–5 letter location code (UN/LOCODE or IATA), e.g. CNSHA.</value></data>
+  <data name="Validation_MaxLength" xml:space="preserve"><value>Use at most {1} characters.</value></data>
+  <data name="Validation_NoFriday" xml:space="preserve"><value>Couriers do not deliver on Friday. Please choose another day.</value></data>
+  <data name="Validation_Phone" xml:space="preserve"><value>Phone must contain 7–20 digits, optionally starting with +.</value></data>
+  <data name="Validation_PhoneLast4" xml:space="preserve"><value>Enter the last 4 digits of the mobile number on the order.</value></data>
+  <data name="Validation_Range" xml:space="preserve"><value>Enter a value between {1} and {2}.</value></data>
+  <data name="Validation_Required" xml:space="preserve"><value>This field is required.</value></data>
+  <data name="Validation_RoutingTag" xml:space="preserve"><value>Use 3 English letters, e.g. NJF.</value></data>
+  <data name="Validation_Role" xml:space="preserve"><value>Choose one of the roles: Admin, Operations, Finance or Viewer.</value></data>
+  <data name="Validation_PasswordLength" xml:space="preserve"><value>The password needs at least 10 characters.</value></data>
+</root>

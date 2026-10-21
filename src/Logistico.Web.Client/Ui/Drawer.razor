@@ -1,0 +1,40 @@
+@* Blueprint drawer sliding in from the inline-end side (right in English, left in Arabic). *@
+@if (IsOpen)
+{
+    <div class="bp6-portal">
+        <div class="bp6-overlay bp6-overlay-open bp6-overlay-container" @onkeydown="KeyAsync">
+            <div class="bp6-overlay-backdrop" @onclick="CloseAsync"></div>
+            <div class="bp6-drawer bp6-position-right bp6-overlay-content lx-drawer" role="dialog" aria-modal="true" aria-labelledby="@titleId" style="@(Width is null ? null : $"width:min({Width},100vw)")">
+                <div class="bp6-drawer-header">
+                    @if (Icon is not null)
+                    {
+                        <Icon Name="@Icon" Large="true" />
+                    }
+                    <h4 id="@titleId" class="bp6-heading">@Title</h4>
+                    <Button Minimal="true" Icon="cross" Title="@L["Close"]" OnClick="CloseAsync" autofocus />
+                </div>
+                <div class="bp6-drawer-body">@ChildContent</div>
+                @if (Footer is not null)
+                {
+                    <div class="bp6-drawer-footer">@Footer</div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private readonly string titleId = $"lx-drawer-title-{Guid.NewGuid():N}";
+
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public string? Width { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? Footer { get; set; }
+
+    private Task CloseAsync() => IsOpenChanged.InvokeAsync(false);
+
+    private Task KeyAsync(KeyboardEventArgs e) => e.Key == "Escape" ? CloseAsync() : Task.CompletedTask;
+}

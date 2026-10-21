@@ -1,0 +1,112 @@
+@inject NavigationManager Navigation
+
+<Section Title="@L["PerformanceDetails"]" Subtitle="@L["PerformanceDetailsHint"]" Icon="comparison" Padded="false" CssClass="lx-dashboard-performance">
+    <ChildContent>
+        <Tabs Selected="@selected" SelectedChanged="@(value => selected = value)" CssClass="lx-dashboard-tabs">
+            <Tab Id="sellers" Title="@L["TopSellers"]" Icon="shop">
+                @if (Overview.Sellers.Count == 0)
+                {
+                    <NonIdealState Icon="shop" Title="@L["NoDataPeriod"]" />
+                }
+                else
+                {
+                    <DashboardTableFrame Href="merchants">
+                        <table class="bp6-html-table lx-table lx-table-compact">
+                            <thead><tr><th>@L["Col_Seller"]</th><th class="lx-num">@L["Col_Orders"]</th><th class="lx-num">@L["Col_SuccessRate"]</th></tr></thead>
+                            <tbody>
+                                @foreach (var seller in Overview.Sellers.Take(6))
+                                {
+                                    var sellerHref = $"merchants/{seller.MerchantId}";
+                                    <tr @onclick="@(() => Navigation.NavigateTo(sellerHref))"
+                                        @onkeydown="@(e => NavigateOnKey(e, sellerHref))"
+                                        class="lx-row-link" role="link" tabindex="0">
+                                        <td><Cell Title="@seller.Name" Sub="@(seller.CodCollected > 0 ? Fmt.Money(seller.CodCollected, "IQD") : null)" /></td>
+                                        <td class="lx-num">@Fmt.Number(seller.Orders)</td>
+                                        <td class="lx-num"><RateTag Value="seller.SuccessRate" /></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </DashboardTableFrame>
+                }
+            </Tab>
+            <Tab Id="governorates" Title="@L["GovernoratePerformance"]" Icon="map-marker">
+                @if (Overview.Governorates.Count == 0)
+                {
+                    <NonIdealState Icon="map" Title="@L["NoDataPeriod"]" />
+                }
+                else
+                {
+                    <DashboardTableFrame Href="network">
+                        <table class="bp6-html-table lx-table lx-table-compact">
+                            <thead><tr><th>@L["Field_Governorate"]</th><th class="lx-num">@L["Col_Orders"]</th><th class="lx-num">@L["Col_SuccessRate"]</th><th class="lx-num">@L["Col_AvgDelivery"]</th></tr></thead>
+                            <tbody>
+                                @foreach (var governorate in Overview.Governorates.Take(6))
+                                {
+                                    var average = governorate.AvgDeliveryHours is { } hours ? Fmt.Duration((decimal)hours, L) : ("—", "");
+                                    var governorateHref = $"shipments?governorate={governorate.Code}";
+                                    <tr @onclick="@(() => Navigation.NavigateTo(governorateHref))"
+                                        @onkeydown="@(e => NavigateOnKey(e, governorateHref))"
+                                        class="lx-row-link" role="link" tabindex="0">
+                                        <td>@Fmt.Place(governorate.Code)</td>
+                                        <td class="lx-num">@Fmt.Number(governorate.Orders)</td>
+                                        <td class="lx-num"><RateTag Value="governorate.SuccessRate" /></td>
+                                        <td class="lx-num">@average.Item1 <span class="bp6-text-muted lx-small">@average.Item2</span></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </DashboardTableFrame>
+                }
+            </Tab>
+            <Tab Id="couriers" Title="@L["CourierLeaderboard"]" Icon="people">
+                @if (Overview.Couriers.Count == 0)
+                {
+                    <NonIdealState Icon="people" Title="@L["NoDataPeriod"]" />
+                }
+                else
+                {
+                    <DashboardTableFrame Href="fleet">
+                        <table class="bp6-html-table lx-table lx-table-compact">
+                            <thead><tr><th>@L["Field_Courier"]</th><th class="lx-num">@L["Col_Delivered"]</th><th class="lx-num">@L["Col_SuccessRate"]</th><th class="lx-num">@L["Col_Rating"]</th></tr></thead>
+                            <tbody>
+                                @foreach (var courier in Overview.Couriers.Take(6))
+                                {
+                                    <tr>
+                                        <td><Cell Title="@courier.Name" Sub="@(courier.FailedAttempts > 0 ? L.Count("FailedAttemptsN", courier.FailedAttempts) : null)" /></td>
+                                        <td class="lx-num">@Fmt.Number(courier.Delivered)</td>
+                                        <td class="lx-num"><RateTag Value="courier.SuccessRate" /></td>
+                                        <td class="lx-num lx-nowrap">
+                                            @if (courier.AverageRating is { } stars)
+                                            {
+                                                <span class="lx-star-score" aria-label="@L.Count("StarsN", (int)Math.Round(stars))"><span aria-hidden="true">★</span> <bdi dir="ltr">@Fmt.Number(stars, 1)</bdi></span>
+                                            }
+                                            else
+                                            {
+                                                <span class="bp6-text-muted">—</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </DashboardTableFrame>
+                }
+            </Tab>
+        </Tabs>
+    </ChildContent>
+</Section>
+
+@code {
+    private string selected = "sellers";
+
+    [Parameter, EditorRequired] public AnalyticsOverview Overview { get; set; } = default!;
+
+    private void NavigateOnKey(KeyboardEventArgs e, string href)
+    {
+        if (e.Key is "Enter" or " ")
+        {
+            Navigation.NavigateTo(href);
+        }
+    }
+}

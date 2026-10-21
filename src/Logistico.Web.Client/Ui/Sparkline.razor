@@ -1,0 +1,40 @@
+@* A tiny trend line (oldest → newest in reading direction) with a soft area under it. *@
+<svg class="@Bp.Cls("lx-spark", CssClass)" viewBox="0 0 @W @H" preserveAspectRatio="none" aria-hidden="true">
+    <path d="@Area" class="lx-spark-area" />
+    <path d="@Line" class="lx-spark-line" />
+</svg>
+
+@code {
+    private const int W = 100;
+    private const int H = 28;
+
+    [Parameter, EditorRequired] public IReadOnlyList<int> Values { get; set; } = [];
+    [Parameter] public string? CssClass { get; set; }
+
+    private IEnumerable<(double X, double Y)> Points
+    {
+        get
+        {
+            var max = Math.Max(1, Values.Max());
+            var step = Values.Count > 1 ? (double)W / (Values.Count - 1) : W;
+            for (var i = 0; i < Values.Count; i++)
+            {
+                var x = i * step;
+                yield return (Bidi.Rtl ? W - x : x, H - 2 - (Values[i] / (double)max * (H - 4)));
+            }
+        }
+    }
+
+    private string Line => "M" + string.Join("L", Points.Select(p => P(p)));
+
+    private string Area
+    {
+        get
+        {
+            var pts = Points.ToList();
+            return $"M{P((pts[0].X, H))}L" + string.Join("L", pts.Select(p => P(p))) + $"L{P((pts[^1].X, H))}Z";
+        }
+    }
+
+    private static string P((double X, double Y) p) => string.Create(CultureInfo.InvariantCulture, $"{p.X:0.#},{p.Y:0.#}");
+}

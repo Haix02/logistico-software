@@ -1,0 +1,78 @@
+@* Dashboard number: label and icon on top, a large value with a smaller unit ("131.9" + "مليون د.ع") underneath. *@
+@if (Href is null)
+{
+    <div class="@CardClass" title="@Exact">@Content</div>
+}
+else
+{
+    <a href="@Href" class="@CardClass" title="@Exact">@Content</a>
+}
+
+@code {
+    [Parameter, EditorRequired] public string Label { get; set; } = "";
+    [Parameter] public string Value { get; set; } = "";
+
+    /// <summary>A money amount: shown compact ("131.9" + "مليون د.ع") with the exact amount on hover.</summary>
+    [Parameter] public decimal? Amount { get; set; }
+    [Parameter] public string Currency { get; set; } = "IQD";
+
+    /// <summary>Several currency totals, shown compact with the exact totals on hover.</summary>
+    [Parameter] public IEnumerable<Logistico.Modules.Shipments.Contracts.MoneyTotal>? Totals { get; set; }
+    [Parameter] public string? Unit { get; set; }
+    [Parameter] public string Icon { get; set; } = "dashboard";
+    [Parameter] public Intent Intent { get; set; }
+    [Parameter] public string? Href { get; set; }
+    [Parameter] public string? Hint { get; set; }
+
+    /// <summary>Full value shown on hover when <see cref="Value"/> is abbreviated.</summary>
+    [Parameter] public string? Exact { get; set; }
+
+    /// <summary>Change against the previous period: percent of the previous value, or points for rates (<see cref="ChangeInPoints"/>).</summary>
+    [Parameter] public decimal? Change { get; set; }
+    [Parameter] public bool ChangeInPoints { get; set; }
+
+    /// <summary>Whether a rise is good news (orders, success) or bad news (returns, delivery time).</summary>
+    [Parameter] public bool HigherIsBetter { get; set; } = true;
+
+    /// <summary>Daily values for a small trend line under the number.</summary>
+    [Parameter] public IReadOnlyList<int>? Trend { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (Amount is { } amount)
+        {
+            (Value, Unit) = Fmt.CompactParts(amount, Currency);
+            Exact ??= Fmt.Money(amount, Currency);
+        }
+        else if (Totals is not null)
+        {
+            (Value, Unit) = Fmt.CompactTotalParts(Totals);
+            Exact ??= Fmt.Totals(Totals);
+        }
+    }
+
+    private string CardClass => Bp.Cls("lx-kpi", Intent == Intent.None ? null : "lx-kpi-" + Intent.ToString().ToLowerInvariant());
+
+    private RenderFragment Content => @<text>
+        <div class="lx-kpi-top">
+            <span class="lx-kpi-label">@Label</span>
+            <span class="lx-kpi-icon"><Icon Name="@Icon" /></span>
+        </div>
+        <div class="lx-kpi-value">
+            <span class="lx-kpi-number">@Value</span>
+            @if (!string.IsNullOrEmpty(Unit))
+            {
+                <span class="lx-kpi-unit">@Unit</span>
+            }
+        </div>
+        <MetricDelta Change="Change" ChangeInPoints="ChangeInPoints" HigherIsBetter="HigherIsBetter" />
+        @if (Hint is not null)
+        {
+            <div class="lx-kpi-hint" title="@Hint">@Hint</div>
+        }
+        @if (Trend is { Count: > 1 })
+        {
+            <Sparkline Values="Trend" CssClass="lx-kpi-spark" />
+        }
+    </text>;
+}

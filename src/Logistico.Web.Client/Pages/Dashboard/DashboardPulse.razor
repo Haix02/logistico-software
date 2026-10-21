@@ -1,0 +1,46 @@
+<section class="lx-ops-pulse lx-card" aria-label="@L["LiveNow"]">
+    <div class="lx-ops-pulse-title">
+        <span class="lx-pulse-dot" aria-hidden="true"></span>
+        <span>@L["LiveNow"]</span>
+    </div>
+    <div class="lx-ops-pulse-items">
+        <a href="shipments?inWarehouse=true" class="lx-ops-pulse-item">
+            <Icon Name="office" />
+            <span><strong>@Fmt.Number(Summary.InWarehouse)</strong> @L["Kpi_InWarehouse"]</span>
+        </a>
+        <a href="transfers?status=InTransit" class="lx-ops-pulse-item">
+            <Icon Name="drive-time" />
+            <span><strong>@Fmt.Number(Network.OnTrucks)</strong> @L["Kpi_OnTrucks"]</span>
+        </a>
+        <a href="shipments?status=OutForDelivery" class="lx-ops-pulse-item">
+            <Icon Name="truck" />
+            <span><strong>@Fmt.Number(Summary.OutForDelivery)</strong> @L["Kpi_OutForDelivery"]</span>
+        </a>
+        <a href="shipments?status=DeliveryFailed" class="lx-ops-pulse-item">
+            <Icon Name="warning-sign" />
+            <span><strong>@Fmt.Number(Count(ShipmentStatus.DeliveryFailed))</strong> @L["View_Failed"]</span>
+        </a>
+        <a href="automation" class="lx-ops-pulse-item lx-ops-pulse-alert">
+            <Icon Name="notifications" />
+            <span><strong>@Fmt.Number(Network.OpenAlerts)</strong> @L["Kpi_OpenAlerts"]</span>
+        </a>
+        <a href="@(canFinance ? "finance" : null)" class="lx-ops-pulse-item">
+            <Icon Name="bank-account" />
+            <span><strong title="@Fmt.Totals(Summary.CodToCollect)">@Fmt.CompactTotals(Summary.CodToCollect)</strong> @L["Kpi_CodToCollect"]</span>
+        </a>
+    </div>
+</section>
+
+@code {
+    private bool canFinance;
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    [Parameter, EditorRequired] public ShipmentsSummary Summary { get; set; } = default!;
+    [Parameter, EditorRequired] public NetworkOverview Network { get; set; } = default!;
+
+    private int Count(ShipmentStatus status) =>
+        Summary.Counts.Where(c => c.ServiceType == ServiceType.Domestic && c.Status == status).Sum(c => c.Count);
+
+    protected override async Task OnInitializedAsync() => canFinance = await AuthState.CanAsync(StaffPolicies.Finance);
+}

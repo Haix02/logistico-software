@@ -1,0 +1,10 @@
+@* Placeholder while data loads (Blueprint skeleton glow). *@
+@for (var i = 0; i < Lines; i++)
+{
+    <div class="@Bp.Cls("bp6-skeleton", Block ? "lx-skeleton-block" : "lx-skeleton-line")" style="@($"width:{(i == Lines - 1 && Lines > 1 ? 60 : 100)}%")"></div>
+}
+
+@code {
+    [Parameter] public int Lines { get; set; } = 3;
+    [Parameter] public bool Block { get; set; }
+}

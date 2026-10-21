@@ -1,0 +1,163 @@
+@page "/returns"
+@inject OperationsApi Operations
+@inject ShipmentsApi Shipments
+@inject OpsState Ops
+@inject NavigationManager Navigation
+@inject Toaster Toaster
+
+<PageTitle>@L["Nav_Returns"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["ReturnsTitle"]" Subtitle="@L["ReturnsSubtitle"]" Icon="undo">
+    <Actions>
+        <LinkButton Href="automation?tab=rules" Icon="automatic-updates" Text="@L["ReturnRules"]" Minimal="true" />
+    </Actions>
+</PageHeader>
+
+@if (overview is not null)
+{
+    <div class="lx-kpis">
+        <KpiCard Icon="undo" Label="@L["Kpi_ReturnsStarted"]" Value="@Fmt.Number(overview.Initiated)" Intent="Intent.Warning" Hint="@L["Kpi_ReturnsStartedHint"]" />
+        <KpiCard Icon="drive-time" Label="@L["Kpi_ReturnsOnTrucks"]" Value="@Fmt.Number(overview.OnTrucks)" Intent="Intent.Primary" />
+        <KpiCard Icon="office" Label="@L["Kpi_ReturnsAtHub"]" Value="@Fmt.Number(overview.AtHub)" Intent="Intent.Warning" Hint="@L["Kpi_ReturnsAtHubHint"]" />
+        <KpiCard Icon="time" Label="@L["Kpi_ReturnsOverdue"]" Value="@Fmt.Number(overview.OverdueCollection)" Intent="@(overview.OverdueCollection > 0 ? Intent.Danger : Intent.Success)" />
+        <KpiCard Icon="tick-circle" Label="@L["Kpi_ReturnedThisMonth"]" Value="@Fmt.Number(overview.ReturnedThisMonth)" Intent="Intent.Success" />
+    </div>
+}
+
+<Tabs @bind-Selected="tab">
+    <Tab Id="ready" Title="@L["ReadyForSellers"]" Icon="shop" Count="@(overview?.AtHub)" CountIntent="Intent.Warning">
+        @if (overview is null)
+        {
+            <Skeleton Block="true" Lines="3" />
+        }
+        else if (overview.ReadyBySeller.Count == 0)
+        {
+            <div class="lx-card"><NonIdealState Icon="tick-circle" Title="@L["NoReturnsWaiting"]" Description="@L["NoReturnsWaitingHint"]" /></div>
+        }
+        else
+        {
+            <div class="lx-grid-3">
+                @foreach (var group in overview.ReadyBySeller)
+                {
+                    var overdue = group.OldestAt < DateTimeOffset.UtcNow.AddDays(-5);
+                    <div class="lx-card lx-card-pad lx-stack" style="gap:8px">
+                        <div class="lx-row" style="justify-content:space-between">
+                            <span class="lx-strong lx-ellipsis"><Mixed Text="@group.MerchantName" /></span>
+                            <Tag Intent="Intent.Primary">@HubCatalog.FindOrDefault(group.HubCode).RoutingTag</Tag>
+                        </div>
+                        <div class="lx-kpi-value"><span class="lx-kpi-number" style="font-size:24px">@Fmt.Number(group.Count)</span><span class="lx-kpi-unit">@L.Count("ParcelsUnit", group.Count)</span></div>
+                        <div class="@Bp.Cls("lx-small", overdue ? "lx-intent-danger" : "bp6-text-muted")">@string.Format(CultureInfo.CurrentCulture, L["WaitingSince"], Fmt.Ago(group.OldestAt, L))</div>
+                        <Allowed Policy="@StaffPolicies.Operate">
+                            <Button Icon="hand" Text="@L["HandOver"]" Intent="Intent.Primary" OnClick="@(() => OpenHandOverAsync(group))" />
+                        </Allowed>
+                    </div>
+                }
+            </div>
+        }
+    </Tab>
+    <Tab Id="travelling" Title="@L["ReturnsOnTheWay"]" Icon="drive-time" Count="@(overview is null ? null : overview.Initiated + overview.OnTrucks)">
+        <div class="lx-table-card">
+            <ShipmentTable Items="travelling?.Items" Loading="travelling is null" Columns="ShipmentColumns.Returns" EmptyIcon="undo" EmptyTitle="@L["NoReturnsTravelling"]" />
+        </div>
+    </Tab>
+    <Tab Id="returned" Title="@L["ReturnedToSellers"]" Icon="tick-circle">
+        <div class="lx-table-card">
+            <ShipmentTable Items="returned?.Items" Loading="returned is null" Columns="ShipmentColumns.Tracking | ShipmentColumns.Seller | ShipmentColumns.Customer | ShipmentColumns.Destination | ShipmentColumns.Age" EmptyIcon="undo" />
+        </div>
+    </Tab>
+    <Tab Id="reasons" Title="@L["ReturnReasons"]" Icon="pie-chart">
+        <div class="lx-card lx-card-pad lx-bars">
+            @{ var max = Math.Max(1, overview?.ByReason.Select(r => r.Count).DefaultIfEmpty(0).Max() ?? 1); }
+            @foreach (var reason in overview?.ByReason ?? [])
+            {
+                <div class="lx-bar-row">
+                    <span>@ShipmentTexts.Of(reason.Reason)</span>
+                    <span class="lx-bar-track"><span class="lx-bar-fill lx-bar-fill-warning" style="@($"width:{(reason.Count * 100.0 / max).ToString("0.#", CultureInfo.InvariantCulture)}%")"></span></span>
+                    <span class="lx-bar-value">@Fmt.Number(reason.Count)</span>
+                </div>
+            }
+        </div>
+    </Tab>
+</Tabs>
+
+<Dialog @bind-IsOpen="handOverOpen" Title="@string.Format(CultureInfo.CurrentCulture, L["HandOverTo"], handOverGroup?.MerchantName ?? "")" Icon="hand" Width="720px">
+    <ChildContent>
+        <p class="bp6-text-muted">@L["HandOverHint"]</p>
+        <div class="lx-table-card lx-mb">
+            <ShipmentTable Items="handOverItems" Loading="handOverItems is null" Columns="ShipmentColumns.Shelf | ShipmentColumns.Tracking | ShipmentColumns.Customer | ShipmentColumns.Age"
+                           Selectable="true" @bind-Selected="handOverSelected" OnRowClick="@(_ => Task.CompletedTask)" />
+        </div>
+        <FormField TValue="string" Label="@L["ReceivedByName"]" Helper="@L["ReceivedByHint"]">
+            <input class="bp6-input bp6-fill" @bind="receivedBy" />
+        </FormField>
+    </ChildContent>
+    <Footer>
+        <Button Text="@L["Cancel"]" OnClick="@(() => handOverOpen = false)" />
+        <Button Intent="Intent.Primary" Icon="hand" Text="@L.Count("HandOverN", handOverSelected.Count)"
+                Disabled="@(handOverSelected.Count == 0)" Loading="saving" OnClick="HandOverAsync" />
+    </Footer>
+</Dialog>
+
+@code {
+    [SupplyParameterFromQuery(Name = "tab")] public string? Tab { get; set; }
+
+    private string? tab = "ready";
+    private ReturnsOverview? overview;
+    private ShipmentListResult? travelling;
+    private ShipmentListResult? returned;
+    private ReturnSellerGroup? handOverGroup;
+    private IReadOnlyList<ShipmentListItem>? handOverItems;
+    private HashSet<Guid> handOverSelected = [];
+    private string? receivedBy;
+    private bool handOverOpen;
+    private bool saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tab = Tab ?? "ready";
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        var overviewTask = Operations.GetReturnsAsync();
+        var travellingTask = Shipments.ListAsync(new ShipmentQuery { Status = [ShipmentStatus.ReturnInitiated, ShipmentStatus.ReturnInTransit], Sort = "age", PageSize = 100 });
+        var returnedTask = Shipments.ListAsync(new ShipmentQuery { Status = [ShipmentStatus.Returned], Sort = "age", Desc = false, PageSize = 50 });
+        await Task.WhenAll(overviewTask, travellingTask, returnedTask);
+        overview = await overviewTask;
+        travelling = await travellingTask;
+        returned = await returnedTask;
+    }
+
+    private async Task OpenHandOverAsync(ReturnSellerGroup group)
+    {
+        handOverGroup = group;
+        handOverItems = null;
+        handOverOpen = true;
+        receivedBy = null;
+        var page = await Shipments.ListAsync(new ShipmentQuery { Status = [ShipmentStatus.ReturnAtHub], MerchantId = group.MerchantId, Hub = group.HubCode, Sort = "bin", Desc = false, PageSize = 200 });
+        handOverItems = page.Items;
+        handOverSelected = page.Items.Select(i => i.Id).ToHashSet();
+    }
+
+    private async Task HandOverAsync()
+    {
+        saving = true;
+        try
+        {
+            var manifest = await Operations.HandOverAsync(new HandOverReturnsRequest { ShipmentIds = handOverSelected.ToList(), ReceivedBy = receivedBy });
+            handOverOpen = false;
+            Toaster.Success(L.Count("HandedOver", manifest.Items.Count, manifest.Number));
+            await Ops.RefreshAsync();
+            Navigation.NavigateTo($"returns/manifests/{Uri.EscapeDataString(manifest.Number)}");
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

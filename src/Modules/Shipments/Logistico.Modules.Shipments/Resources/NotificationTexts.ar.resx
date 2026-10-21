@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="NoCod" xml:space="preserve"><value>لا شيء (مدفوع مسبقاً)</value></data>
+  <data name="OurCourier" xml:space="preserve"><value>مندوبنا</value></data>
+  <data name="Template_ConfirmOrder" xml:space="preserve"><value>مرحباً {0}، وصلنا طلبك {1} من {2} بمبلغ {4}. يرجى تأكيد الطلب حتى نرسله إليك — بالرد هنا بكلمة «نعم» أو من هذا الرابط: </value></data>
+  <data name="Template_Delivered" xml:space="preserve"><value>تم تسليم طلبك {1} من {2}. شكراً لك!</value></data>
+  <data name="Template_DeliveryFailed" xml:space="preserve"><value>مرحباً {0}، لم نتمكن من توصيل طلبك {1} اليوم ({5}). سنحاول مجدداً يوم {6}. يمكنك اختيار يوم آخر من هنا: </value></data>
+  <data name="Template_OutForDelivery" xml:space="preserve"><value>مرحباً {0}، طلبك {1} من {2} خرج للتوصيل اليوم مع المندوب {3}. المبلغ عند الاستلام: {4}. تابع طلبك: </value></data>
+  <data name="Template_RequestReceived" xml:space="preserve"><value>استلمنا طلبك رقم {7} بخصوص الشحنة {1}، وسنتابعه قريباً.</value></data>
+  <data name="Template_Rescheduled" xml:space="preserve"><value>مرحباً {0}، تم تحديد موعد توصيل طلبك {1} يوم {6}. تابع طلبك: </value></data>
+  <data name="Template_ReturnStarted" xml:space="preserve"><value>مرحباً {0}، طلبك {1} في طريق الإرجاع إلى {2}. إذا كان هذا خطأ، يرجى التواصل مع المتجر.</value></data>
+</root>

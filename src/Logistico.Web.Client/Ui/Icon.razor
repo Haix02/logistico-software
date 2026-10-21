@@ -1,0 +1,12 @@
+<span class="@Bp.Cls(Large ? "bp6-icon-large" : "bp6-icon-standard", "bp6-icon-" + Name, CssClass)" aria-hidden="true"></span>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Name { get; set; } = "";
+
+    [Parameter]
+    public bool Large { get; set; }
+
+    [Parameter]
+    public string? CssClass { get; set; }
+}

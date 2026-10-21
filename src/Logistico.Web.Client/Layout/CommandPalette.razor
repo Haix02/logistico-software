@@ -1,0 +1,355 @@
+@* Global search and command palette: instant local commands plus cancellable server-side lookup. *@
+@implements IDisposable
+@inject NavigationManager Navigation
+@inject ShipmentsApi Shipments
+@inject MerchantsApi Merchants
+@inject OpsState Ops
+@inject IJSRuntime JS
+
+@if (open)
+{
+    <div class="bp6-portal">
+        <div class="bp6-overlay bp6-overlay-open bp6-overlay-container" @onkeydown="KeyAsync">
+            <div class="bp6-overlay-backdrop" @onclick="Close"></div>
+            <section class="bp6-omnibar lx-omnibar" role="dialog" aria-modal="true" aria-labelledby="lx-palette-title">
+                <h2 id="lx-palette-title" class="lx-sr-only">@L["Palette_Title"]</h2>
+                <div class="bp6-input-group bp6-large bp6-fill lx-omnibar-input">
+                    <span class="bp6-icon bp6-icon-large bp6-icon-search" aria-hidden="true"></span>
+                    <input id="lx-palette-input" class="bp6-input bp6-large" type="search" role="combobox" autocomplete="off" spellcheck="false"
+                           placeholder="@L["Palette_Placeholder"]" aria-label="@L["Palette_Placeholder"]" aria-controls="lx-palette-results"
+                           aria-expanded="true" aria-autocomplete="list" aria-activedescendant="@ActiveOptionId" value="@term" @oninput="InputAsync" />
+                    @if (searching)
+                    {
+                        <span class="bp6-input-action lx-omnibar-spinner" aria-hidden="true"><Spinner Size="18" /></span>
+                    }
+                    else if (term.Length > 0)
+                    {
+                        <button type="button" class="bp6-button bp6-minimal bp6-input-action lx-omnibar-clear" title="@L["Clear"]"
+                                aria-label="@L["Clear"]" @onclick="ClearAsync">
+                            <Icon Name="cross" />
+                        </button>
+                    }
+                </div>
+
+                <div class="lx-sr-only" role="status" aria-live="polite" aria-atomic="true">
+                    @if (searching)
+                    {
+                        @L["Palette_Searching"]
+                    }
+                    else if (searchFailed)
+                    {
+                        @L["Palette_Error"]
+                    }
+                    else
+                    {
+                        @string.Format(CultureInfo.CurrentCulture, L["Palette_ResultCount"], Fmt.Number(results.Count))
+                    }
+                </div>
+
+                <ul id="lx-palette-results" class="bp6-menu lx-menu lx-omnibar-results" role="listbox" aria-busy="@(searching ? "true" : "false")">
+                    @{ var index = 0; }
+                    @foreach (var group in results.GroupBy(r => r.Group))
+                    {
+                        <MenuDivider Title="@group.Key" />
+                        @foreach (var item in group)
+                        {
+                            var i = index++;
+                            <li id="@OptionId(i)" role="option" aria-selected="@(i == active ? "true" : "false")">
+                                @if (item.Action is not null)
+                                {
+                                    <button type="button" class="@ResultClass(i)" @onclick="@(() => RunAsync(item))" @onmouseenter="@(() => active = i)">
+                                        <Icon Name="@item.Icon" />
+                                        <span class="bp6-text-overflow-ellipsis bp6-fill"><Mixed Text="@item.Text" /></span>
+                                        @if (item.Label is not null)
+                                        {
+                                            <span class="bp6-menu-item-label"><Mixed Text="@item.Label" /></span>
+                                        }
+                                    </button>
+                                }
+                                else
+                                {
+                                    <a class="@ResultClass(i)" href="@item.Href" @onclick="Close" @onmouseenter="@(() => active = i)">
+                                        <Icon Name="@item.Icon" />
+                                        <span class="bp6-text-overflow-ellipsis bp6-fill"><Mixed Text="@item.Text" /></span>
+                                        @if (item.Label is not null)
+                                        {
+                                            <span class="bp6-menu-item-label"><Mixed Text="@item.Label" /></span>
+                                        }
+                                    </a>
+                                }
+                            </li>
+                        }
+                    }
+
+                    @if (searchFailed)
+                    {
+                        <li class="lx-omnibar-message lx-omnibar-error" role="alert">
+                            <Icon Name="warning-sign" />
+                            <span>@L["Palette_Error"]</span>
+                            <button type="button" class="bp6-button bp6-small bp6-minimal" @onclick="RetryAsync">@L["Palette_Retry"]</button>
+                        </li>
+                    }
+                    else if (!searching && results.Count == 0)
+                    {
+                        <li class="lx-omnibar-message">
+                            <Icon Name="search" />
+                            <span>@(term.Trim().Length < MinimumSearchLength ? L["Palette_TypeMore"] : L["Palette_NoResults"])</span>
+                        </li>
+                    }
+                </ul>
+
+                <footer class="lx-omnibar-foot" aria-hidden="true">
+                    <span><kbd class="lx-kbd lx-kbd-light">↑</kbd><kbd class="lx-kbd lx-kbd-light">↓</kbd> @L["Palette_Move"]</span>
+                    <span><kbd class="lx-kbd lx-kbd-light">Enter</kbd> @L["Palette_Open"]</span>
+                    <span><kbd class="lx-kbd lx-kbd-light">Esc</kbd> @L["Close"]</span>
+                </footer>
+            </section>
+        </div>
+    </div>
+}
+
+@code {
+    private const int MinimumSearchLength = 2;
+    private const int DebounceMilliseconds = 240;
+
+    private sealed record PaletteItem(string Group, string Icon, string Text, string? Label, string? Href, Func<Task>? Action = null);
+
+    /// <summary>The signed-in staff member: pages and actions their role cannot use are not offered.</summary>
+    [Parameter, EditorRequired] public System.Security.Claims.ClaimsPrincipal User { get; set; } = default!;
+
+    private bool open;
+    private bool searching;
+    private bool searchFailed;
+    private bool focusPending;
+    private bool disposed;
+    private string term = "";
+    private int active;
+    private List<PaletteItem> results = [];
+    private CancellationTokenSource? pending;
+
+    private string? ActiveOptionId => results.Count == 0 ? null : OptionId(Math.Clamp(active, 0, results.Count - 1));
+
+    protected override void OnInitialized() => Ops.PaletteRequested += OnRequested;
+
+    private void OnRequested() => _ = InvokeAsync(() => Open(null));
+
+    /// <summary>Opens the palette, optionally pre-filled (for example, with a scanned barcode).</summary>
+    public async Task Open(string? text)
+    {
+        open = true;
+        focusPending = true;
+        term = text ?? "";
+        active = 0;
+        await SearchAsync(immediate: true);
+    }
+
+    private void Close()
+    {
+        pending?.Cancel();
+        pending = null;
+        searching = false;
+        searchFailed = false;
+        open = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (open && focusPending)
+        {
+            focusPending = false;
+            await JS.InvokeVoidAsync("lx.focus", "lx-palette-input");
+        }
+    }
+
+    private async Task InputAsync(ChangeEventArgs e)
+    {
+        term = e.Value?.ToString() ?? "";
+        active = 0;
+        await SearchAsync(immediate: false);
+    }
+
+    private async Task ClearAsync()
+    {
+        term = "";
+        active = 0;
+        await SearchAsync(immediate: true);
+        focusPending = true;
+    }
+
+    private Task RetryAsync() => SearchAsync(immediate: true);
+
+    private async Task SearchAsync(bool immediate)
+    {
+        pending?.Cancel();
+        var cts = new CancellationTokenSource();
+        pending = cts;
+        var text = term.Trim();
+
+        searching = false;
+        searchFailed = false;
+        results = StaticResults(text);
+        active = results.Count == 0 ? 0 : Math.Clamp(active, 0, results.Count - 1);
+        StateHasChanged();
+
+        if (text.Length < MinimumSearchLength)
+        {
+            if (pending == cts)
+            {
+                pending = null;
+            }
+
+            cts.Dispose();
+            return;
+        }
+
+        try
+        {
+            if (!immediate)
+            {
+                await Task.Delay(DebounceMilliseconds, cts.Token);
+            }
+
+            searching = true;
+            StateHasChanged();
+
+            var shipmentsTask = Shipments.ListAsync(new ShipmentQuery { Q = text, PageSize = 6 }, cts.Token);
+            var sellersTask = Merchants.ListAsync(text, 1, 4, cts.Token);
+            await Task.WhenAll(shipmentsTask, sellersTask);
+
+            if (pending != cts || cts.IsCancellationRequested || !open)
+            {
+                return;
+            }
+
+            var found = await shipmentsTask;
+            var sellers = await sellersTask;
+            var remote = new List<PaletteItem>();
+            remote.AddRange(found.Items.Select(s => new PaletteItem(L["Palette_Shipments"], StatusTag.IconOf(s.Status),
+                $"{s.TrackingNumber} · {s.ConsigneeName}", $"{ShipmentTexts.Of(s.Status)} · {Fmt.Place(s.DestinationCode)}", $"shipments/{s.Id}")));
+
+            if (found.TotalCount > found.Items.Count)
+            {
+                remote.Add(new(L["Palette_Shipments"], "th", string.Format(CultureInfo.CurrentCulture, L["Palette_AllResults"], Fmt.Number(found.TotalCount)), null,
+                    "shipments" + new ShipmentQuery { Q = text }.ToQueryString()));
+            }
+
+            remote.AddRange(sellers.Items.Select(m => new PaletteItem(L["Palette_Sellers"], "shop", m.Name,
+                m.InstagramHandle is null ? Fmt.Place(m.Governorate) : "@" + m.InstagramHandle, $"merchants/{m.Id}")));
+
+            var local = StaticResults(text);
+            var isTrackingNumber = TrackingNumber.IsValid(TrackingNumber.Normalize(text));
+            results = isTrackingNumber ? [.. remote, .. local] : [.. local, .. remote];
+            active = results.Count == 0 ? 0 : Math.Clamp(active, 0, results.Count - 1);
+        }
+        catch (OperationCanceledException) when (cts.IsCancellationRequested)
+        {
+            // A newer query or closing the palette superseded this request.
+        }
+        catch (Exception ex) when (ex is HttpRequestException or ApiException)
+        {
+            if (pending == cts && open)
+            {
+                searchFailed = true;
+            }
+        }
+        finally
+        {
+            if (pending == cts)
+            {
+                pending = null;
+                searching = false;
+                if (!disposed)
+                {
+                    StateHasChanged();
+                }
+            }
+
+            cts.Dispose();
+        }
+    }
+
+    private List<PaletteItem> StaticResults(string text)
+    {
+        var pages = AppNavigation.All
+            .Where(e => User.Can(e.Policy) && Matches(text, L[e.TextKey], e.Keywords))
+            .Select(e => new PaletteItem(L["Palette_Pages"], e.Icon, L[e.TextKey], e.Shortcut is null ? null : "g " + e.Shortcut, e.Href));
+        var operate = User.Can(StaffPolicies.Operate);
+        var actions = new List<PaletteItem?>
+        {
+            operate ? new(L["Palette_Actions"], "add", L["NewOrder"], "n", "orders/new") : null,
+            operate ? new(L["Palette_Actions"], "barcode", L["Palette_ScanParcel"], null, "warehouse") : null,
+            operate ? new(L["Palette_Actions"], "drive-time", L["Transfers_New"], null, "transfers?new=1") : null,
+            User.Can(StaffPolicies.Care) ? new(L["Palette_Actions"], "inbox", L["Requests_New"], null, "requests?new=1") : null,
+            new(L["Palette_Actions"], "key-command", L["Shortcuts_Title"], "?", null, () => { Close(); Ops.OpenHelp(); return Task.CompletedTask; }),
+        }.OfType<PaletteItem>().Where(a => Matches(text, a.Text, null));
+        return [.. (text.Length == 0 ? pages.Take(8) : pages), .. actions];
+    }
+
+    private static bool Matches(string text, string title, string? keywords) =>
+        text.Length == 0
+        || title.Contains(text, StringComparison.CurrentCultureIgnoreCase)
+        || (keywords?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false);
+
+    private async Task KeyAsync(KeyboardEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case "Escape":
+                Close();
+                break;
+            case "ArrowDown":
+                active = results.Count == 0 ? 0 : (active + 1) % results.Count;
+                await RevealActiveAsync();
+                break;
+            case "ArrowUp":
+                active = results.Count == 0 ? 0 : (active - 1 + results.Count) % results.Count;
+                await RevealActiveAsync();
+                break;
+            case "Home" when results.Count > 0:
+                active = 0;
+                await RevealActiveAsync();
+                break;
+            case "End" when results.Count > 0:
+                active = results.Count - 1;
+                await RevealActiveAsync();
+                break;
+            case "Enter" when results.Count > 0:
+                await RunAsync(results[Math.Clamp(active, 0, results.Count - 1)]);
+                break;
+        }
+    }
+
+    private async Task RevealActiveAsync()
+    {
+        StateHasChanged();
+        await Task.Yield();
+        if (ActiveOptionId is { } id)
+        {
+            await JS.InvokeVoidAsync("lx.scrollIntoView", id);
+        }
+    }
+
+    private async Task RunAsync(PaletteItem item)
+    {
+        Close();
+        if (item.Action is not null)
+        {
+            await item.Action();
+        }
+        else if (item.Href is not null)
+        {
+            Navigation.NavigateTo(item.Href);
+        }
+    }
+
+    private string ResultClass(int index) => Bp.Cls("bp6-menu-item lx-omnibar-result", Bp.When(index == active, "bp6-active"));
+
+    private static string OptionId(int index) => $"lx-palette-option-{index}";
+
+    public void Dispose()
+    {
+        disposed = true;
+        pending?.Cancel();
+        Ops.PaletteRequested -= OnRequested;
+    }
+}

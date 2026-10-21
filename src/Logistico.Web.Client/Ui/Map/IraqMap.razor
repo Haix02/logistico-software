@@ -1,0 +1,159 @@
+@* Iraq network map: governorates shaded by the chosen measure, hubs, and line-haul lanes (trucks on the road animate).
+   Pure SVG generated from public-domain boundaries (scripts/generate-iraq-map.py): fast, offline, no map service. *@
+
+<svg class="lx-map" viewBox="@ViewBox" role="img" aria-label="@L["Nav_Network"]" xmlns="http://www.w3.org/2000/svg">
+    <g>
+        @foreach (var shape in IraqMapShapes.Governorates)
+        {
+            var value = ValueOf(shape.Code);
+            var name = Logistico.SharedKernel.Iraq.IraqGovernorates.Find(shape.Code)?.Name ?? shape.Code;
+            <path d="@shape.Path" class="@Bp.Cls("lx-map-gov", StepFor(value), Bp.When(Selected == shape.Code, "lx-map-gov-selected"))"
+                  @onclick="@(() => OnSelect.InvokeAsync(Selected == shape.Code ? null : shape.Code))" tabindex="0" role="button" aria-label="@($"{name}: {Fmt.Number(value)}")">
+                <title>@name · @Fmt.Number(value)</title>
+            </path>
+        }
+    </g>
+
+    <g>
+        @foreach (var lane in Lanes)
+        {
+            if (PointOf(lane.FromHubCode) is not { } a || PointOf(lane.ToHubCode) is not { } b)
+            {
+                continue;
+            }
+
+            var width = 2 + Math.Min(6, (lane.Parcels + lane.Waiting) / 8.0);
+            <path d="@Curve(a, b)" class="@Bp.Cls("lx-map-lane", Bp.When(lane.Trucks > 0, "lx-map-lane-moving"))"
+                  stroke-width="@F(width)" stroke="@(lane.Overdue ? "#cd4246" : lane.Trucks > 0 ? "#2d72d2" : "#8f99a8")">
+                <title>@HubCatalog.FindOrDefault(lane.FromHubCode).RoutingTag → @HubCatalog.FindOrDefault(lane.ToHubCode).RoutingTag · @string.Format(CultureInfo.CurrentCulture, L["LaneTip"], Fmt.Number(lane.Trucks), Fmt.Number(lane.Parcels), Fmt.Number(lane.Waiting))</title>
+            </path>
+        }
+    </g>
+
+    @if (!Compact)
+    {
+        <g>
+            @foreach (var shape in IraqMapShapes.Governorates)
+            {
+                var (x, y) = LabelAt(shape);
+                @SvgText(x, y, "lx-map-label", Logistico.SharedKernel.Iraq.IraqGovernorates.Find(shape.Code)?.Name ?? shape.Code)
+                @SvgText(x, y + 13, "lx-map-label lx-map-count", Fmt.Number(ValueOf(shape.Code)))
+            }
+        </g>
+    }
+
+    <g>
+        @foreach (var hub in HubCatalog.All.OrderBy(h => h.Kind == HubKind.SortingHub))
+        {
+            if (PointOf(hub.Code) is not { } p)
+            {
+                continue;
+            }
+
+            var load = Hubs.FirstOrDefault(h => h.HubCode == hub.Code);
+            var size = (Compact ? 11 : 14) * (hub.Kind == HubKind.SortingHub ? 1 : 0.82);
+            var css = Bp.Cls("lx-map-hub", $"lx-map-hub-{hub.Kind.ToString().ToLowerInvariant()}", Bp.When(load?.OpenAlerts > 0, "lx-map-hub-alert"));
+            <g @onclick="@(() => OnHub.InvokeAsync(hub.Code))" style="cursor:pointer" role="button" tabindex="0" aria-label="@hub.Name">
+                @if (hub.Kind == HubKind.SortingHub)
+                {
+                    <circle cx="@F(p.X)" cy="@F(p.Y)" r="@F(size)" class="@css" />
+                }
+                else
+                {
+                    <rect x="@F(p.X - size)" y="@F(p.Y - size)" width="@F(size * 2)" height="@F(size * 2)" rx="@(hub.Kind == HubKind.Branch ? "5" : "2")" class="@css" />
+                }
+                <title>@hub.Name · @ShipmentTexts.Of(hub.Kind) · @string.Format(CultureInfo.CurrentCulture, L["OnShelvesN"], Fmt.Number(load?.OnShelves ?? 0))</title>
+                @SvgText(p.X, p.Y + 3.4, "lx-map-hub-text", hub.RoutingTag)
+            </g>
+        }
+    </g>
+</svg>
+
+@if (!Compact)
+{
+    <div class="lx-map-legend">
+        <span>@L["Map_Low"]</span><span class="lx-map-legend-scale"></span><span>@L["Map_High"]</span>
+        <span class="lx-row" style="gap:4px"><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#2d72d2" stroke-width="3" stroke-dasharray="6 4" /></svg> @L["Map_TrucksMoving"]</span>
+        <span class="lx-row" style="gap:4px"><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#cd4246" stroke-width="3" /></svg> @L["Map_TruckLate"]</span>
+        <span class="lx-row" style="gap:4px"><svg width="14" height="14"><circle cx="7" cy="7" r="6" fill="#cd4246" /></svg> @L["Map_HubAlerts"]</span>
+    </div>
+}
+
+@code {
+    /// <summary>Shades of the map ramp (lx-map-s0 … s6 in app.css, one ramp per theme).</summary>
+    private const int Steps = 7;
+
+    [Parameter] public IReadOnlyList<GovernorateLoad> Governorates { get; set; } = [];
+    [Parameter] public IReadOnlyList<HubLoad> Hubs { get; set; } = [];
+    [Parameter] public IReadOnlyList<LaneLoad> Lanes { get; set; } = [];
+
+    /// <summary>What shades the governorates.</summary>
+    [Parameter] public Func<GovernorateLoad, int> Measure { get; set; } = g => g.Active;
+    [Parameter] public string? Selected { get; set; }
+    [Parameter] public EventCallback<string?> OnSelect { get; set; }
+    [Parameter] public EventCallback<string> OnHub { get; set; }
+
+    /// <summary>Small version for the dashboard: no labels or legend.</summary>
+    [Parameter] public bool Compact { get; set; }
+
+    private static string ViewBox => string.Create(CultureInfo.InvariantCulture, $"0 0 {IraqMapShapes.Width} {IraqMapShapes.Height}");
+
+    private int ValueOf(string code)
+    {
+        var own = Governorates.FirstOrDefault(g => g.Code == code) is { } load ? Measure(load) : 0;
+
+        // Halabja has no outline of its own in the source data; it is drawn within Sulaymaniyah.
+        if (code == "IQ-SU" && Governorates.FirstOrDefault(g => g.Code == "IQ-HA") is { } halabja)
+        {
+            own += Measure(halabja);
+        }
+
+        return own;
+    }
+
+    private string StepFor(int value)
+    {
+        var max = Math.Max(1, IraqMapShapes.Governorates.Max(s => ValueOf(s.Code)));
+        if (value <= 0)
+        {
+            return "lx-map-s0";
+        }
+
+        var step = (int)Math.Ceiling(Math.Sqrt(value / (double)max) * (Steps - 1));
+        return "lx-map-s" + Math.Clamp(step, 1, Steps - 1).ToString(CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Labels moved off hub markers and truck lanes. Baghdad and Karbala are small, so theirs sit just outside the shape.
+    /// </summary>
+    internal static (double X, double Y) LabelAt(GovernorateShape shape) => shape.Code switch
+    {
+        "IQ-BG" => (shape.LabelX + 34, shape.LabelY - 16),
+        "IQ-KA" => (shape.LabelX - 24, shape.LabelY + 6),
+        "IQ-NA" => (shape.LabelX - 10, shape.LabelY + 34),
+        "IQ-AR" => (shape.LabelX + 18, shape.LabelY - 6),
+        "IQ-NI" => (shape.LabelX - 22, shape.LabelY + 18),
+        "IQ-BA" => (shape.LabelX - 8, shape.LabelY + 26),
+        "IQ-BB" => (shape.LabelX + 16, shape.LabelY + 2),
+        _ => (shape.LabelX, shape.LabelY),
+    };
+
+    /// <summary>A gentle arc between two hubs so lanes in opposite directions do not overlap.</summary>
+    private static string Curve((double X, double Y) a, (double X, double Y) b)
+    {
+        var (mx, my) = ((a.X + b.X) / 2, (a.Y + b.Y) / 2);
+        var (dx, dy) = (b.X - a.X, b.Y - a.Y);
+        var (cx, cy) = (mx - dy * 0.18, my + dx * 0.18);
+        return string.Create(CultureInfo.InvariantCulture, $"M{a.X:0.#},{a.Y:0.#} Q{cx:0.#},{cy:0.#} {b.X:0.#},{b.Y:0.#}");
+    }
+
+    private static string F(double value) => value.ToString("0.#", CultureInfo.InvariantCulture);
+
+    /// <summary>Map position of an active hub from its coordinates; null for hubs that are not in the network any more.</summary>
+    private static (double X, double Y)? PointOf(string hubCode) =>
+        HubCatalog.Find(hubCode) is { Latitude: > 0 } hub ? IraqMapShapes.Project(hub.Latitude, hub.Longitude) : null;
+
+    /// <summary>SVG &lt;text&gt; (Razor reserves the &lt;text&gt; tag, so it is written as markup).</summary>
+    private static MarkupString SvgText(double x, double y, string cssClass, string content) =>
+        new($"<text x=\"{F(x)}\" y=\"{F(y)}\" class=\"{cssClass}\">{System.Net.WebUtility.HtmlEncode(content)}</text>");
+}

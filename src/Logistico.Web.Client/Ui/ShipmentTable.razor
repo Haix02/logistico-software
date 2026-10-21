@@ -1,0 +1,182 @@
+@* The one table for parcels: consistent columns, sortable headers, optional selection, bidi-safe text. *@
+@inject NavigationManager Navigation
+
+<DataTable TItem="ShipmentListItem" Items="Items" Loading="Loading" ColumnCount="@ColumnCount" OnRowClick="OpenAsync"
+           RowClass="RowClass" EmptyIcon="@EmptyIcon" EmptyTitle="@(EmptyTitle ?? L["NoShipmentsFound"])" EmptyDescription="@EmptyDescription">
+    <Header>
+        @if (Selectable)
+        {
+            <th class="lx-col-check">
+                <Switch Checkbox="true" Value="AllSelected" ValueChanged="ToggleAllAsync" CssClass="lx-sr-label" />
+            </th>
+        }
+        @if (Has(ShipmentColumns.Shelf)) { <Th Key="bin" Text="@L["Field_Shelf"]" /> }
+        @if (Has(ShipmentColumns.Tracking)) { <Th Key="trackingNumber" Text="@L["Col_Tracking"]" /> }
+        @if (Has(ShipmentColumns.Status)) { <Th Key="status" Text="@L["Col_Status"]" /> }
+        @if (Has(ShipmentColumns.Seller)) { <Th Key="merchant" Text="@L["Col_Seller"]" /> }
+        @if (Has(ShipmentColumns.Customer)) { <Th Key="consignee" Text="@L["Col_Customer"]" /> }
+        @if (Has(ShipmentColumns.Destination)) { <Th Key="destination" Text="@L["Col_Destination"]" /> }
+        @if (Has(ShipmentColumns.Route)) { <Th Key="hub" Text="@L["Col_Route"]" /> }
+        @if (Has(ShipmentColumns.Courier)) { <th>@L["Field_Courier"]</th> }
+        @if (Has(ShipmentColumns.Cod)) { <Th Key="cod" Text="@L["Col_Cod"]" CssClass="lx-num" /> }
+        @if (Has(ShipmentColumns.Eta)) { <Th Key="eta" Text="@L["Col_Eta"]" /> }
+        @if (Has(ShipmentColumns.Age)) { <Th Key="age" Text="@L["Col_Age"]" /> }
+        @if (Has(ShipmentColumns.Created)) { <Th Key="createdAt" Text="@L["Col_Created"]" /> }
+    </Header>
+    <Row Context="s">
+        @if (Selectable)
+        {
+            <td class="lx-col-check" @onclick:stopPropagation="true">
+                <Switch Checkbox="true" Value="@Selected.Contains(s.Id)" ValueChanged="@(on => ToggleAsync(s.Id, on))" />
+            </td>
+        }
+        @if (Has(ShipmentColumns.Shelf))
+        {
+            <td>@if (s.WarehouseBin is { } bin) { <Tag Icon="box"><bdi dir="ltr">@bin</bdi></Tag> } else { <span class="bp6-text-muted">—</span> }</td>
+        }
+        @if (Has(ShipmentColumns.Tracking))
+        {
+            <td>
+                <Cell CssClass="lx-cell-narrow" Sub="@(s.ExternalReference ?? ShipmentTexts.Of(s.ServiceType))">
+                    <TitleContent><span class="lx-code">@s.TrackingNumber</span></TitleContent>
+                </Cell>
+            </td>
+        }
+        @if (Has(ShipmentColumns.Status))
+        {
+            <td>
+                <div class="lx-stack" style="gap:2px">
+                    <StatusTag Status="s.Status" />
+                    @if (s.ReturnReason is { } reason && ShipmentLifecycle.IsReturning(s.Status))
+                    {
+                        <span class="lx-cell-sub">@ShipmentTexts.Of(reason)</span>
+                    }
+                    else if (s.DeliveryAttempts > 1 || s.Status == ShipmentStatus.DeliveryFailed)
+                    {
+                        <span class="lx-cell-sub">@L.Count("AttemptsN", s.DeliveryAttempts)</span>
+                    }
+                </div>
+            </td>
+        }
+        @if (Has(ShipmentColumns.Seller))
+        {
+            <td><Cell Title="@(s.MerchantName ?? s.ShipperName)" Sub="@(s.MerchantName is null ? null : Fmt.Place(s.OriginCode))" /></td>
+        }
+        @if (Has(ShipmentColumns.Customer))
+        {
+            <td>
+                <Cell Title="@s.ConsigneeName">
+                    <SubContent><PhoneText Value="@s.ConsigneePhone" /></SubContent>
+                </Cell>
+            </td>
+        }
+        @if (Has(ShipmentColumns.Destination))
+        {
+            <td><Cell CssClass="lx-cell-narrow" Title="@Fmt.Place(s.DestinationCode)" Sub="@s.DestinationCity" /></td>
+        }
+        @if (Has(ShipmentColumns.Route))
+        {
+            <td><HubRoute Current="@s.CurrentHubCode" Target="@(ShipmentLifecycle.IsReturning(s.Status) ? s.OriginHubCode ?? s.DestinationHubCode : s.DestinationHubCode)" Status="s.Status" /></td>
+        }
+        @if (Has(ShipmentColumns.Courier))
+        {
+            <td><span class="lx-nowrap"><Mixed Text="@(s.CourierName ?? "—")" /></span></td>
+        }
+        @if (Has(ShipmentColumns.Cod))
+        {
+            <td class="lx-num">@Fmt.Money(s.CodAmount, s.CodCurrency)</td>
+        }
+        @if (Has(ShipmentColumns.Eta))
+        {
+            var late = s.EtaAt < DateTimeOffset.UtcNow && ShipmentLifecycle.IsActive(s.Status) && !ShipmentLifecycle.IsReturning(s.Status);
+            <td class="@Bp.Cls("lx-nowrap", Bp.When(late, "lx-intent-danger"))" title="@(late ? L["Late"].Value : null)">
+                @if (s.RescheduledTo is { } next)
+                {
+                    <span class="lx-row" style="gap:4px"><Icon Name="calendar" /> @Fmt.Date(next)</span>
+                }
+                else
+                {
+                    @Fmt.Date(s.DeliveredAt ?? s.EtaAt)
+                }
+            </td>
+        }
+        @if (Has(ShipmentColumns.Age))
+        {
+            <td class="lx-nowrap bp6-text-muted" title="@Fmt.DateTime(s.LastStatusAt)">@Fmt.Ago(s.LastStatusAt, L)</td>
+        }
+        @if (Has(ShipmentColumns.Created))
+        {
+            <td class="lx-nowrap bp6-text-muted">@Fmt.Date(s.CreatedAt)</td>
+        }
+    </Row>
+</DataTable>
+
+@code {
+    [Parameter] public IReadOnlyList<ShipmentListItem>? Items { get; set; }
+    [Parameter] public bool Loading { get; set; }
+    [Parameter] public ShipmentColumns Columns { get; set; } = ShipmentColumns.List;
+
+    /// <summary>Sortable headers need a cascading <see cref="SortState"/>; without one headers are plain.</summary>
+    [CascadingParameter] public SortState? Sort { get; set; }
+    [Parameter] public bool Selectable { get; set; }
+    [Parameter] public HashSet<Guid> Selected { get; set; } = [];
+    [Parameter] public EventCallback<HashSet<Guid>> SelectedChanged { get; set; }
+    [Parameter] public EventCallback<ShipmentListItem> OnRowClick { get; set; }
+    [Parameter] public string EmptyIcon { get; set; } = "search";
+    [Parameter] public string? EmptyTitle { get; set; }
+    [Parameter] public string? EmptyDescription { get; set; }
+
+    private int ColumnCount => (Selectable ? 1 : 0) + Enum.GetValues<ShipmentColumns>().Count(c => c is not (ShipmentColumns.None or ShipmentColumns.List or ShipmentColumns.Hub or ShipmentColumns.Returns) && Has(c));
+
+    private bool AllSelected => Items is { Count: > 0 } && Items.All(i => Selected.Contains(i.Id));
+
+    private bool Has(ShipmentColumns column) => (Columns & column) == column;
+
+    private string? RowClass(ShipmentListItem s) =>
+        Selected.Contains(s.Id) ? "lx-row-selected"
+        : s.Status is ShipmentStatus.CustomsHold ? "lx-row-danger"
+        : s.Status is ShipmentStatus.DeliveryFailed || ShipmentLifecycle.IsReturning(s.Status) ? "lx-row-warning"
+        : null;
+
+    private Task OpenAsync(ShipmentListItem s)
+    {
+        if (OnRowClick.HasDelegate)
+        {
+            return OnRowClick.InvokeAsync(s);
+        }
+
+        Navigation.NavigateTo($"shipments/{s.Id}");
+        return Task.CompletedTask;
+    }
+
+    private Task ToggleAsync(Guid id, bool on)
+    {
+        if (on)
+        {
+            Selected.Add(id);
+        }
+        else
+        {
+            Selected.Remove(id);
+        }
+
+        return SelectedChanged.InvokeAsync(Selected);
+    }
+
+    private Task ToggleAllAsync(bool on)
+    {
+        foreach (var item in Items ?? [])
+        {
+            if (on)
+            {
+                Selected.Add(item.Id);
+            }
+            else
+            {
+                Selected.Remove(item.Id);
+            }
+        }
+
+        return SelectedChanged.InvokeAsync(Selected);
+    }
+}

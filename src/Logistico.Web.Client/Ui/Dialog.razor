@@ -1,0 +1,43 @@
+@if (IsOpen)
+{
+    <div class="bp6-portal">
+        <div class="bp6-overlay bp6-overlay-open bp6-overlay-scroll-container" @onkeydown="KeyAsync">
+            <div class="bp6-overlay-backdrop"></div>
+            <div class="bp6-dialog-container bp6-overlay-content" @onclick="CloseAsync">
+                <div class="bp6-dialog lx-dialog" style="@($"width:{Width}")" role="dialog" aria-modal="true" aria-labelledby="@titleId" @onclick:stopPropagation="true">
+                    <div class="bp6-dialog-header">
+                        @if (Icon is not null)
+                        {
+                            <Icon Name="@Icon" />
+                        }
+                        <h5 id="@titleId" class="bp6-heading">@Title</h5>
+                        <Button Minimal="true" Icon="cross" Title="@L["Close"]" OnClick="CloseAsync" autofocus />
+                    </div>
+                    <div class="bp6-dialog-body">@ChildContent</div>
+                    @if (Footer is not null)
+                    {
+                        <div class="bp6-dialog-footer">
+                            <div class="bp6-dialog-footer-actions">@Footer</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private readonly string titleId = $"lx-dialog-title-{Guid.NewGuid():N}";
+
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public string Width { get; set; } = "560px";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? Footer { get; set; }
+
+    private Task CloseAsync() => IsOpenChanged.InvokeAsync(false);
+
+    private Task KeyAsync(KeyboardEventArgs e) => e.Key == "Escape" ? CloseAsync() : Task.CompletedTask;
+}

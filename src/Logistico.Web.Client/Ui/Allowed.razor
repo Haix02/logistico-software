@@ -1,0 +1,27 @@
+@* Shows its content only to staff roles that a policy allows (StaffPolicies). The API refuses the same actions either way. *@
+@using System.Security.Claims
+
+@if (user is not null && user.Can(Policy))
+{
+    @ChildContent
+}
+else
+{
+    @Otherwise
+}
+
+@code {
+    private ClaimsPrincipal? user;
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    /// <summary>One of <see cref="Logistico.SharedKernel.Identity.StaffPolicies"/>.</summary>
+    [Parameter, EditorRequired] public string Policy { get; set; } = "";
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Shown instead when the role is not allowed (for example a read-only value).</summary>
+    [Parameter] public RenderFragment? Otherwise { get; set; }
+
+    protected override async Task OnParametersSetAsync() => user = AuthState is null ? null : (await AuthState).User;
+}

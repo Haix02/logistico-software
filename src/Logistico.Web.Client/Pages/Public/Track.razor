@@ -1,0 +1,456 @@
+@page "/track"
+@page "/track/{TrackingNumber}"
+@inject ShipmentsApi Shipments
+@inject NavigationManager Navigation
+
+<PageTitle>@L["TrackTitle"] · @L["AppName"]</PageTitle>
+
+<div class="lx-track">
+    <div class="lx-track-hero">
+        <h1 class="bp6-heading">@L["TrackTitle"]</h1>
+        <p class="bp6-text-muted">@L["TrackIntro"]</p>
+        <form class="lx-track-form" @onsubmit="Search">
+            <div class="bp6-input-group bp6-large bp6-fill">
+                <span class="bp6-icon bp6-icon-large bp6-icon-path-search"></span>
+                <input class="bp6-input bp6-large lx-upper" dir="ltr" placeholder="LX26 0001 2345 7" @bind="input" aria-label="@L["Col_Tracking"]" />
+            </div>
+            <Button Type="submit" Intent="Intent.Primary" Large="true" Text="@L["Track"]" Loading="loading" />
+        </form>
+    </div>
+
+    @if (message is not null)
+    {
+        <Callout Intent="Intent.Warning" Icon="search">@message</Callout>
+    }
+
+    @if (view is null && !loading)
+    {
+        <div class="lx-track-guide">
+            <div class="lx-track-guide-item">
+                <Icon Name="envelope" Large="true" />
+                <h2>@L["Track_HelpNumberTitle"]</h2>
+                <p>@L["Track_HelpNumberText"]</p>
+            </div>
+            <div class="lx-track-guide-item">
+                <Icon Name="edit" Large="true" />
+                <h2>@L["Track_HelpChangeTitle"]</h2>
+                <p>@L["Track_HelpChangeText"]</p>
+            </div>
+            <div class="lx-track-guide-item">
+                <Icon Name="star" Large="true" />
+                <h2>@L["Track_HelpConfirmTitle"]</h2>
+                <p>@L["Track_HelpConfirmText"]</p>
+            </div>
+        </div>
+        <NetworkSilhouette CssClass="lx-track-map" />
+    }
+
+    @if (view is not null)
+    {
+        <div class="lx-card lx-track-card">
+            <div class="lx-track-head">
+                <div>
+                    <div class="bp6-text-muted lx-small">@L["Col_Tracking"]</div>
+                    <div class="lx-track-number lx-code">@view.TrackingNumber</div>
+                    @if (view.MerchantName is not null)
+                    {
+                        <div class="lx-track-from"><Icon Name="shop" /> <Mixed Text="@string.Format(CultureInfo.CurrentCulture, L["FromShop"], view.MerchantName)" /></div>
+                    }
+                </div>
+                <StatusTag Status="view.Status" Large="true" Round="true" />
+            </div>
+
+            <div class="lx-track-headline">@Headline</div>
+
+            <TrackingStages Service="view.ServiceType" Status="view.Status" Large="true" CrossesHubs="view.CrossesHubs" AtDestinationHub="@(view.CurrentHubCode == view.DestinationHubCode)" />
+
+            <div class="lx-track-facts">
+                <div class="lx-track-fact">
+                    <Icon Name="map-marker" Large="true" />
+                    <div><div class="bp6-text-muted lx-small">@L["DeliveringTo"]</div><div>@Fmt.Place(view.DestinationCode)@(view.DestinationCity is null ? "" : " — " + view.DestinationCity)</div></div>
+                </div>
+                @if (WhereNow is { } where)
+                {
+                    <div class="lx-track-fact">
+                        <Icon Name="@(ShipmentLifecycle.IsOnLineHaul(view.Status) ? "drive-time" : "office")" Large="true" />
+                        <div><div class="bp6-text-muted lx-small">@L["WhereNow"]</div><div>@where</div></div>
+                    </div>
+                }
+                <div class="lx-track-fact">
+                    <Icon Name="calendar" Large="true" />
+                    <div>
+                        <div class="bp6-text-muted lx-small">@(view.DeliveredAt is null ? L["ExpectedBy"] : L["DeliveredOn"])</div>
+                        <div>@(view.DeliveredAt is { } delivered ? Fmt.DateTime(delivered) : Fmt.Date(view.RescheduledTo ?? view.EtaAt ?? view.PromisedAt))</div>
+                    </div>
+                </div>
+                @if (view.AmountToPay is { } amount)
+                {
+                    <div class="lx-track-fact lx-track-pay">
+                        <Icon Name="dollar" Large="true" />
+                        <div><div class="bp6-text-muted lx-small">@L["AmountToPay"]</div><div class="lx-strong">@Fmt.Money(amount, view.AmountCurrency)</div></div>
+                    </div>
+                }
+            </div>
+
+            @if (view.AwaitingConfirmation)
+            {
+                <div class="lx-confirm-box">
+                    <div class="lx-row"><Icon Name="phone-call" Large="true" /><h3 class="bp6-heading" style="margin:0">@L["Track_ConfirmTitle"]</h3></div>
+                    <p class="bp6-text-muted" style="margin:0">@L["Track_ConfirmText"]</p>
+                    <div class="lx-row lx-confirm-form">
+                        <label class="bp6-label" for="confirm-last4" style="margin:0">@L["Field_PhoneLast4"]</label>
+                        <input id="confirm-last4" class="bp6-input lx-last4" inputmode="numeric" maxlength="4" dir="ltr" autocomplete="off" @bind="confirmLast4" @bind:event="oninput" placeholder="••••" />
+                        <Button Intent="Intent.Success" Icon="tick" Text="@L["Track_ConfirmAction"]" Loading="confirming" Disabled="@(confirmLast4?.Length != 4)" OnClick="@(() => AnswerAsync(true))" />
+                        <Button Minimal="true" Intent="Intent.Danger" Icon="cross" Text="@L["Track_DeclineAction"]" Disabled="@(confirmLast4?.Length != 4 || confirming)" OnClick="@(() => AnswerAsync(false))" />
+                    </div>
+                    @if (confirmError is not null)
+                    {
+                        <Callout Intent="Intent.Danger" Icon="error">@confirmError</Callout>
+                    }
+                </div>
+            }
+            else if (confirmAnswer is { } answer)
+            {
+                <Callout Intent="@(answer ? Intent.Success : Intent.Primary)" Icon="@(answer ? "tick-circle" : "info-sign")" CssClass="lx-mt">
+                    @L[answer ? "Track_Confirmed" : "Track_Declined"]
+                </Callout>
+            }
+
+            @if (view.CanRate && ratedStars is null)
+            {
+                <div class="lx-rate-box">
+                    <h3 class="bp6-heading" style="margin:0">@L["Track_RateTitle"]</h3>
+                    <div class="lx-stars" role="radiogroup" aria-label="@L["Track_RateTitle"]">
+                        @for (var star = 1; star <= 5; star++)
+                        {
+                            var value = star;
+                            <button type="button" role="radio" aria-checked="@(stars == value ? "true" : "false")" aria-label="@L.Count("StarsN", value)"
+                                    class="@Bp.Cls("lx-star", Bp.When(value <= stars, "lx-star-on"))" @onclick="@(() => stars = value)">★</button>
+                        }
+                    </div>
+                    @if (stars > 0)
+                    {
+                        <textarea class="bp6-input bp6-fill" rows="2" maxlength="500" @bind="ratingComment" placeholder="@L[stars <= 2 ? "Track_RateCommentLow" : "Track_RateComment"]"></textarea>
+                        <div class="lx-row lx-confirm-form">
+                            <label class="bp6-label" for="rate-last4" style="margin:0">@L["Field_PhoneLast4"]</label>
+                            <input id="rate-last4" class="bp6-input lx-last4" inputmode="numeric" maxlength="4" dir="ltr" autocomplete="off" @bind="rateLast4" @bind:event="oninput" placeholder="••••" />
+                            <Button Intent="Intent.Primary" Icon="send-message" Text="@L["Track_RateSend"]" Loading="rating" Disabled="@(rateLast4?.Length != 4)" OnClick="RateAsync" />
+                        </div>
+                    }
+                    @if (rateError is not null)
+                    {
+                        <Callout Intent="Intent.Danger" Icon="error">@rateError</Callout>
+                    }
+                </div>
+            }
+            else if ((ratedStars ?? view.Rating) is { } given)
+            {
+                <Callout Intent="Intent.Success" Icon="star" CssClass="lx-mt">
+                    <span class="lx-stars-static" aria-label="@L.Count("StarsN", given)">@(new string('★', given))<span class="lx-star-off">@(new string('★', 5 - given))</span></span>
+                    @L[given <= 2 ? "Track_RatedLow" : "Track_Rated"]
+                </Callout>
+            }
+
+            @if (view.Status == ShipmentStatus.DeliveryFailed && view.Events.FirstOrDefault()?.FailureReason is { } reason)
+            {
+                <Callout Intent="Intent.Warning" Icon="phone" Title="@L["WeTriedToDeliver"]">
+                    @ShipmentTexts.Of(reason). @L["WeWillTryAgain"]
+                </Callout>
+            }
+
+            @if (receipt is not null)
+            {
+                <Callout Intent="Intent.Success" Icon="tick-circle" Title="@string.Format(CultureInfo.CurrentCulture, L["RequestReceivedTitle"], receipt.Number)" CssClass="lx-mt">
+                    @(receipt.AppliedAutomatically ? L["RequestAppliedText"] : L["RequestQueuedText"])
+                </Callout>
+            }
+            else if (view.OpenRequests > 0)
+            {
+                <Callout Intent="Intent.Primary" Icon="inbox" CssClass="lx-mt">@L["RequestPendingText"]</Callout>
+            }
+
+            @if (view.AllowedRequests.Count > 0 && receipt is null)
+            {
+                <h3 class="bp6-heading lx-track-sub">@L["NeedChange"]</h3>
+                <div class="lx-help-options" role="radiogroup">
+                    @foreach (var type in view.AllowedRequests)
+                    {
+                        <button type="button" role="radio" aria-checked="@(form?.Type == type ? "true" : "false")"
+                                class="@Bp.Cls("lx-choice", Bp.When(form?.Type == type, "lx-choice-active"))" @onclick="@(() => StartRequest(type))">
+                            <Icon Name="@DomainIcons.Of(type)" Large="true" />
+                            <span class="lx-stack"><span class="lx-choice-title">@ShipmentTexts.Of(type)</span><span class="lx-choice-sub">@L["CustomerRequestHint_" + type]</span></span>
+                        </button>
+                    }
+                </div>
+
+                @if (form is not null)
+                {
+                    <EditForm Model="form" OnValidSubmit="SendRequestAsync" class="lx-card lx-card-pad" style="box-shadow:none;border:1px solid var(--lx-border)">
+                        <DataAnnotationsValidator />
+                        <div class="lx-form-grid">
+                            @switch (form.Type)
+                            {
+                                case RequestType.Reschedule:
+                                    <FormField Label="@L["Field_PreferredDate"]" Required="true" Field="() => form.PreferredDate" Helper="@L["NoFridayHint"]" CssClass="lx-span-2">
+                                        <InputDate class="bp6-input bp6-fill" @bind-Value="form.PreferredDate" />
+                                    </FormField>
+                                    break;
+                                case RequestType.ChangeAddress:
+                                    <FormField Label="@L["Field_Area"]" Field="() => form.NewCity">
+                                        <InputText class="bp6-input bp6-fill" @bind-Value="form.NewCity" />
+                                    </FormField>
+                                    <FormField Label="@L["Field_Landmark"]" Hint="@L["Optional"]" Field="() => form.NewLandmark">
+                                        <InputText class="bp6-input bp6-fill" @bind-Value="form.NewLandmark" />
+                                    </FormField>
+                                    <FormField Label="@L["Field_Address"]" Required="true" Field="() => form.NewAddress" CssClass="lx-span-2">
+                                        <InputText class="bp6-input bp6-fill" @bind-Value="form.NewAddress" />
+                                    </FormField>
+                                    break;
+                                case RequestType.ChangePhone:
+                                    <FormField Label="@L["Field_NewPhone"]" Required="true" Field="() => form.NewPhone" CssClass="lx-span-2">
+                                        <InputText class="bp6-input bp6-fill" type="tel" dir="ltr" placeholder="0770 123 4567" @bind-Value="form.NewPhone" />
+                                    </FormField>
+                                    break;
+                            }
+                            <FormField Label="@L["Col_Details"]" Required="@(form.Type == RequestType.Complaint)" Hint="@(form.Type == RequestType.Complaint ? null : L["Optional"].Value)" Field="() => form.Details" CssClass="lx-span-2">
+                                <InputTextArea class="bp6-input bp6-fill" rows="2" @bind-Value="form.Details" />
+                            </FormField>
+                            <FormField Label="@L["Field_PhoneLast4"]" Required="true" Helper="@L["PhoneLast4Hint"]" Field="() => form.PhoneLast4">
+                                <InputText class="bp6-input lx-last4" dir="ltr" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••" @bind-Value="form.PhoneLast4" />
+                            </FormField>
+                        </div>
+                        @if (requestError is not null)
+                        {
+                            <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mb">@requestError</Callout>
+                        }
+                        <div class="lx-form-actions">
+                            <Button Type="submit" Intent="Intent.Primary" Icon="send-message" Text="@L["SendRequest"]" Loading="sending" />
+                            <Button Minimal="true" Text="@L["Cancel"]" OnClick="@(() => form = null)" />
+                        </div>
+                    </EditForm>
+                }
+            }
+
+            <h3 class="bp6-heading lx-track-sub">@L["Journey"]</h3>
+            <Timeline Entries="timeline" />
+
+            <div class="lx-track-share">
+                <CopyButton Value="@Navigation.Uri" Text="@L["CopyLink"]" Minimal="false" />
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string? TrackingNumber { get; set; }
+
+    private string? input;
+    private PublicTrackingView? view;
+    private string? confirmLast4;
+    private bool confirming;
+    private bool? confirmAnswer;
+    private string? confirmError;
+    private int stars;
+    private string? ratingComment;
+    private string? rateLast4;
+    private bool rating;
+    private int? ratedStars;
+    private string? rateError;
+    private IReadOnlyList<TimelineEntry> timeline = [];
+    private CustomerRequest? form;
+    private CustomerRequestReceipt? receipt;
+    private string? message;
+    private string? requestError;
+    private bool loading;
+    private bool sending;
+
+    private string Headline => view?.Status switch
+    {
+        ShipmentStatus.Delivered => L["Headline_Delivered"],
+        ShipmentStatus.OutForDelivery => L["Headline_OutForDelivery"],
+        ShipmentStatus.DeliveryFailed => L["Headline_Failed"],
+        ShipmentStatus.InTransitToHub => L["Headline_BetweenCities"],
+        ShipmentStatus.AtWarehouse or ShipmentStatus.ReadyForDispatch or ShipmentStatus.AtDestinationWarehouse => L["Headline_Warehouse"],
+        ShipmentStatus.Booked => L["Headline_Booked"],
+        ShipmentStatus.PickedUp => L["Headline_PickedUp"],
+        ShipmentStatus.CustomsPending or ShipmentStatus.CustomsHold or ShipmentStatus.ArrivedPortOfEntry or ShipmentStatus.Released => L["Headline_Customs"],
+        ShipmentStatus.Returned or ShipmentStatus.ReturnInitiated or ShipmentStatus.ReturnInTransit or ShipmentStatus.ReturnAtHub => L["Headline_Returned"],
+        ShipmentStatus.Cancelled => L["Headline_Cancelled"],
+        _ => L["Headline_InTransit"],
+    };
+
+    /// <summary>The city of the hub holding the parcel, or the city it is travelling to.</summary>
+    private string? WhereNow => view switch
+    {
+        null => null,
+        { Status: ShipmentStatus.InTransitToHub } => string.Format(CultureInfo.CurrentCulture, L["OnTheWayTo"], Fmt.Place(view.Hub(view.DestinationHubCode)?.Governorate)),
+        { CurrentHubCode: { } hub } when ShipmentLifecycle.IsActive(view.Status) => string.Format(CultureInfo.CurrentCulture, L["AtOurHubIn"], Fmt.Place(view.Hub(hub)?.Governorate)),
+        _ => null,
+    };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(TrackingNumber))
+        {
+            input = TrackingNumber;
+            await LookupAsync(TrackingNumber);
+        }
+    }
+
+    private void Search()
+    {
+        var normalized = Logistico.Modules.Shipments.Contracts.Rules.TrackingNumber.Normalize(input ?? "");
+        if (!Logistico.Modules.Shipments.Contracts.Rules.TrackingNumber.IsValid(normalized))
+        {
+            view = null;
+            message = L["InvalidTrackingNumber"];
+            return;
+        }
+
+        Navigation.NavigateTo($"track/{normalized}");
+    }
+
+    private async Task RateAsync()
+    {
+        if (view is null || rateLast4 is not { Length: 4 } last4 || stars is < 1 or > 5)
+        {
+            return;
+        }
+
+        rating = true;
+        rateError = null;
+        try
+        {
+            await Shipments.RateAsCustomerAsync(view.TrackingNumber, new CustomerRating { PhoneLast4 = last4, Stars = stars, Comment = ratingComment });
+            ratedStars = stars;
+        }
+        catch (ApiException ex)
+        {
+            rateError = CustomerError(ex);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            rateError = L["ServiceUnavailable"];
+        }
+        finally
+        {
+            rating = false;
+        }
+    }
+
+    /// <summary>The customer confirms or declines the order; the last 4 digits of their mobile prove it is them.</summary>
+    private async Task AnswerAsync(bool confirm)
+    {
+        if (view is null || confirmLast4 is not { Length: 4 } last4)
+        {
+            return;
+        }
+
+        confirming = true;
+        confirmError = null;
+        try
+        {
+            await Shipments.ConfirmAsCustomerAsync(view.TrackingNumber, last4, confirm);
+            confirmAnswer = confirm;
+            await LookupAsync(view.TrackingNumber);
+        }
+        catch (ApiException ex)
+        {
+            confirmError = CustomerError(ex);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            confirmError = L["ServiceUnavailable"];
+        }
+        finally
+        {
+            confirming = false;
+        }
+    }
+
+    private async Task LookupAsync(string trackingNumber)
+    {
+        view = null;
+        message = null;
+        form = null;
+        receipt = null;
+        var normalized = Logistico.Modules.Shipments.Contracts.Rules.TrackingNumber.Normalize(trackingNumber);
+        if (!Logistico.Modules.Shipments.Contracts.Rules.TrackingNumber.IsValid(normalized))
+        {
+            message = L["InvalidTrackingNumber"];
+            return;
+        }
+
+        loading = true;
+        try
+        {
+            view = await Shipments.TrackAsync(normalized);
+            timeline = view is null ? [] : view.Events.Select(e => new TimelineEntry(e.Status, e.OccurredAt, view.Hub(e.HubCode)?.Name ?? e.Location, FailureReason: e.FailureReason)).ToList();
+            message = view is null ? L["TrackingNotFound"].Value : null;
+        }
+        catch (ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+        {
+            message = L["TooManyRequests"];
+        }
+        catch (ApiException ex)
+        {
+            message = ex.UserMessage;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            message = L["ServiceUnavailable"];
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    /// <summary>Wrong digits, an order locked after too many wrong answers (its own message), or the address rate limit (no body).</summary>
+    private string CustomerError(ApiException ex) => ex.StatusCode switch
+    {
+        System.Net.HttpStatusCode.Forbidden => L["Track_WrongDigits"],
+        System.Net.HttpStatusCode.TooManyRequests when ex.Problem?.Title is null => L["TooManyRequests"],
+        _ => ex.UserMessage,
+    };
+
+    private void StartRequest(RequestType type)
+    {
+        form = new CustomerRequest { Type = type, PreferredDate = type == RequestType.Reschedule ? DeliveryPromise.NextWorkingDay(DateTimeOffset.UtcNow) : null };
+        requestError = null;
+    }
+
+    private async Task SendRequestAsync()
+    {
+        if (view is null || form is null)
+        {
+            return;
+        }
+
+        sending = true;
+        requestError = null;
+        try
+        {
+            receipt = await Shipments.SendCustomerRequestAsync(view.TrackingNumber, form);
+            form = null;
+            var refreshed = await Shipments.TrackAsync(view.TrackingNumber);
+            if (refreshed is not null)
+            {
+                view = refreshed;
+                timeline = view.Events.Select(e => new TimelineEntry(e.Status, e.OccurredAt, view.Hub(e.HubCode)?.Name ?? e.Location, FailureReason: e.FailureReason)).ToList();
+            }
+        }
+        catch (ApiException ex)
+        {
+            requestError = CustomerError(ex);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            requestError = L["ServiceUnavailable"];
+        }
+        finally
+        {
+            sending = false;
+        }
+    }
+}

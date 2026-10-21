@@ -1,0 +1,30 @@
+name: Idea or feature request
+description: Something that would help your hub, couriers, sellers or customers
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: Who has this problem and how do they work around it today? (e.g. "Basra hub staff re-type tracking numbers because…")
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: What should Logistico do? Mock-ups or examples from other tools are welcome.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Orders and shipments
+        - Hubs, trucks and scanning
+        - Couriers and last mile
+        - Customers and tracking page
+        - Sellers, COD and finance
+        - Demand intelligence and data
+        - Customs (ASYCUDA)
+        - Arabic / English / Kurdish texts
+        - Other

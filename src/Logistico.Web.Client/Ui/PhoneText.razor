@@ -1,0 +1,18 @@
+@* Iraqi mobile number shown as 0770 123 4567, always left-to-right; optionally a tap-to-call link. *@
+@if (string.IsNullOrEmpty(Value))
+{
+    <span class="bp6-text-muted">—</span>
+}
+else if (Link)
+{
+    <a class="lx-phone" href="@($"tel:{Value}")" dir="ltr">@IraqPhone.Display(Value)</a>
+}
+else
+{
+    <span class="lx-phone" dir="ltr">@IraqPhone.Display(Value)</span>
+}
+
+@code {
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public bool Link { get; set; }
+}

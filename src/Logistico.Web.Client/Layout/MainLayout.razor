@@ -1,0 +1,422 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject NavigationManager Navigation
+@inject AccountApi Account
+@inject ShipmentsApi Shipments
+@inject OperationsApi Operations
+@inject OpsState Ops
+@inject Toaster Toaster
+@inject IJSRuntime JS
+@using System.Security.Claims
+
+<div class="@Bp.Cls("lx-app", Bp.When(menuOpen, "lx-menu-open"), Bp.When(collapsed, "lx-sidebar-collapsed"), Bp.When(!staff, "lx-no-sidebar"))">
+    <header class="bp6-navbar bp6-dark lx-topbar">
+        <div class="bp6-navbar-group lx-topbar-start">
+            @if (staff)
+            {
+                <Button Minimal="true" Icon="@(menuOpen ? "cross" : "menu")" CssClass="lx-menu-toggle" Title="@L["Menu"]" OnClick="@(() => menuOpen = !menuOpen)" />
+            }
+            <a class="lx-brand" href="">
+                <span class="lx-logo" aria-hidden="true"></span>
+                <span class="lx-brand-name">@L["AppName"]</span>
+            </a>
+            @if (staff)
+            {
+                <button type="button" class="lx-search-trigger" @onclick="Ops.OpenPalette" aria-label="@L["GlobalSearchPlaceholder"]">
+                    <Icon Name="search" />
+                    <span class="lx-search-trigger-text">@L["GlobalSearchPlaceholder"]</span>
+                    <kbd class="lx-kbd">Ctrl K</kbd>
+                </button>
+            }
+        </div>
+        <div class="bp6-navbar-group lx-topbar-end">
+            @if (staff)
+            {
+                <Button Minimal="true" CssClass="@Bp.Cls("lx-hide-sm", Bp.When(radarFlash, "lx-pulse-flash"))" Tip="@L["HubRadarTitle"]" OnClick="@(() => radarOpen = true)">
+                    <span class="lx-row"><span class="lx-pulse-dot" aria-hidden="true"></span><span>@L["HubRadar"]</span>
+                        @if (radar is not null)
+                        {
+                            <Tag Intent="@(radar.MisroutedToday > 0 ? Intent.Warning : Intent.Success)" Round="true">@Fmt.Number(radar.ScansToday)</Tag>
+                        }
+                    </span>
+                </Button>
+                <a href="automation" class="bp6-button bp6-minimal lx-topbar-badge lx-tip" data-tip="@L["Alerts_Title"]" aria-label="@L["Alerts_Title"]">
+                    <Icon Name="notifications" />
+                    @if (Ops.Counters is { OpenAlerts: > 0 } counters)
+                    {
+                        <span class="lx-count">@(counters.OpenAlerts > 99 ? "99+" : Fmt.Number(counters.OpenAlerts))</span>
+                    }
+                </a>
+                @if (user.Can(StaffPolicies.Operate))
+                {
+                    <LinkButton Href="orders/new" Icon="add" Text="@L["NewOrder"]" Intent="Intent.Primary" CssClass="lx-hide-sm" />
+                }
+            }
+            <Button Minimal="true" Icon="translate" Text="@L["OtherLanguage"]" Title="@L["SwitchLanguage"]" OnClick="SwitchLanguage" />
+            <Button Minimal="true" Icon="@(dark ? "flash" : "moon")" Tip="@L["ToggleTheme"]" OnClick="ToggleThemeAsync" CssClass="lx-hide-sm" />
+            <AuthorizeView>
+                <Popover Minimal="true" Icon="user" Text="@DisplayName(context)" Title="@context.User.Identity?.Name" Width="250px">
+                    <ul class="bp6-menu lx-menu">
+                        <MenuDivider Title="@context.User.Identity?.Name" />
+                        <li class="lx-menu-role" role="presentation">
+                            <Tag Minimal="true" Icon="@(context.User.IsStaff() ? "key" : "time")">@L["Role_" + (context.User.StaffRole() ?? "None")]</Tag>
+                        </li>
+                        <MenuItem Icon="cog" Text="@L["MyAccount"]" OnClick="@(() => Navigation.NavigateTo("Account/Manage", forceLoad: true))" />
+                        <MenuItem Icon="key-command" Text="@L["Shortcuts_Title"]" Label="?" OnClick="Ops.OpenHelp" />
+                        <MenuItem Icon="@(muted ? "volume-off" : "volume-up")" Text="@(muted ? L["SoundMuted"] : L["SoundOn"])" OnClick="ToggleMuteAsync" />
+                        <MenuItem Icon="@(dark ? "flash" : "moon")" Text="@L["ToggleTheme"]" OnClick="ToggleThemeAsync" />
+                        <MenuDivider />
+                        <MenuItem Icon="log-out" Text="@L["SignOut"]" Intent="Intent.Danger" OnClick="Account.SignOutAsync" />
+                    </ul>
+                </Popover>
+            </AuthorizeView>
+        </div>
+    </header>
+
+    <div class="lx-body">
+        @if (staff)
+        {
+            <aside class="lx-sidebar" aria-label="@L["Menu"]">
+                <div class="lx-sidebar-inner">
+                    <nav>
+                        @foreach (var group in AppNavigation.For(user))
+                        {
+                            <div class="lx-nav-header">@L[group.TitleKey]</div>
+                            <ul class="lx-nav">
+                                @foreach (var item in group.Items)
+                                {
+                                    var (count, tone) = CountFor(item.Href);
+                                    <li>
+                                        <NavLink class="@Bp.Cls("lx-nav-item", Bp.When(collapsed, "lx-tip"))" ActiveClass="active" href="@item.Href"
+                                                 Match="@(item.Exact ? NavLinkMatch.All : NavLinkMatch.Prefix)" data-tip="@(collapsed ? L[item.TextKey].Value : null)"
+                                                 @onclick="@(() => menuOpen = false)">
+                                            <Icon Name="@item.Icon" />
+                                            <span class="lx-nav-text">@L[item.TextKey]</span>
+                                            @if (count > 0)
+                                            {
+                                                <span class="@Bp.Cls("lx-nav-count", tone)">@(count > 999 ? "999+" : Fmt.Number(count))</span>
+                                            }
+                                        </NavLink>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </nav>
+                    <div class="lx-sidebar-footer">
+                        <Button Minimal="true" Small="true" Icon="@(collapsed ? Bidi.ChevronForward : Bidi.ChevronBack)" Text="@L["CollapseMenu"]"
+                                CssClass="lx-collapse-btn lx-collapse-toggle" OnClick="ToggleCollapseAsync" />
+                    </div>
+                </div>
+            </aside>
+            <div class="lx-sidebar-scrim" @onclick="@(() => menuOpen = false)"></div>
+        }
+        <main class="lx-main" id="main">
+            @if (!staff || HubCatalog.IsLoaded || networkUnavailable)
+            {
+                @Body
+            }
+            else
+            {
+                <Skeleton Block="true" Lines="3" />
+            }
+        </main>
+    </div>
+</div>
+
+<Drawer @bind-IsOpen="radarOpen" Title="@L["HubRadarTitle"]" Icon="feed" Width="620px">
+    <ChildContent>
+        <div class="lx-hub-picker">
+            @foreach (var hub in HubCatalog.All)
+            {
+                var stat = radar?.Hubs.FirstOrDefault(h => h.HubCode == hub.Code);
+                <div class="lx-hub-card">
+                    <div class="lx-hub-card-title"><Tag Intent="Intent.Primary">@hub.RoutingTag</Tag><span>@hub.Name</span></div>
+                    <div class="lx-hub-card-sub">
+                        @L.Count("ScansN", stat?.ScansToday ?? 0)
+                        @if (stat?.MisroutedToday is > 0)
+                        {
+                            <span class="lx-intent-warning"> · @string.Format(CultureInfo.CurrentCulture, L["MisroutedN"], Fmt.Number(stat.MisroutedToday))</span>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+        <ul class="lx-list lx-card">
+            @foreach (var e in radar?.Recent ?? [])
+            {
+                <li>
+                    <a class="lx-list-item" href="@(e.ShipmentId is { } id ? $"shipments/{id}" : null)" @onclick="@(() => radarOpen = false)">
+                        <span class="@Bp.Cls("lx-list-icon", !e.Ok ? "lx-list-icon-danger" : e.IsMisrouted ? "lx-list-icon-warning" : "lx-list-icon-primary")">
+                            <Icon Name="@(!e.Ok ? "error" : e.IsMisrouted ? "warning-sign" : "barcode")" />
+                        </span>
+                        <span class="lx-list-body">
+                            <span class="lx-list-title"><span class="lx-code">@e.TrackingNumber</span> · @ShipmentTexts.Of(e.Operation)</span>
+                            <span class="lx-list-sub"><Mixed Text="@e.Message" /></span>
+                        </span>
+                        <span class="lx-stack" style="align-items:flex-end">
+                            <Tag Intent="@(e.IsMisrouted ? Intent.Warning : Intent.None)">@HubCatalog.FindOrDefault(e.HubCode).RoutingTag</Tag>
+                            <span class="lx-list-meta">@Fmt.Time(e.ScannedAt)</span>
+                        </span>
+                    </a>
+                </li>
+            }
+            @if (radar is { Recent.Count: 0 })
+            {
+                <li><NonIdealState Icon="barcode" Title="@L["NoScansYet"]" /></li>
+            }
+        </ul>
+    </ChildContent>
+    <Footer>
+        <Allowed Policy="@StaffPolicies.Operate">
+            <LinkButton Href="warehouse" Icon="barcode" Text="@L["Nav_Warehouse"]" Intent="Intent.Primary" />
+        </Allowed>
+        <LinkButton Href="network" Icon="map" Text="@L["Nav_Network"]" />
+    </Footer>
+</Drawer>
+
+@if (staff)
+{
+    <CommandPalette @ref="palette" User="user" />
+    <ShortcutsDialog User="user" />
+}
+<ConfirmHost />
+<ToastHost />
+
+<div id="blazor-error-ui" data-nosnippet>
+    @L["UnhandledError"]
+    <a href="." class="reload">@L["Reload"]</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
+    private CommandPalette? palette;
+    private bool menuOpen;
+    private bool collapsed;
+    private bool radarOpen;
+    private bool radarFlash;
+    private bool dark;
+    private bool muted;
+    private HubRadar? radar;
+    private bool networkUnavailable;
+    private DotNetObjectReference<MainLayout>? selfRef;
+    private CancellationTokenSource? loopCts;
+    private ClaimsPrincipal user = new();
+    private bool staff;
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Ops.Changed += OnOpsChanged;
+        HubCatalog.Changed += OnNetworkChanged;
+        user = AuthState is null ? new() : (await AuthState).User;
+        staff = user.IsStaff();
+        dark = await JS.InvokeAsync<bool>("lx.isDark");
+        muted = await JS.InvokeAsync<bool>("lx.isMuted");
+        collapsed = await JS.InvokeAsync<string?>("lx.getPref", "sidebar") == "collapsed";
+        if (!staff)
+        {
+            return; // no company data without a role: the page explains how to get access
+        }
+
+        try
+        {
+            // Pages route parcels with the company's own warehouses, so they wait for the network.
+            await Operations.RefreshNetworkAsync();
+        }
+        catch (Exception ex) when (ex is ApiException or HttpRequestException)
+        {
+            networkUnavailable = true; // fall back to the standard network rather than blocking the app
+        }
+
+        await Task.WhenAll(RefreshRadarAsync(notify: false), Ops.RefreshAsync());
+        StartBackgroundRefresh();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            selfRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("lx.registerShortcuts", selfRef);
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnShortcut(string name)
+    {
+        if (!staff)
+        {
+            return;
+        }
+
+        switch (name)
+        {
+            case "palette" when palette is not null:
+                await palette.Open(null);
+                break;
+            case "help":
+                Ops.OpenHelp();
+                break;
+            case "new-order" when user.Can(StaffPolicies.Operate):
+                Navigation.NavigateTo("orders/new");
+                break;
+            default:
+                if (name.StartsWith("go:", StringComparison.Ordinal) && AppNavigation.ByShortcut(name[3..]) is { } entry && user.Can(entry.Policy))
+                {
+                    Navigation.NavigateTo(entry.Href);
+                }
+
+                break;
+        }
+    }
+
+    /// <summary>A keyboard-wedge scanner typed a code outside any input: open that parcel (or search for it).</summary>
+    [JSInvokable]
+    public async Task OnGlobalBarcodeScanned(string rawBarcode)
+    {
+        var code = TrackingNumber.Normalize(rawBarcode ?? "");
+        if (!staff || code.Length == 0)
+        {
+            return;
+        }
+
+        if (TrackingNumber.IsValid(code))
+        {
+            var found = await Shipments.ListAsync(new ShipmentQuery { Q = code, PageSize = 1 });
+            if (found.Items.Count == 1)
+            {
+                Navigation.NavigateTo($"shipments/{found.Items[0].Id}");
+                return;
+            }
+        }
+
+        if (palette is not null)
+        {
+            await palette.Open(rawBarcode);
+        }
+    }
+
+    private void StartBackgroundRefresh()
+    {
+        loopCts = new CancellationTokenSource();
+        _ = RefreshLoopAsync(loopCts.Token);
+    }
+
+    private async Task RefreshLoopAsync(CancellationToken token)
+    {
+        try
+        {
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
+            var ticks = 0;
+            while (await timer.WaitForNextTickAsync(token))
+            {
+                ticks++;
+                await InvokeAsync(() => RefreshRadarAsync(notify: true));
+                if (ticks % 6 == 0)
+                {
+                    await Ops.RefreshAsync();
+                }
+            }
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            // Normal component disposal after navigation or sign-out.
+        }
+    }
+
+    private async Task RefreshRadarAsync(bool notify)
+    {
+        try
+        {
+            var previous = radar?.LastSeq;
+            var snapshot = await Operations.GetRadarAsync();
+            if (notify && previous is { } seq && snapshot.LastSeq > seq)
+            {
+                radarFlash = true;
+                var remoteScans = snapshot.Recent.Where(e => e.Seq > seq && e.Seq > Ops.LastLocalScanSeq).ToList();
+                var misrouted = remoteScans.FirstOrDefault(e => e.IsMisrouted);
+                if (misrouted is not null)
+                {
+                    await JS.InvokeVoidAsync("lx.remoteBeep", true, true);
+                    var hub = HubCatalog.FindOrDefault(misrouted.HubCode);
+                    var expected = HubCatalog.FindOrDefault(misrouted.ExpectedHubCode);
+                    Toaster.Warning(string.Format(CultureInfo.CurrentCulture, L["MisroutedToast"], hub.Name, misrouted.TrackingNumber, expected.Name));
+                }
+                else if (remoteScans.FirstOrDefault() is { } latest)
+                {
+                    await JS.InvokeVoidAsync("lx.remoteBeep", latest.Ok, false);
+                    var hub = HubCatalog.FindOrDefault(latest.HubCode);
+                    Toaster.Show(
+                        string.Format(CultureInfo.CurrentCulture, L["RemoteScanToast"], hub.DisplayLabel, latest.TrackingNumber, latest.Message),
+                        latest.Ok ? Intent.Primary : Intent.Danger,
+                        "barcode");
+                }
+            }
+            else
+            {
+                radarFlash = false;
+            }
+
+            radar = snapshot;
+            StateHasChanged();
+        }
+        catch (Exception ex) when (ex is HttpRequestException or ApiException or TaskCanceledException)
+        {
+            // The radar is best-effort; try again on the next tick.
+        }
+    }
+
+    private (int Count, string? Tone) CountFor(string href) => Ops.Counters is not { } c
+        ? (0, null)
+        : href switch
+        {
+            "requests" => (c.OpenRequests, c.OverdueRequests > 0 ? "lx-nav-count-danger" : null),
+            "confirmations" => (c.PendingConfirmations, "lx-nav-count-warning"),
+            "automation" => (c.OpenAlerts, c.CriticalAlerts > 0 ? "lx-nav-count-danger" : "lx-nav-count-warning"),
+            "returns" => (c.ReturnsAtHub, null),
+            "transfers" => (c.ParcelsWaitingForTruck, "lx-nav-count-warning"),
+            _ => (0, null),
+        };
+
+    private string? DisplayName(AuthenticationState context) =>
+        context.User.FindFirst(Logistico.SharedKernel.Identity.LogisticoClaimTypes.DisplayName)?.Value ?? context.User.Identity?.Name;
+
+    private void OnOpsChanged() => InvokeAsync(StateHasChanged);
+
+    private void OnNetworkChanged() => InvokeAsync(StateHasChanged);
+
+    private void SwitchLanguage()
+    {
+        var target = AppCultures.IsArabic ? AppCultures.English : AppCultures.Arabic;
+        var returnUrl = "/" + Navigation.ToBaseRelativePath(Navigation.Uri);
+        Navigation.NavigateTo($"culture?c={target}&returnUrl={Uri.EscapeDataString(returnUrl)}", forceLoad: true);
+    }
+
+    private async Task ToggleThemeAsync()
+    {
+        dark = !dark;
+        await JS.InvokeVoidAsync("lx.setDark", dark);
+    }
+
+    private async Task ToggleMuteAsync()
+    {
+        muted = !muted;
+        await JS.InvokeVoidAsync("lx.setMuted", muted);
+    }
+
+    private async Task ToggleCollapseAsync()
+    {
+        collapsed = !collapsed;
+        await JS.InvokeVoidAsync("lx.setPref", "sidebar", collapsed ? "collapsed" : "expanded");
+    }
+
+    public void Dispose()
+    {
+        Ops.Changed -= OnOpsChanged;
+        HubCatalog.Changed -= OnNetworkChanged;
+        loopCts?.Cancel();
+        loopCts?.Dispose();
+        selfRef?.Dispose();
+    }
+}

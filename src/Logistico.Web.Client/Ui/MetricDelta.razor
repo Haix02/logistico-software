@@ -1,0 +1,24 @@
+@if (Change is { } change)
+{
+    var good = change == 0 ? (bool?)null : (change > 0) == HigherIsBetter;
+    <span class="@Bp.Cls("lx-kpi-change", Bp.When(Compact, "lx-kpi-change-compact"), good switch { true => "lx-kpi-change-good", false => "lx-kpi-change-bad", _ => null })"
+          title="@L["VsPreviousPeriod"]">
+        <Icon Name="@(change > 0 ? "arrow-up" : change < 0 ? "arrow-down" : "minus")" />
+        <bdi dir="ltr">@(change > 0 ? "+" : "")@Fmt.Number(change)@(ChangeInPoints ? "" : "%")</bdi>
+        @if (ChangeInPoints)
+        {
+            <span>@L["PointsUnit"]</span>
+        }
+        @if (!Compact)
+        {
+            <span class="lx-kpi-change-label">@L["VsPrevious"]</span>
+        }
+    </span>
+}
+
+@code {
+    [Parameter] public decimal? Change { get; set; }
+    [Parameter] public bool ChangeInPoints { get; set; }
+    [Parameter] public bool HigherIsBetter { get; set; } = true;
+    [Parameter] public bool Compact { get; set; }
+}

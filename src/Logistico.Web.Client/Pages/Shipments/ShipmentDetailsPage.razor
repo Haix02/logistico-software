@@ -1,0 +1,672 @@
+@page "/shipments/{Id:guid}"
+@inject ShipmentsApi Shipments
+@inject OperationsApi Operations
+@inject OpsState Ops
+@inject NavigationManager Navigation
+@inject Toaster Toaster
+@inject Confirmer Confirm
+
+<PageTitle>@(shipment?.TrackingNumber ?? L["Shipment"]) · @L["AppName"]</PageTitle>
+
+@if (loading)
+{
+    <Skeleton Block="true" Lines="3" />
+}
+else if (shipment is null)
+{
+    <NonIdealState Icon="search" Title="@L["ShipmentNotFound"]" Description="@L["ShipmentNotFoundHint"]">
+        <LinkButton Href="shipments" Icon="th" Text="@L["Nav_Shipments"]" Intent="Intent.Primary" />
+    </NonIdealState>
+}
+else
+{
+    var s = shipment;
+    <PageHeader Title="@s.TrackingNumber" Icon="@(s.ServiceType == ServiceType.Domestic ? "shop" : "globe")" Subtitle="@SubtitleText" Breadcrumbs="@([(L["Nav_Shipments"].Value, "shipments")])">
+        <TitleExtra><StatusTag Status="s.Status" Large="true" /></TitleExtra>
+        <Actions>
+            <Allowed Policy="@StaffPolicies.Operate">
+                <LinkButton Href="@($"shipments/labels?q={s.TrackingNumber}")" Icon="print" Text="@L["PrintAwbLabel"]" Intent="Intent.Primary" />
+            </Allowed>
+            @if (WhatsAppUrl is not null)
+            {
+                <LinkButton Href="@WhatsAppUrl" Target="_blank" Icon="send-message" Text="@L["SendWhatsApp"]" Intent="Intent.Success" />
+            }
+            <CopyButton Value="@PublicUrl" Text="@L["CopyTrackingLink"]" Minimal="false" />
+            @if (CanEdit)
+            {
+                <Button Icon="edit" Text="@L["EditOrder"]" OnClick="@(() => editOpen = true)" />
+            }
+            <Popover Icon="more" Title="@L["MoreActions"]" Width="260px">
+                <ul class="bp6-menu lx-menu">
+                    @if (canCare)
+                    {
+                        <MenuItem Icon="inbox" Text="@L["Requests_New"]" OnClick="@(() => requestOpen = true)" />
+                    }
+                    @if (CanReturn)
+                    {
+                        <MenuItem Icon="undo" Text="@L["StartReturn"]" Intent="Intent.Warning" OnClick="@(() => returnOpen = true)" />
+                    }
+                    @if (s.ServiceType == ServiceType.International)
+                    {
+                        <MenuItem Icon="endorsed" Text="@L["OpenCustoms"]" Href="@($"customs?shipmentId={s.Id}")" />
+                    }
+                    @if (s.TransferId is { } truck)
+                    {
+                        <MenuItem Icon="drive-time" Text="@L["OpenTruck"]" Href="@($"transfers/{truck}")" />
+                    }
+                    <MenuItem Icon="share" Text="@L["PublicPage"]" Href="@($"track/{s.TrackingNumber}")" Target="_blank" />
+                    <MenuDivider />
+                    <MenuItem Icon="refresh" Text="@L["Refresh"]" OnClick="ReloadAsync" />
+                    @if (CanCancel)
+                    {
+                        <MenuDivider />
+                        <MenuItem Icon="disable" Text="@L["CancelOrder"]" Intent="Intent.Danger" OnClick="@(() => { cancelReason = ""; cancelOpen = true; })" />
+                    }
+                </ul>
+            </Popover>
+        </Actions>
+    </PageHeader>
+
+    <div class="lx-card lx-card-pad lx-mb-lg">
+        <TrackingStages Service="s.ServiceType" Status="s.Status" Large="true" CrossesHubs="s.CrossesHubs" AtDestinationHub="@(s.CurrentHubCode == s.DestinationHubCode)" />
+        <div class="lx-mt-lg"><HubJourney Shipment="s" /></div>
+        @foreach (var notice in Notices)
+        {
+            <Callout Intent="notice.Intent" Icon="@notice.Icon" CssClass="lx-mt">
+                <Mixed Text="@notice.Text" />
+                @if (notice.Action is not null)
+                {
+                    <div class="lx-callout-actions">@notice.Action</div>
+                }
+            </Callout>
+        }
+    </div>
+
+    <div class="lx-split lx-split-wide">
+        <div class="lx-stack" style="gap:18px;min-width:0">
+            @if (canOperate && (allowedNext.Count > 0 || CanReturn))
+            {
+                <Section Title="@L["RecordUpdate"]" Subtitle="@L["RecordUpdateHint"]" Icon="flag">
+                    <EditForm Model="milestone" OnValidSubmit="RecordAsync" Context="form">
+                        <DataAnnotationsValidator />
+                        <div class="lx-row-wrap" role="group" aria-label="@L["NextStep"]">
+                            @foreach (var next in allowedNext)
+                            {
+                                <Button Icon="@StatusTag.IconOf(next)" Text="@ShipmentTexts.Of(next)" Active="@(milestone.Status == next)"
+                                        Intent="@(milestone.Status == next ? Intent.Primary : Intent.None)" Outlined="@(milestone.Status != next)" OnClick="@(() => Choose(next))" />
+                            }
+                            @if (CanReturn)
+                            {
+                                <Button Icon="undo" Text="@L["StartReturn"]" Outlined="true" Intent="Intent.Warning" OnClick="@(() => returnOpen = true)" />
+                            }
+                        </div>
+                        @if (milestone.Status is { } chosen)
+                        {
+                            <div class="lx-form-grid lx-mt">
+                                @if (ShipmentLifecycle.IsInWarehouse(chosen))
+                                {
+                                    <FormField Label="@L["Col_Hub"]" Field="() => milestone.Location">
+                                        <HtmlSelect Value="@milestone.Location" ValueChanged="@(v => milestone.Location = v)" Fill="true">
+                                            @foreach (var h in HubCatalog.All)
+                                            {
+                                                <option value="@h.Code">@h.RoutingTag · @h.Name</option>
+                                            }
+                                        </HtmlSelect>
+                                    </FormField>
+                                    <FormField Label="@L["Field_Shelf"]" Helper="@L["ShelfHelper"]" Field="() => milestone.WarehouseBin">
+                                        <InputText class="bp6-input bp6-fill lx-upper" @bind-Value="milestone.WarehouseBin" placeholder="A-01-2" dir="ltr" />
+                                    </FormField>
+                                }
+                                @if (chosen is ShipmentStatus.OutForDelivery or ShipmentStatus.PickedUp)
+                                {
+                                    <FormField Label="@L["Field_Courier"]" Required="@(chosen == ShipmentStatus.OutForDelivery)" Field="() => milestone.CourierName" CssClass="lx-span-2">
+                                        <HtmlSelect Value="@milestone.CourierName" ValueChanged="@(v => milestone.CourierName = v)" Fill="true">
+                                            <option value="">@L["ChooseCourier"]</option>
+                                            @foreach (var c in couriers.OrderBy(c => HubCatalog.ResolveDestinationHub(c.Governorate).Code == s.DestinationHubCode ? 0 : 1))
+                                            {
+                                                <option value="@c.DisplayLabel">@c.Name (@c.Code) · @Fmt.Place(c.Governorate)</option>
+                                            }
+                                        </HtmlSelect>
+                                    </FormField>
+                                }
+                                @if (chosen == ShipmentStatus.DeliveryFailed)
+                                {
+                                    <FormField Label="@L["Field_FailureReason"]" Required="true" Field="() => milestone.FailureReason" Helper="@FailureHelper" CssClass="lx-span-2">
+                                        <span class="bp6-html-select bp6-fill">
+                                            <InputSelect @bind-Value="milestone.FailureReason">
+                                                <option value="">@L["ChooseReason"]</option>
+                                                @foreach (var r in Enum.GetValues<DeliveryFailureReason>())
+                                                {
+                                                    <option value="@r">@ShipmentTexts.Of(r)</option>
+                                                }
+                                            </InputSelect>
+                                            <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                                        </span>
+                                    </FormField>
+                                }
+                                <FormField Label="@L["Field_Notes"]" Hint="@L["Optional"]" Field="() => milestone.Notes" CssClass="lx-span-2">
+                                    <InputText class="bp6-input bp6-fill" @bind-Value="milestone.Notes" />
+                                </FormField>
+                            </div>
+                            @if (serverError is not null)
+                            {
+                                <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mt">@serverError</Callout>
+                            }
+                            <Button Type="submit" Intent="Intent.Primary" Icon="tick" Text="@(string.Format(CultureInfo.CurrentCulture, L["SaveAs"], ShipmentTexts.Of(chosen)))" Loading="saving" CssClass="lx-mt" />
+                        }
+                    </EditForm>
+                </Section>
+            }
+
+            <Tabs @bind-Selected="tab">
+                <Tab Id="journey" Title="@L["Journey"]" Icon="timeline-events" Count="@s.Events.Count">
+                    <div class="lx-card lx-card-pad"><Timeline Entries="timeline" Internal="true" /></div>
+                </Tab>
+                <Tab Id="requests" Title="@L["Nav_Requests"]" Icon="inbox" Count="@(requests?.Items.Count)" CountIntent="@(requests?.Items.Any(r => r.Status is RequestStatus.Open or RequestStatus.InProgress) == true ? Intent.Warning : Intent.None)">
+                    <div class="lx-card">
+                        <Allowed Policy="@StaffPolicies.Care"><div class="lx-toolbar"><span class="lx-spacer"></span><Button Small="true" Icon="add" Text="@L["Requests_New"]" OnClick="@(() => requestOpen = true)" /></div></Allowed>
+                        <ul class="lx-list">
+                            @foreach (var r in requests?.Items ?? [])
+                            {
+                                <li>
+                                    <a class="lx-list-item" href="@($"requests?q={r.Number}&status=all")">
+                                        <span class="lx-list-icon lx-list-icon-primary"><Icon Name="@DomainIcons.Of(r.Type)" /></span>
+                                        <span class="lx-list-body">
+                                            <span class="lx-list-title">@ShipmentTexts.Of(r.Type) · <span class="lx-code" style="font-weight:500">@r.Number</span></span>
+                                            <span class="lx-list-sub"><Mixed Text="@(r.Details ?? r.NewAddress ?? Fmt.Date(r.PreferredDate))" /></span>
+                                        </span>
+                                        <Tag Intent="@(r.Status is RequestStatus.Open or RequestStatus.InProgress ? Intent.Warning : Intent.Success)">@ShipmentTexts.Of(r.Status)</Tag>
+                                    </a>
+                                </li>
+                            }
+                            @if (requests is { Items.Count: 0 })
+                            {
+                                <li><NonIdealState Icon="inbox" Title="@L["NoRequests"]" /></li>
+                            }
+                        </ul>
+                    </div>
+                </Tab>
+            </Tabs>
+        </div>
+
+        <div class="lx-stack" style="gap:18px;min-width:0">
+            <Section Title="@L["Sec_Customer"]" Icon="person">
+                <dl class="lx-props">
+                    <dt>@L["Field_Name"]</dt><dd><Mixed Text="@s.ConsigneeName" /></dd>
+                    @if (s.ConsigneePhone is not null)
+                    {
+                        <dt>@L["Field_Phone"]</dt><dd><PhoneText Value="@s.ConsigneePhone" Link="true" /></dd>
+                    }
+                    <dt>@L["Field_Destination"]</dt><dd>@Fmt.Place(s.DestinationCode)@(s.DestinationCity is null ? "" : " — " + s.DestinationCity)</dd>
+                    @if (s.DeliveryAddress is not null)
+                    {
+                        <dt>@L["Field_Address"]</dt><dd><Mixed Text="@s.DeliveryAddress" /></dd>
+                    }
+                    @if (s.Landmark is not null)
+                    {
+                        <dt>@L["Field_Landmark"]</dt><dd><Mixed Text="@s.Landmark" /></dd>
+                    }
+                </dl>
+            </Section>
+
+            <Section Title="@L["Sec_Routing"]" Icon="route">
+                <dl class="lx-props">
+                    @if (s.OriginHubCode is not null)
+                    {
+                        <dt>@L["OriginHub"]</dt><dd>@Fmt.Hub(s.OriginHubCode)</dd>
+                    }
+                    <dt>@L["DestinationHub"]</dt><dd>@Fmt.Hub(s.DestinationHubCode)</dd>
+                    <dt>@L["CurrentlyAt"]</dt>
+                    <dd>
+                        @if (s.CurrentHubCode is not null)
+                        {
+                            @Fmt.Hub(s.CurrentHubCode)
+                            @if (s.WarehouseBin is { } bin)
+                            {
+                                <Tag Icon="box" CssClass="lx-ms"><bdi dir="ltr">@bin</bdi></Tag>
+                            }
+                        }
+                        else if (ShipmentLifecycle.IsOnLineHaul(s.Status))
+                        {
+                            @L["OnATruck"]
+                        }
+                        else if (s.CourierName is not null && s.Status is ShipmentStatus.OutForDelivery or ShipmentStatus.DeliveryFailed)
+                        {
+                            <Mixed Text="@string.Format(CultureInfo.CurrentCulture, L["WithCourier"], s.CourierName)" />
+                        }
+                        else
+                        {
+                            <span class="bp6-text-muted">—</span>
+                        }
+                    </dd>
+                    @if (s.TransferId is { } truckId)
+                    {
+                        <dt>@L["Col_Truck"]</dt><dd><a href="@($"transfers/{truckId}")">@L["OpenTruck"]</a></dd>
+                    }
+                </dl>
+            </Section>
+
+            <Section Title="@(s.MerchantName is null ? L["Sec_Shipper"] : L["Sec_Seller"])" Icon="shop">
+                <dl class="lx-props">
+                    <dt>@L["Field_Name"]</dt>
+                    <dd>
+                        @if (s.MerchantId is { } merchantId)
+                        {
+                            <a href="@($"merchants/{merchantId}")"><Mixed Text="@s.MerchantName" /></a>
+                        }
+                        else
+                        {
+                            <Mixed Text="@s.ShipperName" />
+                        }
+                    </dd>
+                    @if (s.ExternalReference is not null)
+                    {
+                        <dt>@L["Field_OrderRef"]</dt><dd><bdi dir="ltr" class="lx-mono">@s.ExternalReference</bdi></dd>
+                    }
+                    <dt>@L["Field_Origin"]</dt><dd>@Fmt.Place(s.OriginCode)</dd>
+                    @if (s.ServiceType == ServiceType.Domestic)
+                    {
+                        <dt>@L["Field_HowWeGetIt"]</dt><dd>@(s.PickupRequired ? L["Pickup"] : L["DropOff"])</dd>
+                    }
+                    else
+                    {
+                        <dt>@L["Field_Mode"]</dt><dd>@ShipmentTexts.Of(s.Mode)@(s.Incoterm is null ? "" : " · " + s.Incoterm)</dd>
+                    }
+                </dl>
+            </Section>
+
+            <Section Title="@L["Sec_ParcelAndMoney"]" Icon="box">
+                <dl class="lx-props">
+                    @if (s.ItemsDescription is not null)
+                    {
+                        <dt>@L["Field_Items"]</dt><dd><Mixed Text="@s.ItemsDescription" /></dd>
+                    }
+                    <dt>@L["Field_Pieces"]</dt><dd>@Fmt.Number(s.Pieces) · @Fmt.Number(s.ChargeableWeightKg, 2) @L["Kg"]</dd>
+                    <dt>@L["Field_Cod"]</dt>
+                    <dd>
+                        @Fmt.Money(s.CodAmount, s.CodCurrency)
+                        @if (s.CodCollectedAt is not null)
+                        {
+                            <Tag Intent="Intent.Success" Icon="tick" CssClass="lx-ms">@L["Collected"]</Tag>
+                        }
+                    </dd>
+                    @if (s.DeliveryFee is not null)
+                    {
+                        <dt>@L["Field_DeliveryFee"]</dt><dd>@Fmt.Money(s.DeliveryFee, "IQD")</dd>
+                    }
+                    @if (s.DeclaredValue is not null)
+                    {
+                        <dt>@L["Field_DeclaredValue"]</dt><dd>@Fmt.Money(s.DeclaredValue, s.DeclaredCurrency)</dd>
+                    }
+                </dl>
+            </Section>
+
+            <Section Title="@L["Sec_Delivery"]" Icon="time">
+                <dl class="lx-props">
+                    <dt>@L["PromisedBy"]</dt><dd>@Fmt.Date(s.PromisedAt)</dd>
+                    @if (s.RescheduledTo is { } next)
+                    {
+                        <dt>@L["NextAttempt"]</dt><dd>@Fmt.Date(next)</dd>
+                    }
+                    <dt>@L["Delivered"]</dt><dd>@Fmt.DateTime(s.DeliveredAt)</dd>
+                    <dt>@L["Attempts"]</dt><dd>@Fmt.Number(s.DeliveryAttempts)</dd>
+                    @if (s.CourierName is not null)
+                    {
+                        <dt>@L["Field_Courier"]</dt><dd><Mixed Text="@s.CourierName" /></dd>
+                    }
+                    <dt>@L["Col_Created"]</dt><dd>@Fmt.DateTime(s.CreatedAt) · <Mixed Text="@s.CreatedBy" /></dd>
+                    @if (s.Notes is not null)
+                    {
+                        <dt>@L["Field_Notes"]</dt><dd><Mixed Text="@s.Notes" /></dd>
+                    }
+                </dl>
+            </Section>
+
+            <Section Title="@L["PrintAwbLabel"]" Icon="barcode">
+                @{ var destHub = HubCatalog.FindOrDefault(s.DestinationHubCode); }
+                <div class="lx-awb-label" style="max-width:none;box-shadow:none">
+                    <div class="lx-awb-top">
+                        <span class="lx-awb-brand">@destHub.Name</span>
+                        <span class="lx-awb-hub-box" style="font-size:18px;padding:2px 8px">@destHub.RoutingTag</span>
+                    </div>
+                    <div class="lx-awb-barcode">@((MarkupString)Code128Barcode.ToSvg(s.TrackingNumber, 48, true))</div>
+                </div>
+            </Section>
+        </div>
+    </div>
+
+    <Dialog @bind-IsOpen="returnOpen" Title="@L["StartReturn"]" Icon="undo" Width="480px">
+        <ChildContent>
+            <p>@L["StartReturnHint"]</p>
+            <FormField TValue="ReturnReason?" Label="@L["Field_ReturnReason"]" Required="true">
+                <HtmlSelect Value="@returnDraft.Reason?.ToString()" ValueChanged="@(v => returnDraft.Reason = Enum.TryParse<ReturnReason>(v, out var r) ? r : null)" Fill="true">
+                    <option value="">@L["ChooseReason"]</option>
+                    @foreach (var r in Enum.GetValues<ReturnReason>())
+                    {
+                        <option value="@r">@ShipmentTexts.Of(r)</option>
+                    }
+                </HtmlSelect>
+            </FormField>
+            <FormField TValue="string" Label="@L["Field_Notes"]" Hint="@L["Optional"]">
+                <input class="bp6-input bp6-fill" @bind="returnDraft.Notes" />
+            </FormField>
+            @if (serverError is not null)
+            {
+                <Callout Intent="Intent.Danger" Icon="error">@serverError</Callout>
+            }
+        </ChildContent>
+        <Footer>
+            <Button Text="@L["Cancel"]" OnClick="@(() => returnOpen = false)" />
+            <Button Intent="Intent.Warning" Icon="undo" Text="@L["StartReturn"]" Disabled="@(returnDraft.Reason is null)" Loading="saving" OnClick="StartReturnAsync" />
+        </Footer>
+    </Dialog>
+
+    <Logistico.Web.Client.Pages.Requests.NewRequestDialog @bind-IsOpen="requestOpen" ShipmentId="s.Id" OnCreated="RequestCreatedAsync" />
+
+    <EditOrderDrawer @bind-IsOpen="editOpen" Shipment="s" OnSaved="OrderSavedAsync" />
+
+    <Dialog @bind-IsOpen="cancelOpen" Title="@L["CancelOrder"]" Icon="disable" Width="480px">
+        <ChildContent>
+            <Callout Intent="@(s.Status is ShipmentStatus.Booked or ShipmentStatus.Draft ? Intent.Danger : Intent.Warning)" Icon="info-sign" CssClass="lx-mb">
+                @L[s.Status is ShipmentStatus.Booked or ShipmentStatus.Draft ? "CancelBeforePickupHint" : "CancelAfterPickupHint"]
+            </Callout>
+            <FormField TValue="string" Label="@L["Field_CancelReason"]" Required="true">
+                <textarea class="bp6-input bp6-fill" rows="2" @bind="cancelReason" @bind:event="oninput" placeholder="@L["CancelReasonPlaceholder"]"></textarea>
+            </FormField>
+            @if (serverError is not null)
+            {
+                <Callout Intent="Intent.Danger" Icon="error">@serverError</Callout>
+            }
+        </ChildContent>
+        <Footer>
+            <Button Text="@L["Back"]" OnClick="@(() => cancelOpen = false)" />
+            <Button Intent="Intent.Danger" Icon="disable" Text="@L["CancelOrder"]" Disabled="@string.IsNullOrWhiteSpace(cancelReason)" Loading="saving" OnClick="CancelOrderAsync" />
+        </Footer>
+    </Dialog>
+}
+
+@code {
+    private sealed record Notice(Intent Intent, string Icon, string Text, RenderFragment? Action = null);
+
+    [Parameter] public Guid Id { get; set; }
+
+    private ShipmentDetails? shipment;
+    private ServiceRequestList? requests;
+    private IReadOnlyList<CourierLookupItem> couriers = [];
+    private IReadOnlyList<ShipmentStatus> allowedNext = [];
+    private IReadOnlyList<TimelineEntry> timeline = [];
+    private RecordShipmentEventRequest milestone = new();
+    private StartReturnRequest returnDraft = new();
+    private AutomationPolicy? policy;
+    private string? tab = "journey";
+    private bool loading = true;
+    private bool saving;
+    private bool returnOpen;
+    private bool requestOpen;
+    private bool editOpen;
+    private bool cancelOpen;
+    private bool canOperate;
+    private bool canCare;
+    private string cancelReason = "";
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private string? serverError;
+
+    private string SubtitleText => shipment is null ? "" :
+        $"{ShipmentTexts.Of(shipment.ServiceType)} · {Fmt.Place(shipment.OriginCode)} {Bidi.Arrow} {Fmt.Place(shipment.DestinationCode)}";
+
+    private string PublicUrl => Navigation.ToAbsoluteUri($"track/{shipment?.TrackingNumber}").ToString();
+
+    /// <summary>Orders can be corrected until they are out with a courier (by roles that operate).</summary>
+    private bool CanEdit => canOperate && shipment is { ServiceType: ServiceType.Domestic } s && !ShipmentLifecycle.IsReturning(s.Status)
+        && s.Status is not (ShipmentStatus.OutForDelivery or ShipmentStatus.Delivered or ShipmentStatus.Returned or ShipmentStatus.Cancelled);
+
+    private bool CanCancel => canOperate && (shipment is { Status: ShipmentStatus.Booked or ShipmentStatus.Draft } || CanReturn);
+
+    private bool CanReturn => canOperate && shipment is not null && !ShipmentLifecycle.IsReturning(shipment.Status)
+        && shipment.Status is not (ShipmentStatus.Returned or ShipmentStatus.Cancelled or ShipmentStatus.OutForDelivery or ShipmentStatus.Booked or ShipmentStatus.Draft)
+        && ShipmentLifecycle.CanTransition(shipment.ServiceType, shipment.Status, ShipmentStatus.ReturnInitiated);
+
+    private string? FailureHelper => shipment is null || policy is null ? null
+        : shipment.DeliveryAttempts >= policy.MaxDeliveryAttempts
+            ? string.Format(CultureInfo.CurrentCulture, L["FailureWillReturn"], Fmt.Number(policy.MaxDeliveryAttempts))
+            : string.Format(CultureInfo.CurrentCulture, L["FailureWillReschedule"], Fmt.Number(shipment.DeliveryAttempts), Fmt.Number(policy.MaxDeliveryAttempts));
+
+    private string? WhatsAppUrl
+    {
+        get
+        {
+            if (shipment is null || IraqPhone.WhatsAppDigits(shipment.ConsigneePhone) is not { } digits)
+            {
+                return null;
+            }
+
+            var text = string.Format(CultureInfo.CurrentCulture, L["WhatsAppMessage"], shipment.ConsigneeName, shipment.MerchantName ?? shipment.ShipperName, shipment.TrackingNumber, PublicUrl);
+            return $"https://wa.me/{digits}?text={Uri.EscapeDataString(text)}";
+        }
+    }
+
+    private IEnumerable<Notice> Notices
+    {
+        get
+        {
+            if (shipment is not { } s)
+            {
+                yield break;
+            }
+
+            if (s.Confirmation == ConfirmationStatus.Pending && s.Status == ShipmentStatus.Booked)
+            {
+                var text = string.Format(CultureInfo.CurrentCulture, L["AwaitingConfirmationNotice"], s.ConfirmationRequestedAt is { } asked ? Fmt.Ago(asked, L) : "—")
+                    + (s.ConfirmationAttempts > 0 ? " · " + L.Count("NoAnswerN", s.ConfirmationAttempts) : "");
+                yield return new(Intent.Warning, "phone-call", text,
+                    @<Allowed Policy="@StaffPolicies.Care"><div class="lx-row" style="gap:6px">
+                        <Button Small="true" Intent="Intent.Success" Icon="tick" Text="@L["Confirm"]" Loading="saving" OnClick="@(() => RecordConfirmationAsync(ConfirmationOutcome.Confirmed))" />
+                        <Button Small="true" Icon="phone-call" Text="@L["NoAnswer"]" Loading="saving" OnClick="@(() => RecordConfirmationAsync(ConfirmationOutcome.NoAnswer))" />
+                        <Button Small="true" Minimal="true" Intent="Intent.Danger" Icon="disable" Text="@L["DeclineOrder"]" OnClick="@(() => RecordConfirmationAsync(ConfirmationOutcome.Declined))" />
+                    </div></Allowed>);
+            }
+            else if (s.Confirmation == ConfirmationStatus.Confirmed && s.Status == ShipmentStatus.Booked)
+            {
+                yield return new(Intent.Success, "tick-circle", string.Format(CultureInfo.CurrentCulture, L["ConfirmedNotice"], s.ConfirmationBy ?? "—"));
+            }
+
+            if (s.Status == ShipmentStatus.DeliveryFailed && s.LastFailureReason is { } reason)
+            {
+                yield return new(Intent.Warning, "warning-sign", string.Format(CultureInfo.CurrentCulture, L["FailedAttemptCallout"], Fmt.Number(s.DeliveryAttempts), ShipmentTexts.Of(reason)));
+            }
+
+            if (s.RescheduledTo is { } next && ShipmentLifecycle.IsActive(s.Status) && !ShipmentLifecycle.IsReturning(s.Status))
+            {
+                yield return new(Intent.Primary, "calendar", string.Format(CultureInfo.CurrentCulture, L["RescheduledNotice"], Fmt.Date(next)));
+            }
+
+            if (ShipmentLifecycle.IsReturning(s.Status) || s.Status == ShipmentStatus.Returned)
+            {
+                var why = s.ReturnReason is { } r ? ShipmentTexts.Of(r) : ShipmentTexts.Of(s.Status);
+                var text = s.Status == ShipmentStatus.Returned
+                    ? string.Format(CultureInfo.CurrentCulture, L["ReturnedNotice"], why, s.ReturnManifestNumber ?? "—")
+                    : string.Format(CultureInfo.CurrentCulture, L["ReturningNotice"], why, Fmt.Hub(s.TargetHubCode));
+                yield return new(Intent.Warning, "undo", text);
+            }
+
+            if (s.CurrentHubCode is { } hub && hub != s.TargetHubCode && ShipmentLifecycle.IsInWarehouse(s.Status) || s.Status == ShipmentStatus.ReturnInitiated && s.CurrentHubCode is not null && s.CurrentHubCode != s.TargetHubCode)
+            {
+                yield return new(Intent.Primary, "drive-time", string.Format(CultureInfo.CurrentCulture, L["NeedsTruckNotice"], Fmt.Hub(s.CurrentHubCode), Fmt.Hub(s.TargetHubCode)));
+            }
+
+            var open = requests?.Items.Count(r => r.Status is RequestStatus.Open or RequestStatus.InProgress) ?? 0;
+            if (open > 0)
+            {
+                yield return new(Intent.Warning, "inbox", L.Count("OpenRequestsNotice", open),
+                    @<Button Small="true" Text="@L["Nav_Requests"]" Icon="inbox" OnClick="@(() => tab = "requests")" />);
+            }
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        loading = true;
+        canOperate = await AuthState.CanAsync(StaffPolicies.Operate);
+        canCare = await AuthState.CanAsync(StaffPolicies.Care);
+        var couriersTask = Shipments.LookupCouriersAsync();
+        var policyTask = Operations.GetPolicyAsync();
+        await ReloadAsync();
+        couriers = await couriersTask;
+        policy = await policyTask;
+        loading = false;
+    }
+
+    private async Task ReloadAsync()
+    {
+        var detailsTask = Shipments.GetAsync(Id);
+        var requestsTask = Operations.ListRequestsAsync(new ServiceRequestQuery { ShipmentId = Id, PageSize = 50 });
+        Apply(await detailsTask);
+        requests = await requestsTask;
+    }
+
+    private void Apply(ShipmentDetails? details)
+    {
+        shipment = details;
+        allowedNext = details is null ? [] : ShipmentLifecycle.ManualNext(details.ServiceType, details.Status).Where(s => s != ShipmentStatus.ReturnInitiated).ToList();
+        timeline = details?.Events
+            .Select(e => new TimelineEntry(e.Status, e.OccurredAt, e.Location, e.WarehouseBin, e.CourierName, e.FailureReason, e.Notes, e.Source, e.RecordedBy))
+            .ToList() ?? [];
+        var first = allowedNext.FirstOrDefault(s => s is not ShipmentStatus.Cancelled);
+        milestone = new RecordShipmentEventRequest
+        {
+            Status = allowedNext.Count == 0 ? null : first,
+            Location = details?.CurrentHubCode ?? details?.DestinationHubCode,
+        };
+        serverError = null;
+    }
+
+    private void Choose(ShipmentStatus next)
+    {
+        milestone.Status = next;
+        serverError = null;
+    }
+
+    private async Task RecordAsync()
+    {
+        if (shipment is null)
+        {
+            return;
+        }
+
+        saving = true;
+        serverError = null;
+        try
+        {
+            var updated = await Shipments.RecordEventAsync(shipment.Id, shipment.Version, milestone);
+            Apply(updated);
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["StatusUpdated"], updated.TrackingNumber, ShipmentTexts.Of(updated.Status)));
+            await Ops.RefreshAsync();
+        }
+        catch (ApiException ex)
+        {
+            serverError = ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private async Task RecordConfirmationAsync(ConfirmationOutcome outcome)
+    {
+        if (shipment is null)
+        {
+            return;
+        }
+
+        if (outcome == ConfirmationOutcome.Declined
+            && !await Confirm.AskAsync(L["DeclineOrder"], L["DeclineOrderHint"], L["DeclineOrder"], Intent.Danger, "disable"))
+        {
+            return;
+        }
+
+        saving = true;
+        try
+        {
+            Apply(await Shipments.RecordConfirmationAsync(shipment.Id, shipment.Version, outcome));
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["ConfirmationRecordedN"], shipment.TrackingNumber, ShipmentTexts.Of(outcome)));
+            await Ops.RefreshAsync();
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private async Task OrderSavedAsync(ShipmentDetails saved)
+    {
+        Apply(saved);
+        await Ops.RefreshAsync();
+    }
+
+    private async Task CancelOrderAsync()
+    {
+        if (shipment is null)
+        {
+            return;
+        }
+
+        saving = true;
+        serverError = null;
+        try
+        {
+            Apply(await Shipments.CancelOrderAsync(shipment.Id, shipment.Version, cancelReason));
+            cancelOpen = false;
+            Toaster.Success(L["OrderCancelled"]);
+            await Ops.RefreshAsync();
+        }
+        catch (ApiException ex)
+        {
+            serverError = ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private async Task StartReturnAsync()
+    {
+        if (shipment is null)
+        {
+            return;
+        }
+
+        saving = true;
+        serverError = null;
+        try
+        {
+            Apply(await Shipments.StartReturnAsync(shipment.Id, shipment.Version, returnDraft));
+            returnOpen = false;
+            returnDraft = new StartReturnRequest();
+            Toaster.Success(L["ReturnStarted"]);
+            await Ops.RefreshAsync();
+        }
+        catch (ApiException ex)
+        {
+            serverError = ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private async Task RequestCreatedAsync(ServiceRequestItem created)
+    {
+        Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["RequestCreated"], created.Number));
+        tab = "requests";
+        await ReloadAsync();
+        await Ops.RefreshAsync();
+    }
+}

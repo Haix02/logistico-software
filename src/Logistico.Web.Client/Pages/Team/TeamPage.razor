@@ -1,0 +1,400 @@
+@page "/team"
+@attribute [Authorize(Policy = StaffPolicies.Administer)]
+@using System.Security.Cryptography
+@inject TeamApi Team
+@inject Toaster Toaster
+@inject Confirmer Confirm
+
+<PageTitle>@L["Nav_Team"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["Nav_Team"]" Subtitle="@L["Team_Subtitle"]" Icon="key">
+    <Actions>
+        <Button Icon="new-person" Text="@L["Team_Add"]" Intent="Intent.Primary" OnClick="OpenNew" />
+    </Actions>
+</PageHeader>
+
+@if (members is not null)
+{
+    <div class="lx-kpis">
+        <KpiCard Icon="people" Label="@L["Team_Members"]" Value="@Fmt.Number(members.Count(m => m.Role is not null))" Intent="Intent.Primary" />
+        <KpiCard Icon="key" Label="@L["Role_Admin"]" Value="@Fmt.Number(members.Count(m => m.Role == StaffRoles.Admin && !m.IsLocked))" />
+        <KpiCard Icon="time" Label="@L["Role_None"]" Value="@Fmt.Number(members.Count(m => m.Role is null && !m.IsLocked))"
+                 Intent="@(members.Any(m => m.Role is null && !m.IsLocked) ? Intent.Warning : Intent.None)" />
+        <KpiCard Icon="lock" Label="@L["Team_Locked"]" Value="@Fmt.Number(members.Count(m => m.IsLocked))" />
+        <KpiCard Icon="shield" Label="@L["Team_TwoFactor"]" Value="@Fmt.Number(members.Count(m => m.TwoFactorEnabled))" Unit="@("/ " + Fmt.Number(members.Count))"
+                 Intent="@(members.All(m => m.TwoFactorEnabled) ? Intent.Success : Intent.None)" />
+    </div>
+}
+
+<div class="lx-stack" style="gap:18px;min-width:0">
+    <div class="lx-table-card">
+        <DataTable TItem="TeamMember" Items="members" Loading="members is null" ColumnCount="5" EmptyIcon="people" EmptyTitle="@L["Team_Empty"]"
+                   RowClass="@(m => m.IsLocked ? "lx-row-muted" : null)">
+            <Header>
+                <th>@L["Team_Member"]</th>
+                <th>@L["Field_Role"]</th>
+                <th>@L["Team_TwoFactor"]</th>
+                <th>@L["Col_Status"]</th>
+                <th class="lx-col-actions"></th>
+            </Header>
+            <Row Context="m">
+                <td>
+                    <Cell Title="@(m.DisplayName ?? m.Email)">
+                        <TitleContent>
+                            <Mixed Text="@(m.DisplayName ?? m.Email)" />
+                            @if (m.IsYou)
+                            {
+                                <Tag Intent="Intent.Primary" CssClass="lx-ms-xs">@L["Team_You"]</Tag>
+                            }
+                        </TitleContent>
+                        <SubContent><span dir="ltr">@m.Email</span></SubContent>
+                    </Cell>
+                </td>
+                <td>
+                    @if (m.IsYou)
+                    {
+                        <Tag Icon="key" Title="@L["Team_SelfHint"]">@RoleName(m.Role)</Tag>
+                    }
+                    else
+                    {
+                        <HtmlSelect Small="true" CssClass="lx-role-select" Value="@(m.Role ?? "")" Label="@string.Format(CultureInfo.CurrentCulture, L["Team_RoleOf"], m.DisplayName ?? m.Email)"
+                                    Disabled="@(busy == m.Id)" ValueChanged="@(v => ChangeRoleAsync(m, v))">
+                            @foreach (var role in StaffRoles.All)
+                            {
+                                <option value="@role">@RoleName(role)</option>
+                            }
+                            <option value="">@L["Role_None"]</option>
+                        </HtmlSelect>
+                    }
+                </td>
+                <td>
+                    @if (m.TwoFactorEnabled)
+                    {
+                        <Tag Intent="Intent.Success" Icon="shield">@L["Team_On"]</Tag>
+                    }
+                    else
+                    {
+                        <span class="bp6-text-muted">@L["Team_Off"]</span>
+                    }
+                </td>
+                <td>
+                    @if (m.IsLocked)
+                    {
+                        <Tag Intent="Intent.Danger" Icon="lock">@L["Team_Locked"]</Tag>
+                    }
+                    else if (m.LockedOutUntil is { } until)
+                    {
+                        <Tag Intent="Intent.Warning" Icon="time">@string.Format(CultureInfo.CurrentCulture, L["Team_LockedOutUntil"], Fmt.Time(until))</Tag>
+                    }
+                    else if (m.Role is null)
+                    {
+                        <Tag Intent="Intent.Warning" Icon="time">@L["Role_None"]</Tag>
+                    }
+                    else
+                    {
+                        <Tag Intent="Intent.Success" Icon="tick">@L["Active"]</Tag>
+                    }
+                </td>
+                <td class="lx-col-actions">
+                    @if (!m.IsYou)
+                    {
+                        <span class="lx-row" style="gap:4px;flex-wrap:nowrap;justify-content:flex-end">
+                            <Button Small="true" Minimal="true" Icon="key" Tip="@L["Team_SetPassword"]" Disabled="@(busy == m.Id)" OnClick="@(() => OpenPassword(m))" />
+                            @if (m.IsLocked || m.LockedOutUntil is not null)
+                            {
+                                <Button Small="true" Icon="unlock" Text="@L["Team_Unlock"]" Loading="@(busy == m.Id)" OnClick="@(() => UnlockAsync(m))" />
+                            }
+                            @if (!m.IsLocked)
+                            {
+                                <Button Small="true" Minimal="true" Intent="Intent.Danger" Icon="lock" Text="@L["Team_Lock"]" Loading="@(busy == m.Id)" OnClick="@(() => LockAsync(m))" />
+                            }
+                        </span>
+                    }
+                </td>
+            </Row>
+        </DataTable>
+    </div>
+
+    <Section Title="@L["Team_Matrix"]" Subtitle="@L["Team_MatrixHint"]" Icon="th-list" Padded="false">
+        <div class="lx-table-wrap">
+            <table class="bp6-html-table bp6-compact lx-table lx-role-matrix">
+                <thead>
+                    <tr>
+                        <th scope="col"><span class="lx-sr-only">@L["Team_Capability"]</span></th>
+                        @foreach (var role in StaffRoles.All)
+                        {
+                            <th scope="col">@RoleName(role)</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var (key, policy) in Capabilities)
+                    {
+                        var allowed = StaffPolicies.RolesFor(policy);
+                        <tr>
+                            <th scope="row">@L[key]</th>
+                            @foreach (var role in StaffRoles.All)
+                            {
+                                <td>
+                                    @if (allowed.Contains(role))
+                                    {
+                                        <Icon Name="tick" CssClass="lx-intent-success" /><span class="lx-sr-only">@L["Yes"]</span>
+                                    }
+                                    else
+                                    {
+                                        <Icon Name="minus" CssClass="lx-muted" /><span class="lx-sr-only">@L["No"]</span>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </Section>
+</div>
+
+<Dialog @bind-IsOpen="dialogOpen" Title="@L["Team_Add"]" Icon="new-person" Width="600px">
+    <ChildContent>
+        <EditForm Model="draft" OnValidSubmit="CreateAsync" id="member-form">
+            <DataAnnotationsValidator />
+            <div class="lx-form-grid">
+                <FormField Label="@L["Field_Name"]" Required="true" Field="() => draft.DisplayName">
+                    <InputText class="bp6-input bp6-fill" @bind-Value="draft.DisplayName" autocomplete="off" />
+                </FormField>
+                <FormField Label="@L["Field_Email"]" Required="true" Field="() => draft.Email">
+                    <InputText class="bp6-input bp6-fill" @bind-Value="draft.Email" type="email" dir="ltr" autocomplete="off" placeholder="name@company.iq" />
+                </FormField>
+                <FormField Label="@L["Field_Role"]" Required="true" Helper="@L["RoleHint_" + draft.Role]" Field="() => draft.Role" CssClass="lx-span-2">
+                    <span class="bp6-html-select bp6-fill">
+                        <InputSelect @bind-Value="draft.Role">
+                            @foreach (var role in StaffRoles.All)
+                            {
+                                <option value="@role">@RoleName(role)</option>
+                            }
+                        </InputSelect>
+                        <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                    </span>
+                </FormField>
+                <FormField Label="@L["Field_FirstPassword"]" Required="true" Helper="@L["FirstPasswordHelper"]" Field="() => draft.Password" CssClass="lx-span-2">
+                    <div class="bp6-control-group bp6-fill">
+                        <InputText class="bp6-input bp6-fill lx-mono" @bind-Value="draft.Password" dir="ltr" autocomplete="new-password" spellcheck="false" />
+                        <Button Icon="refresh" Text="@L["Generate"]" OnClick="Generate" />
+                        @if (!string.IsNullOrEmpty(draft.Password))
+                        {
+                            <CopyButton Value="@draft.Password" Minimal="false" Title="@L["Copy"]" />
+                        }
+                    </div>
+                </FormField>
+            </div>
+            @if (error is not null)
+            {
+                <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mt">@error</Callout>
+            }
+        </EditForm>
+    </ChildContent>
+    <Footer>
+        <Button Text="@L["Cancel"]" OnClick="@(() => dialogOpen = false)" />
+        <Button Type="submit" form="member-form" Intent="Intent.Primary" Icon="tick" Text="@L["Team_Add"]" Loading="saving" />
+    </Footer>
+</Dialog>
+
+<Dialog IsOpen="passwordFor is not null" IsOpenChanged="@(open => { if (!open) passwordFor = null; })"
+        Title="@string.Format(CultureInfo.CurrentCulture, L["Team_SetPasswordTitle"], passwordFor?.DisplayName ?? passwordFor?.Email)" Icon="key" Width="520px">
+    <ChildContent>
+        <FormField TValue="string" Label="@L["Field_NewPassword"]" Required="true" Helper="@L["Team_SetPasswordHelper"]">
+            <div class="bp6-control-group bp6-fill">
+                <input class="bp6-input bp6-fill lx-mono" @bind="newPassword" dir="ltr" autocomplete="new-password" spellcheck="false" aria-label="@L["Field_NewPassword"]" />
+                <Button Icon="refresh" Text="@L["Generate"]" OnClick="@(() => newPassword = NewPassword())" />
+                @if (!string.IsNullOrEmpty(newPassword))
+                {
+                    <CopyButton Value="@newPassword" Minimal="false" Title="@L["Copy"]" />
+                }
+            </div>
+        </FormField>
+        @if (passwordError is not null)
+        {
+            <Callout Intent="Intent.Danger" Icon="error">@passwordError</Callout>
+        }
+    </ChildContent>
+    <Footer>
+        <Button Text="@L["Cancel"]" OnClick="@(() => passwordFor = null)" />
+        <Button Intent="Intent.Primary" Icon="key" Text="@L["Team_SetPassword"]" Loading="saving" Disabled="@string.IsNullOrWhiteSpace(newPassword)" OnClick="SetPasswordAsync" />
+    </Footer>
+</Dialog>
+
+@code {
+    /// <summary>What the matrix shows, each with the policy that grants it (the same ones the API checks).</summary>
+    private static readonly (string TextKey, string Policy)[] Capabilities =
+    [
+        ("Capability_Read", StaffPolicies.Staff),
+        ("Capability_Operate", StaffPolicies.Operate),
+        ("Capability_Care", StaffPolicies.Care),
+        ("Capability_Export", StaffPolicies.Operate),
+        ("Capability_Finance", StaffPolicies.Finance),
+        ("Capability_Administer", StaffPolicies.Administer),
+    ];
+
+    private IReadOnlyList<TeamMember>? members;
+    private CreateTeamMemberRequest draft = new();
+    private bool dialogOpen;
+    private bool saving;
+    private string? busy;
+    private string? error;
+    private TeamMember? passwordFor;
+    private string newPassword = "";
+    private string? passwordError;
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        try
+        {
+            members = (await Team.ListAsync()).Members;
+        }
+        catch (ApiException ex)
+        {
+            members = [];
+            Toaster.Error(ex.UserMessage);
+        }
+    }
+
+    private string RoleName(string? role) => L["Role_" + (role ?? "None")];
+
+    private void OpenNew()
+    {
+        draft = new CreateTeamMemberRequest();
+        Generate();
+        error = null;
+        dialogOpen = true;
+    }
+
+    private void Generate() => draft.Password = NewPassword();
+
+    /// <summary>A password that meets the sign-in rules (upper, lower, digit, symbol, 10+), without look-alike characters.</summary>
+    private static string NewPassword()
+    {
+        const string upper = "ABCDEFGHJKLMNPQRSTUVWXYZ", lower = "abcdefghijkmnpqrstuvwxyz", digits = "23456789";
+        var groups = Enumerable.Range(0, 3).Select(_ => string.Concat(
+            upper[RandomNumberGenerator.GetInt32(upper.Length)],
+            lower[RandomNumberGenerator.GetInt32(lower.Length)],
+            lower[RandomNumberGenerator.GetInt32(lower.Length)],
+            digits[RandomNumberGenerator.GetInt32(digits.Length)]));
+        return string.Join('-', groups);
+    }
+
+    private void OpenPassword(TeamMember member)
+    {
+        newPassword = NewPassword();
+        passwordError = null;
+        passwordFor = member;
+    }
+
+    private async Task SetPasswordAsync()
+    {
+        if (passwordFor is not { } member)
+        {
+            return;
+        }
+
+        saving = true;
+        passwordError = null;
+        try
+        {
+            await Team.ResetPasswordAsync(member.Id, newPassword);
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["Team_PasswordSet"], member.DisplayName ?? member.Email));
+            passwordFor = null;
+        }
+        catch (ApiException ex)
+        {
+            passwordError = ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private async Task CreateAsync()
+    {
+        saving = true;
+        error = null;
+        try
+        {
+            var created = await Team.CreateAsync(draft);
+            dialogOpen = false;
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["Team_Added"], created.DisplayName ?? created.Email));
+            await LoadAsync();
+        }
+        catch (ApiException ex)
+        {
+            error = ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private async Task ChangeRoleAsync(TeamMember member, string? value)
+    {
+        var role = string.IsNullOrEmpty(value) ? null : value;
+        if (role == member.Role)
+        {
+            return;
+        }
+
+        var name = member.DisplayName ?? member.Email;
+        if (role is null && !await Confirm.AskAsync(L["Team_RemoveTitle"], string.Format(CultureInfo.CurrentCulture, L["Team_RemoveMessage"], name), L["Team_RemoveConfirm"], Intent.Danger, "blocked-person"))
+        {
+            await LoadAsync(); // put the picker back
+            return;
+        }
+
+        await RunAsync(member, async () =>
+        {
+            await Team.ChangeRoleAsync(member.Id, role);
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["Team_RoleChanged"], name, RoleName(role)));
+        });
+    }
+
+    private async Task LockAsync(TeamMember member)
+    {
+        var name = member.DisplayName ?? member.Email;
+        if (!await Confirm.AskAsync(L["Team_LockTitle"], string.Format(CultureInfo.CurrentCulture, L["Team_LockMessage"], name), L["Team_Lock"], Intent.Danger, "lock"))
+        {
+            return;
+        }
+
+        await RunAsync(member, async () =>
+        {
+            await Team.LockAsync(member.Id);
+            Toaster.Show(string.Format(CultureInfo.CurrentCulture, L["Team_LockedToast"], name), Intent.Warning, "lock");
+        });
+    }
+
+    private Task UnlockAsync(TeamMember member) => RunAsync(member, async () =>
+    {
+        await Team.UnlockAsync(member.Id);
+        Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["Team_UnlockedToast"], member.DisplayName ?? member.Email));
+    });
+
+    private async Task RunAsync(TeamMember member, Func<Task> action)
+    {
+        busy = member.Id;
+        try
+        {
+            await action();
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            busy = null;
+            await LoadAsync();
+        }
+    }
+}

@@ -1,0 +1,431 @@
+@page "/fleet"
+@inject ShipmentsApi Shipments
+@inject OperationsApi Operations
+@inject OpsState Ops
+@inject Toaster Toaster
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>@L["Nav_Fleet"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["FleetTitle"]" Subtitle="@L["FleetSubtitle"]" Icon="people">
+    <Actions>
+        <Allowed Policy="@StaffPolicies.Operate">
+            <Button Icon="add" Text="@L["NewCourier"]" Intent="Intent.Primary" OnClick="OpenNew" />
+        </Allowed>
+    </Actions>
+</PageHeader>
+
+@if (overview is not null)
+{
+    <div class="lx-kpis">
+        <KpiCard Icon="people" Label="@L["Kpi_ActiveCouriers"]" Value="@Fmt.Number(overview.ActiveCouriers)" Intent="Intent.Primary" />
+        <KpiCard Icon="truck" Label="@L["Kpi_OutForDelivery"]" Value="@Fmt.Number(overview.OutForDelivery)" Intent="Intent.Primary" Href="shipments?status=OutForDelivery" />
+        <KpiCard Icon="tick-circle" Label="@L["Kpi_DeliveredToday"]" Value="@Fmt.Number(overview.DeliveredToday)" Intent="Intent.Success" />
+        <KpiCard Icon="warning-sign" Label="@L["Kpi_FailedAttempts"]" Value="@Fmt.Number(overview.FailedAttempts)" Intent="Intent.Warning" Href="shipments?status=DeliveryFailed" />
+        <KpiCard Icon="dollar" Label="@L["Kpi_CashWithCouriers"]" Amount="overview.CashWithCouriersIqd" />
+    </div>
+}
+
+<Allowed Policy="@StaffPolicies.Operate">
+    <Section Title="@L["QuickDispatchTitle"]" Subtitle="@L["QuickDispatchHint"]" Icon="truck">
+        <form @onsubmit="DispatchAsync">
+            <div class="bp6-control-group bp6-fill lx-stack-sm">
+                <HtmlSelect Value="@dispatchCourier" ValueChanged="@(v => dispatchCourier = v)" Label="@L["Field_Courier"]">
+                    <option value="">@L["ChooseCourier"]</option>
+                    @foreach (var c in overview?.Couriers.Where(c => c.IsActive) ?? [])
+                    {
+                        <option value="@c.DisplayLabel">@c.Name (@c.Code) · @Fmt.Place(c.Governorate)</option>
+                    }
+                </HtmlSelect>
+                <div class="bp6-input-group bp6-fill">
+                    <span class="bp6-icon bp6-icon-standard bp6-icon-barcode"></span>
+                    <input id="lx-dispatch" class="bp6-input lx-upper" dir="ltr" placeholder="LX26…" @bind="dispatchTracking" autocomplete="off" aria-label="@L["Col_Tracking"]" />
+                </div>
+                <Button Type="submit" Intent="Intent.Primary" Icon="truck" Text="@L["Dispatch"]" Loading="dispatching" />
+            </div>
+        </form>
+    </Section>
+</Allowed>
+
+<div class="lx-table-card">
+    <div class="lx-toolbar">
+        <SearchInput CssClass="lx-toolbar-search" Value="@q" Placeholder="@L["CourierPlaceholder"]" OnSearch="@(text => { q = text; return LoadAsync(); })" />
+        <HtmlSelect Value="@governorateFilter" ValueChanged="@(v => { governorateFilter = v; return LoadAsync(); })" Label="@L["Field_Governorate"]">
+            <option value="">@L["AllGovernorates"]</option>
+            @foreach (var g in IraqGovernorates.All)
+            {
+                <option value="@g.Code">@g.Name</option>
+            }
+        </HtmlSelect>
+    </div>
+    <DataTable TItem="CourierListItem" Items="overview?.Couriers" Loading="loading" ColumnCount="8" OnRowClick="OpenEdit" EmptyIcon="people" EmptyTitle="@L["NoCouriers"]">
+        <Header>
+            <th>@L["Field_Courier"]</th>
+            <th>@L["Col_Hub"]</th>
+            <th>@L["Col_Vehicle"]</th>
+            <th class="lx-num">@L["Col_OutNow"]</th>
+            <th class="lx-num">@L["Col_DeliveredToday"]</th>
+            <th class="lx-num">@L["Col_SuccessRate"]</th>
+            <th class="lx-num">@L["Col_CashOnRun"]</th>
+            <th class="lx-col-actions"></th>
+        </Header>
+        <Row Context="c">
+            <td>
+                <Cell Title="@c.Name">
+                    <SubContent><span class="lx-code" style="font-weight:500">@c.Code</span> · <PhoneText Value="@c.Phone" /></SubContent>
+                </Cell>
+            </td>
+            <td><Cell CssClass="lx-cell-narrow" Title="@Fmt.Place(c.Governorate)" Sub="@HubCatalog.ResolveDestinationHub(c.Governorate).RoutingTag" /></td>
+            <td><Cell CssClass="lx-cell-narrow" Title="@ShipmentTexts.Of(c.VehicleType)" Sub="@c.VehiclePlate" /></td>
+            <td class="lx-num">@if (c.OutForDeliveryCount > 0) { <Tag Intent="Intent.Primary">@Fmt.Number(c.OutForDeliveryCount)</Tag> } else { <span class="bp6-text-muted">0</span> }</td>
+            <td class="lx-num">@Fmt.Number(c.DeliveredTodayCount)</td>
+            <td class="lx-num">@SuccessRate(c)</td>
+            <td class="lx-num">@Fmt.Money(c.CashOnRunIqd, "IQD")</td>
+            <td class="lx-col-actions" @onclick:stopPropagation="true">
+                @if (!c.IsActive)
+                {
+                    <Tag>@L["Inactive"]</Tag>
+                }
+                <Button Small="true" Icon="clipboard" Text="@L["OpenRunsheet"]" OnClick="@(() => OpenRunsheetAsync(c))" />
+            </td>
+        </Row>
+    </DataTable>
+</div>
+
+<Drawer @bind-IsOpen="runsheetOpen" Title="@string.Format(CultureInfo.CurrentCulture, L["RunsheetTitle"], runsheetCourier?.DisplayLabel ?? "")" Icon="clipboard" Width="640px">
+    <ChildContent>
+        @if (runsheetLoading)
+        {
+            <Skeleton Lines="6" />
+        }
+        else if (runsheetItems.Count == 0)
+        {
+            <NonIdealState Icon="tick-circle" Title="@L["RunsheetEmpty"]" />
+        }
+        else
+        {
+            <div class="lx-summary-total lx-mb" style="margin-block-start:0;border:0">
+                <span>@L.Count("ParcelsN", runsheetItems.Count)</span>
+                <span>@Fmt.Money(runsheetItems.Where(s => s.Status == ShipmentStatus.OutForDelivery).Sum(s => s.CodAmount ?? 0), "IQD")</span>
+            </div>
+            <ul class="lx-list lx-card">
+                @foreach (var s in runsheetItems)
+                {
+                    <li class="lx-list-item">
+                        <span class="lx-list-body">
+                            <span class="lx-list-title"><span class="lx-code">@s.TrackingNumber</span> · <Mixed Text="@s.ConsigneeName" /></span>
+                            <span class="lx-list-sub">@Fmt.Place(s.DestinationCode)@(s.DestinationCity is null ? "" : " · " + s.DestinationCity) · <PhoneText Value="@s.ConsigneePhone" Link="true" /></span>
+                        </span>
+                        <span class="lx-stack" style="align-items:flex-end">
+                            <span class="lx-semibold lx-nowrap">@Fmt.Money(s.CodAmount, s.CodCurrency)</span>
+                            @if (s.Status == ShipmentStatus.OutForDelivery && canOperate)
+                            {
+                                <span class="lx-row" style="gap:4px">
+                                    @if (WhatsAppUrl(s) is { } wa)
+                                    {
+                                        <a href="@wa" target="_blank" rel="noopener" class="bp6-button bp6-minimal bp6-small" title="@L["SendWhatsApp"]">
+                                            <Icon Name="send-message" />
+                                        </a>
+                                    }
+                                    <Button Small="true" Intent="Intent.Success" Icon="tick" Text="@L["Delivered"]" Loading="saving" OnClick="@(() => CompleteAsync(s, ScanOperation.Deliver, null))" />
+                                    <Popover Small="true" Icon="cross" Title="@L["FailedAttempt"]" Text="@L["FailedAttempt"]" Align="end" Width="240px">
+                                        <ul class="bp6-menu lx-menu">
+                                            @foreach (var reason in Enum.GetValues<DeliveryFailureReason>())
+                                            {
+                                                <MenuItem Text="@ShipmentTexts.Of(reason)" OnClick="@(() => CompleteAsync(s, ScanOperation.Fail, reason))" />
+                                            }
+                                        </ul>
+                                    </Popover>
+                                </span>
+                            }
+                            else
+                            {
+                                <StatusTag Status="s.Status" />
+                            }
+                        </span>
+                    </li>
+                }
+            </ul>
+        }
+    </ChildContent>
+</Drawer>
+
+<Dialog @bind-IsOpen="dialogOpen" Title="@(editing is null ? L["NewCourier"].Value : L["EditCourier"].Value)" Icon="truck" Width="700px">
+    <ChildContent>
+        <EditForm Model="draft" OnValidSubmit="SaveCourierAsync" id="courier-form">
+            <DataAnnotationsValidator />
+            <EditableBy Policy="@StaffPolicies.Operate">
+                <div class="lx-form-grid">
+                    <FormField Label="@L["Field_Name"]" Required="true" Field="() => draft.Name">
+                        <InputText class="bp6-input bp6-fill" @bind-Value="draft.Name" />
+                    </FormField>
+                    <FormField Label="@L["Field_CourierCode"]" Required="true" Field="() => draft.Code">
+                        <InputText class="bp6-input bp6-fill lx-mono" @bind-Value="draft.Code" dir="ltr" placeholder="Baghdad-04" />
+                    </FormField>
+                    <FormField Label="@L["Field_Phone"]" Required="true" Helper="@L["PhoneHelper"]" Field="() => draft.Phone">
+                        <InputText class="bp6-input bp6-fill" @bind-Value="draft.Phone" type="tel" dir="ltr" placeholder="0770 123 4567" />
+                    </FormField>
+                    <FormField Label="@L["Field_Governorate"]" Required="true" Field="() => draft.Governorate">
+                        <span class="bp6-html-select bp6-fill">
+                            <InputSelect @bind-Value="draft.Governorate">
+                                @foreach (var g in IraqGovernorates.All)
+                                {
+                                    <option value="@g.Code">@g.Name</option>
+                                }
+                            </InputSelect>
+                            <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                        </span>
+                    </FormField>
+                    <FormField Label="@L["Field_VehicleType"]" Field="() => draft.VehicleType">
+                        <span class="bp6-html-select bp6-fill">
+                            <InputSelect @bind-Value="draft.VehicleType">
+                                @foreach (var v in Enum.GetValues<VehicleType>())
+                                {
+                                    <option value="@v">@ShipmentTexts.Of(v)</option>
+                                }
+                            </InputSelect>
+                            <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                        </span>
+                    </FormField>
+                    <FormField Label="@L["Field_VehiclePlate"]" Hint="@L["Optional"]" Field="() => draft.VehiclePlate">
+                        <InputText class="bp6-input bp6-fill lx-mono lx-upper" @bind-Value="draft.VehiclePlate" dir="ltr" placeholder="BG-48219" />
+                    </FormField>
+                    <FormField Label="@L["Field_Notes"]" Hint="@L["Optional"]" Field="() => draft.Notes" CssClass="lx-span-2">
+                        <InputText class="bp6-input bp6-fill" @bind-Value="draft.Notes" />
+                    </FormField>
+                    <Switch @bind-Value="draft.IsActive" Label="@L["ActiveCourier"]" CssClass="lx-span-2" />
+                </div>
+            </EditableBy>
+            @if (error is not null)
+            {
+                <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mt">@error</Callout>
+            }
+        </EditForm>
+    </ChildContent>
+    <Footer>
+        <Button Text="@L["Cancel"]" OnClick="@(() => dialogOpen = false)" />
+        <Allowed Policy="@StaffPolicies.Operate">
+            <Button Type="submit" form="courier-form" Intent="Intent.Primary" Icon="tick" Text="@L["Save"]" Loading="saving" />
+        </Allowed>
+    </Footer>
+</Dialog>
+
+@code {
+    private FleetOverviewResult? overview;
+    private string? q;
+    private string? governorateFilter;
+    private string? dispatchCourier;
+    private string? dispatchTracking;
+    private bool loading = true;
+    private bool dispatching;
+    private bool dialogOpen;
+    private bool runsheetOpen;
+    private bool runsheetLoading;
+    private bool saving;
+    private bool canOperate;
+    private string? error;
+    private CourierListItem? editing;
+    private CourierListItem? runsheetCourier;
+    private List<ShipmentListItem> runsheetItems = [];
+    private CourierRequest draft = new();
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        canOperate = await AuthState.CanAsync(StaffPolicies.Operate);
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        loading = true;
+        try
+        {
+            overview = await Shipments.GetFleetOverviewAsync(q, governorateFilter, null);
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private string SuccessRate(CourierListItem c)
+    {
+        var attempts = c.TotalDeliveredCount + c.FailedCount;
+        return attempts == 0 ? "—" : (c.TotalDeliveredCount / (decimal)attempts).ToString("P0", CultureInfo.CurrentCulture);
+    }
+
+    private string? WhatsAppUrl(ShipmentListItem s)
+    {
+        var digits = IraqPhone.WhatsAppDigits(s.ConsigneePhone);
+        if (string.IsNullOrEmpty(digits))
+        {
+            return null;
+        }
+
+        var trackUrl = Navigation.ToAbsoluteUri($"track/{s.TrackingNumber}").ToString();
+        var text = string.Format(
+            CultureInfo.CurrentCulture,
+            L["WhatsAppMessage"],
+            s.ConsigneeName,
+            s.MerchantName ?? s.ShipperName,
+            s.TrackingNumber,
+            trackUrl);
+        return $"https://wa.me/{digits}?text={Uri.EscapeDataString(text)}";
+    }
+
+    private async Task OpenRunsheetAsync(CourierListItem c)
+    {
+        runsheetCourier = c;
+        runsheetOpen = true;
+        runsheetLoading = true;
+        try
+        {
+            var page = await Shipments.ListAsync(new ShipmentQuery
+            {
+                Courier = c.Code,
+                Status = [ShipmentStatus.OutForDelivery, ShipmentStatus.DeliveryFailed],
+                Sort = "destination",
+                Desc = false,
+                PageSize = 200,
+            });
+            runsheetItems = page.Items.ToList();
+        }
+        finally
+        {
+            runsheetLoading = false;
+        }
+    }
+
+    private async Task CompleteAsync(ShipmentListItem s, ScanOperation operation, DeliveryFailureReason? reason)
+    {
+        saving = true;
+        try
+        {
+            var hub = runsheetCourier is null ? HubCatalog.FindOrDefault(s.DestinationHubCode) : HubCatalog.ResolveDestinationHub(runsheetCourier.Governorate);
+            var outcome = await Operations.ScanAsync(new ScanRequest
+            {
+                Operation = operation,
+                TrackingNumber = s.TrackingNumber,
+                HubCode = hub.Code,
+                CourierName = runsheetCourier?.DisplayLabel,
+                FailureReason = reason,
+            });
+            Toaster.Success($"{s.TrackingNumber} · {ShipmentTexts.Of(outcome.Status ?? s.Status)}");
+            if (runsheetCourier is not null)
+            {
+                await OpenRunsheetAsync(runsheetCourier);
+            }
+
+            await LoadAsync();
+            await Ops.RefreshAsync();
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private void OpenNew()
+    {
+        editing = null;
+        draft = new CourierRequest();
+        error = null;
+        dialogOpen = true;
+    }
+
+    private void OpenEdit(CourierListItem c)
+    {
+        editing = c;
+        draft = new CourierRequest
+        {
+            Code = c.Code,
+            Name = c.Name,
+            Phone = IraqPhone.Display(c.Phone),
+            Governorate = c.Governorate,
+            VehicleType = c.VehicleType,
+            VehiclePlate = c.VehiclePlate,
+            Notes = c.Notes,
+            IsActive = c.IsActive,
+        };
+        error = null;
+        dialogOpen = true;
+    }
+
+    private async Task SaveCourierAsync()
+    {
+        saving = true;
+        error = null;
+        try
+        {
+            if (editing is null)
+            {
+                await Shipments.CreateCourierAsync(draft);
+            }
+            else
+            {
+                await Shipments.UpdateCourierAsync(editing.Id, editing.Version, draft);
+            }
+
+            dialogOpen = false;
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["CourierSaved"], draft.Name));
+            await LoadAsync();
+        }
+        catch (ApiException ex)
+        {
+            error = ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private async Task DispatchAsync()
+    {
+        var tracking = TrackingNumber.Normalize(dispatchTracking ?? "");
+        if (tracking.Length == 0 || dispatching)
+        {
+            return;
+        }
+
+        var courier = overview?.Couriers.FirstOrDefault(c => c.DisplayLabel == dispatchCourier);
+        if (courier is null)
+        {
+            Toaster.Warning(L["ChooseCourierFirst"]);
+            return;
+        }
+
+        dispatching = true;
+        try
+        {
+            var outcome = await Operations.ScanAsync(new ScanRequest
+            {
+                Operation = ScanOperation.Dispatch,
+                TrackingNumber = tracking,
+                HubCode = HubCatalog.ResolveDestinationHub(courier.Governorate).Code,
+                CourierName = courier.DisplayLabel,
+            });
+            dispatchTracking = null;
+            await JS.InvokeVoidAsync("lx.beep", true);
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["DispatchedWith"], outcome.CourierName ?? courier.DisplayLabel));
+            await LoadAsync();
+        }
+        catch (ApiException ex)
+        {
+            await JS.InvokeVoidAsync("lx.beep", false);
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            dispatching = false;
+            await JS.InvokeVoidAsync("lx.focus", "lx-dispatch");
+        }
+    }
+}

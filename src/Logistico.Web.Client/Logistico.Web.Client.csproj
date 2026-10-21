@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
+    <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
+    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+    <!-- Arabic (Iraq) number/date formats need the full ICU data in the browser. -->
+    <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" />
+    <PackageReference Include="Microsoft.Extensions.Localization" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Logistico.SharedKernel\Logistico.SharedKernel.csproj" />
+    <ProjectReference Include="..\Modules\Shipments\Logistico.Modules.Shipments.Contracts\Logistico.Modules.Shipments.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Merchants\Logistico.Modules.Merchants.Contracts\Logistico.Modules.Merchants.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,227 @@
+@page "/confirmations"
+@attribute [Authorize(Policy = StaffPolicies.Care)]
+@inject ShipmentsApi Shipments
+@inject MerchantsApi Merchants
+@inject OperationsApi Operations
+@inject OpsState Ops
+@inject NavigationManager Navigation
+@inject Toaster Toaster
+
+<PageTitle>@L["Nav_Confirmations"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["ConfirmationsTitle"]" Subtitle="@L["ConfirmationsSubtitle"]" Icon="phone-call">
+    <Actions>
+        <Button Icon="refresh" Minimal="true" Tip="@L["Refresh"]" Loading="loading" OnClick="LoadAsync" />
+        <LinkButton Href="automation?tab=rules" Icon="cog" Text="@L["ConfirmationRules"]" Minimal="true" />
+    </Actions>
+</PageHeader>
+
+@if (queue is not null)
+{
+    <div class="lx-kpis">
+        <KpiCard Icon="phone-call" Label="@L["Kpi_AwaitingConfirmation"]" Value="@Fmt.Number(queue.Total)" Intent="Intent.Primary" />
+        <KpiCard Icon="time" Label="@L["Kpi_ConfirmationOverdue"]" Value="@Fmt.Number(queue.Overdue)" Intent="@(queue.Overdue > 0 ? Intent.Warning : Intent.Success)" />
+        <KpiCard Icon="tick-circle" Label="@L["Kpi_ConfirmedToday"]" Value="@Fmt.Number(queue.ConfirmedToday)" Intent="Intent.Success" />
+        <KpiCard Icon="disable" Label="@L["Kpi_DeclinedToday"]" Value="@Fmt.Number(queue.DeclinedToday + queue.AutoCancelledToday)" Intent="@(queue.DeclinedToday + queue.AutoCancelledToday > 0 ? Intent.Danger : Intent.None)"
+                 Hint="@(queue.AutoCancelledToday > 0 ? string.Format(CultureInfo.CurrentCulture, L["AutoCancelledN"], Fmt.Number(queue.AutoCancelledToday)) : null)" />
+    </div>
+}
+
+<div class="lx-table-card">
+    <div class="lx-toolbar">
+        <SearchInput CssClass="lx-toolbar-search" Value="@q" Placeholder="@L["ConfirmationSearch"]" OnSearch="@(text => { q = text; page = 1; return LoadAsync(); })" />
+        <HtmlSelect Value="@merchantId?.ToString()" ValueChanged="@(v => { merchantId = Guid.TryParse(v, out var id) ? id : null; page = 1; return LoadAsync(); })" Label="@L["Field_Seller"]">
+            <option value="">@L["AllSellers"]</option>
+            @foreach (var m in merchants)
+            {
+                <option value="@m.Id">@m.Name</option>
+            }
+        </HtmlSelect>
+    </div>
+
+    <div class="lx-table-wrap">
+        <table class="bp6-html-table bp6-html-table-striped lx-table">
+            <thead>
+                <tr>
+                    <th>@L["Col_Tracking"]</th>
+                    <th>@L["Col_Customer"]</th>
+                    <th>@L["Col_Destination"]</th>
+                    <th>@L["CustomerHistory"]</th>
+                    <th class="lx-num">@L["Col_Cod"]</th>
+                    <th>@L["Col_WaitingFor"]</th>
+                    <th class="lx-col-actions"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (queue is null)
+                {
+                    <tr class="lx-table-message"><td colspan="7"><Skeleton Lines="3" /></td></tr>
+                }
+                else if (queue.Items.Count == 0)
+                {
+                    <tr class="lx-table-message"><td colspan="7"><NonIdealState Icon="tick-circle" Title="@L["NoConfirmationsWaiting"]" Description="@L["NoConfirmationsWaitingHint"]" /></td></tr>
+                }
+                else
+                {
+                    @foreach (var item in queue.Items)
+                    {
+                        var overdue = item.RequestedAt is { } at && Clock() - at > TimeSpan.FromHours(overdueHours);
+                        <tr class="@Bp.Cls(Bp.When(overdue, "lx-row-warning"), Bp.When(busy.Contains(item.Id), "lx-row-busy"))">
+                            <td>
+                                <a href="@($"shipments/{item.Id}")" class="lx-code">@item.TrackingNumber</a>
+                                <div class="lx-cell-sub"><Mixed Text="@item.MerchantName" /></div>
+                            </td>
+                            <td>
+                                <Cell Title="@item.ConsigneeName" />
+                                <div class="lx-row" style="gap:6px">
+                                    <PhoneText Value="@item.ConsigneePhone" Link="true" />
+                                    @if (WhatsAppUrl(item) is { } wa)
+                                    {
+                                        <a href="@wa" target="_blank" rel="noopener" class="lx-icon-link" title="@L["SendWhatsApp"]"><Icon Name="send-message" /></a>
+                                    }
+                                </div>
+                            </td>
+                            <td><Cell Title="@Fmt.Place(item.DestinationCode)" Sub="@item.DestinationCity" /></td>
+                            <td>
+                                <Tag Intent="@RiskIntent(item.Risk)" Round="true" Minimal="@(item.Risk is CustomerRisk.New or CustomerRisk.Low)">@ShipmentTexts.Of(item.Risk)</Tag>
+                                @if (item.PreviousDelivered + item.PreviousReturned > 0)
+                                {
+                                    <div class="lx-cell-sub">@string.Format(CultureInfo.CurrentCulture, L["HistoryShort"], Fmt.Number(item.PreviousDelivered), Fmt.Number(item.PreviousReturned))</div>
+                                }
+                            </td>
+                            <td class="lx-num">@Fmt.Money(item.CodAmount, "IQD")</td>
+                            <td>
+                                <span class="@Bp.Cls(Bp.When(overdue, "lx-text-warning"))">@(item.RequestedAt is { } r ? Fmt.Ago(r, L) : "—")</span>
+                                @if (item.Attempts > 0)
+                                {
+                                    <div class="lx-cell-sub">@L.Count("NoAnswerN", item.Attempts)</div>
+                                }
+                            </td>
+                            <td class="lx-col-actions">
+                                <Allowed Policy="@StaffPolicies.Care">
+                                    <div class="lx-row" style="gap:4px;flex-wrap:nowrap">
+                                        <Button Small="true" Intent="Intent.Success" Icon="tick" Text="@L["Confirm"]" Disabled="@busy.Contains(item.Id)" OnClick="@(() => RecordAsync(item, ConfirmationOutcome.Confirmed))" />
+                                        <Button Small="true" Icon="phone-call" Text="@L["NoAnswer"]" Disabled="@busy.Contains(item.Id)" OnClick="@(() => RecordAsync(item, ConfirmationOutcome.NoAnswer))" />
+                                        <Button Small="true" Minimal="true" Intent="Intent.Danger" Icon="disable" Tip="@L["DeclineOrder"]" Disabled="@busy.Contains(item.Id)" OnClick="@(() => AskDecline(item))" />
+                                    </div>
+                                </Allowed>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    @if (queue is { Total: > 0 })
+    {
+        <Pager Page="page" PageSize="pageSize" Total="queue.Total" OnPage="@(p => { page = p; return LoadAsync(); })" OnPageSize="@(s => { pageSize = s; page = 1; return LoadAsync(); })" />
+    }
+</div>
+
+<Dialog @bind-IsOpen="declineOpen" Title="@L["DeclineOrder"]" Icon="disable" Width="460px">
+    <ChildContent>
+        <p>@L["DeclineOrderHint"]</p>
+        <FormField TValue="string" Label="@L["Field_CancelReason"]" Hint="@L["Optional"]">
+            <input class="bp6-input bp6-fill" @bind="declineNote" placeholder="@L["DeclineReasonPlaceholder"]" />
+        </FormField>
+    </ChildContent>
+    <Footer>
+        <Button Text="@L["Back"]" OnClick="@(() => declineOpen = false)" />
+        <Button Intent="Intent.Danger" Icon="disable" Text="@L["DeclineOrder"]" OnClick="DeclineAsync" />
+    </Footer>
+</Dialog>
+
+@code {
+    private ConfirmationQueue? queue;
+    private IReadOnlyList<MerchantLookupItem> merchants = [];
+    private readonly HashSet<Guid> busy = [];
+    private string? q;
+    private Guid? merchantId;
+    private int page = 1;
+    private int pageSize = 50;
+    private bool loading;
+    private int overdueHours = 12;
+    private bool declineOpen;
+    private string? declineNote;
+    private ConfirmationQueueItem? declining;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var merchantsTask = Merchants.LookupAsync();
+        var policyTask = Operations.GetPolicyAsync();
+        await LoadAsync();
+        merchants = await merchantsTask;
+        overdueHours = (await policyTask).ConfirmationHours;
+    }
+
+    private async Task LoadAsync()
+    {
+        loading = true;
+        try
+        {
+            queue = await Shipments.GetConfirmationsAsync(q, merchantId, page, pageSize);
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private async Task RecordAsync(ConfirmationQueueItem item, ConfirmationOutcome outcome, string? note = null)
+    {
+        busy.Add(item.Id);
+        try
+        {
+            await Shipments.RecordConfirmationAsync(item.Id, item.Version, outcome, note);
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["ConfirmationRecordedN"], item.TrackingNumber, ShipmentTexts.Of(outcome)));
+            await Task.WhenAll(LoadAsync(), Ops.RefreshAsync());
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+            await LoadAsync();
+        }
+        finally
+        {
+            busy.Remove(item.Id);
+        }
+    }
+
+    private void AskDecline(ConfirmationQueueItem item)
+    {
+        declining = item;
+        declineNote = null;
+        declineOpen = true;
+    }
+
+    private async Task DeclineAsync()
+    {
+        declineOpen = false;
+        if (declining is { } item)
+        {
+            await RecordAsync(item, ConfirmationOutcome.Declined, declineNote);
+        }
+    }
+
+    private static DateTimeOffset Clock() => DateTimeOffset.UtcNow;
+
+    private static Intent RiskIntent(CustomerRisk risk) => risk switch
+    {
+        CustomerRisk.High => Intent.Danger,
+        CustomerRisk.Medium => Intent.Warning,
+        CustomerRisk.Low => Intent.Success,
+        _ => Intent.None,
+    };
+
+    private string? WhatsAppUrl(ConfirmationQueueItem item)
+    {
+        if (IraqPhone.WhatsAppDigits(item.ConsigneePhone) is not { } digits)
+        {
+            return null;
+        }
+
+        var link = Navigation.ToAbsoluteUri($"track/{item.TrackingNumber}").ToString();
+        var text = string.Format(CultureInfo.CurrentCulture, L["ConfirmWhatsApp"], item.ConsigneeName.Split(' ')[0], item.MerchantName ?? "", Fmt.Money(item.CodAmount, "IQD"), link);
+        return $"https://wa.me/{digits}?text={Uri.EscapeDataString(text)}";
+    }
+}

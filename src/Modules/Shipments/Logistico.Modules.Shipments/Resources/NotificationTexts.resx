@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="NoCod" xml:space="preserve"><value>nothing (prepaid)</value></data>
+  <data name="OurCourier" xml:space="preserve"><value>our courier</value></data>
+  <data name="Template_ConfirmOrder" xml:space="preserve"><value>Hello {0}, we have your order {1} from {2} ({4}). Please confirm it so we can send it to you — reply "yes" here or confirm from this link: </value></data>
+  <data name="Template_Delivered" xml:space="preserve"><value>Your order {1} from {2} has been delivered. Thank you!</value></data>
+  <data name="Template_DeliveryFailed" xml:space="preserve"><value>Hello {0}, we could not deliver your order {1} today ({5}). We will try again on {6}. You can choose another day here: </value></data>
+  <data name="Template_OutForDelivery" xml:space="preserve"><value>Hello {0}, your order {1} from {2} is out for delivery today with our courier {3}. Amount to pay on delivery: {4}. Track it: </value></data>
+  <data name="Template_RequestReceived" xml:space="preserve"><value>We received your request {7} for order {1}. We will take care of it shortly.</value></data>
+  <data name="Template_Rescheduled" xml:space="preserve"><value>Hello {0}, the delivery of your order {1} is now planned for {6}. Track it: </value></data>
+  <data name="Template_ReturnStarted" xml:space="preserve"><value>Hello {0}, your order {1} is being returned to {2}. If this is a mistake, contact the shop.</value></data>
+</root>

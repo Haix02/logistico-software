@@ -1,0 +1,81 @@
+@* Blueprint tabs. Child <Tab> components register themselves; only the selected panel is rendered. *@
+<CascadingValue Value="this" IsFixed="true">@ChildContent</CascadingValue>
+<div class="@Bp.Cls("bp6-tabs", "lx-tabs", Bp.When(Large, "bp6-large"), CssClass)">
+    <div class="@Bp.Cls("bp6-tab-list", Bp.When(Large, "bp6-large"))" role="tablist">
+        @foreach (var tab in tabs)
+        {
+            var selected = tab.Id == SelectedId;
+            <div class="bp6-tab" role="tab" tabindex="@(selected ? 0 : -1)" id="@($"tab-{tab.Id}")"
+                 aria-selected="@(selected ? "true" : "false")" aria-controls="@($"panel-{tab.Id}")"
+                 @onclick="@(() => SelectAsync(tab.Id))" @onkeydown="@(e => KeyAsync(e, tab.Id))">
+                @if (tab.Icon is not null)
+                {
+                    <Icon Name="@tab.Icon" />
+                }
+                <span>@tab.Title</span>
+                @if (tab.Count is { } count)
+                {
+                    <span class="@Bp.Cls("bp6-tag", "bp6-minimal", "bp6-round", Bp.IntentClass(tab.CountIntent))">@Fmt.Number(count)</span>
+                }
+            </div>
+        }
+    </div>
+    @foreach (var tab in tabs.Where(t => t.Id == SelectedId))
+    {
+        <div class="bp6-tab-panel lx-tab-panel" role="tabpanel" id="@($"panel-{tab.Id}")" aria-labelledby="@($"tab-{tab.Id}")">@tab.ChildContent</div>
+    }
+</div>
+
+@code {
+    private readonly List<Tab> tabs = [];
+
+    [Parameter] public string? Selected { get; set; }
+    [Parameter] public EventCallback<string> SelectedChanged { get; set; }
+    [Parameter] public bool Large { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private string? SelectedId => Selected ?? tabs.FirstOrDefault()?.Id;
+
+    internal void Add(Tab tab)
+    {
+        if (!tabs.Contains(tab))
+        {
+            tabs.Add(tab);
+            StateHasChanged();
+        }
+    }
+
+    internal void Remove(Tab tab)
+    {
+        if (tabs.Remove(tab))
+        {
+            StateHasChanged();
+        }
+    }
+
+    internal void Refresh() => StateHasChanged();
+
+    private async Task SelectAsync(string id)
+    {
+        Selected = id;
+        await SelectedChanged.InvokeAsync(id);
+    }
+
+    private Task KeyAsync(KeyboardEventArgs e, string id)
+    {
+        var index = tabs.FindIndex(t => t.Id == id);
+        var step = e.Key switch
+        {
+            "ArrowRight" => Bidi.Rtl ? -1 : 1,
+            "ArrowLeft" => Bidi.Rtl ? 1 : -1,
+            _ => 0,
+        };
+        if (e.Key == "Enter")
+        {
+            return SelectAsync(id);
+        }
+
+        return step == 0 || tabs.Count == 0 ? Task.CompletedTask : SelectAsync(tabs[(index + step + tabs.Count) % tabs.Count].Id);
+    }
+}

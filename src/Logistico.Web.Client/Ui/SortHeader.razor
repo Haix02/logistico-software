@@ -1,0 +1,17 @@
+<th class="@Bp.Cls("lx-sortable", Bp.When(Active, "lx-sorted"), CssClass)" aria-sort="@(Active ? (Sort!.Desc ? "descending" : "ascending") : "none")">
+    <button type="button" class="lx-sort-button" @onclick="ToggleAsync">
+        <span>@Text</span>
+        <Icon Name="@(Active ? (Sort!.Desc ? "chevron-down" : "chevron-up") : "double-caret-vertical")" CssClass="lx-sort-icon" />
+    </button>
+</th>
+
+@code {
+    [CascadingParameter] public SortState? Sort { get; set; }
+    [Parameter, EditorRequired] public string Key { get; set; } = "";
+    [Parameter, EditorRequired] public string Text { get; set; } = "";
+    [Parameter] public string? CssClass { get; set; }
+
+    private bool Active => Sort?.Key == Key;
+
+    private Task ToggleAsync() => Sort?.ToggleAsync(Key) ?? Task.CompletedTask;
+}

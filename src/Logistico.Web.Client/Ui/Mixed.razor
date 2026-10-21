@@ -1,0 +1,26 @@
+@* User text that may mix Arabic and Latin, e.g. "علي (Baghdad-03)" or an Arabic address in the English UI.
+   Arabic UI: Latin runs are isolated left-to-right inside the right-to-left line.
+   English UI: the whole text is isolated with its own direction (bdi = dir auto), so Arabic keeps its order.
+   Always one wrapper element, so inside a flex row the runs stay a single item. *@
+@if (Bidi.Rtl)
+{
+    <span class="lx-mixed">@foreach (var (part, ltr) in Bidi.Split(Text))
+    {
+        if (ltr)
+        {
+            <bdi dir="ltr">@part</bdi>
+        }
+        else
+        {
+            @part
+        }
+    }</span>
+}
+else
+{
+    <bdi class="lx-mixed">@Text</bdi>
+}
+
+@code {
+    [Parameter] public string? Text { get; set; }
+}

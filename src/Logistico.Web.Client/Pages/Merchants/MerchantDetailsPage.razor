@@ -1,0 +1,168 @@
+@page "/merchants/{Id:guid}"
+@inject MerchantsApi Merchants
+@inject ShipmentsApi Shipments
+@inject NavigationManager Navigation
+@inject Toaster Toaster
+
+<PageTitle>@(merchant?.Name ?? L["Nav_Sellers"]) · @L["AppName"]</PageTitle>
+
+@if (merchant is null)
+{
+    @if (loaded)
+    {
+        <NonIdealState Icon="shop" Title="@L["SellerNotFound"]" />
+    }
+    else
+    {
+        <div class="lx-center lx-pad"><Spinner /></div>
+    }
+}
+else
+{
+    <PageHeader Title="@merchant.Name" Icon="shop" Breadcrumbs="@([(L["Nav_Sellers"].Value, "merchants")])"
+                Subtitle="@($"{merchant.ContactName} · {IraqPhone.Display(merchant.Phone)} · {Fmt.Place(merchant.Governorate)}")">
+        <TitleExtra>
+            @if (!merchant.IsActive)
+            {
+                <Tag>@L["Inactive"]</Tag>
+            }
+        </TitleExtra>
+        <Actions>
+            @if (merchant.InstagramHandle is not null)
+            {
+                <LinkButton Href="@($"https://instagram.com/{merchant.InstagramHandle}")" Target="_blank" Icon="link" Text="@("@" + merchant.InstagramHandle)" Minimal="true" />
+            }
+            <Allowed Policy="@StaffPolicies.Operate">
+                <Button Icon="edit" Text="@L["Edit"]" OnClick="OpenEdit" />
+                <LinkButton Href="@($"orders/new?merchantId={merchant.Id}")" Icon="add" Text="@L["NewOrder"]" Intent="Intent.Primary" />
+            </Allowed>
+        </Actions>
+    </PageHeader>
+
+    @if (summary is not null)
+    {
+        <div class="lx-kpis">
+            <KpiCard Icon="shopping-cart" Label="@L["Kpi_TotalOrders"]" Value="@Fmt.Number(summary.Total)" />
+            <KpiCard Icon="truck" Label="@L["Kpi_InProgress"]" Value="@Fmt.Number(InProgress)" Intent="Intent.Primary" />
+            <KpiCard Icon="tick-circle" Label="@L["Kpi_Delivered"]" Value="@Fmt.Number(Count(ShipmentStatus.Delivered))" Intent="Intent.Success" />
+            <KpiCard Icon="undo" Label="@L["Kpi_Returned"]" Value="@Fmt.Number(Count(ShipmentStatus.Returned, ShipmentStatus.ReturnInitiated))" Intent="Intent.Warning" />
+            <KpiCard Icon="dollar" Label="@L["Kpi_CodToCollect"]" Totals="summary.CodToCollect" />
+            <KpiCard Icon="bank-account" Label="@L["Kpi_CodCollected"]" Totals="summary.CodCollected" Intent="Intent.Success" />
+        </div>
+    }
+
+    <Section Title="@L["RecentOrders"]" Icon="th" Padded="false">
+        <Actions>
+            <LinkButton Href="@($"shipments?merchantId={merchant.Id}")" Minimal="true" Small="true" Text="@L["ViewAll"]" />
+        </Actions>
+        <ChildContent>
+            <DataTable TItem="ShipmentListItem" Items="orders?.Items" ColumnCount="6" OnRowClick="Open" EmptyIcon="shopping-cart" EmptyTitle="@L["NoOrdersYet"]">
+                <Header>
+                    <th>@L["Col_Tracking"]</th>
+                    <th>@L["Col_Status"]</th>
+                    <th>@L["Col_Customer"]</th>
+                    <th>@L["Col_Destination"]</th>
+                    <th class="lx-num">@L["Col_Cod"]</th>
+                    <th>@L["Col_Created"]</th>
+                </Header>
+                <Row Context="s">
+                    <td class="lx-mono">@s.TrackingNumber</td>
+                    <td><StatusTag Status="s.Status" /></td>
+                    <td>@s.ConsigneeName</td>
+                    <td>@Fmt.Place(s.DestinationCode)</td>
+                    <td class="lx-num">@Fmt.Money(s.CodAmount, s.CodCurrency)</td>
+                    <td class="bp6-text-muted lx-nowrap">@Fmt.Date(s.CreatedAt)</td>
+                </Row>
+            </DataTable>
+        </ChildContent>
+    </Section>
+
+    <Dialog @bind-IsOpen="editOpen" Title="@L["EditSeller"]" Icon="edit" Width="720px">
+        <ChildContent>
+            <MerchantForm Model="draft" FormId="edit-merchant" OnSubmit="SaveAsync" Error="@error" />
+        </ChildContent>
+        <Footer>
+            <Button Text="@L["Cancel"]" OnClick="@(() => editOpen = false)" />
+            <Button Type="submit" form="edit-merchant" Intent="Intent.Primary" Icon="tick" Text="@L["Save"]" Loading="saving" />
+        </Footer>
+    </Dialog>
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private MerchantDetails? merchant;
+    private ShipmentsSummary? summary;
+    private ShipmentListResult? orders;
+    private bool loaded;
+    private bool editOpen;
+    private bool saving;
+    private string? error;
+    private MerchantRequest draft = new();
+
+    private int InProgress => summary?.Counts.Where(c => ShipmentLifecycle.IsActive(c.Status) && c.Status is not ShipmentStatus.ReturnInitiated).Sum(c => c.Count) ?? 0;
+
+    private int Count(params ShipmentStatus[] statuses) => summary?.Counts.Where(c => statuses.Contains(c.Status)).Sum(c => c.Count) ?? 0;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        merchant = await Merchants.GetAsync(Id);
+        loaded = true;
+        if (merchant is not null)
+        {
+            var summaryTask = Shipments.GetSummaryAsync(merchant.Id);
+            var ordersTask = Shipments.ListAsync(new ShipmentQuery { MerchantId = merchant.Id, PageSize = 15 });
+            summary = await summaryTask;
+            orders = await ordersTask;
+        }
+    }
+
+    private void OpenEdit()
+    {
+        if (merchant is null)
+        {
+            return;
+        }
+
+        draft = new MerchantRequest
+        {
+            Name = merchant.Name,
+            InstagramHandle = merchant.InstagramHandle,
+            ContactName = merchant.ContactName,
+            Phone = IraqPhone.Display(merchant.Phone),
+            Governorate = merchant.Governorate,
+            Address = merchant.Address,
+            Notes = merchant.Notes,
+            IsActive = merchant.IsActive,
+        };
+        error = null;
+        editOpen = true;
+    }
+
+    private async Task SaveAsync()
+    {
+        if (merchant is null)
+        {
+            return;
+        }
+
+        saving = true;
+        error = null;
+        try
+        {
+            merchant = await Merchants.UpdateAsync(merchant.Id, merchant.Version, draft);
+            editOpen = false;
+            Toaster.Success(L["Saved"]);
+        }
+        catch (ApiException ex)
+        {
+            error = ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private void Open(ShipmentListItem s) => Navigation.NavigateTo($"shipments/{s.Id}");
+}

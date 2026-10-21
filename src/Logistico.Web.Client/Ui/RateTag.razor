@@ -1,0 +1,15 @@
+@* A success percentage as a coloured tag: green from 90 %, orange from 75 %, red below; "—" without data. *@
+@if (Value is { } v)
+{
+    <span class="@Bp.Cls("lx-rate", v >= Good ? "lx-rate-good" : v >= Fair ? "lx-rate-fair" : "lx-rate-poor")">@Fmt.Percent(v)</span>
+}
+else
+{
+    <span class="bp6-text-muted">—</span>
+}
+
+@code {
+    [Parameter] public decimal? Value { get; set; }
+    [Parameter] public decimal Good { get; set; } = 90;
+    [Parameter] public decimal Fair { get; set; } = 75;
+}

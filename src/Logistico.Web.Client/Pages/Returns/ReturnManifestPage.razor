@@ -1,0 +1,61 @@
+@page "/returns/manifests/{Number}"
+@inject OperationsApi Operations
+@inject IJSRuntime JS
+
+<PageTitle>@Number · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@string.Format(CultureInfo.CurrentCulture, L["ManifestTitle"], Number)" Icon="document" Breadcrumbs="@([(L["Nav_Returns"].Value, "returns")])">
+    <Actions>
+        <Button Icon="print" Text="@L["PrintNow"]" Intent="Intent.Primary" OnClick="@(() => JS.InvokeVoidAsync("lx.print"))" />
+    </Actions>
+</PageHeader>
+
+@if (manifest is null)
+{
+    @if (notFound)
+    {
+        <NonIdealState Icon="document" Title="@L["ManifestNotFound"]" />
+    }
+    else
+    {
+        <Skeleton Lines="6" />
+    }
+}
+else
+{
+    <div class="lx-card lx-card-pad lx-print-sheet">
+        <div class="lx-row lx-mb" style="justify-content:space-between;align-items:flex-start">
+            <div class="lx-stack">
+                <span class="lx-row"><span class="lx-logo"></span><span class="lx-strong" style="font-size:18px">@L["AppName"]</span></span>
+                <span class="lx-strong" style="font-size:20px">@string.Format(CultureInfo.CurrentCulture, L["ManifestTitle"], manifest.Number)</span>
+            </div>
+            @((MarkupString)Code128Barcode.ToSvg(manifest.Number, 40, true))
+        </div>
+        <dl class="lx-props lx-mb">
+            <dt>@L["Col_Seller"]</dt><dd><Mixed Text="@(manifest.MerchantName ?? "—")" /></dd>
+            <dt>@L["Col_Hub"]</dt><dd>@Fmt.Hub(manifest.HubCode)</dd>
+            <dt>@L["Date"]</dt><dd>@Fmt.DateTime(manifest.At)</dd>
+            <dt>@L["HandedOverBy"]</dt><dd><Mixed Text="@(manifest.HandedOverBy ?? "—")" /></dd>
+            <dt>@L["ReceivedByName"]</dt><dd><Mixed Text="@(manifest.ReceivedBy ?? "—")" /></dd>
+            <dt>@L["Parcels"]</dt><dd>@Fmt.Number(manifest.Items.Count)</dd>
+        </dl>
+        <ShipmentTable Items="manifest.Items" Columns="ShipmentColumns.Tracking | ShipmentColumns.Customer | ShipmentColumns.Destination | ShipmentColumns.Cod" />
+        <div class="lx-grid-2 lx-mt-lg">
+            <div class="lx-stack"><span class="bp6-text-muted">@L["SignatureSeller"]</span><span style="border-block-end:1px solid var(--lx-border-strong);height:48px"></span></div>
+            <div class="lx-stack"><span class="bp6-text-muted">@L["SignatureHub"]</span><span style="border-block-end:1px solid var(--lx-border-strong);height:48px"></span></div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public string Number { get; set; } = "";
+
+    private ReturnManifest? manifest;
+    private bool notFound;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        manifest = await Operations.GetManifestAsync(Number);
+        notFound = manifest is null;
+    }
+}

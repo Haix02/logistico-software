@@ -1,0 +1,11 @@
+<div class="lx-dashboard-table-frame">
+    <div class="lx-table-wrap">@ChildContent</div>
+    <div class="lx-dashboard-table-footer">
+        <LinkButton Href="@Href" Minimal="true" Small="true" Text="@L["ViewAll"]" RightIcon="@Bidi.ChevronForward" />
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Href { get; set; } = "";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

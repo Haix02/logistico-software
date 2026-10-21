@@ -1,0 +1,426 @@
+@page "/automation"
+@inject OperationsApi Operations
+@inject OpsState Ops
+@inject NavigationManager Navigation
+@inject Toaster Toaster
+@inject IJSRuntime JS
+
+<PageTitle>@L["Nav_Automation"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["AutomationTitle"]" Subtitle="@L["AutomationSubtitle"]" Icon="automatic-updates">
+    <Actions>
+        @if (overview?.LastSweepAt is { } swept)
+        {
+            <span class="bp6-text-muted lx-small">@string.Format(CultureInfo.CurrentCulture, L["LastRun"], Fmt.Ago(swept, L))</span>
+        }
+        <Allowed Policy="@StaffPolicies.Operate">
+            <Button Icon="play" Text="@L["RunNow"]" Loading="running" OnClick="RunAsync" />
+        </Allowed>
+    </Actions>
+</PageHeader>
+
+@if (overview is not null)
+{
+    <div class="lx-kpis">
+        <KpiCard Icon="notifications" Label="@L["Kpi_OpenAlerts"]" Value="@Fmt.Number(overview.OpenAlerts)" Intent="@(overview.CriticalAlerts > 0 ? Intent.Danger : Intent.Warning)"
+                 Hint="@string.Format(CultureInfo.CurrentCulture, L["CriticalN"], Fmt.Number(overview.CriticalAlerts))" />
+        <KpiCard Icon="automatic-updates" Label="@L["Kpi_ActionsToday"]" Value="@Fmt.Number(overview.ActionsToday)" Intent="Intent.Primary" />
+        <KpiCard Icon="undo" Label="@L["Kpi_AutoReturns"]" Value="@Fmt.Number(overview.AutoReturnsToday)" Intent="Intent.Warning" />
+        <KpiCard Icon="calendar" Label="@L["Kpi_AutoReschedules"]" Value="@Fmt.Number(overview.AutoReschedulesToday)" Intent="Intent.Primary" />
+        <KpiCard Icon="drive-time" Label="@L["Kpi_TrucksPlanned"]" Value="@Fmt.Number(overview.TransfersPlannedToday)" Intent="Intent.Primary" />
+        <KpiCard Icon="chat" Label="@L["Kpi_MessagesPending"]" Value="@Fmt.Number(overview.PendingMessages)" Intent="@(overview.PendingMessages > 0 ? Intent.Warning : Intent.Success)" />
+    </div>
+}
+
+<Tabs Selected="@tab" SelectedChanged="SelectTabAsync">
+    <Tab Id="alerts" Title="@L["Alerts_Title"]" Icon="notifications" Count="@(overview?.OpenAlerts)" CountIntent="Intent.Danger">
+        <div class="lx-table-card">
+            <div class="lx-toolbar">
+                <SegmentedControl TValue="bool?" Options="OpenOptions" Value="alertOpen" ValueChanged="@(v => { alertOpen = v; alertPage = 1; return LoadAlertsAsync(); })" Label="@L["Col_Status"]" />
+                <HtmlSelect Value="@alertKind?.ToString()" ValueChanged="@(v => { alertKind = Enum.TryParse<AlertKind>(v, out var k) ? k : null; alertPage = 1; return LoadAlertsAsync(); })" Label="@L["Col_Type"]">
+                    <option value="">@L["AllTypes"]</option>
+                    @foreach (var kind in Enum.GetValues<AlertKind>())
+                    {
+                        var count = alerts?.OpenByKind.FirstOrDefault(k => k.Kind == kind)?.Count ?? 0;
+                        <option value="@kind">@ShipmentTexts.Of(kind) (@Fmt.Number(count))</option>
+                    }
+                </HtmlSelect>
+                <HtmlSelect Value="@alertHub" ValueChanged="@(v => { alertHub = v; alertPage = 1; return LoadAlertsAsync(); })" Label="@L["Col_Hub"]">
+                    <option value="">@L["AllHubs"]</option>
+                    @foreach (var h in HubCatalog.All)
+                    {
+                        <option value="@h.Code">@h.RoutingTag · @h.Name</option>
+                    }
+                </HtmlSelect>
+            </div>
+            <DataTable TItem="OpsAlertItem" Items="alerts?.Items" Loading="alertsLoading" ColumnCount="6" OnRowClick="OpenAlert" EmptyIcon="tick-circle" EmptyTitle="@L["NoAlerts"]"
+                       RowClass="@(a => a.ResolvedAt is not null ? null : a.Severity == AlertSeverity.Critical ? "lx-row-danger" : "lx-row-warning")">
+                <Header>
+                    <th>@L["Col_Alert"]</th>
+                    <th>@L["Col_Subject"]</th>
+                    <th>@L["Col_Hub"]</th>
+                    <th>@L["Col_Waiting"]</th>
+                    <th>@L["Col_Raised"]</th>
+                    <th class="lx-col-actions"></th>
+                </Header>
+                <Row Context="a">
+                    <td>
+                        <span class="lx-row" style="gap:8px">
+                            <span class="@Bp.Cls("lx-list-icon", a.ResolvedAt is not null ? "lx-list-icon-success" : a.Severity == AlertSeverity.Critical ? "lx-list-icon-danger" : "lx-list-icon-warning")" style="width:28px;height:28px"><Icon Name="@DomainIcons.Of(a.Kind)" /></span>
+                            <Cell Title="@ShipmentTexts.Of(a.Kind)" Sub="@ShipmentTexts.Of(a.Severity)" />
+                        </span>
+                    </td>
+                    <td><span class="lx-code">@(a.TrackingNumber ?? a.TransferNumber ?? a.RequestNumber)</span></td>
+                    <td>@if (a.HubCode is { } hub) { <Tag>@HubCatalog.FindOrDefault(hub).RoutingTag</Tag> }</td>
+                    <td class="lx-nowrap">@Fmt.Hours(a.Hours, L)</td>
+                    <td class="lx-nowrap bp6-text-muted">@Fmt.Ago(a.RaisedAt, L)</td>
+                    <td class="lx-col-actions" @onclick:stopPropagation="true">
+                        @if (a.ResolvedAt is null)
+                        {
+                            <Allowed Policy="@StaffPolicies.Operate">
+                                <Button Small="true" Minimal="true" Icon="tick" Text="@L["MarkHandled"]" OnClick="@(() => ResolveAlertAsync(a))" />
+                            </Allowed>
+                        }
+                        else
+                        {
+                            <span class="bp6-text-muted lx-small">@(a.AutoResolved ? L["ClearedAutomatically"] : L["Handled"])</span>
+                        }
+                    </td>
+                </Row>
+            </DataTable>
+            @if (alerts is not null)
+            {
+                <Pager Page="alerts.Page" PageSize="alerts.PageSize" Total="alerts.TotalCount" OnPage="@(p => { alertPage = p; return LoadAlertsAsync(); })" OnPageSize="@(s => { alertSize = s; alertPage = 1; return LoadAlertsAsync(); })" />
+            }
+        </div>
+    </Tab>
+
+    <Tab Id="messages" Title="@L["CustomerMessages"]" Icon="chat" Count="@(messages?.Pending)" CountIntent="Intent.Warning">
+        <div class="lx-table-card">
+            <div class="lx-toolbar">
+                <SegmentedControl TValue="NotificationStatus?" Options="MessageOptions" Value="messageStatus" ValueChanged="@(v => { messageStatus = v; messagePage = 1; return LoadMessagesAsync(); })" />
+                <span class="bp6-text-muted lx-small">@L["MessagesHint"]</span>
+            </div>
+            <DataTable TItem="CustomerNotificationItem" Items="messages?.Items" Loading="messagesLoading" ColumnCount="5" EmptyIcon="chat" EmptyTitle="@L["NoMessages"]">
+                <Header>
+                    <th>@L["Col_Message"]</th>
+                    <th>@L["Col_Shipment"]</th>
+                    <th>@L["Col_Text"]</th>
+                    <th>@L["Col_Status"]</th>
+                    <th class="lx-col-actions"></th>
+                </Header>
+                <Row Context="m">
+                    <td><Cell Title="@ShipmentTexts.Of(m.Template)" Sub="@Fmt.Ago(m.CreatedAt, L)" /></td>
+                    <td><Cell><TitleContent><a class="lx-code" href="@($"shipments/{m.ShipmentId}")">@m.TrackingNumber</a></TitleContent><SubContent><PhoneText Value="@m.Phone" /></SubContent></Cell></td>
+                    <td><span class="lx-cell lx-cell-wide"><span class="lx-cell-sub" style="white-space:normal;color:var(--lx-text-2)" title="@m.Body">@m.Body</span></span></td>
+                    <td><Tag Intent="@(m.Status == NotificationStatus.Pending ? Intent.Warning : m.Status == NotificationStatus.Sent ? Intent.Success : Intent.None)">@ShipmentTexts.Of(m.Status)</Tag></td>
+                    <td class="lx-col-actions">
+                        @if (m.Status == NotificationStatus.Pending)
+                        {
+                            <Allowed Policy="@StaffPolicies.Care">
+                                <Button Small="true" Intent="Intent.Success" Icon="send-message" Text="@L["SendWhatsApp"]" OnClick="@(() => SendAsync(m))" />
+                                <Button Small="true" Minimal="true" Icon="cross" Tip="@L["Skip"]" OnClick="@(() => MarkAsync(m, NotificationStatus.Skipped))" />
+                            </Allowed>
+                        }
+                    </td>
+                </Row>
+            </DataTable>
+            @if (messages is not null)
+            {
+                <Pager Page="messages.Page" PageSize="messages.PageSize" Total="messages.TotalCount" OnPage="@(p => { messagePage = p; return LoadMessagesAsync(); })" OnPageSize="@(_ => Task.CompletedTask)" />
+            }
+        </div>
+    </Tab>
+
+    <Tab Id="log" Title="@L["ActivityLog"]" Icon="history">
+        <div class="lx-table-card">
+            <DataTable TItem="AutomationLogItem" Items="log?.Items" Loading="logLoading" ColumnCount="4" EmptyIcon="history" EmptyTitle="@L["NoActivity"]">
+                <Header>
+                    <th>@L["Col_Time"]</th>
+                    <th>@L["Col_Action"]</th>
+                    <th>@L["Col_Shipment"]</th>
+                    <th>@L["Col_Details"]</th>
+                </Header>
+                <Row Context="e">
+                    <td class="lx-nowrap bp6-text-muted">@Fmt.DateTime(e.At)</td>
+                    <td><Tag Icon="@RuleIcon(e.Rule)" Intent="@RuleIntent(e.Rule)">@ShipmentTexts.Of(e.Rule)</Tag></td>
+                    <td>@if (e.ShipmentId is { } sid) { <a class="lx-code" href="@($"shipments/{sid}")">@e.TrackingNumber</a> } else { <span class="lx-code">@e.TrackingNumber</span> }</td>
+                    <td class="bp6-text-muted lx-small"><Mixed Text="@DetailText(e)" /></td>
+                </Row>
+            </DataTable>
+            @if (log is not null)
+            {
+                <Pager Page="log.Page" PageSize="log.PageSize" Total="log.TotalCount" OnPage="@(p => { logPage = p; return LoadLogAsync(); })" OnPageSize="@(_ => Task.CompletedTask)" />
+            }
+        </div>
+    </Tab>
+
+    <Tab Id="rules" Title="@L["Rules"]" Icon="cog">
+        @if (policy is null)
+        {
+            <Skeleton Lines="8" />
+        }
+        else
+        {
+            <EditForm Model="policy" OnValidSubmit="SavePolicyAsync">
+                <DataAnnotationsValidator />
+                <EditableBy Policy="@StaffPolicies.Administer">
+                    <div class="lx-grid-2">
+                        <Section Title="@L["Rules_Delivery"]" Icon="truck" Padded="false">
+                            <div class="lx-rule">
+                                <div><div class="lx-rule-title">@L["Rule_MaxAttempts"]</div><div class="lx-rule-desc">@L["Rule_MaxAttemptsHint"]</div></div>
+                                <div class="lx-rule-value"><InputNumber class="bp6-input" @bind-Value="policy.MaxDeliveryAttempts" min="1" max="6" /> <span>@L["Attempts"]</span></div>
+                            </div>
+                            <div class="lx-rule">
+                                <div><div class="lx-rule-title">@L["Rule_ReturnOnRefusal"]</div><div class="lx-rule-desc">@L["Rule_ReturnOnRefusalHint"]</div></div>
+                                <Switch @bind-Value="policy.ReturnOnRefusal" Large="true" />
+                            </div>
+                            <div class="lx-rule">
+                                <div><div class="lx-rule-title">@L["Rule_AutoReschedule"]</div><div class="lx-rule-desc">@L["Rule_AutoRescheduleHint"]</div></div>
+                                <Switch @bind-Value="policy.AutoReschedule" Large="true" />
+                            </div>
+                            <div class="lx-rule">
+                                <div><div class="lx-rule-title">@L["Rule_AutoRequests"]</div><div class="lx-rule-desc">@L["Rule_AutoRequestsHint"]</div></div>
+                                <Switch @bind-Value="policy.AutoApplyCustomerRequests" Large="true" />
+                            </div>
+                            <div class="lx-rule">
+                                <div><div class="lx-rule-title">@L["Rule_Notify"]</div><div class="lx-rule-desc">@L["Rule_NotifyHint"]</div></div>
+                                <Switch @bind-Value="policy.NotifyCustomers" Large="true" />
+                            </div>
+                        </Section>
+                        <Section Title="@L["Rules_Network"]" Icon="time" Padded="false">
+                            <div class="lx-rule">
+                                <div><div class="lx-rule-title">@L["Rule_AutoTrucks"]</div><div class="lx-rule-desc">@L["Rule_AutoTrucksHint"]</div></div>
+                                <Switch @bind-Value="policy.AutoPlanTransfers" Large="true" />
+                            </div>
+                            <RuleNumber Title="@L["Rule_PickupSla"]" Hint="@L["Rule_PickupSlaHint"]" Unit="@L["Hours"]" @bind-Value="policy.PickupSlaHours" Max="168" />
+                            <RuleNumber Title="@L["Rule_Dwell"]" Hint="@L["Rule_DwellHint"]" Unit="@L["Hours"]" @bind-Value="policy.WarehouseDwellHours" Max="336" />
+                            <RuleNumber Title="@L["Rule_Courier"]" Hint="@L["Rule_CourierHint"]" Unit="@L["Hours"]" @bind-Value="policy.OutForDeliveryHours" Max="72" />
+                            <RuleNumber Title="@L["Rule_LineHaul"]" Hint="@L["Rule_LineHaulHint"]" Unit="@L["Hours"]" @bind-Value="policy.LineHaulGraceHours" Max="72" />
+                            <RuleNumber Title="@L["Rule_ReturnCollection"]" Hint="@L["Rule_ReturnCollectionHint"]" Unit="@L["Days"]" @bind-Value="policy.ReturnCollectionDays" Max="30" />
+                            <RuleNumber Title="@L["Rule_RequestSla"]" Hint="@L["Rule_RequestSlaHint"]" Unit="@L["Hours"]" @bind-Value="policy.RequestSlaHours" Max="168" />
+                        </Section>
+                        <Section Title="@L["Rules_Confirmation"]" Subtitle="@L["Rules_ConfirmationHint"]" Icon="phone-call" Padded="false">
+                            <div class="lx-rule lx-rule-wide">
+                                <div><div class="lx-rule-title">@L["Rule_ConfirmMode"]</div><div class="lx-rule-desc">@L["Rule_ConfirmModeHint"]</div></div>
+                                <SegmentedControl TValue="OrderConfirmationMode" Options="ConfirmOptions" Value="policy.OrderConfirmation" ValueChanged="@(v => policy.OrderConfirmation = v)" Label="@L["Rule_ConfirmMode"]" Small="true" />
+                            </div>
+                            <RuleNumber Title="@L["Rule_ConfirmHours"]" Hint="@L["Rule_ConfirmHoursHint"]" Unit="@L["Hours"]" @bind-Value="policy.ConfirmationHours" Max="72" />
+                            <RuleNumber Title="@L["Rule_AutoCancel"]" Hint="@L["Rule_AutoCancelHint"]" Unit="@L["Hours"]" @bind-Value="policy.AutoCancelUnconfirmedHours" Min="0" Max="336" />
+                        </Section>
+                    </div>
+                    <div class="lx-form-actions">
+                        <Button Type="submit" Intent="Intent.Primary" Icon="tick" Text="@L["SaveRules"]" Loading="saving" />
+                        @if (policy.UpdatedAt is { } changed)
+                        {
+                            <span class="bp6-text-muted lx-small">@string.Format(CultureInfo.CurrentCulture, L["ChangedBy"], Fmt.DateTime(changed), policy.UpdatedBy ?? "—")</span>
+                        }
+                    </div>
+                </EditableBy>
+            </EditForm>
+        }
+    </Tab>
+</Tabs>
+
+@code {
+    [SupplyParameterFromQuery(Name = "tab")] public string? Tab { get; set; }
+    [SupplyParameterFromQuery(Name = "hub")] public string? HubFilter { get; set; }
+
+    private string? tab = "alerts";
+    private AutomationOverview? overview;
+    private AlertList? alerts;
+    private NotificationPage? messages;
+    private AutomationLogPage? log;
+    private AutomationPolicy? policy;
+    private bool? alertOpen = true;
+    private AlertKind? alertKind;
+    private string? alertHub;
+    private int alertPage = 1;
+    private int alertSize = 25;
+    private NotificationStatus? messageStatus = NotificationStatus.Pending;
+    private int messagePage = 1;
+    private int logPage = 1;
+    private bool alertsLoading = true;
+    private bool messagesLoading;
+    private bool logLoading;
+    private bool running;
+    private bool saving;
+
+    private IReadOnlyList<SegmentOption<OrderConfirmationMode>> ConfirmOptions =>
+        [.. Enum.GetValues<OrderConfirmationMode>().Select(m => new SegmentOption<OrderConfirmationMode>(m, ShipmentTexts.Of(m)))];
+
+    private IReadOnlyList<SegmentOption<bool?>> OpenOptions => [new(true, L["Open"]), new(false, L["Closed"]), new(null, L["All"])];
+
+    private IReadOnlyList<SegmentOption<NotificationStatus?>> MessageOptions =>
+        [new(NotificationStatus.Pending, ShipmentTexts.Of(NotificationStatus.Pending)), new(NotificationStatus.Sent, ShipmentTexts.Of(NotificationStatus.Sent)), new(null, L["All"])];
+
+    protected override async Task OnInitializedAsync()
+    {
+        tab = Tab ?? "alerts";
+        alertHub = HubCatalog.Find(HubFilter)?.Code;
+        await Task.WhenAll(LoadOverviewAsync(), LoadTabAsync(tab));
+    }
+
+    private async Task SelectTabAsync(string next)
+    {
+        tab = next;
+        await LoadTabAsync(next);
+    }
+
+    private Task LoadTabAsync(string? which) => which switch
+    {
+        "messages" => LoadMessagesAsync(),
+        "log" => LoadLogAsync(),
+        "rules" => LoadPolicyAsync(),
+        _ => LoadAlertsAsync(),
+    };
+
+    private async Task LoadOverviewAsync() => overview = await Operations.GetAutomationOverviewAsync();
+
+    private async Task LoadAlertsAsync()
+    {
+        alertsLoading = true;
+        try
+        {
+            alerts = await Operations.ListAlertsAsync(alertOpen, alertKind, null, alertHub, alertPage, alertSize);
+        }
+        finally
+        {
+            alertsLoading = false;
+        }
+    }
+
+    private async Task LoadMessagesAsync()
+    {
+        messagesLoading = true;
+        try
+        {
+            messages = await Operations.GetMessagesAsync(messageStatus, messagePage);
+        }
+        finally
+        {
+            messagesLoading = false;
+        }
+    }
+
+    private async Task LoadLogAsync()
+    {
+        logLoading = true;
+        try
+        {
+            log = await Operations.GetLogAsync(page: logPage);
+        }
+        finally
+        {
+            logLoading = false;
+        }
+    }
+
+    private async Task LoadPolicyAsync() => policy ??= await Operations.GetPolicyAsync();
+
+    private async Task RunAsync()
+    {
+        running = true;
+        try
+        {
+            await Operations.RunAutomationAsync();
+            Toaster.Success(L["AutomationRan"]);
+            await Task.WhenAll(LoadOverviewAsync(), LoadTabAsync(tab), Ops.RefreshAsync());
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            running = false;
+        }
+    }
+
+    private void OpenAlert(OpsAlertItem a)
+    {
+        if (a.ShipmentId is { } shipmentId)
+        {
+            Navigation.NavigateTo($"shipments/{shipmentId}");
+        }
+        else if (a.TransferId is { } transferId)
+        {
+            Navigation.NavigateTo($"transfers/{transferId}");
+        }
+        else if (a.RequestId is not null)
+        {
+            Navigation.NavigateTo("requests");
+        }
+    }
+
+    private async Task ResolveAlertAsync(OpsAlertItem a)
+    {
+        await Operations.ResolveAlertAsync(a.Id);
+        await Task.WhenAll(LoadAlertsAsync(), LoadOverviewAsync(), Ops.RefreshAsync());
+    }
+
+    /// <summary>Opens WhatsApp with the message and the public tracking link, then marks it as sent.</summary>
+    private async Task SendAsync(CustomerNotificationItem m)
+    {
+        var link = Navigation.ToAbsoluteUri($"track/{m.TrackingNumber}").ToString();
+        var text = m.Body.EndsWith(": ", StringComparison.Ordinal) || m.Body.EndsWith(" ", StringComparison.Ordinal) ? m.Body + link : $"{m.Body}\n{link}";
+        await JS.InvokeVoidAsync("lx.openWhatsApp", $"https://wa.me/{IraqPhone.WhatsAppDigits(m.Phone)}?text={Uri.EscapeDataString(text)}");
+        await MarkAsync(m, NotificationStatus.Sent);
+    }
+
+    private async Task MarkAsync(CustomerNotificationItem m, NotificationStatus status)
+    {
+        await Operations.MarkMessageAsync(m.Id, status);
+        await Task.WhenAll(LoadMessagesAsync(), LoadOverviewAsync());
+    }
+
+    private async Task SavePolicyAsync()
+    {
+        if (policy is null)
+        {
+            return;
+        }
+
+        saving = true;
+        try
+        {
+            policy = await Operations.UpdatePolicyAsync(policy);
+            Toaster.Success(L["RulesSaved"]);
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private string DetailText(AutomationLogItem e) => e.Rule switch
+    {
+        AutomationRule.AlertRaised or AutomationRule.AlertResolved when Enum.TryParse<AlertKind>(e.Detail, out var kind) => ShipmentTexts.Of(kind),
+        AutomationRule.AutoReturn when Enum.TryParse<ReturnReason>(e.Detail, out var reason) => ShipmentTexts.Of(reason),
+        AutomationRule.NotificationQueued when Enum.TryParse<NotificationTemplate>(e.Detail, out var template) => ShipmentTexts.Of(template),
+        _ => e.Detail ?? "",
+    };
+
+    private static string RuleIcon(AutomationRule rule) => rule switch
+    {
+        AutomationRule.AutoReturn => "undo",
+        AutomationRule.AutoReschedule => "calendar",
+        AutomationRule.PlanTransfer => "drive-time",
+        AutomationRule.AlertRaised => "notifications",
+        AutomationRule.AlertResolved => "tick",
+        AutomationRule.RequestApplied => "inbox",
+        AutomationRule.NotificationQueued => "chat",
+        _ => "document",
+    };
+
+    private static Intent RuleIntent(AutomationRule rule) => rule switch
+    {
+        AutomationRule.AlertRaised or AutomationRule.AutoReturn => Intent.Warning,
+        AutomationRule.AlertResolved or AutomationRule.RequestApplied => Intent.Success,
+        _ => Intent.Primary,
+    };
+}

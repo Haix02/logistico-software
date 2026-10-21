@@ -1,0 +1,36 @@
+@* Settings that only some roles may change: everyone else sees them read-only (a disabled fieldset) with a note on who can. *@
+@using System.Security.Claims
+
+<fieldset class="lx-fieldset" disabled="@(!allowed)">
+    @if (!allowed)
+    {
+        <Callout Icon="eye-open" CssClass="lx-mb">
+            @string.Format(CultureInfo.CurrentCulture, L["ViewOnly"], RoleList)
+        </Callout>
+    }
+    @ChildContent
+</fieldset>
+
+@code {
+    private bool allowed = true;
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    /// <summary>One of <see cref="StaffPolicies"/>: the roles that may change the content.</summary>
+    [Parameter, EditorRequired] public string Policy { get; set; } = "";
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>"Administrator and Finance" / «مدير النظام والمالية».</summary>
+    private string RoleList
+    {
+        get
+        {
+            var names = StaffPolicies.RolesFor(Policy).Select(r => L["Role_" + r].Value).ToList();
+            return names.Count == 1 ? names[0] : string.Join(L["ListSeparator"], names[..^1]) + L["ListAnd"] + names[^1];
+        }
+    }
+
+    protected override async Task OnParametersSetAsync() =>
+        allowed = AuthState is not null && (await AuthState).User.Can(Policy);
+}

@@ -1,0 +1,63 @@
+@* Multi-select status filter in a Blueprint popover with check items. *@
+<Popover Text="@ButtonText" Icon="filter" Outlined="@(Value.Count > 0)" Intent="@(Value.Count > 0 ? Intent.Primary : Intent.None)" Align="start" Width="280px">
+    <div class="lx-popover-body">
+        <ul class="bp6-menu lx-menu lx-check-menu">
+            @foreach (var (group, statuses) in Groups)
+            {
+                <MenuDivider Title="@group" />
+                @foreach (var status in statuses)
+                {
+                    <li>
+                        <Switch Checkbox="true" Value="@Value.Contains(status)" ValueChanged="@(on => ToggleAsync(status, on))">
+                            <StatusTag Status="status" />
+                        </Switch>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+    @if (Value.Count > 0)
+    {
+        <div class="lx-popover-foot">
+            <Button Small="true" Minimal="true" Icon="filter-remove" Text="@L["ClearFilters"]" OnClick="ClearAsync" />
+        </div>
+    }
+</Popover>
+
+@code {
+    [Parameter] public IReadOnlyCollection<ShipmentStatus> Value { get; set; } = [];
+    [Parameter] public EventCallback<IReadOnlyCollection<ShipmentStatus>> ValueChanged { get; set; }
+
+    private string ButtonText => Value.Count switch
+    {
+        0 => L["AllStatuses"],
+        1 => ShipmentTexts.Of(Value.First()),
+        _ => L.Count("StatusesN", Value.Count),
+    };
+
+    private IEnumerable<(string Group, ShipmentStatus[] Statuses)> Groups =>
+    [
+        (L["StatusGroup_Delivery"], [ShipmentStatus.Booked, ShipmentStatus.PickedUp, ShipmentStatus.AtWarehouse, ShipmentStatus.ReadyForDispatch,
+            ShipmentStatus.InTransitToHub, ShipmentStatus.OutForDelivery, ShipmentStatus.DeliveryFailed, ShipmentStatus.Delivered]),
+        (L["StatusGroup_Returns"], [ShipmentStatus.ReturnInitiated, ShipmentStatus.ReturnInTransit, ShipmentStatus.ReturnAtHub, ShipmentStatus.Returned, ShipmentStatus.Cancelled]),
+        (L["StatusGroup_International"], [ShipmentStatus.ReceivedAtOrigin, ShipmentStatus.Consolidated, ShipmentStatus.DepartedOrigin, ShipmentStatus.InTransit,
+            ShipmentStatus.ArrivedPortOfEntry, ShipmentStatus.CustomsPending, ShipmentStatus.CustomsHold, ShipmentStatus.Released, ShipmentStatus.AtDestinationWarehouse]),
+    ];
+
+    private Task ToggleAsync(ShipmentStatus status, bool on)
+    {
+        var next = Value.ToHashSet();
+        if (on)
+        {
+            next.Add(status);
+        }
+        else
+        {
+            next.Remove(status);
+        }
+
+        return ValueChanged.InvokeAsync(next);
+    }
+
+    private Task ClearAsync() => ValueChanged.InvokeAsync(Array.Empty<ShipmentStatus>());
+}

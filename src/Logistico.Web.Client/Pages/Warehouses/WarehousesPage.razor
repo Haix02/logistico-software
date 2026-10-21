@@ -1,0 +1,112 @@
+@page "/warehouses"
+@inject OperationsApi Operations
+@inject NavigationManager Navigation
+
+<PageTitle>@L["Nav_Warehouses"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["WarehousesTitle"]" Subtitle="@L["WarehousesSubtitle"]" Icon="office">
+    <Actions>
+        <Button Icon="refresh" Minimal="true" Tip="@L["Refresh"]" Loading="loading" OnClick="LoadAsync" />
+        <Allowed Policy="@StaffPolicies.Administer">
+            <Button Intent="Intent.Primary" Icon="add" Text="@L["AddWarehouse"]" OnClick="@(() => Open(null))" />
+        </Allowed>
+    </Actions>
+</PageHeader>
+
+@if (list is null)
+{
+    <Skeleton Block="true" Lines="3" />
+}
+else
+{
+    var active = list.Items.Where(w => w.IsActive).ToList();
+    var capacity = active.Where(w => w.ShelfCapacity is > 0).ToList();
+    var use = capacity.Count == 0 ? (int?)null : (int)Math.Round(100.0 * capacity.Sum(w => w.Load.OnShelves) / capacity.Sum(w => w.ShelfCapacity!.Value));
+
+    <div class="lx-kpis">
+        <KpiCard Icon="office" Label="@L["Kpi_ActiveWarehouses"]" Value="@Fmt.Number(active.Count)" Intent="Intent.Primary"
+                 Hint="@string.Join(" · ", active.GroupBy(w => w.Kind).Select(g => $"{Fmt.Number(g.Count())} {ShipmentTexts.Of(g.Key)}"))" />
+        <KpiCard Icon="box" Label="@L["OnShelves"]" Value="@Fmt.Number(active.Sum(w => w.Load.OnShelves))" Intent="Intent.Primary" Href="shipments?inWarehouse=true" />
+        <KpiCard Icon="drive-time" Label="@L["WaitingForTruck"]" Value="@Fmt.Number(active.Sum(w => w.Load.ToTransfer))" Intent="@(active.Sum(w => w.Load.ToTransfer) > 0 ? Intent.Warning : Intent.Success)" Href="shipments?needsTransfer=true" />
+        <KpiCard Icon="dashboard" Label="@L["Kpi_ShelfUse"]" Value="@(use is { } u ? $"{Fmt.Number(u)}%" : "—")" Intent="@(use > 85 ? Intent.Danger : use > 65 ? Intent.Warning : Intent.Success)"
+                 Hint="@(use is null ? L["ShelfUseNoCapacity"].Value : null)" />
+        <KpiCard Icon="map" Label="@L["Kpi_Uncovered"]" Value="@Fmt.Number(list.UncoveredGovernorates.Count)" Intent="@(list.UncoveredGovernorates.Count > 0 ? Intent.Warning : Intent.Success)" />
+    </div>
+
+    @if (list.UncoveredGovernorates.Count > 0)
+    {
+        <Callout Intent="Intent.Warning" Icon="warning-sign" Title="@L["UncoveredTitle"]" CssClass="lx-mb">
+            @string.Format(CultureInfo.CurrentCulture, L["UncoveredHint"], string.Join("، ", list.UncoveredGovernorates.Select(g => $"{IraqGovernorates.NameOrCode(g)} → {HubCatalog.ResolveDestinationHub(g).RoutingTag}")))
+        </Callout>
+    }
+
+    <div class="lx-map-layout">
+        <div class="lx-card lx-map-card">
+            <CoverageMap Hubs="CoverageHubs" />
+        </div>
+
+        <div class="lx-stack" style="gap:14px">
+            @foreach (var w in active)
+            {
+                <WarehouseCard Warehouse="w" OnEdit="@(() => Open(w))" />
+            }
+        </div>
+    </div>
+
+    @if (list.Items.Any(w => !w.IsActive))
+    {
+        <Section Title="@L["RetiredWarehouses"]" Icon="disable" Collapsible="true" StartCollapsed="true" Padded="false">
+            <ul class="lx-list">
+                @foreach (var w in list.Items.Where(w => !w.IsActive))
+                {
+                    <li>
+                        <button type="button" class="lx-list-item" @onclick="@(() => Open(w))">
+                            <span class="lx-list-icon"><span class="lx-code" style="font-size:11px">@w.RoutingTag</span></span>
+                            <span class="lx-list-body">
+                                <span class="lx-list-title">@w.Name</span>
+                                <span class="lx-list-sub">@Fmt.Place(w.Governorate) · @string.Format(CultureInfo.CurrentCulture, L["UpdatedByAt"], w.UpdatedBy ?? "—", Fmt.DateTime(w.UpdatedAt))</span>
+                            </span>
+                            <Tag Minimal="true">@L["Inactive"]</Tag>
+                        </button>
+                    </li>
+                }
+            </ul>
+        </Section>
+    }
+}
+
+<WarehouseEditor @bind-IsOpen="editorOpen" Existing="editing" All="@(list?.Items ?? [])" OnSaved="SavedAsync" />
+
+@code {
+    private WarehouseList? list;
+    private bool loading;
+    private bool editorOpen;
+    private WarehouseDetails? editing;
+
+    private IReadOnlyList<HubInfo> CoverageHubs => list?.Items.Where(w => w.IsActive)
+        .Select(w => new HubInfo(w.Code, w.RoutingTag, w.Governorate, w.NameAr, w.NameEn) { Kind = w.Kind, Latitude = w.Latitude, Longitude = w.Longitude, Covers = w.Covers })
+        .ToList() ?? [];
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        loading = true;
+        try
+        {
+            list = await Operations.ListWarehousesAsync();
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private void Open(WarehouseDetails? warehouse)
+    {
+        editing = warehouse;
+        editorOpen = true;
+    }
+
+    private Task SavedAsync(WarehouseDetails saved) => LoadAsync();
+}

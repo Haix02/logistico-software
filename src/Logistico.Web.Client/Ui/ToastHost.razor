@@ -1,0 +1,23 @@
+@implements IDisposable
+@inject Toaster Toaster
+
+<div class="bp6-toast-container bp6-toast-container-top bp6-toast-container-in-portal lx-toasts" aria-live="polite">
+    @foreach (var toast in Toaster.Items)
+    {
+        <div class="@Bp.Cls("bp6-toast", Bp.IntentClass(toast.Intent), "bp6-overlay-content", "lx-toast")" role="status">
+            <Icon Name="@toast.Icon" />
+            <span class="bp6-toast-message">@toast.Message</span>
+            <div class="bp6-button-group bp6-minimal">
+                <Button Minimal="true" Icon="cross" Title="@L["Close"]" OnClick="@(() => Toaster.Dismiss(toast.Id))" />
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized() => Toaster.Changed += OnChanged;
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Toaster.Changed -= OnChanged;
+}

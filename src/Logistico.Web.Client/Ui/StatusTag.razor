@@ -1,0 +1,38 @@
+<Tag Intent="@IntentOf(Status)" Icon="@IconOf(Status)" Large="Large" Round="Round">@ShipmentTexts.Of(Status)</Tag>
+
+@code {
+    [Parameter, EditorRequired] public ShipmentStatus Status { get; set; }
+    [Parameter] public bool Large { get; set; }
+    [Parameter] public bool Round { get; set; }
+
+    public static Intent IntentOf(ShipmentStatus status) => status switch
+    {
+        ShipmentStatus.Delivered or ShipmentStatus.Released => Intent.Success,
+        ShipmentStatus.CustomsHold => Intent.Danger,
+        ShipmentStatus.DeliveryFailed or ShipmentStatus.CustomsPending or ShipmentStatus.ArrivedPortOfEntry
+            or ShipmentStatus.ReturnInitiated or ShipmentStatus.ReturnInTransit or ShipmentStatus.ReturnAtHub => Intent.Warning,
+        ShipmentStatus.Cancelled or ShipmentStatus.Returned or ShipmentStatus.Draft or ShipmentStatus.Booked => Intent.None,
+        _ => Intent.Primary,
+    };
+
+    public static string IconOf(ShipmentStatus status) => status switch
+    {
+        ShipmentStatus.Booked or ShipmentStatus.Draft => "document",
+        ShipmentStatus.PickedUp => "hand-up",
+        ShipmentStatus.ReceivedAtOrigin or ShipmentStatus.Consolidated => "office",
+        ShipmentStatus.DepartedOrigin or ShipmentStatus.InTransit => "airplane",
+        ShipmentStatus.ArrivedPortOfEntry => "map-marker",
+        ShipmentStatus.CustomsPending => "endorsed",
+        ShipmentStatus.CustomsHold => "ban-circle",
+        ShipmentStatus.Released => "unlock",
+        ShipmentStatus.AtWarehouse or ShipmentStatus.AtDestinationWarehouse => "box",
+        ShipmentStatus.ReadyForDispatch => "layers",
+        ShipmentStatus.OutForDelivery => "truck",
+        ShipmentStatus.Delivered => "tick-circle",
+        ShipmentStatus.DeliveryFailed => "warning-sign",
+        ShipmentStatus.InTransitToHub or ShipmentStatus.ReturnInTransit => "drive-time",
+        ShipmentStatus.ReturnInitiated or ShipmentStatus.ReturnAtHub or ShipmentStatus.Returned => "undo",
+        ShipmentStatus.Cancelled => "cross",
+        _ => "circle",
+    };
+}

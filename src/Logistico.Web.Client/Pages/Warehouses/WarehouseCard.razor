@@ -1,0 +1,76 @@
+@* One warehouse at a glance: identity, coverage, live workload, shelf use and quick actions. *@
+<article class="lx-card lx-warehouse-card">
+    <header class="lx-warehouse-head">
+        <span class="@Bp.Cls("lx-warehouse-tag", $"lx-warehouse-{Warehouse.Kind.ToString().ToLowerInvariant()}")"><bdi>@Warehouse.RoutingTag</bdi></span>
+        <div class="lx-warehouse-title">
+            <h3>@Warehouse.Name</h3>
+            <div class="lx-warehouse-meta">
+                <span><Icon Name="@KindIcon" /> @ShipmentTexts.Of(Warehouse.Kind)</span>
+                <span><Icon Name="map-marker" /> @Fmt.Place(Warehouse.Governorate)</span>
+                @if (Warehouse.ManagerName is { } manager)
+                {
+                    <span><Icon Name="person" /> <Mixed Text="@manager" /></span>
+                }
+                @if (Warehouse.Phone is { } phone)
+                {
+                    <span><Icon Name="phone" /> <PhoneText Value="@phone" /></span>
+                }
+            </div>
+        </div>
+        @if (Warehouse.IsPrimary)
+        {
+            <Tag Intent="Intent.Primary" Icon="star" Round="true">@L["MainWarehouseTag"]</Tag>
+        }
+        <Button Minimal="true" Small="true" Icon="edit" Tip="@L["Edit"]" OnClick="OnEdit" />
+    </header>
+
+    <div class="lx-warehouse-stats">
+        <a href="@($"shipments?hub={Warehouse.Code}&inWarehouse=true")"><strong>@Fmt.Number(Warehouse.Load.OnShelves)</strong><span>@L["OnShelves"]</span></a>
+        <a href="@($"shipments?hub={Warehouse.Code}&inWarehouse=true")"><strong>@Fmt.Number(Warehouse.Load.ToDispatch)</strong><span>@L["ToDispatch"]</span></a>
+        <a href="@($"transfers?hub={Warehouse.Code}")"><strong>@Fmt.Number(Warehouse.Load.ToTransfer)</strong><span>@L["WaitingForTruck"]</span></a>
+        <a href="@($"transfers?hub={Warehouse.Code}&status=InTransit")"><strong>@Fmt.Number(Warehouse.Load.InboundParcels)</strong><span>@L["InboundParcels"]</span></a>
+        <div><strong>@Fmt.Number(Warehouse.Load.DeliveredToday)</strong><span>@L["Kpi_DeliveredToday"]</span></div>
+        <a href="@($"automation?hub={Warehouse.Code}")" class="@Bp.Cls(Bp.When(Warehouse.Load.OpenAlerts > 0, "lx-stat-danger"))"><strong>@Fmt.Number(Warehouse.Load.OpenAlerts)</strong><span>@L["Kpi_OpenAlerts"]</span></a>
+    </div>
+
+    @if (Warehouse.Utilisation is { } use)
+    {
+        <div class="lx-warehouse-capacity">
+            <span class="lx-small">@L["Kpi_ShelfUse"]</span>
+            <ProgressBar Value="@(Math.Min(100, use) / 100.0)" Intent="@(use > 85 ? Intent.Danger : use > 65 ? Intent.Warning : Intent.Success)" />
+            <span class="lx-small lx-num">@string.Format(CultureInfo.CurrentCulture, L["ShelfUseN"], Fmt.Number(Warehouse.Load.OnShelves), Fmt.Number(Warehouse.ShelfCapacity ?? 0))</span>
+        </div>
+    }
+
+    <footer class="lx-warehouse-foot">
+        <div class="lx-warehouse-covers">
+            <span class="bp6-text-muted lx-small">@L["Covers"]</span>
+            @if (Warehouse.Covers.Count == 0)
+            {
+                <span class="bp6-text-muted lx-small">@L["CoversNothing"]</span>
+            }
+            @foreach (var g in Warehouse.Covers)
+            {
+                <Tag Minimal="true" Round="true">@Fmt.Place(g)</Tag>
+            }
+        </div>
+        <div class="lx-row">
+            <Allowed Policy="@StaffPolicies.Operate">
+                <LinkButton Href="@($"warehouse?hub={Warehouse.Code}")" Small="true" Icon="barcode" Text="@L["OpenStation"]" />
+            </Allowed>
+            <LinkButton Href="@($"shipments?hub={Warehouse.Code}&inWarehouse=true")" Small="true" Minimal="true" Icon="th" Text="@L["ParcelsHere"]" />
+        </div>
+    </footer>
+</article>
+
+@code {
+    [Parameter, EditorRequired] public WarehouseDetails Warehouse { get; set; } = default!;
+    [Parameter] public EventCallback OnEdit { get; set; }
+
+    private string KindIcon => Warehouse.Kind switch
+    {
+        HubKind.Branch => "shop",
+        HubKind.Fulfilment => "box",
+        _ => "office",
+    };
+}

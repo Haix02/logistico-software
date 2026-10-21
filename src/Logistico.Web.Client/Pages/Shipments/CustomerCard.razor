@@ -1,0 +1,98 @@
+@* What we already know about the customer behind a mobile number: history, return risk, last address, open orders. *@
+@if (Profile is null)
+{
+    return;
+}
+
+<div class="@Bp.Cls("lx-customer-card", $"lx-customer-{Profile.Risk.ToString().ToLowerInvariant()}")" role="status">
+    @if (Profile.Orders == 0)
+    {
+        <div class="lx-row"><Icon Name="new-person" /><strong>@L["Customer_New"]</strong><span class="bp6-text-muted lx-small">@L["Customer_NewHint"]</span></div>
+    }
+    else
+    {
+        <div class="lx-customer-head">
+            <Icon Name="person" />
+            <strong><Mixed Text="@Profile.Name" /></strong>
+            <Tag Intent="@RiskIntent" Round="true" Icon="@RiskIcon">@L["Risk_" + Profile.Risk]</Tag>
+            <span class="lx-spacer"></span>
+            <span class="bp6-text-muted lx-small">@string.Format(CultureInfo.CurrentCulture, L["Customer_LastOrder"], Fmt.Ago(Profile.LastOrderAt!.Value, L))</span>
+        </div>
+        <div class="lx-customer-stats">
+            <span><b>@Fmt.Number(Profile.Orders)</b> @L["Col_Orders"]</span>
+            <span><b>@Fmt.Number(Profile.Delivered)</b> @L["Col_Delivered"]</span>
+            <span class="@Bp.Cls(Bp.When(Profile.Returned > 0, "lx-text-warning"))"><b>@Fmt.Number(Profile.Returned)</b> @L["Customer_Returned"]</span>
+            @if (Profile.Refused > 0)
+            {
+                <span class="lx-text-danger"><b>@Fmt.Number(Profile.Refused)</b> @L["Customer_Refused"]</span>
+            }
+            <span><RateTag Value="Profile.SuccessRate" /></span>
+        </div>
+        @if (Profile.Risk is CustomerRisk.High or CustomerRisk.Medium)
+        {
+            <div class="lx-small lx-customer-advice"><Icon Name="lightbulb" /> @L[Profile.Risk == CustomerRisk.High ? "Risk_HighAdvice" : "Risk_MediumAdvice"]</div>
+        }
+        @if (Profile.Address is not null)
+        {
+            <div class="lx-customer-address">
+                <Icon Name="map-marker" />
+                <span class="lx-grow"><Mixed Text="@AddressLine" /></span>
+                @if (!IsSameAddress)
+                {
+                    <Button Small="true" Icon="import" Text="@L["Customer_UseAddress"]" OnClick="@(() => OnUseAddress.InvokeAsync(Profile))" />
+                }
+                else
+                {
+                    <Tag Minimal="true" Intent="Intent.Success" Icon="tick">@L["Customer_AddressUsed"]</Tag>
+                }
+            </div>
+        }
+        @if (Profile.Active.Count > 0)
+        {
+            <Callout Intent="@(Profile.Active.Any(o => o.MerchantId == MerchantId) ? Intent.Warning : Intent.Primary)" Icon="duplicate" CssClass="lx-mt-sm">
+                <div>@L.Count(Profile.Active.Any(o => o.MerchantId == MerchantId) ? "Customer_DuplicateN" : "Customer_ActiveN", Profile.Active.Count)</div>
+                <div class="lx-chips lx-mt-sm">
+                    @foreach (var o in Profile.Active)
+                    {
+                        <a class="lx-chip" href="@($"shipments/{o.Id}")" target="_blank">
+                            <span class="lx-code">@o.TrackingNumber</span>
+                            <span class="bp6-text-muted">@ShipmentTexts.Of(o.Status)</span>
+                            @if (o.MerchantId == MerchantId)
+                            {
+                                <Tag Minimal="true" Intent="Intent.Warning">@L["SameSeller"]</Tag>
+                            }
+                        </a>
+                    }
+                </div>
+            </Callout>
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public CustomerProfile? Profile { get; set; }
+    [Parameter] public Guid? MerchantId { get; set; }
+
+    /// <summary>Current address on the form, to tell whether the saved one is already used.</summary>
+    [Parameter] public string? CurrentAddress { get; set; }
+    [Parameter] public EventCallback<CustomerProfile> OnUseAddress { get; set; }
+
+    private bool IsSameAddress => string.Equals(CurrentAddress?.Trim(), Profile?.Address?.Trim(), StringComparison.Ordinal);
+
+    private string AddressLine => string.Join(" — ", new[] { Fmt.Place(Profile!.Governorate), Profile.City, Profile.Address, Profile.Landmark }.Where(s => !string.IsNullOrWhiteSpace(s)));
+
+    private Intent RiskIntent => Profile!.Risk switch
+    {
+        CustomerRisk.High => Intent.Danger,
+        CustomerRisk.Medium => Intent.Warning,
+        CustomerRisk.Low => Intent.Success,
+        _ => Intent.None,
+    };
+
+    private string RiskIcon => Profile!.Risk switch
+    {
+        CustomerRisk.High => "error",
+        CustomerRisk.Medium => "warning-sign",
+        _ => "shield",
+    };
+}

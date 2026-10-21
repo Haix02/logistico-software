@@ -1,0 +1,44 @@
+<Section Title="@L["DomesticPipeline"]" Subtitle="@L["DomesticPipelineHint"]" Icon="shop" CssClass="lx-dashboard-flow-section">
+    <div class="lx-flow" role="list">
+        @foreach (var stage in Stages)
+        {
+            <a class="@Bp.Cls("lx-flow-step", stage.Tone is null ? null : $"lx-flow-{stage.Tone}")" href="@stage.Href" role="listitem">
+                <span class="lx-flow-icon"><Icon Name="@stage.Icon" /></span>
+                <span class="lx-flow-label">@stage.Label</span>
+                <strong>@Fmt.Number(stage.Count)</strong>
+            </a>
+        }
+    </div>
+    <div class="lx-flow-exceptions">
+        <a href="shipments?status=DeliveryFailed">
+            <Icon Name="warning-sign" />
+            <span>@L["View_Failed"]</span>
+            <strong>@Fmt.Number(Count(ShipmentStatus.DeliveryFailed))</strong>
+        </a>
+        <a href="returns">
+            <Icon Name="undo" />
+            <span>@L["Kpi_Returned"]</span>
+            <strong>@Fmt.Number(Count(ShipmentStatus.ReturnInitiated, ShipmentStatus.ReturnInTransit, ShipmentStatus.ReturnAtHub))</strong>
+        </a>
+    </div>
+</Section>
+
+@code {
+    private sealed record FlowStage(string Icon, string Label, int Count, string Href, string? Tone = null);
+
+    [Parameter, EditorRequired] public ShipmentsSummary Summary { get; set; } = default!;
+    [Parameter, EditorRequired] public AnalyticsOverview Analytics { get; set; } = default!;
+
+    private IReadOnlyList<FlowStage> Stages =>
+    [
+        new("shopping-cart", ShipmentTexts.Of(ShipmentStatus.Booked), Count(ShipmentStatus.Booked), "shipments?service=Domestic&status=Booked"),
+        new("cube-add", ShipmentTexts.Of(ShipmentStatus.PickedUp), Count(ShipmentStatus.PickedUp), "shipments?service=Domestic&status=PickedUp"),
+        new("office", L["View_InWarehouse"], Count(ShipmentStatus.AtWarehouse, ShipmentStatus.ReadyForDispatch), "shipments?service=Domestic&inWarehouse=true"),
+        new("drive-time", ShipmentTexts.Of(ShipmentStatus.InTransitToHub), Count(ShipmentStatus.InTransitToHub), "shipments?service=Domestic&status=InTransitToHub"),
+        new("truck", ShipmentTexts.Of(ShipmentStatus.OutForDelivery), Count(ShipmentStatus.OutForDelivery), "shipments?service=Domestic&status=OutForDelivery"),
+        new("tick-circle", L["Kpi_Delivered"], (int)Analytics.Delivered.Value, "shipments?service=Domestic&status=Delivered", "success"),
+    ];
+
+    private int Count(params ShipmentStatus[] statuses) =>
+        Summary.Counts.Where(c => c.ServiceType == ServiceType.Domestic && statuses.Contains(c.Status)).Sum(c => c.Count);
+}

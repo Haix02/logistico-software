@@ -1,0 +1,1149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Action_PlaceHold" xml:space="preserve"><value>حجز جمركي</value></data>
+  <data name="Action_RegisterAsycuda" xml:space="preserve"><value>تسجيل ونقل إلى «في الجمارك»</value></data>
+  <data name="Action_ReleaseCustoms" xml:space="preserve"><value>إفراج جمركي عن الشحنة</value></data>
+  <data name="Action_SaveDeclaration" xml:space="preserve"><value>حفظ البيانات</value></data>
+  <data name="ActionBarcodesSubtitle" xml:space="preserve"><value>اطبع هذه الورقة على طاولة الفرز لتبديل وضع الاستلام والتسليم والمحطة والرف بمجرد مسح الباركود</value></data>
+  <data name="ActionBarcodesTitle" xml:space="preserve"><value>باركودات الأوامر السريعة (امسح بالجهاز أو اضغط للتنفيذ)</value></data>
+  <data name="Active" xml:space="preserve"><value>فعّال</value></data>
+  <data name="ActiveCourier" xml:space="preserve"><value>مندوب فعّال (متاح لاستلام الطرود)</value></data>
+  <data name="ActiveSeller" xml:space="preserve"><value>متجر فعّال (يمكن إنشاء طلبات له)</value></data>
+  <data name="ActivityLog" xml:space="preserve"><value>سجل النشاط</value></data>
+  <data name="Add" xml:space="preserve"><value>إضافة</value></data>
+  <data name="AddressPlaceholder" xml:space="preserve"><value>المحلة، الزقاق، رقم الدار</value></data>
+  <data name="AddWarehouse" xml:space="preserve"><value>إضافة مخزن</value></data>
+  <data name="Ago_Days" xml:space="preserve"><value>قبل {0} يوم</value></data>
+  <data name="Ago_Days_Few" xml:space="preserve"><value>قبل {0} أيام</value></data>
+  <data name="Ago_Days_Many" xml:space="preserve"><value>قبل {0} يومًا</value></data>
+  <data name="Ago_Days_One" xml:space="preserve"><value>قبل يوم</value></data>
+  <data name="Ago_Days_Two" xml:space="preserve"><value>قبل يومين</value></data>
+  <data name="Ago_Hours" xml:space="preserve"><value>قبل {0} ساعة</value></data>
+  <data name="Ago_Hours_Few" xml:space="preserve"><value>قبل {0} ساعات</value></data>
+  <data name="Ago_Hours_One" xml:space="preserve"><value>قبل ساعة</value></data>
+  <data name="Ago_Hours_Two" xml:space="preserve"><value>قبل ساعتين</value></data>
+  <data name="Ago_JustNow" xml:space="preserve"><value>الآن</value></data>
+  <data name="Ago_Minutes" xml:space="preserve"><value>قبل {0} دقيقة</value></data>
+  <data name="Ago_Minutes_Few" xml:space="preserve"><value>قبل {0} دقائق</value></data>
+  <data name="Ago_Minutes_One" xml:space="preserve"><value>قبل دقيقة</value></data>
+  <data name="Ago_Minutes_Two" xml:space="preserve"><value>قبل دقيقتين</value></data>
+  <data name="Alerts_Title" xml:space="preserve"><value>التنبيهات</value></data>
+  <data name="All" xml:space="preserve"><value>الكل</value></data>
+  <data name="AllGovernorates" xml:space="preserve"><value>كل المحافظات</value></data>
+  <data name="AllHubs" xml:space="preserve"><value>كل المراكز</value></data>
+  <data name="AllLanes" xml:space="preserve"><value>كل مسارات الانتقائية</value></data>
+  <data name="AllOffices" xml:space="preserve"><value>كل المنافذ الجمركية</value></data>
+  <data name="AllSellers" xml:space="preserve"><value>كل المتاجر</value></data>
+  <data name="AllSources" xml:space="preserve"><value>كل المصادر</value></data>
+  <data name="AllStatuses" xml:space="preserve"><value>كل الحالات</value></data>
+  <data name="AllTypes" xml:space="preserve"><value>كل الأنواع</value></data>
+  <data name="AmountToPay" xml:space="preserve"><value>المبلغ المطلوب عند الاستلام</value></data>
+  <data name="AnySeller" xml:space="preserve"><value>أي متجر</value></data>
+  <data name="ApplyAndResolve" xml:space="preserve"><value>تطبيق على الطلب</value></data>
+  <data name="AppName" xml:space="preserve"><value>لوجستيكو</value></data>
+  <data name="AreaPlaceholder" xml:space="preserve"><value>مثال: الكرادة، المنصور</value></data>
+  <data name="Arrived" xml:space="preserve"><value>وصلت</value></data>
+  <data name="ArrivedAt" xml:space="preserve"><value>وصلت {0}</value></data>
+  <data name="AtOurHubIn" xml:space="preserve"><value>في مركزنا في {0}</value></data>
+  <data name="Attempts" xml:space="preserve"><value>محاولات التسليم</value></data>
+  <data name="AttemptsN" xml:space="preserve"><value>{0} محاولة</value></data>
+  <data name="AttemptsN_Few" xml:space="preserve"><value>{0} محاولات</value></data>
+  <data name="AttemptsN_One" xml:space="preserve"><value>محاولة واحدة</value></data>
+  <data name="AttemptsN_Two" xml:space="preserve"><value>محاولتان</value></data>
+  <data name="AutoCancelledN" xml:space="preserve"><value>{0} أُلغيت تلقائياً</value></data>
+  <data name="AutomationRan" xml:space="preserve"><value>فحصت الأتمتة كل شيء الآن</value></data>
+  <data name="AutomationSubtitle" xml:space="preserve"><value>قواعد تعمل كل دقيقة: المرتجعات، مواعيد التوصيل الجديدة، الشاحنات، التنبيهات ورسائل الزبائن.</value></data>
+  <data name="AutomationTitle" xml:space="preserve"><value>الأتمتة والتنبيهات</value></data>
+  <data name="AwaitingConfirmationNotice" xml:space="preserve"><value>بانتظار تأكيد الزبون (طُلب {0}). لا يمكن استلامه قبل ذلك.</value></data>
+  <data name="Awb_CollectCash" xml:space="preserve"><value>مبلغ الدفع عند الاستلام (تحصيل نقدي)</value></data>
+  <data name="Awb_Consignee" xml:space="preserve"><value>المستلم (عنوان التوصيل)</value></data>
+  <data name="Awb_Prepaid" xml:space="preserve"><value>مدفوع مسبقاً — لا يوجد تحصيل</value></data>
+  <data name="Awb_Shipper" xml:space="preserve"><value>المرسل (المتجر / الشاحن)</value></data>
+  <data name="Back" xml:space="preserve"><value>رجوع</value></data>
+  <data name="BatchBookedToast" xml:space="preserve"><value>تم حجز {0} طلبات وهي جاهزة للطباعة</value></data>
+  <data name="BatchPastePlaceholder" xml:space="preserve"><value>الصق كل طلب في سطر: الاسم - 0770... - المحافظة والعنوان - أقرب نقطة دالة - المواد - المبلغ</value></data>
+  <data name="BatchPasteSubtitle" xml:space="preserve"><value>الصق كل طلب في سطر (أو افصل بينها بسطر فارغ) لحجزها وطباعة بوليصاتها بضغطة واحدة</value></data>
+  <data name="BatchPasteTitle" xml:space="preserve"><value>لصق دفعة طلبات (واتساب / إكسل)</value></data>
+  <data name="BatchSampleAction" xml:space="preserve"><value>تجربة دفعة جاهزة (4 طلبات)</value></data>
+  <data name="Board_Booked" xml:space="preserve"><value>جديدة وواردة</value></data>
+  <data name="BookBatchN" xml:space="preserve"><value>حجز {0} طلب</value></data>
+  <data name="BookBatchN_Few" xml:space="preserve"><value>حجز {0} طلبات</value></data>
+  <data name="BookBatchN_One" xml:space="preserve"><value>حجز طلب واحد</value></data>
+  <data name="BookBatchN_Two" xml:space="preserve"><value>حجز طلبين</value></data>
+  <data name="BookShipment" xml:space="preserve"><value>حجز الشحنة</value></data>
+  <data name="BulkDispatch" xml:space="preserve"><value>تسليم للمندوب</value></data>
+  <data name="BulkDone" xml:space="preserve"><value>اكتملت العملية الجماعية: {0} بنجاح، {1} تعذر</value></data>
+  <data name="BulkLoad" xml:space="preserve"><value>تحميل على الشاحنة</value></data>
+  <data name="BulkPrintAwb" xml:space="preserve"><value>طباعة بوليصات ⁦4×6⁩</value></data>
+  <data name="BulkReceive" xml:space="preserve"><value>استلام في المخزن</value></data>
+  <data name="ByGovernorate" xml:space="preserve"><value>حسب المحافظة</value></data>
+  <data name="CameraNotSupported" xml:space="preserve"><value>يتطلب المسح بالكاميرا متصفح Chrome أو Edge أو هاتف أندرويد مع السماح بصلاحية الكاميرا.</value></data>
+  <data name="CameraScan" xml:space="preserve"><value>مسح بالكاميرا</value></data>
+  <data name="CameraScanHint" xml:space="preserve"><value>وجّه كاميرا الهاتف أو الحاسوب نحو باركود البوليصة أو رمز الأمر ليتم المسح تلقائياً.</value></data>
+  <data name="CameraScanTitle" xml:space="preserve"><value>مسح الباركود بالكاميرا</value></data>
+  <data name="Cancel" xml:space="preserve"><value>إلغاء</value></data>
+  <data name="CancelAfterPickupHint" xml:space="preserve"><value>الطرد لدينا: سيعود إلى المتجر كمرتجع.</value></data>
+  <data name="CancelBeforePickupHint" xml:space="preserve"><value>لم يُستلم الطرد بعد: سيُلغى الطلب.</value></data>
+  <data name="CancelOrder" xml:space="preserve"><value>إلغاء الطلب</value></data>
+  <data name="CancelReasonPlaceholder" xml:space="preserve"><value>مثلاً: ألغاه المتجر، الزبون طلب مرتين</value></data>
+  <data name="Capability_Care" xml:space="preserve"><value>مكالمات التأكيد وطلبات الزبائن ورسائلهم</value></data>
+  <data name="ChangedBy" xml:space="preserve"><value>عُدّلت {0} بواسطة {1}</value></data>
+  <data name="Chargeable" xml:space="preserve"><value>الوزن المحتسب</value></data>
+  <data name="ChargeableRule" xml:space="preserve"><value>القاعدة</value></data>
+  <data name="ChooseCourier" xml:space="preserve"><value>اختر المندوب…</value></data>
+  <data name="ChooseCourierFirst" xml:space="preserve"><value>اختر المندوب أولاً.</value></data>
+  <data name="ChooseGovernorate" xml:space="preserve"><value>اختر المحافظة…</value></data>
+  <data name="ChooseReason" xml:space="preserve"><value>اختر السبب…</value></data>
+  <data name="ChooseSeller" xml:space="preserve"><value>اختر المتجر…</value></data>
+  <data name="ChooseSellerFirst" xml:space="preserve"><value>اختر المتجر الذي يعود له هذا الطلب.</value></data>
+  <data name="Clear" xml:space="preserve"><value>مسح</value></data>
+  <data name="ClearedAutomatically" xml:space="preserve"><value>زال تلقائياً</value></data>
+  <data name="ClearFilters" xml:space="preserve"><value>مسح الفلاتر</value></data>
+  <data name="ClearSelection" xml:space="preserve"><value>إلغاء التحديد</value></data>
+  <data name="Close" xml:space="preserve"><value>إغلاق</value></data>
+  <data name="Closed" xml:space="preserve"><value>مغلقة</value></data>
+  <data name="CloseManifest" xml:space="preserve"><value>إغلاق الكشف</value></data>
+  <data name="CloseManifestMissing" xml:space="preserve"><value>لم يُمسح {0} طرد عند التفريغ. إغلاق الكشف يجعلها مفقودة وينشئ تنبيهات.</value></data>
+  <data name="CloseManifestMissing_Few" xml:space="preserve"><value>لم تُمسح {0} طرود عند التفريغ. إغلاق الكشف يجعلها مفقودة وينشئ تنبيهات.</value></data>
+  <data name="CloseManifestMissing_Many" xml:space="preserve"><value>لم يُمسح {0} طردًا عند التفريغ. إغلاق الكشف يجعلها مفقودة وينشئ تنبيهات.</value></data>
+  <data name="CloseManifestMissing_One" xml:space="preserve"><value>لم يُمسح طرد واحد عند التفريغ. إغلاق الكشف يجعله مفقودًا وينشئ تنبيهًا.</value></data>
+  <data name="CloseManifestMissing_Two" xml:space="preserve"><value>لم يُمسح طردان عند التفريغ. إغلاق الكشف يجعلهما مفقودين وينشئ تنبيهات.</value></data>
+  <data name="CloseManifestOk" xml:space="preserve"><value>تم تفريغ كل الطرود. هل تريد إغلاق الكشف؟</value></data>
+  <data name="CodHelper" xml:space="preserve"><value>المبلغ الذي يستلمه المندوب من الزبون. اتركه فارغاً إذا كان مدفوعاً مسبقاً.</value></data>
+  <data name="CodTotal" xml:space="preserve"><value>الدفع عند الاستلام</value></data>
+  <data name="Col_Action" xml:space="preserve"><value>العملية</value></data>
+  <data name="Col_Age" xml:space="preserve"><value>منذ</value></data>
+  <data name="Col_Alert" xml:space="preserve"><value>التنبيه</value></data>
+  <data name="Col_AvgDelivery" xml:space="preserve"><value>متوسط المدة</value></data>
+  <data name="Col_CashOnRun" xml:space="preserve"><value>النقد في الذمة (د.ع)</value></data>
+  <data name="Col_Cod" xml:space="preserve"><value>المبلغ عند الاستلام</value></data>
+  <data name="Col_Compliance" xml:space="preserve"><value>التحقق الإلكتروني</value></data>
+  <data name="Col_Created" xml:space="preserve"><value>تاريخ الإنشاء</value></data>
+  <data name="Col_Customer" xml:space="preserve"><value>الزبون</value></data>
+  <data name="Col_Declaration" xml:space="preserve"><value>رقم أسيكودا</value></data>
+  <data name="Col_Delivered" xml:space="preserve"><value>مُسلَّمة</value></data>
+  <data name="Col_DeliveredToday" xml:space="preserve"><value>سلّم اليوم</value></data>
+  <data name="Col_DeliveredUnsettled" xml:space="preserve"><value>مسلّمة (غير مسددة)</value></data>
+  <data name="Col_DeliveryFees" xml:space="preserve"><value>أجور التوصيل</value></data>
+  <data name="Col_Destination" xml:space="preserve"><value>الوجهة</value></data>
+  <data name="Col_Details" xml:space="preserve"><value>التفاصيل</value></data>
+  <data name="Col_Driver" xml:space="preserve"><value>السائق</value></data>
+  <data name="Col_Due" xml:space="preserve"><value>الانتظار</value></data>
+  <data name="Col_DutiesIqd" xml:space="preserve"><value>الرسوم والضرائب (د.ع)</value></data>
+  <data name="Col_Eta" xml:space="preserve"><value>الموعد المتوقع</value></data>
+  <data name="Col_GrossCod" xml:space="preserve"><value>إجمالي المستلم</value></data>
+  <data name="Col_Hub" xml:space="preserve"><value>المحطة</value></data>
+  <data name="Col_InProgressCod" xml:space="preserve"><value>قيد التوصيل</value></data>
+  <data name="Col_Lane" xml:space="preserve"><value>المسار</value></data>
+  <data name="Col_Manifest" xml:space="preserve"><value>الكشف</value></data>
+  <data name="Col_Message" xml:space="preserve"><value>الرسالة</value></data>
+  <data name="Col_NetPayout" xml:space="preserve"><value>صافي مستحق المتجر</value></data>
+  <data name="Col_Office" xml:space="preserve"><value>المنفذ الجمركي</value></data>
+  <data name="Col_Orders" xml:space="preserve"><value>الطلبات</value></data>
+  <data name="Col_OutNow" xml:space="preserve"><value>معه الآن</value></data>
+  <data name="Col_PayoutMethod" xml:space="preserve"><value>طريقة الدفع</value></data>
+  <data name="Col_Raised" xml:space="preserve"><value>منذ</value></data>
+  <data name="Col_Rating" xml:space="preserve"><value>التقييم</value></data>
+  <data name="Col_Request" xml:space="preserve"><value>الطلب</value></data>
+  <data name="Col_Route" xml:space="preserve"><value>المسار</value></data>
+  <data name="Col_Seller" xml:space="preserve"><value>المتجر / المرسل</value></data>
+  <data name="Col_Service" xml:space="preserve"><value>الخدمة</value></data>
+  <data name="Col_SettledAt" xml:space="preserve"><value>تاريخ التسوية</value></data>
+  <data name="Col_SettlementNo" xml:space="preserve"><value>رقم التسوية</value></data>
+  <data name="Col_Shipment" xml:space="preserve"><value>الشحنة</value></data>
+  <data name="Col_Source" xml:space="preserve"><value>المصدر</value></data>
+  <data name="Col_Status" xml:space="preserve"><value>الحالة</value></data>
+  <data name="Col_Subject" xml:space="preserve"><value>يخص</value></data>
+  <data name="Col_SuccessRate" xml:space="preserve"><value>النجاح</value></data>
+  <data name="Col_Text" xml:space="preserve"><value>النص</value></data>
+  <data name="Col_Time" xml:space="preserve"><value>الوقت</value></data>
+  <data name="Col_Timing" xml:space="preserve"><value>التوقيت</value></data>
+  <data name="Col_Tracking" xml:space="preserve"><value>رقم التتبع</value></data>
+  <data name="Col_Truck" xml:space="preserve"><value>الشاحنة</value></data>
+  <data name="Col_Type" xml:space="preserve"><value>النوع</value></data>
+  <data name="Col_Vehicle" xml:space="preserve"><value>المركبة واللوحة</value></data>
+  <data name="Col_Waiting" xml:space="preserve"><value>المدة</value></data>
+  <data name="Col_WaitingFor" xml:space="preserve"><value>ينتظر منذ</value></data>
+  <data name="CollapseMenu" xml:space="preserve"><value>طي القائمة</value></data>
+  <data name="Collected" xml:space="preserve"><value>تم الاستلام</value></data>
+  <data name="Confirm" xml:space="preserve"><value>تأكيد</value></data>
+  <data name="ConfirmationRecordedN" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="ConfirmationRules" xml:space="preserve"><value>قواعد التأكيد</value></data>
+  <data name="ConfirmationSearch" xml:space="preserve"><value>رقم التتبع أو الموبايل أو اسم الزبون…</value></data>
+  <data name="ConfirmationsSubtitle" xml:space="preserve"><value>طلبات الدفع عند الاستلام التي تنتظر تأكيد الزبون قبل استلامها من المتجر. الاتصال أولاً يوفّر المشاوير والمرتجعات.</value></data>
+  <data name="ConfirmationsTitle" xml:space="preserve"><value>تأكيد الطلبات</value></data>
+  <data name="ConfirmedNotice" xml:space="preserve"><value>أكّده {0}. جاهز للاستلام.</value></data>
+  <data name="ConfirmSettlement" xml:space="preserve"><value>تأكيد وتسجيل الدفعة</value></data>
+  <data name="ConfirmWhatsApp" xml:space="preserve"><value>مرحباً {0}، طلبك من {1} بمبلغ {2} جاهز للإرسال. يرجى تأكيده من هنا: {3}</value></data>
+  <data name="Copied" xml:space="preserve"><value>تم النسخ</value></data>
+  <data name="Copy" xml:space="preserve"><value>نسخ</value></data>
+  <data name="CopyLink" xml:space="preserve"><value>نسخ الرابط</value></data>
+  <data name="CopyTrackingLink" xml:space="preserve"><value>نسخ رابط التتبع</value></data>
+  <data name="CourierLeaderboard" xml:space="preserve"><value>المندوبون</value></data>
+  <data name="CourierPlaceholder" xml:space="preserve"><value>اسم المندوب أو رمزه</value></data>
+  <data name="CourierSaved" xml:space="preserve"><value>تم حفظ بيانات المندوب «{0}»</value></data>
+  <data name="CoverageHint" xml:space="preserve"><value>طلبات هذه المحافظات تُسلَّم من هذا المخزن، وطرود البائعين فيها تُستلم هنا.</value></data>
+  <data name="CoverageMap" xml:space="preserve"><value>خريطة التغطية</value></data>
+  <data name="CoverageMovesN" xml:space="preserve"><value>ستنتقل إلى هذا المخزن: {0}</value></data>
+  <data name="CoveredByN" xml:space="preserve"><value>يخدمها الآن {0}</value></data>
+  <data name="Covers" xml:space="preserve"><value>يخدم</value></data>
+  <data name="CoversNothing" xml:space="preserve"><value>لا محافظات</value></data>
+  <data name="Created" xml:space="preserve"><value>أُنشئ</value></data>
+  <data name="CreateOrder" xml:space="preserve"><value>إنشاء طلب التوصيل</value></data>
+  <data name="CriticalN" xml:space="preserve"><value>{0} حرجة</value></data>
+  <data name="CurrentlyAt" xml:space="preserve"><value>موجودة الآن في</value></data>
+  <data name="Customer_ActiveN" xml:space="preserve"><value>لدى الزبون {0} طلب قيد التوصيل.</value></data>
+  <data name="Customer_ActiveN_Few" xml:space="preserve"><value>لدى الزبون {0} طلبات قيد التوصيل.</value></data>
+  <data name="Customer_ActiveN_One" xml:space="preserve"><value>لدى الزبون طلب قيد التوصيل.</value></data>
+  <data name="Customer_ActiveN_Two" xml:space="preserve"><value>لدى الزبون طلبان قيد التوصيل.</value></data>
+  <data name="Customer_AddressUsed" xml:space="preserve"><value>تمت تعبئة العنوان</value></data>
+  <data name="Customer_DuplicateN" xml:space="preserve"><value>طلب مكرر محتمل: لدى الزبون {0} طلب مفتوح، منها من هذا المتجر.</value></data>
+  <data name="Customer_DuplicateN_Few" xml:space="preserve"><value>طلب مكرر محتمل: لدى الزبون {0} طلبات مفتوحة، منها من هذا المتجر.</value></data>
+  <data name="Customer_DuplicateN_One" xml:space="preserve"><value>طلب مكرر محتمل: لدى الزبون طلب مفتوح من هذا المتجر.</value></data>
+  <data name="Customer_DuplicateN_Two" xml:space="preserve"><value>طلب مكرر محتمل: لدى الزبون طلبان مفتوحان، منهما من هذا المتجر.</value></data>
+  <data name="Customer_LastOrder" xml:space="preserve"><value>آخر طلب {0}</value></data>
+  <data name="Customer_New" xml:space="preserve"><value>زبون جديد</value></data>
+  <data name="Customer_NewHint" xml:space="preserve"><value>لا طلبات سابقة بهذا الرقم.</value></data>
+  <data name="Customer_Refused" xml:space="preserve"><value>رفض الاستلام</value></data>
+  <data name="Customer_Returned" xml:space="preserve"><value>مرتجع</value></data>
+  <data name="Customer_UseAddress" xml:space="preserve"><value>استخدم هذا العنوان</value></data>
+  <data name="CustomerHistory" xml:space="preserve"><value>سجل الزبون</value></data>
+  <data name="CustomerMessages" xml:space="preserve"><value>رسائل الزبائن</value></data>
+  <data name="CustomerPays" xml:space="preserve"><value>يدفع الزبون</value></data>
+  <data name="CustomerRequestHint_Cancel" xml:space="preserve"><value>قبل أن نستلمه</value></data>
+  <data name="CustomerRequestHint_ChangeAddress" xml:space="preserve"><value>عنوان خاطئ أو جديد</value></data>
+  <data name="CustomerRequestHint_ChangePhone" xml:space="preserve"><value>تواصلوا معي على رقم آخر</value></data>
+  <data name="CustomerRequestHint_Complaint" xml:space="preserve"><value>أخبرنا بما حدث</value></data>
+  <data name="CustomerRequestHint_Reschedule" xml:space="preserve"><value>اختر يوماً يناسبك</value></data>
+  <data name="CustomerRequestHint_Return" xml:space="preserve"><value>إرجاعه إلى المتجر</value></data>
+  <data name="CustomsDialogTitle" xml:space="preserve"><value>تصريحة أسيكودا الجمركية — {0}</value></data>
+  <data name="CustomsSaved" xml:space="preserve"><value>تم تحديث التصريحة الجمركية للشحنة {0}</value></data>
+  <data name="CustomsSearchPlaceholder" xml:space="preserve"><value>ابحث برقم التتبع، رقم تصريحة أسيكودا، المستورد أو الرمز المنسق HS…</value></data>
+  <data name="CustomsSubtitle" xml:space="preserve"><value>تصاريح الشحن الدولي، التحقق الإلكتروني الإلزامي (شهادة المنشأ والفاتورة)، مسارات الانتقائية وتصدير ملف ⁦SAD XML⁩</value></data>
+  <data name="CustomsTitle" xml:space="preserve"><value>الجمارك ونظام أسيكودا العالمي</value></data>
+  <data name="DailyVolume" xml:space="preserve"><value>الحركة اليومية</value></data>
+  <data name="DailyVolumeHint" xml:space="preserve"><value>{0} – {1}، طلبات التوصيل المحلي</value></data>
+  <data name="DashboardTitle" xml:space="preserve"><value>نظرة عامة على العمليات</value></data>
+  <data name="Date" xml:space="preserve"><value>التاريخ</value></data>
+  <data name="Days" xml:space="preserve"><value>يوم</value></data>
+  <data name="DaysN" xml:space="preserve"><value>{0} يوم</value></data>
+  <data name="DaysN_Few" xml:space="preserve"><value>{0} أيام</value></data>
+  <data name="DaysN_Many" xml:space="preserve"><value>{0} يومًا</value></data>
+  <data name="DaysN_One" xml:space="preserve"><value>يوم واحد</value></data>
+  <data name="DaysN_Two" xml:space="preserve"><value>يومان</value></data>
+  <data name="DeclineOrder" xml:space="preserve"><value>الزبون رفض الطلب</value></data>
+  <data name="DeclineOrderHint" xml:space="preserve"><value>سيُلغى الطلب ويبقى عند المتجر.</value></data>
+  <data name="DeclineReasonPlaceholder" xml:space="preserve"><value>مثلاً: غيّر رأيه، منتج خاطئ</value></data>
+  <data name="Delivered" xml:space="preserve"><value>تم التسليم</value></data>
+  <data name="DeliveredOn" xml:space="preserve"><value>تم التسليم في</value></data>
+  <data name="DeliveringTo" xml:space="preserve"><value>التوصيل إلى</value></data>
+  <data name="Depart" xml:space="preserve"><value>مغادرة الشاحنة</value></data>
+  <data name="DepartConfirm" xml:space="preserve"><value>سيغادر {0} طرد محمّل إلى {1}. الطرود المخططة غير المحمّلة تبقى في المركز.</value></data>
+  <data name="DepartConfirm_Few" xml:space="preserve"><value>ستغادر {0} طرود محمّلة إلى {1}. الطرود المخططة غير المحمّلة تبقى في المركز.</value></data>
+  <data name="DepartConfirm_Many" xml:space="preserve"><value>سيغادر {0} طردًا محمّلًا إلى {1}. الطرود المخططة غير المحمّلة تبقى في المركز.</value></data>
+  <data name="DepartConfirm_One" xml:space="preserve"><value>سيغادر طرد واحد محمّل إلى {1}. الطرود المخططة غير المحمّلة تبقى في المركز.</value></data>
+  <data name="DepartConfirm_Two" xml:space="preserve"><value>سيغادر طردان محمّلان إلى {1}. الطرود المخططة غير المحمّلة تبقى في المركز.</value></data>
+  <data name="Departed" xml:space="preserve"><value>غادرت</value></data>
+  <data name="DepartsTonight" xml:space="preserve"><value>قيد التحميل — المغادرة 08:00 أو 21:00</value></data>
+  <data name="DestinationHub" xml:space="preserve"><value>مركز الوجهة</value></data>
+  <data name="Dispatch" xml:space="preserve"><value>تسليم للمندوب</value></data>
+  <data name="DispatchedWith" xml:space="preserve"><value>خرجت للتوصيل مع {0}</value></data>
+  <data name="DomesticPipeline" xml:space="preserve"><value>التوصيل المحلي حسب المرحلة</value></data>
+  <data name="DomesticPipelineHint" xml:space="preserve"><value>طلبات متاجر انستغرام والمتاجر الإلكترونية</value></data>
+  <data name="DownloadSadXml" xml:space="preserve"><value>تنزيل ملف أسيكودا ⁦SAD XML⁩</value></data>
+  <data name="DownloadStatement" xml:space="preserve"><value>كشف CSV</value></data>
+  <data name="DropOff" xml:space="preserve"><value>المتجر يسلّم بنفسه</value></data>
+  <data name="Edit" xml:space="preserve"><value>تعديل</value></data>
+  <data name="EditCourier" xml:space="preserve"><value>تعديل بيانات المندوب</value></data>
+  <data name="EditMovesHub" xml:space="preserve"><value>سيُسلَّم الطرد من {0}.</value></data>
+  <data name="EditOrder" xml:space="preserve"><value>تعديل الطلب</value></data>
+  <data name="EditOrderHint" xml:space="preserve"><value>يمكن التصحيح حتى خروج الطرد مع المندوب. كل تعديل يُحفظ في سجل الطلب باسمك.</value></data>
+  <data name="EditOrderN" xml:space="preserve"><value>تعديل {0}</value></data>
+  <data name="EditSeller" xml:space="preserve"><value>تعديل بيانات المتجر</value></data>
+  <data name="EditWarehouseN" xml:space="preserve"><value>تعديل {0}</value></data>
+  <data name="EtaAt" xml:space="preserve"><value>متوقعة {0}</value></data>
+  <data name="ExpectedArrival" xml:space="preserve"><value>الوصول المتوقع</value></data>
+  <data name="ExpectedBy" xml:space="preserve"><value>متوقع بتاريخ</value></data>
+  <data name="ExportCsv" xml:space="preserve"><value>تصدير CSV</value></data>
+  <data name="FailedAttempt" xml:space="preserve"><value>تعذّر</value></data>
+  <data name="FailedAttemptCallout" xml:space="preserve"><value>فشلت محاولة التسليم رقم {0}: {1}.</value></data>
+  <data name="FailedAttemptsN" xml:space="preserve"><value>{0} محاولة فاشلة</value></data>
+  <data name="FailedAttemptsN_Few" xml:space="preserve"><value>{0} محاولات فاشلة</value></data>
+  <data name="FailedAttemptsN_One" xml:space="preserve"><value>محاولة فاشلة واحدة</value></data>
+  <data name="FailedAttemptsN_Two" xml:space="preserve"><value>محاولتان فاشلتان</value></data>
+  <data name="FailureReasons" xml:space="preserve"><value>أسباب فشل التوصيل</value></data>
+  <data name="FailureReasonsHint" xml:space="preserve"><value>المحاولات الفاشلة خلال الفترة</value></data>
+  <data name="FailureWillReschedule" xml:space="preserve"><value>المحاولة {0} من {1}. سيُعاد التوصيل في يوم العمل التالي.</value></data>
+  <data name="FailureWillReturn" xml:space="preserve"><value>هذه المحاولة الأخيرة ({0}). ستُعاد الشحنة إلى المتجر تلقائياً.</value></data>
+  <data name="Field_Address" xml:space="preserve"><value>العنوان</value></data>
+  <data name="Field_Area" xml:space="preserve"><value>المنطقة / الحي</value></data>
+  <data name="Field_AssessedDutyIqd" xml:space="preserve"><value>الرسم الجمركي المحتسب (د.ع على سعر 1310)</value></data>
+  <data name="Field_AssessmentNo" xml:space="preserve"><value>رقم إشعار التخميد</value></data>
+  <data name="Field_BrokerName" xml:space="preserve"><value>المخلص الجمركي / المصرّح</value></data>
+  <data name="Field_CancelReason" xml:space="preserve"><value>السبب</value></data>
+  <data name="Field_CocNumber" xml:space="preserve"><value>شهادة المطابقة (⁦COSQC COC⁩)</value></data>
+  <data name="Field_Cod" xml:space="preserve"><value>المبلغ عند الاستلام</value></data>
+  <data name="Field_Consignee" xml:space="preserve"><value>المستلم (المستورد)</value></data>
+  <data name="Field_ConsigneePhone" xml:space="preserve"><value>هاتف المستلم</value></data>
+  <data name="Field_ContactName" xml:space="preserve"><value>اسم المسؤول</value></data>
+  <data name="Field_CooEVerified" xml:space="preserve"><value>تم التحقق إلكترونياً من شهادة المنشأ (النافذة الواحدة)</value></data>
+  <data name="Field_CooNumber" xml:space="preserve"><value>رقم شهادة المنشأ (CoO)</value></data>
+  <data name="Field_CountryOfOrigin" xml:space="preserve"><value>بلد المنشأ (⁦ISO-2⁩)</value></data>
+  <data name="Field_Courier" xml:space="preserve"><value>المندوب</value></data>
+  <data name="Field_CourierCode" xml:space="preserve"><value>رمز المندوب</value></data>
+  <data name="Field_Currency" xml:space="preserve"><value>العملة</value></data>
+  <data name="Field_CustomerName" xml:space="preserve"><value>اسم الزبون</value></data>
+  <data name="Field_CustomerPhone" xml:space="preserve"><value>موبايل الزبون</value></data>
+  <data name="Field_CustomsOffice" xml:space="preserve"><value>منفذ التخليص الجمركي</value></data>
+  <data name="Field_CustomsValueUsd" xml:space="preserve"><value>القيمة الجمركية (دولار)</value></data>
+  <data name="Field_DeclarationNo" xml:space="preserve"><value>رقم تسجيل أسيكودا</value></data>
+  <data name="Field_DeclaredValue" xml:space="preserve"><value>القيمة المصرّح بها</value></data>
+  <data name="Field_DeliveryFee" xml:space="preserve"><value>أجور التوصيل</value></data>
+  <data name="Field_Destination" xml:space="preserve"><value>الوجهة</value></data>
+  <data name="Field_DutyRate" xml:space="preserve"><value>نسبة الرسم الجمركي (%)</value></data>
+  <data name="Field_Email" xml:space="preserve"><value>البريد الإلكتروني</value></data>
+  <data name="Field_FailureReason" xml:space="preserve"><value>سبب تعذّر التسليم</value></data>
+  <data name="Field_FirstPassword" xml:space="preserve"><value>كلمة المرور الأولى</value></data>
+  <data name="Field_FromHub" xml:space="preserve"><value>من مركز</value></data>
+  <data name="Field_Governorate" xml:space="preserve"><value>المحافظة</value></data>
+  <data name="Field_HoldReason" xml:space="preserve"><value>سبب الحجز الجمركي</value></data>
+  <data name="Field_HouseBill" xml:space="preserve"><value>رقم البوليصة</value></data>
+  <data name="Field_HowWeGetIt" xml:space="preserve"><value>طريقة الاستلام</value></data>
+  <data name="Field_HsCode" xml:space="preserve"><value>رمز التعريفة الجمركية (HS)</value></data>
+  <data name="Field_Incoterm" xml:space="preserve"><value>شرط التسليم (Incoterm)</value></data>
+  <data name="Field_Instagram" xml:space="preserve"><value>انستغرام</value></data>
+  <data name="Field_InvoiceEVerified" xml:space="preserve"><value>تم التحقق إلكترونياً من الفاتورة التجارية</value></data>
+  <data name="Field_InvoiceNumber" xml:space="preserve"><value>رقم الفاتورة التجارية</value></data>
+  <data name="Field_Items" xml:space="preserve"><value>المحتويات</value></data>
+  <data name="Field_Kind" xml:space="preserve"><value>النوع</value></data>
+  <data name="Field_Landmark" xml:space="preserve"><value>أقرب نقطة دالة</value></data>
+  <data name="Field_Location" xml:space="preserve"><value>الموقع على الخريطة</value></data>
+  <data name="Field_Manager" xml:space="preserve"><value>المسؤول</value></data>
+  <data name="Field_Mode" xml:space="preserve"><value>وسيلة النقل</value></data>
+  <data name="Field_Name" xml:space="preserve"><value>الاسم</value></data>
+  <data name="Field_NameAr" xml:space="preserve"><value>الاسم بالعربية</value></data>
+  <data name="Field_NameEn" xml:space="preserve"><value>الاسم بالإنجليزية</value></data>
+  <data name="Field_NewAddress" xml:space="preserve"><value>العنوان الجديد</value></data>
+  <data name="Field_NewPassword" xml:space="preserve"><value>كلمة المرور الجديدة</value></data>
+  <data name="Field_NewPhone" xml:space="preserve"><value>رقم الموبايل الجديد</value></data>
+  <data name="Field_Notes" xml:space="preserve"><value>ملاحظات</value></data>
+  <data name="Field_OpeningHours" xml:space="preserve"><value>أوقات الدوام</value></data>
+  <data name="Field_OrderRef" xml:space="preserve"><value>رقم طلب المتجر</value></data>
+  <data name="Field_Origin" xml:space="preserve"><value>المنشأ</value></data>
+  <data name="Field_PayoutMethod" xml:space="preserve"><value>طريقة التسديد</value></data>
+  <data name="Field_PayoutRef" xml:space="preserve"><value>رقم الحوالة أو الوصل</value></data>
+  <data name="Field_Phone" xml:space="preserve"><value>الموبايل</value></data>
+  <data name="Field_PhoneLast4" xml:space="preserve"><value>آخر 4 أرقام من موبايلك</value></data>
+  <data name="Field_PickupAddress" xml:space="preserve"><value>عنوان الاستلام</value></data>
+  <data name="Field_Pieces" xml:space="preserve"><value>عدد القطع</value></data>
+  <data name="Field_PreferredDate" xml:space="preserve"><value>يوم التوصيل</value></data>
+  <data name="Field_Promised" xml:space="preserve"><value>موعد التسليم المتفق عليه</value></data>
+  <data name="Field_ReceiptNo" xml:space="preserve"><value>رقم وصل الخزينة</value></data>
+  <data name="Field_Regime" xml:space="preserve"><value>النظام الجمركي</value></data>
+  <data name="Field_ReturnReason" xml:space="preserve"><value>السبب</value></data>
+  <data name="Field_RoutingTag" xml:space="preserve"><value>رمز التوجيه</value></data>
+  <data name="Field_Seal" xml:space="preserve"><value>رقم الختم</value></data>
+  <data name="Field_SelectivityLane" xml:space="preserve"><value>مسار الانتقائية</value></data>
+  <data name="Field_Seller" xml:space="preserve"><value>المتجر</value></data>
+  <data name="Field_Shelf" xml:space="preserve"><value>الرف</value></data>
+  <data name="Field_ShelfCapacity" xml:space="preserve"><value>سعة الرفوف (طرود)</value></data>
+  <data name="Field_Shipper" xml:space="preserve"><value>المرسل</value></data>
+  <data name="Field_ShopName" xml:space="preserve"><value>اسم المتجر</value></data>
+  <data name="Field_TaxAndFeesIqd" xml:space="preserve"><value>رسوم الطوابع والموانئ (د.ع)</value></data>
+  <data name="Field_ToHub" xml:space="preserve"><value>إلى مركز</value></data>
+  <data name="Field_Truck" xml:space="preserve"><value>الشاحنة</value></data>
+  <data name="Field_VehiclePlate" xml:space="preserve"><value>رقم اللوحة</value></data>
+  <data name="Field_VehicleType" xml:space="preserve"><value>نوع المركبة</value></data>
+  <data name="Field_VolumeCbm" xml:space="preserve"><value>الحجم (م³)</value></data>
+  <data name="Field_WeightKg" xml:space="preserve"><value>الوزن (كغم)</value></data>
+  <data name="FinanceSubtitle" xml:space="preserve"><value>مطابقة المبالغ المستلمة من الزبائن، احتساب أجور التوصيل وتسديد صافي مستحقات المتاجر</value></data>
+  <data name="FinanceTitle" xml:space="preserve"><value>المالية وتسويات الدفع عند الاستلام</value></data>
+  <data name="FindOrderHint" xml:space="preserve"><value>امسح أو اكتب رقم التتبع</value></data>
+  <data name="FleetSubtitle" xml:space="preserve"><value>إدارة مندوبي التوصيل، المركبات، جولات التوصيل الفعّالة والمبالغ النقدية قيد التحصيل</value></data>
+  <data name="FleetTitle" xml:space="preserve"><value>الأسطول والمندوبون</value></data>
+  <data name="FromShop" xml:space="preserve"><value>من {0}</value></data>
+  <data name="GlobalSearchPlaceholder" xml:space="preserve"><value>رقم التتبع، الهاتف، الزبون أو المتجر…</value></data>
+  <data name="GovernoratePerformance" xml:space="preserve"><value>حسب المحافظة</value></data>
+  <data name="HandedOver" xml:space="preserve"><value>تم تسليم {0} طرد — كشف {1}</value></data>
+  <data name="HandedOver_Few" xml:space="preserve"><value>تم تسليم {0} طرود — كشف {1}</value></data>
+  <data name="HandedOver_Many" xml:space="preserve"><value>تم تسليم {0} طردًا — كشف {1}</value></data>
+  <data name="HandedOver_One" xml:space="preserve"><value>تم تسليم طرد واحد — كشف {1}</value></data>
+  <data name="HandedOver_Two" xml:space="preserve"><value>تم تسليم طردين — كشف {1}</value></data>
+  <data name="HandedOverBy" xml:space="preserve"><value>سلّمها</value></data>
+  <data name="Handled" xml:space="preserve"><value>تمت المعالجة</value></data>
+  <data name="HandOver" xml:space="preserve"><value>تسليم للمتجر</value></data>
+  <data name="HandOverHint" xml:space="preserve"><value>ألغِ تحديد الطرود التي لن يستلمها المتجر اليوم. يُطبع كشف للتوقيع.</value></data>
+  <data name="HandOverN" xml:space="preserve"><value>تسليم {0} طرد</value></data>
+  <data name="HandOverN_Few" xml:space="preserve"><value>تسليم {0} طرود</value></data>
+  <data name="HandOverN_Many" xml:space="preserve"><value>تسليم {0} طردًا</value></data>
+  <data name="HandOverN_One" xml:space="preserve"><value>تسليم طرد واحد</value></data>
+  <data name="HandOverN_Two" xml:space="preserve"><value>تسليم طردين</value></data>
+  <data name="HandOverTo" xml:space="preserve"><value>تسليم المرتجعات إلى {0}</value></data>
+  <data name="Headline_BetweenCities" xml:space="preserve"><value>في الشاحنة إلى مدينتك</value></data>
+  <data name="Headline_Booked" xml:space="preserve"><value>تم تسجيل طلبك</value></data>
+  <data name="Headline_Cancelled" xml:space="preserve"><value>تم إلغاء هذا الطلب</value></data>
+  <data name="Headline_Customs" xml:space="preserve"><value>شحنتك قيد الإجراءات الجمركية</value></data>
+  <data name="Headline_Delivered" xml:space="preserve"><value>تم التسليم — شكراً لك!</value></data>
+  <data name="Headline_Failed" xml:space="preserve"><value>لم نتمكن من التسليم اليوم</value></data>
+  <data name="Headline_InTransit" xml:space="preserve"><value>شحنتك في الطريق</value></data>
+  <data name="Headline_OutForDelivery" xml:space="preserve"><value>مع المندوب — يصل اليوم</value></data>
+  <data name="Headline_PickedUp" xml:space="preserve"><value>استلمنا طردك من المتجر</value></data>
+  <data name="Headline_Returned" xml:space="preserve"><value>يتم إرجاع الطرد إلى المتجر</value></data>
+  <data name="Headline_Warehouse" xml:space="preserve"><value>طردك في مخزننا</value></data>
+  <data name="HistoryShort" xml:space="preserve"><value>{0} سُلِّم · {1} مرتجع</value></data>
+  <data name="Hours" xml:space="preserve"><value>ساعة</value></data>
+  <data name="HoursN" xml:space="preserve"><value>{0} ساعة</value></data>
+  <data name="HoursN_Few" xml:space="preserve"><value>{0} ساعات</value></data>
+  <data name="HoursN_One" xml:space="preserve"><value>ساعة واحدة</value></data>
+  <data name="HoursN_Two" xml:space="preserve"><value>ساعتان</value></data>
+  <data name="HubLine" xml:space="preserve"><value>{0} على الرفوف · {1} بانتظار شاحنة · {2} قادمة</value></data>
+  <data name="HubRadar" xml:space="preserve"><value>رادار المراكز</value></data>
+  <data name="HubRadarTitle" xml:space="preserve"><value>رادار المراكز — آخر عمليات المسح في العراق</value></data>
+  <data name="Hubs" xml:space="preserve"><value>المراكز</value></data>
+  <data name="HubsHint" xml:space="preserve"><value>اضغط على مركز لعرض رفوفه</value></data>
+  <data name="HubSwitched" xml:space="preserve"><value>تم تغيير المركز إلى {0}</value></data>
+  <data name="Inactive" xml:space="preserve"><value>غير فعّال</value></data>
+  <data name="InboundParcels" xml:space="preserve"><value>قادمة بالشاحنات</value></data>
+  <data name="InboundTrucks" xml:space="preserve"><value>شاحنات قادمة</value></data>
+  <data name="InboundTrucksHint" xml:space="preserve"><value>طرود في الطريق إلى هذا المركز</value></data>
+  <data name="InternationalPipeline" xml:space="preserve"><value>الشحنات الدولية حسب الحالة</value></data>
+  <data name="InvalidTrackingNumber" xml:space="preserve"><value>هذا لا يبدو رقم تتبع صحيحاً. يرجى التأكد من الأرقام.</value></data>
+  <data name="Iqd" xml:space="preserve"><value>د.ع</value></data>
+  <data name="IqdHint" xml:space="preserve"><value>بالدينار العراقي</value></data>
+  <data name="ItemsPlaceholder" xml:space="preserve"><value>ماذا يوجد داخل الطرد؟</value></data>
+  <data name="Journey" xml:space="preserve"><value>مسار الشحنة</value></data>
+  <data name="Kg" xml:space="preserve"><value>كغم</value></data>
+  <data name="Kpi_ActionsToday" xml:space="preserve"><value>إجراءات تلقائية اليوم</value></data>
+  <data name="Kpi_ActiveCouriers" xml:space="preserve"><value>المندوبون الفعّالون</value></data>
+  <data name="Kpi_ActiveParcels" xml:space="preserve"><value>طرود نشطة</value></data>
+  <data name="Kpi_ActiveWarehouses" xml:space="preserve"><value>مخازن فعّالة</value></data>
+  <data name="Kpi_AssessedDuties" xml:space="preserve"><value>الرسوم والضرائب المحتسبة</value></data>
+  <data name="Kpi_AutoReschedules" xml:space="preserve"><value>أُعيدت جدولتها اليوم</value></data>
+  <data name="Kpi_AutoReturns" xml:space="preserve"><value>إرجاع تلقائي اليوم</value></data>
+  <data name="Kpi_AvgDelivery" xml:space="preserve"><value>متوسط مدة التوصيل</value></data>
+  <data name="Kpi_AvgDeliveryHint" xml:space="preserve"><value>من الطلب حتى باب الزبون</value></data>
+  <data name="Kpi_AwaitingConfirmation" xml:space="preserve"><value>بانتظار التأكيد</value></data>
+  <data name="Kpi_AwaitingDeclaration" xml:space="preserve"><value>بانتظار التصريحة</value></data>
+  <data name="Kpi_Booked" xml:space="preserve"><value>طلبات جديدة</value></data>
+  <data name="Kpi_CashWithCouriers" xml:space="preserve"><value>النقد مع المندوبين</value></data>
+  <data name="Kpi_CodCollected" xml:space="preserve"><value>المبالغ المستلمة</value></data>
+  <data name="Kpi_CodCollectedPeriod" xml:space="preserve"><value>المبالغ المستلمة</value></data>
+  <data name="Kpi_CodToCollect" xml:space="preserve"><value>مبالغ قيد التحصيل</value></data>
+  <data name="Kpi_ConfirmationOverdue" xml:space="preserve"><value>تأخر تأكيدها</value></data>
+  <data name="Kpi_ConfirmedToday" xml:space="preserve"><value>أُكِّدت اليوم</value></data>
+  <data name="Kpi_CustomsHold" xml:space="preserve"><value>محتجزة في الجمارك</value></data>
+  <data name="Kpi_DeclinedToday" xml:space="preserve"><value>أُلغيت اليوم</value></data>
+  <data name="Kpi_Delivered" xml:space="preserve"><value>تم تسليمها</value></data>
+  <data name="Kpi_DeliveredToday" xml:space="preserve"><value>سُلّمت اليوم</value></data>
+  <data name="Kpi_DeliveryRevenue" xml:space="preserve"><value>إيرادات أجور التوصيل</value></data>
+  <data name="Kpi_FailedAttempts" xml:space="preserve"><value>محاولات فاشلة</value></data>
+  <data name="Kpi_FirstAttempt" xml:space="preserve"><value>التسليم من أول محاولة</value></data>
+  <data name="Kpi_FirstAttemptHint" xml:space="preserve"><value>سُلِّمت دون محاولة فاشلة</value></data>
+  <data name="Kpi_InClearance" xml:space="preserve"><value>قيد التخليص الجمركي</value></data>
+  <data name="Kpi_InProgress" xml:space="preserve"><value>قيد التنفيذ</value></data>
+  <data name="Kpi_InWarehouse" xml:space="preserve"><value>في المخزن</value></data>
+  <data name="Kpi_Late" xml:space="preserve"><value>متأخرة</value></data>
+  <data name="Kpi_MessagesPending" xml:space="preserve"><value>رسائل للإرسال</value></data>
+  <data name="Kpi_NetPayableToSellers" xml:space="preserve"><value>صافي مستحقات المتاجر</value></data>
+  <data name="Kpi_OnTime" xml:space="preserve"><value>في الموعد</value></data>
+  <data name="Kpi_OnTimeHint" xml:space="preserve"><value>سُلِّمت قبل الموعد الموعود</value></data>
+  <data name="Kpi_OnTrucks" xml:space="preserve"><value>في الشاحنات</value></data>
+  <data name="Kpi_OpenAlerts" xml:space="preserve"><value>تنبيهات مفتوحة</value></data>
+  <data name="Kpi_OpenRequests" xml:space="preserve"><value>طلبات مفتوحة</value></data>
+  <data name="Kpi_OutForDelivery" xml:space="preserve"><value>مع المندوبين</value></data>
+  <data name="Kpi_OverdueRequests" xml:space="preserve"><value>طلبات متأخرة</value></data>
+  <data name="Kpi_ParcelsWaiting" xml:space="preserve"><value>بانتظار شاحنة</value></data>
+  <data name="Kpi_ParcelsWaitingHint" xml:space="preserve"><value>في مركز آخر ولم تُحمّل بعد</value></data>
+  <data name="Kpi_PendingCodCollection" xml:space="preserve"><value>مبالغ قيد التحصيل</value></data>
+  <data name="Kpi_Rating" xml:space="preserve"><value>تقييم الزبائن</value></data>
+  <data name="Kpi_ReleasedCustoms" xml:space="preserve"><value>تم الإفراج الجمركي</value></data>
+  <data name="Kpi_Returned" xml:space="preserve"><value>المرتجعات</value></data>
+  <data name="Kpi_ReturnedThisMonth" xml:space="preserve"><value>أُعيدت هذا الشهر</value></data>
+  <data name="Kpi_ReturnRate" xml:space="preserve"><value>نسبة المرتجع</value></data>
+  <data name="Kpi_ReturnsAtHub" xml:space="preserve"><value>جاهزة للمتاجر</value></data>
+  <data name="Kpi_ReturnsAtHubHint" xml:space="preserve"><value>في مركز المتجر</value></data>
+  <data name="Kpi_ReturnsOnTrucks" xml:space="preserve"><value>في شاحنات الإرجاع</value></data>
+  <data name="Kpi_ReturnsOverdue" xml:space="preserve"><value>لم تُستلم في الوقت</value></data>
+  <data name="Kpi_ReturnsStarted" xml:space="preserve"><value>بدأ إرجاعها</value></data>
+  <data name="Kpi_ReturnsStartedHint" xml:space="preserve"><value>مع المندوبين أو في مركز</value></data>
+  <data name="Kpi_ShelfUse" xml:space="preserve"><value>إشغال الرفوف</value></data>
+  <data name="Kpi_SuccessRate" xml:space="preserve"><value>نجاح التوصيل</value></data>
+  <data name="Kpi_SuccessRateHint" xml:space="preserve"><value>المُسلَّم من (المُسلَّم + المرتجع)</value></data>
+  <data name="Kpi_TotalOrders" xml:space="preserve"><value>إجمالي الطلبات</value></data>
+  <data name="Kpi_TotalSettled" xml:space="preserve"><value>تم تسديدها للمتاجر</value></data>
+  <data name="Kpi_TrucksLate" xml:space="preserve"><value>شاحنات متأخرة</value></data>
+  <data name="Kpi_TrucksLoading" xml:space="preserve"><value>شاحنات قيد التحميل</value></data>
+  <data name="Kpi_TrucksOnRoad" xml:space="preserve"><value>شاحنات في الطريق</value></data>
+  <data name="Kpi_TrucksPlanned" xml:space="preserve"><value>طرود أُضيفت لشاحنات</value></data>
+  <data name="Kpi_Uncovered" xml:space="preserve"><value>محافظات بلا مخزن</value></data>
+  <data name="Kpi_UnsettledCod" xml:space="preserve"><value>تم تحصيلها (بانتظار التسوية)</value></data>
+  <data name="LandmarkPlaceholder" xml:space="preserve"><value>مثال: قرب مول المنصور</value></data>
+  <data name="LaneTip" xml:space="preserve"><value>شاحنات: {0} · طرود في الطريق: {1} · قيد التحميل: {2}</value></data>
+  <data name="LastRun" xml:space="preserve"><value>آخر تشغيل {0}</value></data>
+  <data name="Late" xml:space="preserve"><value>متأخرة</value></data>
+  <data name="LeftAt" xml:space="preserve"><value>غادرت {0}</value></data>
+  <data name="LiveNow" xml:space="preserve"><value>الآن</value></data>
+  <data name="LoadAutoHint" xml:space="preserve"><value>اتركها تلقائية: كل طرد يُمسح يوضع على شاحنة مركزه.</value></data>
+  <data name="LoadedOfPlanned" xml:space="preserve"><value>{0} محمّلة · {1} بانتظار التحميل</value></data>
+  <data name="LocationHint" xml:space="preserve"><value>اضغط على الخريطة لوضع الدبوس، أو استخدم مركز المحافظة.</value></data>
+  <data name="LocodeHelper" xml:space="preserve"><value>رمز ⁦UN/LOCODE⁩ أو رمز المطار، مثال: ⁦CNSHA, TRIST, AEDXB⁩</value></data>
+  <data name="MainWarehouseTag" xml:space="preserve"><value>رئيسي</value></data>
+  <data name="ManifestEmpty" xml:space="preserve"><value>لا توجد طرود على هذه الشاحنة بعد</value></data>
+  <data name="ManifestNotFound" xml:space="preserve"><value>الكشف غير موجود</value></data>
+  <data name="ManifestTitle" xml:space="preserve"><value>كشف مرتجعات {0}</value></data>
+  <data name="Map_Active" xml:space="preserve"><value>نشطة</value></data>
+  <data name="Map_High" xml:space="preserve"><value>أكثر</value></data>
+  <data name="Map_HubAlerts" xml:space="preserve"><value>مركز فيه تنبيهات</value></data>
+  <data name="Map_Low" xml:space="preserve"><value>أقل</value></data>
+  <data name="Map_Measure" xml:space="preserve"><value>عرض</value></data>
+  <data name="Map_TruckLate" xml:space="preserve"><value>شاحنة متأخرة</value></data>
+  <data name="Map_TrucksMoving" xml:space="preserve"><value>شاحنات في الطريق</value></data>
+  <data name="MarkHandled" xml:space="preserve"><value>تمت المعالجة</value></data>
+  <data name="MarkResolved" xml:space="preserve"><value>تم الحل</value></data>
+  <data name="Menu" xml:space="preserve"><value>القائمة</value></data>
+  <data name="MessagesHint" xml:space="preserve"><value>تُكتب الرسائل تلقائياً؛ أرسلها عبر واتساب بنقرة واحدة.</value></data>
+  <data name="MisroutedN" xml:space="preserve"><value>{0} بمسار خاطئ</value></data>
+  <data name="MisroutedToast" xml:space="preserve"><value>⚠ طرد بالمسار الخاطئ في {0}: {1} وجهته الصحيحة {2}</value></data>
+  <data name="MisrouteHint" xml:space="preserve"><value>مركز خاطئ — أرسلها إلى {0}.</value></data>
+  <data name="MissingHint" xml:space="preserve"><value>ابحث في الشاحنة ومركز الانطلاق. مسح الطرد في أي مركز يزيل التنبيه.</value></data>
+  <data name="MissingN" xml:space="preserve"><value>{0} مفقودة</value></data>
+  <data name="Mode_BatchOrders" xml:space="preserve"><value>إدخال دفعة طلبات</value></data>
+  <data name="Mode_Dispatch" xml:space="preserve"><value>تسليم للمندوب</value></data>
+  <data name="Mode_Load" xml:space="preserve"><value>تحميل الشاحنة</value></data>
+  <data name="Mode_Receive" xml:space="preserve"><value>استلام</value></data>
+  <data name="Mode_SingleOrder" xml:space="preserve"><value>طلب مفرد</value></data>
+  <data name="Mode_Verify" xml:space="preserve"><value>فحص المسار</value></data>
+  <data name="ModeSwitched" xml:space="preserve"><value>الوضع: {0}</value></data>
+  <data name="MoreActions" xml:space="preserve"><value>إجراءات أخرى</value></data>
+  <data name="MoveCoverageConfirm" xml:space="preserve"><value>نقل وحفظ</value></data>
+  <data name="MoveCoverageMessage" xml:space="preserve"><value>ستُخدم {0} من هذا المخزن. الطرود التي في الطريق تبقى على مسارها، والطلبات الجديدة تمر من هنا.</value></data>
+  <data name="MoveCoverageTitle" xml:space="preserve"><value>نقل التغطية</value></data>
+  <data name="MyAccount" xml:space="preserve"><value>حسابي</value></data>
+  <data name="Nav_AdminSection" xml:space="preserve"><value>الإدارة</value></data>
+  <data name="Nav_Automation" xml:space="preserve"><value>الأتمتة والتنبيهات</value></data>
+  <data name="Nav_BusinessSection" xml:space="preserve"><value>المتاجر والمالية</value></data>
+  <data name="Nav_CareSection" xml:space="preserve"><value>خدمة العملاء</value></data>
+  <data name="Nav_Confirmations" xml:space="preserve"><value>تأكيد الطلبات</value></data>
+  <data name="Nav_Customs" xml:space="preserve"><value>الجمارك (أسيكودا)</value></data>
+  <data name="Nav_Dashboard" xml:space="preserve"><value>لوحة التحكم</value></data>
+  <data name="Nav_Finance" xml:space="preserve"><value>المالية والتحصيل</value></data>
+  <data name="Nav_Fleet" xml:space="preserve"><value>الأسطول والتتبع</value></data>
+  <data name="Nav_HubsSection" xml:space="preserve"><value>المراكز والنقل</value></data>
+  <data name="Nav_Network" xml:space="preserve"><value>خريطة شبكة العراق</value></data>
+  <data name="Nav_NewInternational" xml:space="preserve"><value>شحنة دولية جديدة</value></data>
+  <data name="Nav_NewOrder" xml:space="preserve"><value>طلب توصيل جديد</value></data>
+  <data name="Nav_Operations" xml:space="preserve"><value>العمليات</value></data>
+  <data name="Nav_Pricing" xml:space="preserve"><value>أسعار التوصيل</value></data>
+  <data name="Nav_PrintLabels" xml:space="preserve"><value>بوليصات الشحن والباركود</value></data>
+  <data name="Nav_Requests" xml:space="preserve"><value>طلبات العملاء</value></data>
+  <data name="Nav_Returns" xml:space="preserve"><value>المرتجعات</value></data>
+  <data name="Nav_Sellers" xml:space="preserve"><value>المتاجر</value></data>
+  <data name="Nav_Shipments" xml:space="preserve"><value>الشحنات</value></data>
+  <data name="Nav_Team" xml:space="preserve"><value>الفريق والصلاحيات</value></data>
+  <data name="Nav_Track" xml:space="preserve"><value>تتبع شحنة</value></data>
+  <data name="Nav_Transfers" xml:space="preserve"><value>الشاحنات بين المراكز</value></data>
+  <data name="Nav_Warehouse" xml:space="preserve"><value>محطة المركز</value></data>
+  <data name="Nav_Warehouses" xml:space="preserve"><value>المخازن والفروع</value></data>
+  <data name="NeedChange" xml:space="preserve"><value>هل تحتاج إلى تغيير شيء؟</value></data>
+  <data name="NeedsAttention" xml:space="preserve"><value>تحتاج متابعة</value></data>
+  <data name="NeedsAttentionHint" xml:space="preserve"><value>تسليمات فاشلة وشحنات محتجزة</value></data>
+  <data name="NeedsTruckNotice" xml:space="preserve"><value>في {0}، ويجب نقلها بالشاحنة إلى {1}.</value></data>
+  <data name="NetworkSubtitle" xml:space="preserve"><value>كل الطرود في العراق: أين هي، وما المتأخر، وأي الشاحنات في الطريق.</value></data>
+  <data name="NetworkTitle" xml:space="preserve"><value>خريطة شبكة العراق</value></data>
+  <data name="NewCourier" xml:space="preserve"><value>مندوب جديد</value></data>
+  <data name="NewInternationalSubtitle" xml:space="preserve"><value>شحن إلى العراق بحراً أو جواً أو براً</value></data>
+  <data name="NewInternationalTitle" xml:space="preserve"><value>شحنة دولية جديدة</value></data>
+  <data name="NewOrder" xml:space="preserve"><value>طلب جديد</value></data>
+  <data name="NewOrderSubtitle" xml:space="preserve"><value>متجر (مثلاً على انستغرام) يرسل طرداً لزبونه — نستلمه، نخزنه، نوصله ونستلم المبلغ.</value></data>
+  <data name="NewOrderTitle" xml:space="preserve"><value>طلب توصيل جديد</value></data>
+  <data name="NewSeller" xml:space="preserve"><value>متجر جديد</value></data>
+  <data name="NextAttempt" xml:space="preserve"><value>المحاولة التالية</value></data>
+  <data name="NextHubHint" xml:space="preserve"><value>التالي: شاحنة إلى {0}.</value></data>
+  <data name="NextStep" xml:space="preserve"><value>الخطوة التالية</value></data>
+  <data name="NoActivity" xml:space="preserve"><value>لا يوجد نشاط بعد</value></data>
+  <data name="NoAlerts" xml:space="preserve"><value>لا توجد تنبيهات — كل شيء في موعده</value></data>
+  <data name="NoAnswer" xml:space="preserve"><value>لم يرد</value></data>
+  <data name="NoAnswerN" xml:space="preserve"><value>{0} اتصال دون رد</value></data>
+  <data name="NoAnswerN_Few" xml:space="preserve"><value>{0} اتصالات دون رد</value></data>
+  <data name="NoAnswerN_Many" xml:space="preserve"><value>{0} اتصالاً دون رد</value></data>
+  <data name="NoAnswerN_One" xml:space="preserve"><value>اتصال واحد دون رد</value></data>
+  <data name="NoAnswerN_Two" xml:space="preserve"><value>اتصالان دون رد</value></data>
+  <data name="NoConfirmationsWaiting" xml:space="preserve"><value>لا طلبات بانتظار التأكيد</value></data>
+  <data name="NoConfirmationsWaitingHint" xml:space="preserve"><value>الطلبات الجديدة التي تحتاج تأكيداً تظهر هنا.</value></data>
+  <data name="NoCouriers" xml:space="preserve"><value>لا يوجد مندوبون يطابقون البحث</value></data>
+  <data name="NoDataPeriod" xml:space="preserve"><value>لا بيانات في هذه الفترة</value></data>
+  <data name="NoFailuresPeriod" xml:space="preserve"><value>لا محاولات فاشلة في هذه الفترة</value></data>
+  <data name="NoFridayHint" xml:space="preserve"><value>لا يوجد توصيل يوم الجمعة</value></data>
+  <data name="NoInboundTrucks" xml:space="preserve"><value>لا توجد شاحنات في الطريق إلى هنا</value></data>
+  <data name="NoMessages" xml:space="preserve"><value>لا توجد رسائل</value></data>
+  <data name="NoOrdersYet" xml:space="preserve"><value>لا توجد طلبات بعد</value></data>
+  <data name="NoRatingsPeriod" xml:space="preserve"><value>لا توجد تقييمات من الزبائن في هذه الفترة بعد</value></data>
+  <data name="NoRequests" xml:space="preserve"><value>لا توجد طلبات</value></data>
+  <data name="NoReturnsTravelling" xml:space="preserve"><value>لا توجد مرتجعات في الطريق</value></data>
+  <data name="NoReturnsWaiting" xml:space="preserve"><value>لا توجد مرتجعات بانتظار التسليم</value></data>
+  <data name="NoReturnsWaitingHint" xml:space="preserve"><value>تظهر المرتجعات هنا عند وصولها إلى مركز المتجر.</value></data>
+  <data name="NoScansYet" xml:space="preserve"><value>امسح طرداً للبدء</value></data>
+  <data name="NoSellers" xml:space="preserve"><value>لا توجد متاجر</value></data>
+  <data name="NoSettlementsYet" xml:space="preserve"><value>لا توجد تسويات مسجلة بعد</value></data>
+  <data name="NoShipments" xml:space="preserve"><value>لا توجد شحنات تطابق هذه الفلاتر</value></data>
+  <data name="NoShipmentsFound" xml:space="preserve"><value>لا توجد طرود هنا</value></data>
+  <data name="NoShipmentsHint" xml:space="preserve"><value>جرّب بحثاً آخر أو امسح الفلاتر.</value></data>
+  <data name="NotCovered" xml:space="preserve"><value>بلا تغطية</value></data>
+  <data name="NotesPlaceholder" xml:space="preserve"><value>الاتصال قبل الوصول، قابل للكسر…</value></data>
+  <data name="NotFoundText" xml:space="preserve"><value>الصفحة التي تبحث عنها غير موجودة.</value></data>
+  <data name="NotFoundTitle" xml:space="preserve"><value>الصفحة غير موجودة</value></data>
+  <data name="NothingNeedsAttention" xml:space="preserve"><value>لا يوجد ما يحتاج متابعة حالياً</value></data>
+  <data name="NothingWaitingForTruck" xml:space="preserve"><value>لا توجد طرود بانتظار شاحنة</value></data>
+  <data name="NoTrucks" xml:space="preserve"><value>لا توجد شاحنات بعد</value></data>
+  <data name="NoUnsettledBalances" xml:space="preserve"><value>جميع الطلبات المسلّمة تمت تسويتها</value></data>
+  <data name="OnATruck" xml:space="preserve"><value>في شاحنة</value></data>
+  <data name="OnShelves" xml:space="preserve"><value>على الرفوف</value></data>
+  <data name="OnShelvesHint" xml:space="preserve"><value>كل الطرود الموجودة في المركز الآن</value></data>
+  <data name="OnShelvesN" xml:space="preserve"><value>{0} على الرفوف</value></data>
+  <data name="OnTheWayTo" xml:space="preserve"><value>في الطريق إلى {0}</value></data>
+  <data name="Open" xml:space="preserve"><value>مفتوحة</value></data>
+  <data name="OpenCustoms" xml:space="preserve"><value>الجمارك وأسيكودا</value></data>
+  <data name="Opened" xml:space="preserve"><value>فُتحت</value></data>
+  <data name="OpeningHoursPlaceholder" xml:space="preserve"><value>السبت–الخميس 8:00–20:00</value></data>
+  <data name="OpenRequestsNotice" xml:space="preserve"><value>{0} طلب مفتوح على هذه الشحنة</value></data>
+  <data name="OpenRequestsNotice_Few" xml:space="preserve"><value>{0} طلبات مفتوحة على هذه الشحنة</value></data>
+  <data name="OpenRequestsNotice_Many" xml:space="preserve"><value>{0} طلبًا مفتوحًا على هذه الشحنة</value></data>
+  <data name="OpenRequestsNotice_One" xml:space="preserve"><value>طلب مفتوح على هذه الشحنة</value></data>
+  <data name="OpenRequestsNotice_Two" xml:space="preserve"><value>طلبان مفتوحان على هذه الشحنة</value></data>
+  <data name="OpenRunsheet" xml:space="preserve"><value>قائمة التوزيع والتسليم</value></data>
+  <data name="OpenShipment" xml:space="preserve"><value>فتح الشحنة</value></data>
+  <data name="OpenStation" xml:space="preserve"><value>محطة المسح</value></data>
+  <data name="OpenTruck" xml:space="preserve"><value>فتح الشاحنة</value></data>
+  <data name="Optional" xml:space="preserve"><value>(اختياري)</value></data>
+  <data name="OrderCancelled" xml:space="preserve"><value>تم إلغاء الطلب</value></data>
+  <data name="OrderCreated" xml:space="preserve"><value>تم إنشاء الطلب — رقم التتبع {0}</value></data>
+  <data name="OrderUpdated" xml:space="preserve"><value>تم تعديل الطلب</value></data>
+  <data name="OriginHub" xml:space="preserve"><value>مركز المتجر</value></data>
+  <data name="OtherLanguage" xml:space="preserve"><value>English</value></data>
+  <data name="Pager_Label" xml:space="preserve"><value>الصفحات</value></data>
+  <data name="Pager_Next" xml:space="preserve"><value>الصفحة التالية</value></data>
+  <data name="Pager_None" xml:space="preserve"><value>لا توجد نتائج</value></data>
+  <data name="Pager_Of" xml:space="preserve"><value>من</value></data>
+  <data name="Pager_Page" xml:space="preserve"><value>صفحة</value></data>
+  <data name="Pager_PageSize" xml:space="preserve"><value>الصفوف</value></data>
+  <data name="Pager_Previous" xml:space="preserve"><value>الصفحة السابقة</value></data>
+  <data name="Pager_Showing" xml:space="preserve"><value>عرض</value></data>
+  <data name="Palette_Actions" xml:space="preserve"><value>إجراءات</value></data>
+  <data name="Palette_AllResults" xml:space="preserve"><value>عرض كل النتائج ({0})</value></data>
+  <data name="Palette_Error" xml:space="preserve"><value>البحث في الشحنات والمتاجر غير متاح مؤقتاً.</value></data>
+  <data name="Palette_Move" xml:space="preserve"><value>تنقّل</value></data>
+  <data name="Palette_NoResults" xml:space="preserve"><value>لا توجد نتائج</value></data>
+  <data name="Palette_Open" xml:space="preserve"><value>فتح</value></data>
+  <data name="Palette_Pages" xml:space="preserve"><value>الصفحات</value></data>
+  <data name="Palette_Placeholder" xml:space="preserve"><value>رقم التتبع أو الهاتف أو الزبون أو المتجر أو اسم صفحة…</value></data>
+  <data name="Palette_ResultCount" xml:space="preserve"><value>نتائج البحث: {0}</value></data>
+  <data name="Palette_Retry" xml:space="preserve"><value>إعادة المحاولة</value></data>
+  <data name="Palette_ScanParcel" xml:space="preserve"><value>مسح طرد في مركز</value></data>
+  <data name="Palette_Searching" xml:space="preserve"><value>جارٍ البحث في الشحنات والمتاجر…</value></data>
+  <data name="Palette_Sellers" xml:space="preserve"><value>المتاجر</value></data>
+  <data name="Palette_Shipments" xml:space="preserve"><value>الشحنات</value></data>
+  <data name="Palette_Title" xml:space="preserve"><value>البحث والأوامر</value></data>
+  <data name="Palette_TypeMore" xml:space="preserve"><value>اكتب حرفين على الأقل للبحث في الشحنات والمتاجر.</value></data>
+  <data name="Parcels" xml:space="preserve"><value>عدد الطرود</value></data>
+  <data name="ParcelsHere" xml:space="preserve"><value>الطرود هنا</value></data>
+  <data name="ParcelsN" xml:space="preserve"><value>{0} طرد</value></data>
+  <data name="ParcelsN_Few" xml:space="preserve"><value>{0} طرود</value></data>
+  <data name="ParcelsN_Many" xml:space="preserve"><value>{0} طردًا</value></data>
+  <data name="ParcelsN_One" xml:space="preserve"><value>طرد واحد</value></data>
+  <data name="ParcelsN_Two" xml:space="preserve"><value>طردان</value></data>
+  <data name="ParcelsUnit" xml:space="preserve"><value>طرد</value></data>
+  <data name="ParcelsUnit_Few" xml:space="preserve"><value>طرود</value></data>
+  <data name="ParcelsUnit_Many" xml:space="preserve"><value>طردًا</value></data>
+  <data name="ParcelsUnit_One" xml:space="preserve"><value>طرد</value></data>
+  <data name="ParseBatchAction" xml:space="preserve"><value>تحليل الدفعة</value></data>
+  <data name="PerformanceDetails" xml:space="preserve"><value>تفاصيل الأداء</value></data>
+  <data name="PerformanceDetailsHint" xml:space="preserve"><value>مقارنة المتاجر والمحافظات والمندوبين وراء الأرقام الرئيسية</value></data>
+  <data name="Period" xml:space="preserve"><value>الفترة</value></data>
+  <data name="Period_30" xml:space="preserve"><value>30 يوماً</value></data>
+  <data name="Period_7" xml:space="preserve"><value>7 أيام</value></data>
+  <data name="Period_90" xml:space="preserve"><value>90 يوماً</value></data>
+  <data name="Period_Today" xml:space="preserve"><value>اليوم</value></data>
+  <data name="PhoneHelper" xml:space="preserve"><value>موبايل عراقي، مثال: ⁦0770 123 4567⁩</value></data>
+  <data name="PhoneLast4Hint" xml:space="preserve"><value>للتأكد من هويتك</value></data>
+  <data name="Pickup" xml:space="preserve"><value>نستلم من المتجر</value></data>
+  <data name="PlannedNotLoaded" xml:space="preserve"><value>{0} طرد مخطط لم يُمسح</value></data>
+  <data name="PlannedNotLoaded_Few" xml:space="preserve"><value>{0} طرود مخططة لم تُمسح</value></data>
+  <data name="PlannedNotLoaded_Many" xml:space="preserve"><value>{0} طردًا مخططًا لم يُمسح</value></data>
+  <data name="PlannedNotLoaded_One" xml:space="preserve"><value>طرد واحد مخطط لم يُمسح</value></data>
+  <data name="PlannedNotLoaded_Two" xml:space="preserve"><value>طردان مخططان لم يُمسحا</value></data>
+  <data name="PlannedNotLoadedHint" xml:space="preserve"><value>امسحها على الشاحنة قبل المغادرة، وإلا ستبقى في المركز للشاحنة التالية.</value></data>
+  <data name="PlannedOnTruckHint" xml:space="preserve"><value>ضعها على شاحنة {0} ({1}).</value></data>
+  <data name="PlanWaitingParcels" xml:space="preserve"><value>إضافة كل الطرود المنتظرة لهذا المسار</value></data>
+  <data name="PointsUnit" xml:space="preserve"><value>نقطة</value></data>
+  <data name="Price_Breakdown" xml:space="preserve"><value>{0} أساسي</value></data>
+  <data name="Price_DiscountPart" xml:space="preserve"><value>− خصم المتجر {0}%</value></data>
+  <data name="Price_WeightPart" xml:space="preserve"><value>+ {0} وزن</value></data>
+  <data name="PricesSaved" xml:space="preserve"><value>حُفظت الأسعار. الطلبات الجديدة تستخدمها الآن.</value></data>
+  <data name="Pricing_Basics" xml:space="preserve"><value>الأساسيات</value></data>
+  <data name="Pricing_ByGovernorate" xml:space="preserve"><value>السعر حسب الوجهة</value></data>
+  <data name="Pricing_ByGovernorateHint" xml:space="preserve"><value>للزبائن خارج محافظة المتجر، مجمّعة حسب المخزن الذي يوصل.</value></data>
+  <data name="Pricing_Calculator" xml:space="preserve"><value>احسب السعر</value></data>
+  <data name="Pricing_CalculatorHint" xml:space="preserve"><value>اعرف سعر الطرد قبل الحفظ.</value></data>
+  <data name="Pricing_Change" xml:space="preserve"><value>عن القياسي</value></data>
+  <data name="Pricing_Default" xml:space="preserve"><value>باقي المحافظات (افتراضي)</value></data>
+  <data name="Pricing_DefaultHint" xml:space="preserve"><value>يُستخدم عندما لا يكون للمحافظة سعر خاص.</value></data>
+  <data name="Pricing_Discount" xml:space="preserve"><value>الخصم</value></data>
+  <data name="Pricing_ExtraKg" xml:space="preserve"><value>كل كيلوغرام إضافي</value></data>
+  <data name="Pricing_ExtraKgHint" xml:space="preserve"><value>يُضاف عن كل كيلوغرام فوق الوزن المشمول.</value></data>
+  <data name="Pricing_From" xml:space="preserve"><value>المتجر في</value></data>
+  <data name="Pricing_IncludedWeight" xml:space="preserve"><value>الوزن المشمول</value></data>
+  <data name="Pricing_IncludedWeightHint" xml:space="preserve"><value>الطرود حتى هذا الوزن تدفع السعر الأساسي.</value></data>
+  <data name="Pricing_NoDiscounts" xml:space="preserve"><value>لا خصومات للمتاجر</value></data>
+  <data name="Pricing_NoDiscountsHint" xml:space="preserve"><value>كل المتاجر تدفع سعر القائمة.</value></data>
+  <data name="Pricing_Price" xml:space="preserve"><value>السعر</value></data>
+  <data name="Pricing_SameGovernorate" xml:space="preserve"><value>داخل محافظة المتجر</value></data>
+  <data name="Pricing_SameGovernorateHint" xml:space="preserve"><value>الزبون في نفس محافظة المتجر.</value></data>
+  <data name="Pricing_Sellers" xml:space="preserve"><value>خصومات المتاجر</value></data>
+  <data name="Pricing_SellersHint" xml:space="preserve"><value>أسعار خاصة للمتاجر الكبيرة: نسبة خصم على كل توصيل.</value></data>
+  <data name="Pricing_SetAll" xml:space="preserve"><value>الكل:</value></data>
+  <data name="Pricing_To" xml:space="preserve"><value>الزبون في</value></data>
+  <data name="Pricing_WeightCharge" xml:space="preserve"><value>الوزن الإضافي</value></data>
+  <data name="PricingSubtitle" xml:space="preserve"><value>ما يدفعه المتجر عن كل طرد. تُسعَّر الطلبات الجديدة من هذه القائمة تلقائياً.</value></data>
+  <data name="PricingTitle" xml:space="preserve"><value>أسعار التوصيل</value></data>
+  <data name="PrintAwbLabel" xml:space="preserve"><value>طباعة بوليصة ⁦4×6⁩</value></data>
+  <data name="PrintLabelsSubtitle" xml:space="preserve"><value>باركود ⁦Code-128⁩ قياسي، رمز فرز المحافظة (⁦BGW / BSR / EBL⁩)، ومبلغ التحصيل لطابعات الملصقات الحرارية</value></data>
+  <data name="PrintLabelsTitle" xml:space="preserve"><value>طباعة بوليصات الشحن الحرارية (⁦4×6⁩) وباركودات الأوامر</value></data>
+  <data name="PrintManifest" xml:space="preserve"><value>طباعة الكشف</value></data>
+  <data name="PrintNow" xml:space="preserve"><value>طباعة الملصقات (⁦4×6⁩)</value></data>
+  <data name="PromisedBy" xml:space="preserve"><value>موعد التسليم</value></data>
+  <data name="PublicFooter" xml:space="preserve"><value>لوجستيكو — الشحن والتوصيل في كل العراق</value></data>
+  <data name="PublicPage" xml:space="preserve"><value>صفحة الزبون</value></data>
+  <data name="QuickDispatchHint" xml:space="preserve"><value>اختر المندوب وامسح أو اكتب رقم التتبع لتسليمه الطرد فوراً.</value></data>
+  <data name="QuickDispatchTitle" xml:space="preserve"><value>إرسال سريع مع المندوب</value></data>
+  <data name="QuickViews" xml:space="preserve"><value>عروض سريعة</value></data>
+  <data name="RatingsN" xml:space="preserve"><value>{0} تقييم في هذه الفترة</value></data>
+  <data name="RatingsN_Few" xml:space="preserve"><value>{0} تقييمات في هذه الفترة</value></data>
+  <data name="RatingsN_Many" xml:space="preserve"><value>{0} تقييماً في هذه الفترة</value></data>
+  <data name="RatingsN_One" xml:space="preserve"><value>تقييم واحد في هذه الفترة</value></data>
+  <data name="RatingsN_Two" xml:space="preserve"><value>تقييمان في هذه الفترة</value></data>
+  <data name="ReadyForCourierHint" xml:space="preserve"><value>جاهزة للتسليم إلى المندوب.</value></data>
+  <data name="ReadyForSellers" xml:space="preserve"><value>جاهزة للمتاجر</value></data>
+  <data name="Receive" xml:space="preserve"><value>استلام</value></data>
+  <data name="ReceivedByHint" xml:space="preserve"><value>اسم الشخص الذي يستلم عن المتجر</value></data>
+  <data name="ReceivedByName" xml:space="preserve"><value>المستلم</value></data>
+  <data name="RecentOrders" xml:space="preserve"><value>أحدث الطلبات</value></data>
+  <data name="RecordedBy" xml:space="preserve"><value>بواسطة</value></data>
+  <data name="RecordUpdate" xml:space="preserve"><value>تحديث الحالة</value></data>
+  <data name="RecordUpdateHint" xml:space="preserve"><value>تظهر فقط الخطوات الممكنة من الحالة الحالية.</value></data>
+  <data name="Refresh" xml:space="preserve"><value>تحديث</value></data>
+  <data name="Reject" xml:space="preserve"><value>رفض</value></data>
+  <data name="Reload" xml:space="preserve"><value>إعادة التحميل</value></data>
+  <data name="RemoteScanToast" xml:space="preserve"><value>{0}: {1} — {2}</value></data>
+  <data name="Remove" xml:space="preserve"><value>حذف</value></data>
+  <data name="RequestAppliedText" xml:space="preserve"><value>تم — حدّثنا طلبك.</value></data>
+  <data name="RequestCreated" xml:space="preserve"><value>تم تسجيل الطلب {0}</value></data>
+  <data name="RequestPendingText" xml:space="preserve"><value>نحن نعمل على طلبك.</value></data>
+  <data name="RequestQueuedText" xml:space="preserve"><value>سيتابعه فريقنا قريباً ويتواصل معك عند الحاجة.</value></data>
+  <data name="RequestReceivedTitle" xml:space="preserve"><value>استلمنا طلبك {0}</value></data>
+  <data name="RequestRejected" xml:space="preserve"><value>رُفض الطلب {0}</value></data>
+  <data name="RequestResolved" xml:space="preserve"><value>تم حل الطلب {0}</value></data>
+  <data name="Requests_New" xml:space="preserve"><value>تسجيل طلب زبون</value></data>
+  <data name="RequestsSearch" xml:space="preserve"><value>رقم الطلب أو التتبع أو نص…</value></data>
+  <data name="RequestsSubtitle" xml:space="preserve"><value>ما يطلبه الزبائن والمتاجر: مواعيد وعناوين جديدة، إلغاء، إرجاع وشكاوى.</value></data>
+  <data name="RequestsTitle" xml:space="preserve"><value>طلبات العملاء</value></data>
+  <data name="RescheduledNotice" xml:space="preserve"><value>محاولة التوصيل التالية: {0}</value></data>
+  <data name="RescheduleTo" xml:space="preserve"><value>الموعد الجديد: {0}</value></data>
+  <data name="Resolution" xml:space="preserve"><value>ملاحظة</value></data>
+  <data name="Resolved" xml:space="preserve"><value>حُلّ</value></data>
+  <data name="ResolveWithoutChange" xml:space="preserve"><value>حل دون تغيير</value></data>
+  <data name="RetiredWarehouses" xml:space="preserve"><value>مخازن متوقفة</value></data>
+  <data name="RetireHint" xml:space="preserve"><value>المخزن المتوقف يحتفظ بسجله، وتنتقل محافظاته إلى أقرب مخزن فعّال. يجب أن يكون فارغاً أولاً.</value></data>
+  <data name="ReturnedNotice" xml:space="preserve"><value>أُعيدت إلى المتجر ({0}) — كشف {1}</value></data>
+  <data name="ReturnedToSellers" xml:space="preserve"><value>أُعيدت</value></data>
+  <data name="ReturningNotice" xml:space="preserve"><value>في طريق العودة إلى المتجر ({0}) عبر {1}</value></data>
+  <data name="ReturnParcel" xml:space="preserve"><value>مرتجع</value></data>
+  <data name="ReturnReasons" xml:space="preserve"><value>أسباب الإرجاع</value></data>
+  <data name="ReturnRules" xml:space="preserve"><value>قواعد الإرجاع</value></data>
+  <data name="ReturnsForSellers" xml:space="preserve"><value>مرتجعات للمتاجر</value></data>
+  <data name="ReturnsForSellersHint" xml:space="preserve"><value>بانتظار التسليم للمتجر</value></data>
+  <data name="ReturnsOnTheWay" xml:space="preserve"><value>في طريق العودة</value></data>
+  <data name="ReturnsSubtitle" xml:space="preserve"><value>الطرود العائدة إلى المتاجر: تلقائياً بعد المحاولات الفاشلة أو الرفض، وتُسلّم بكشف موقّع.</value></data>
+  <data name="ReturnStarted" xml:space="preserve"><value>بدأ الإرجاع</value></data>
+  <data name="ReturnsTitle" xml:space="preserve"><value>المرتجعات</value></data>
+  <data name="Risk_High" xml:space="preserve"><value>خطر إرجاع عالٍ</value></data>
+  <data name="Risk_HighAdvice" xml:space="preserve"><value>عادت عدة طلبات سابقة. أكّد الطلب والعنوان قبل الاستلام، أو اطلب من المتجر عربوناً.</value></data>
+  <data name="Risk_Low" xml:space="preserve"><value>موثوق</value></data>
+  <data name="Risk_Medium" xml:space="preserve"><value>بعض المرتجعات</value></data>
+  <data name="Risk_MediumAdvice" xml:space="preserve"><value>أكّد الطلب هاتفياً قبل استلامه من المتجر.</value></data>
+  <data name="Risk_New" xml:space="preserve"><value>جديد</value></data>
+  <data name="RoleHint_Admin" xml:space="preserve"><value>كل شيء، ومنه الأسعار وقواعد الأتمتة والمخازن والبيانات المفتوحة والفريق.</value></data>
+  <data name="RoleHint_CustomerSupport" xml:space="preserve"><value>مكتب الاتصال: مكالمات التأكيد وطلبات الزبائن ورسائلهم، ويطّلع على كل شيء عدا المالية.</value></data>
+  <data name="RoleHint_Finance" xml:space="preserve"><value>أجور التوصيل وتسويات التجار، ويطّلع على كل ما عداها.</value></data>
+  <data name="RoleHint_Operations" xml:space="preserve"><value>العمل اليومي: الطلبات ومسح المخازن والشاحنات والمندوبين والمرتجعات وطلبات الزبائن والجمارك.</value></data>
+  <data name="RoleHint_Viewer" xml:space="preserve"><value>يطّلع على اللوحات والقوائم والرؤى دون أن يغيّر شيئاً.</value></data>
+  <data name="Role_Admin" xml:space="preserve"><value>مدير النظام</value></data>
+  <data name="Role_CustomerSupport" xml:space="preserve"><value>خدمة الزبائن</value></data>
+  <data name="Role_Finance" xml:space="preserve"><value>المالية</value></data>
+  <data name="Role_Operations" xml:space="preserve"><value>العمليات</value></data>
+  <data name="Role_Viewer" xml:space="preserve"><value>مشاهد فقط</value></data>
+  <data name="Route" xml:space="preserve"><value>المسار</value></data>
+  <data name="RoutingTagHint" xml:space="preserve"><value>3 أحرف إنجليزية تُطبع على البوليصات، مثل ⁦KRK⁩. لا يمكن تغييره لاحقاً.</value></data>
+  <data name="Rule_AutoCancel" xml:space="preserve"><value>إلغاء الطلبات غير المؤكدة بعد</value></data>
+  <data name="Rule_AutoCancelHint" xml:space="preserve"><value>0 = لا إلغاء تلقائي.</value></data>
+  <data name="Rule_AutoRequests" xml:space="preserve"><value>تنفيذ طلبات الزبائن البسيطة</value></data>
+  <data name="Rule_AutoRequestsHint" xml:space="preserve"><value>يوم جديد، رقم جديد، عنوان في نفس المحافظة، إلغاء قبل الاستلام</value></data>
+  <data name="Rule_AutoReschedule" xml:space="preserve"><value>إعادة جدولة المحاولات الفاشلة</value></data>
+  <data name="Rule_AutoRescheduleHint" xml:space="preserve"><value>إعادة المحاولة في يوم العمل التالي (عدا الجمعة)</value></data>
+  <data name="Rule_AutoTrucks" xml:space="preserve"><value>تخطيط الشاحنات تلقائياً</value></data>
+  <data name="Rule_AutoTrucksHint" xml:space="preserve"><value>الطرود في مركز آخر تُضاف لأول شاحنة على مسارها</value></data>
+  <data name="Rule_ConfirmHours" xml:space="preserve"><value>تنبيه إذا لم يُؤكَّد خلال</value></data>
+  <data name="Rule_ConfirmHoursHint" xml:space="preserve"><value>يُطلب من الموظفين الاتصال بالزبون.</value></data>
+  <data name="Rule_ConfirmMode" xml:space="preserve"><value>الطلبات التي تحتاج تأكيداً</value></data>
+  <data name="Rule_ConfirmModeHint" xml:space="preserve"><value>«الزبائن ذوو المرتجعات» يطلب التأكيد فقط ممن عادت طرودهم سابقاً.</value></data>
+  <data name="Rule_Courier" xml:space="preserve"><value>مع المندوب</value></data>
+  <data name="Rule_CourierHint" xml:space="preserve"><value>تنبيه عندما تبقى الشحنة مع المندوب أكثر من</value></data>
+  <data name="Rule_Dwell" xml:space="preserve"><value>على الرف</value></data>
+  <data name="Rule_DwellHint" xml:space="preserve"><value>تنبيه عندما تنتظر الشحنة في المركز أكثر من</value></data>
+  <data name="Rule_LineHaul" xml:space="preserve"><value>تأخر الشاحنة</value></data>
+  <data name="Rule_LineHaulHint" xml:space="preserve"><value>وقت إضافي فوق مدة الطريق قبل اعتبار الشاحنة متأخرة</value></data>
+  <data name="Rule_MaxAttempts" xml:space="preserve"><value>الإرجاع بعد المحاولات الفاشلة</value></data>
+  <data name="Rule_MaxAttemptsHint" xml:space="preserve"><value>تُعاد الشحنة إلى المتجر بعد هذا العدد من المحاولات</value></data>
+  <data name="Rule_Notify" xml:space="preserve"><value>مراسلة الزبائن</value></data>
+  <data name="Rule_NotifyHint" xml:space="preserve"><value>خروج للتوصيل، محاولة فاشلة، موعد جديد، تسليم، إرجاع</value></data>
+  <data name="Rule_PickupSla" xml:space="preserve"><value>الاستلام من المتجر</value></data>
+  <data name="Rule_PickupSlaHint" xml:space="preserve"><value>تنبيه عندما لا يُستلم الطلب خلال</value></data>
+  <data name="Rule_RequestSla" xml:space="preserve"><value>الطلبات</value></data>
+  <data name="Rule_RequestSlaHint" xml:space="preserve"><value>يجب الرد على طلبات الزبائن خلال</value></data>
+  <data name="Rule_ReturnCollection" xml:space="preserve"><value>استلام المرتجع</value></data>
+  <data name="Rule_ReturnCollectionHint" xml:space="preserve"><value>تنبيه عندما لا يستلم المتجر المرتجع خلال</value></data>
+  <data name="Rule_ReturnOnRefusal" xml:space="preserve"><value>الإرجاع عند الرفض</value></data>
+  <data name="Rule_ReturnOnRefusalHint" xml:space="preserve"><value>رفض الزبون يبدأ الإرجاع مباشرة</value></data>
+  <data name="RuleDivisor" xml:space="preserve"><value>الوزن الحجمي: الطول×العرض×الارتفاع (سم) ÷ {0}</value></data>
+  <data name="Rules" xml:space="preserve"><value>القواعد</value></data>
+  <data name="Rules_Confirmation" xml:space="preserve"><value>تأكيد الطلبات</value></data>
+  <data name="Rules_ConfirmationHint" xml:space="preserve"><value>اطلب من الزبائن تأكيد طلبات الدفع عند الاستلام قبل الاستلام من المتجر</value></data>
+  <data name="Rules_Delivery" xml:space="preserve"><value>التوصيل والزبائن</value></data>
+  <data name="Rules_Network" xml:space="preserve"><value>الشاحنات والمهل</value></data>
+  <data name="RuleSea" xml:space="preserve"><value>بحري: الوزن أو الحجم، 1 م³ = 1000 كغم</value></data>
+  <data name="RulesSaved" xml:space="preserve"><value>تم حفظ القواعد</value></data>
+  <data name="RunNow" xml:space="preserve"><value>تشغيل الآن</value></data>
+  <data name="RunsheetEmpty" xml:space="preserve"><value>لا توجد طرود مع هذا المندوب الآن</value></data>
+  <data name="RunsheetTitle" xml:space="preserve"><value>قائمة توزيع المندوب (Runsheet) — {0}</value></data>
+  <data name="SameGovernorate" xml:space="preserve"><value>نفس المحافظة</value></data>
+  <data name="SameSeller" xml:space="preserve"><value>نفس المتجر</value></data>
+  <data name="Sample_Baghdad" xml:space="preserve"><value>مثال: طلب بغداد</value></data>
+  <data name="Sample_Basra" xml:space="preserve"><value>مثال: طلب البصرة</value></data>
+  <data name="Sample_Erbil" xml:space="preserve"><value>مثال: طلب أربيل</value></data>
+  <data name="Save" xml:space="preserve"><value>حفظ</value></data>
+  <data name="SaveAs" xml:space="preserve"><value>حفظ كـ «{0}»</value></data>
+  <data name="SaveChanges" xml:space="preserve"><value>حفظ التعديلات</value></data>
+  <data name="Saved" xml:space="preserve"><value>تم الحفظ</value></data>
+  <data name="SavePrices" xml:space="preserve"><value>حفظ الأسعار</value></data>
+  <data name="SaveRules" xml:space="preserve"><value>حفظ القواعد</value></data>
+  <data name="ScanMode" xml:space="preserve"><value>وضع المسح</value></data>
+  <data name="ScanOrType" xml:space="preserve"><value>امسح أو اكتب رقم التتبع ثم اضغط Enter</value></data>
+  <data name="ScansN" xml:space="preserve"><value>{0} عملية مسح</value></data>
+  <data name="ScansN_Few" xml:space="preserve"><value>{0} عمليات مسح</value></data>
+  <data name="ScansN_One" xml:space="preserve"><value>عملية مسح واحدة</value></data>
+  <data name="ScansN_Two" xml:space="preserve"><value>عمليتا مسح</value></data>
+  <data name="ScanToLoad" xml:space="preserve"><value>امسح الطرود على الشاحنة في {0}</value></data>
+  <data name="ScanToUnload" xml:space="preserve"><value>امسح الطرود عند التفريغ في {0}</value></data>
+  <data name="Search" xml:space="preserve"><value>بحث</value></data>
+  <data name="SearchPlaceholder" xml:space="preserve"><value>ابحث برقم التتبع، الهاتف، الزبون، المتجر أو رقم الطلب…</value></data>
+  <data name="Sec_AsycudaHeader" xml:space="preserve"><value>بيانات تصريحة أسيكودا</value></data>
+  <data name="Sec_Cargo" xml:space="preserve"><value>البضاعة والقيمة</value></data>
+  <data name="Sec_Customer" xml:space="preserve"><value>الزبون</value></data>
+  <data name="Sec_Delivery" xml:space="preserve"><value>التسليم</value></data>
+  <data name="Sec_IraqCompliance" xml:space="preserve"><value>التحقق الإلكتروني الإلزامي وشهادة المطابقة</value></data>
+  <data name="Sec_Parcel" xml:space="preserve"><value>الطرد</value></data>
+  <data name="Sec_ParcelAndMoney" xml:space="preserve"><value>الطرد والدفع</value></data>
+  <data name="Sec_Parties" xml:space="preserve"><value>المرسل والمستلم</value></data>
+  <data name="Sec_Payment" xml:space="preserve"><value>الدفع</value></data>
+  <data name="Sec_Route" xml:space="preserve"><value>المسار ووسيلة النقل</value></data>
+  <data name="Sec_Routing" xml:space="preserve"><value>المسار داخل العراق</value></data>
+  <data name="Sec_Seller" xml:space="preserve"><value>المتجر</value></data>
+  <data name="Sec_Shipper" xml:space="preserve"><value>المرسل</value></data>
+  <data name="Sec_ValuationAndDuties" xml:space="preserve"><value>التقييم والرسوم الجمركية (سعر البنك المركزي 1 دولار = 1310 د.ع)</value></data>
+  <data name="SelectedN" xml:space="preserve"><value>{0} محدد</value></data>
+  <data name="SellerBalancesSubtitle" xml:space="preserve"><value>طلبات مسلّمة تم استلام مبالغها ولم تُسدّد للمتجر بعد</value></data>
+  <data name="SellerBalancesTitle" xml:space="preserve"><value>أرصدة المتاجر الجاهزة للتسديد</value></data>
+  <data name="SellerCreated" xml:space="preserve"><value>تمت إضافة المتجر «{0}»</value></data>
+  <data name="SellerNotFound" xml:space="preserve"><value>المتجر غير موجود</value></data>
+  <data name="SellerReceives" xml:space="preserve"><value>يستلم المتجر</value></data>
+  <data name="SellerSearchPlaceholder" xml:space="preserve"><value>ابحث باسم المتجر أو حساب انستغرام أو الهاتف…</value></data>
+  <data name="SellersSubtitle" xml:space="preserve"><value>متاجر انستغرام والمتاجر الإلكترونية التي نوصل طرودها</value></data>
+  <data name="SellersTitle" xml:space="preserve"><value>المتاجر</value></data>
+  <data name="SendRequest" xml:space="preserve"><value>إرسال الطلب</value></data>
+  <data name="SendWhatsApp" xml:space="preserve"><value>إرسال للزبون</value></data>
+  <data name="ServedBy" xml:space="preserve"><value>يخدمها {0}</value></data>
+  <data name="SettleDialogTitle" xml:space="preserve"><value>تسديد مستحقات المتجر — {0}</value></data>
+  <data name="SettlementCreated" xml:space="preserve"><value>تم تسجيل التسوية {0} — الصافي المسدد {1}</value></data>
+  <data name="SettlementsHistorySubtitle" xml:space="preserve"><value>دفعات تم تسديدها للمتاجر مع إمكانية تنزيل كشف تفصيلي CSV</value></data>
+  <data name="SettlementsHistoryTitle" xml:space="preserve"><value>سجل التسويات والدفعات المكتملة</value></data>
+  <data name="SettlePayout" xml:space="preserve"><value>تسديد المستحقات</value></data>
+  <data name="Shelf" xml:space="preserve"><value>الرف</value></data>
+  <data name="ShelfCapacityHint" xml:space="preserve"><value>تُستخدم للتنبيه قبل امتلاء الرفوف.</value></data>
+  <data name="ShelfHelper" xml:space="preserve"><value>مكان وضع الطرد، مثال: ⁦A-01-2⁩</value></data>
+  <data name="ShelfSwitched" xml:space="preserve"><value>تم اختيار الرف {0}</value></data>
+  <data name="ShelfUseN" xml:space="preserve"><value>{0} من {1}</value></data>
+  <data name="ShelfUseNoCapacity" xml:space="preserve"><value>حدّد السعة لعرضه</value></data>
+  <data name="Shipment" xml:space="preserve"><value>الشحنة</value></data>
+  <data name="ShipmentBooked" xml:space="preserve"><value>تم حجز الشحنة — رقم التتبع {0}</value></data>
+  <data name="ShipmentNotFound" xml:space="preserve"><value>الشحنة غير موجودة</value></data>
+  <data name="ShipmentNotFoundHint" xml:space="preserve"><value>قد تعود لشركة أخرى أو أن الرابط غير صحيح.</value></data>
+  <data name="ShipmentsSubtitle" xml:space="preserve"><value>كل الطرود والشحنات من الطلب حتى التسليم</value></data>
+  <data name="ShipmentsTitle" xml:space="preserve"><value>الشحنات</value></data>
+  <data name="Shortcuts_Palette" xml:space="preserve"><value>البحث والأوامر</value></data>
+  <data name="Shortcuts_Scanner" xml:space="preserve"><value>امسح أي باركود في أي صفحة لفتح الطرد</value></data>
+  <data name="Shortcuts_Search" xml:space="preserve"><value>بحث</value></data>
+  <data name="Shortcuts_Title" xml:space="preserve"><value>اختصارات لوحة المفاتيح</value></data>
+  <data name="SignatureHub" xml:space="preserve"><value>توقيع موظف المركز</value></data>
+  <data name="SignatureSeller" xml:space="preserve"><value>توقيع المتجر</value></data>
+  <data name="SignOut" xml:space="preserve"><value>تسجيل الخروج</value></data>
+  <data name="Skip" xml:space="preserve"><value>تجاوز</value></data>
+  <data name="SmartPasteAction" xml:space="preserve"><value>تحليل وتعبئة الحقول</value></data>
+  <data name="SmartPasteHelper" xml:space="preserve"><value>يدعم الأرقام العربية والإنجليزية، المحافظات، نقاط الدالة، والمبلغ (مثل 45 الف أو 45,000)</value></data>
+  <data name="SmartPastePlaceholder" xml:space="preserve"><value>مثال: سارة محمد - 07701234567 - بغداد المنصور شارع 14 رمضان - قرب مطعم الساعة - فستان أسود - 45 الف</value></data>
+  <data name="SmartPasteSubtitle" xml:space="preserve"><value>الصق رسالة الزبون لتعبئة الاسم والموبايل والمحافظة ونقطة الدالة والمبلغ تلقائياً</value></data>
+  <data name="SmartPasteTitle" xml:space="preserve"><value>اللصق الذكي من واتساب أو إنستغرام</value></data>
+  <data name="SoundMuted" xml:space="preserve"><value>الصوت مكتوم</value></data>
+  <data name="SoundOn" xml:space="preserve"><value>التنبيه الصوتي للمسح مفعّل</value></data>
+  <data name="Source_Customs" xml:space="preserve"><value>الجمارك</value></data>
+  <data name="Source_Scan" xml:space="preserve"><value>مسح</value></data>
+  <data name="Source_System" xml:space="preserve"><value>النظام</value></data>
+  <data name="Source_User" xml:space="preserve"><value>يدوي</value></data>
+  <data name="StaffSignIn" xml:space="preserve"><value>دخول الموظفين</value></data>
+  <data name="StandardPrices" xml:space="preserve"><value>الأسعار القياسية</value></data>
+  <data name="StartReturn" xml:space="preserve"><value>إرجاع إلى المتجر</value></data>
+  <data name="StartReturnHint" xml:space="preserve"><value>تعود الشحنة إلى مركز المتجر وتنتظر التسليم. لا يُحصّل مبلغ الدفع عند الاستلام.</value></data>
+  <data name="StatusesN" xml:space="preserve"><value>{0} حالة</value></data>
+  <data name="StatusesN_Few" xml:space="preserve"><value>{0} حالات</value></data>
+  <data name="StatusesN_One" xml:space="preserve"><value>حالة واحدة</value></data>
+  <data name="StatusesN_Two" xml:space="preserve"><value>حالتان</value></data>
+  <data name="StatusGroup_Delivery" xml:space="preserve"><value>التوصيل</value></data>
+  <data name="StatusGroup_International" xml:space="preserve"><value>الشحن الدولي</value></data>
+  <data name="StatusGroup_Returns" xml:space="preserve"><value>المرتجعات والإلغاء</value></data>
+  <data name="StatusUpdated" xml:space="preserve"><value>{0} أصبحت «{1}»</value></data>
+  <data name="StickyHint" xml:space="preserve"><value>(يبقى للمسح التالي)</value></data>
+  <data name="Summary" xml:space="preserve"><value>الملخص</value></data>
+  <data name="SwitchLanguage" xml:space="preserve"><value>تغيير اللغة</value></data>
+  <data name="Tab_ActionSheet" xml:space="preserve"><value>ورقة باركودات أوامر المخزن</value></data>
+  <data name="Tab_AwbLabels" xml:space="preserve"><value>بوليصات الطرود (AWB)</value></data>
+  <data name="Tab_QuickCommands" xml:space="preserve"><value>أوامر سريعة</value></data>
+  <data name="TakeRequest" xml:space="preserve"><value>سأتابعه</value></data>
+  <data name="Team_LockedOutUntil" xml:space="preserve"><value>كلمات مرور خاطئة: مقفل حتى {0}</value></data>
+  <data name="Team_PasswordSet" xml:space="preserve"><value>تم تعيين كلمة مرور جديدة لـ {0}.</value></data>
+  <data name="Team_SetPassword" xml:space="preserve"><value>تعيين كلمة مرور</value></data>
+  <data name="Team_SetPasswordHelper" xml:space="preserve"><value>تنتهي الجلسات المفتوحة لهذا الحساب خلال دقيقة. أرسل كلمة المرور الجديدة بشكل خاص.</value></data>
+  <data name="Team_SetPasswordTitle" xml:space="preserve"><value>كلمة مرور جديدة لـ {0}</value></data>
+  <data name="TodayAtHub" xml:space="preserve"><value>اليوم في {0}</value></data>
+  <data name="ToDispatch" xml:space="preserve"><value>جاهزة للمندوبين</value></data>
+  <data name="ToDispatchHint" xml:space="preserve"><value>زبائنها ضمن منطقة هذا المركز</value></data>
+  <data name="ToggleSection" xml:space="preserve"><value>إظهار أو إخفاء</value></data>
+  <data name="ToggleTheme" xml:space="preserve"><value>الوضع الداكن / الفاتح</value></data>
+  <data name="TooManyRequests" xml:space="preserve"><value>طلبات كثيرة. يرجى الانتظار دقيقة والمحاولة مجدداً.</value></data>
+  <data name="TopSellers" xml:space="preserve"><value>أكثر المتاجر طلباً</value></data>
+  <data name="Track" xml:space="preserve"><value>تتبع</value></data>
+  <data name="Track_ConfirmAction" xml:space="preserve"><value>نعم، أرسلوه</value></data>
+  <data name="Track_Confirmed" xml:space="preserve"><value>شكراً! تم تأكيد طلبك وسيصلك قريباً.</value></data>
+  <data name="Track_ConfirmText" xml:space="preserve"><value>طلب المتجر تأكيد الطلب قبل أن نستلم الطرد. أدخل آخر 4 أرقام من موبايلك.</value></data>
+  <data name="Track_ConfirmTitle" xml:space="preserve"><value>يرجى تأكيد طلبك</value></data>
+  <data name="Track_DeclineAction" xml:space="preserve"><value>ألغوا طلبي</value></data>
+  <data name="Track_Declined" xml:space="preserve"><value>تم إلغاء طلبك ولن يُرسل.</value></data>
+  <data name="Track_RateComment" xml:space="preserve"><value>هل تريد أن تضيف شيئاً آخر؟ (اختياري)</value></data>
+  <data name="Track_RateCommentLow" xml:space="preserve"><value>ما الذي حصل؟ سنطلب من خدمة الزبائن الاتصال بك.</value></data>
+  <data name="Track_Rated" xml:space="preserve"><value>شكراً لتقييمك خدمة التوصيل.</value></data>
+  <data name="Track_RatedLow" xml:space="preserve"><value>شكراً. ستراجع خدمة الزبائن ملاحظتك وتتصل بك.</value></data>
+  <data name="Track_RateSend" xml:space="preserve"><value>إرسال التقييم</value></data>
+  <data name="Track_RateTitle" xml:space="preserve"><value>كيف كانت خدمة التوصيل؟</value></data>
+  <data name="Track_WrongDigits" xml:space="preserve"><value>هذه الأرقام لا تطابق رقم الموبايل في الطلب.</value></data>
+  <data name="TrackingNotFound" xml:space="preserve"><value>لا توجد شحنة بهذا الرقم.</value></data>
+  <data name="TrackIntro" xml:space="preserve"><value>أدخل رقم التتبع الموجود في رسالتك أو الوصل.</value></data>
+  <data name="TrackTitle" xml:space="preserve"><value>تتبع طردك</value></data>
+  <data name="Transfers_New" xml:space="preserve"><value>فتح شاحنة جديدة</value></data>
+  <data name="TransfersSearch" xml:space="preserve"><value>رقم الشاحنة أو اللوحة أو السائق أو رقم التتبع…</value></data>
+  <data name="TransfersSubtitle" xml:space="preserve"><value>شاحنات النقل بين المراكز. تُخطط الطرود تلقائياً؛ امسحها عند التحميل والتفريغ.</value></data>
+  <data name="TransfersTitle" xml:space="preserve"><value>الشاحنات بين المراكز</value></data>
+  <data name="Trend_Booked" xml:space="preserve"><value>طلبات جديدة</value></data>
+  <data name="Trend_Delivered" xml:space="preserve"><value>تسليم</value></data>
+  <data name="Trend_Failed" xml:space="preserve"><value>محاولات فاشلة</value></data>
+  <data name="Trend_Returned" xml:space="preserve"><value>مرتجعات</value></data>
+  <data name="TruckAuto" xml:space="preserve"><value>تلقائي — شاحنة وجهة الطرد</value></data>
+  <data name="TruckDeparted" xml:space="preserve"><value>{0} في الطريق</value></data>
+  <data name="TruckDetails" xml:space="preserve"><value>الشاحنة</value></data>
+  <data name="TruckNotFound" xml:space="preserve"><value>الشاحنة غير موجودة</value></data>
+  <data name="TruckOpened" xml:space="preserve"><value>{0} قيد التحميل</value></data>
+  <data name="TrucksOnRoad" xml:space="preserve"><value>المسارات</value></data>
+  <data name="UncoveredHint" xml:space="preserve"><value>طرودها تذهب إلى أقرب مخزن: {0}. أضف تغطية لتوجيهها بشكل مقصود.</value></data>
+  <data name="UncoveredTitle" xml:space="preserve"><value>بعض المحافظات بلا مخزن</value></data>
+  <data name="UnhandledError" xml:space="preserve"><value>حدث خطأ غير متوقع.</value></data>
+  <data name="ServiceUnavailable" xml:space="preserve"><value>تعذر الاتصال بالخدمة حالياً. تحقق من الإنترنت وحاول مجدداً.</value></data>
+  <data name="StarsN" xml:space="preserve"><value>{0} نجمة</value></data>
+  <data name="StarsN_One" xml:space="preserve"><value>نجمة واحدة</value></data>
+  <data name="StarsN_Two" xml:space="preserve"><value>نجمتان</value></data>
+  <data name="StarsN_Few" xml:space="preserve"><value>{0} نجوم</value></data>
+  <data name="StarsN_Many" xml:space="preserve"><value>{0} نجمة</value></data>
+  <data name="Unit_Days" xml:space="preserve"><value>يوم</value></data>
+  <data name="Unit_Hours" xml:space="preserve"><value>ساعة</value></data>
+  <data name="Unload" xml:space="preserve"><value>تفريغ</value></data>
+  <data name="UnloadedOfOnBoard" xml:space="preserve"><value>تم تفريغ {0} من {1}</value></data>
+  <data name="UpdatedByAt" xml:space="preserve"><value>آخر تعديل: {0} · {1}</value></data>
+  <data name="UseGovernorateCentre" xml:space="preserve"><value>مركز المحافظة</value></data>
+  <data name="ValidOrders" xml:space="preserve"><value>طلبات جاهزة للحجز</value></data>
+  <data name="View" xml:space="preserve"><value>العرض</value></data>
+  <data name="View_CustomsHold" xml:space="preserve"><value>محجوزة في الجمارك</value></data>
+  <data name="View_Failed" xml:space="preserve"><value>محاولات فاشلة</value></data>
+  <data name="View_InWarehouse" xml:space="preserve"><value>على الرفوف</value></data>
+  <data name="View_Kanban" xml:space="preserve"><value>لوحة المراحل</value></data>
+  <data name="View_Late" xml:space="preserve"><value>متأخرة</value></data>
+  <data name="View_NeedsTruck" xml:space="preserve"><value>بانتظار شاحنة</value></data>
+  <data name="View_PickupPending" xml:space="preserve"><value>بانتظار الاستلام</value></data>
+  <data name="View_Returns" xml:space="preserve"><value>مرتجعات</value></data>
+  <data name="View_Table" xml:space="preserve"><value>جدول</value></data>
+  <data name="View_WithCourier" xml:space="preserve"><value>مع المندوبين</value></data>
+  <data name="ViewAll" xml:space="preserve"><value>عرض الكل</value></data>
+  <data name="VsPrevious" xml:space="preserve"><value>عن الفترة السابقة</value></data>
+  <data name="VsPreviousPeriod" xml:space="preserve"><value>مقارنة بنفس عدد الأيام قبلها</value></data>
+  <data name="WaitingForTruck" xml:space="preserve"><value>بانتظار شاحنة</value></data>
+  <data name="WaitingForTruckHint" xml:space="preserve"><value>يجب نقلها إلى مركز آخر</value></data>
+  <data name="WaitingSince" xml:space="preserve"><value>أقدمها وصل {0}</value></data>
+  <data name="WarehouseActive" xml:space="preserve"><value>المخزن فعّال</value></data>
+  <data name="WarehouseAddressPlaceholder" xml:space="preserve"><value>المنطقة، الشارع، أقرب نقطة دالة</value></data>
+  <data name="WarehouseCoverage" xml:space="preserve"><value>المحافظات التي يخدمها</value></data>
+  <data name="WarehouseCreatedN" xml:space="preserve"><value>أُضيف {0}</value></data>
+  <data name="WarehouseEmpty" xml:space="preserve"><value>المخزن فارغ</value></data>
+  <data name="WarehouseIdentity" xml:space="preserve"><value>التعريف</value></data>
+  <data name="WarehouseLocation" xml:space="preserve"><value>الموقع</value></data>
+  <data name="WarehouseMain" xml:space="preserve"><value>المخزن الرئيسي (يستقبل الطرود التي لا تطابق مخزناً آخر)</value></data>
+  <data name="WarehouseOperations" xml:space="preserve"><value>التشغيل</value></data>
+  <data name="WarehouseSavedN" xml:space="preserve"><value>حُفظ {0}</value></data>
+  <data name="WarehousesSubtitle" xml:space="preserve"><value>مراكز الفرز والفروع والمستودعات في العراق، والمحافظات التي يخدمها كل منها، وحجم العمل فيها الآن.</value></data>
+  <data name="WarehousesTitle" xml:space="preserve"><value>المخازن والفروع</value></data>
+  <data name="WarehouseSubtitle" xml:space="preserve"><value>امسح الطرود عند الاستلام والتحميل والتسليم للمندوب. اختر المركز أولاً.</value></data>
+  <data name="WarehouseTitle" xml:space="preserve"><value>محطة المركز</value></data>
+  <data name="WeTriedToDeliver" xml:space="preserve"><value>حاولنا تسليم طردك</value></data>
+  <data name="WeWillTryAgain" xml:space="preserve"><value>سيتواصل معك المندوب لتحديد موعد جديد.</value></data>
+  <data name="WhatsAppMessage" xml:space="preserve"><value>مرحباً {0}، طلبك من {1} في الطريق إليك مع لوجستيكو. رقم التتبع: {2}. تابع طلبك من هنا: {3}</value></data>
+  <data name="WhereNow" xml:space="preserve"><value>مكانها الآن</value></data>
+  <data name="WithCourier" xml:space="preserve"><value>مع {0}</value></data>
+  <data name="Nav_IntelligenceSection" xml:space="preserve"><value>التحليلات</value></data>
+  <data name="Nav_Insights" xml:space="preserve"><value>ذكاء الطلب</value></data>
+  <data name="Insights_Title" xml:space="preserve"><value>ذكاء الطلب في العراق</value></data>
+  <data name="Insights_Subtitle" xml:space="preserve"><value>ماذا يطلب الزبائن في أنحاء العراق، وأين ومتى، وكيف تنتهي طلباتهم</value></data>
+  <data name="Period_365" xml:space="preserve"><value>12 شهرًا</value></data>
+  <data name="Insights_OpenData" xml:space="preserve"><value>بيانات مفتوحة (CSV)</value></data>
+  <data name="Insights_OpenDataHint" xml:space="preserve"><value>مجاميع مجهّلة يمكن نشرها: بلا أسماء أو أرقام هواتف أو عناوين، وتُحذف المجموعات التي تقل عن 10 طلبات.</value></data>
+  <data name="Insights_NoData" xml:space="preserve"><value>لا توجد طلبات توصيل محلية في هذه الفترة</value></data>
+  <data name="Insights_NoDataHint" xml:space="preserve"><value>اختر فترة أطول، أو سجّل طلبات توصيل لتبدأ بمعرفة ما يريده زبائنك.</value></data>
+  <data name="Insights_Orders" xml:space="preserve"><value>الطلبات</value></data>
+  <data name="Insights_AvgBasket" xml:space="preserve"><value>متوسط قيمة الطلب</value></data>
+  <data name="Insights_AvgBasketHint" xml:space="preserve"><value>مبلغ الدفع عند الاستلام لكل طلب</value></data>
+  <data name="Insights_Customers" xml:space="preserve"><value>الزبائن</value></data>
+  <data name="Insights_CustomersHint" xml:space="preserve"><value>أرقام موبايل مختلفة</value></data>
+  <data name="Insights_RepeatShare" xml:space="preserve"><value>طلبات الزبائن المتكررين</value></data>
+  <data name="Insights_RepeatHint" xml:space="preserve"><value>زبائن طلبوا مرتين أو أكثر: {0}</value></data>
+  <data name="Insights_Findings" xml:space="preserve"><value>أبرز النتائج</value></data>
+  <data name="Insights_FindingsHint" xml:space="preserve"><value>مستخرجة تلقائيًا من طلبات هذه الفترة</value></data>
+  <data name="Finding_None" xml:space="preserve"><value>لا توجد طلبات كافية في هذه الفترة لاستخراج نتائج بعد.</value></data>
+  <data name="Finding_TopCategory" xml:space="preserve"><value>{0} هي الأكثر طلبًا من الزبائن: {1} من كل الطلبات.</value></data>
+  <data name="Finding_Growth" xml:space="preserve"><value>نمت الطلبات إلى {0} بنسبة {1} مقارنة بالفترة السابقة.</value></data>
+  <data name="Finding_WeakGovernorate" xml:space="preserve"><value>{0} لديها أدنى نسبة نجاح في التوصيل ({1}). أكثر سبب للفشل فيها: {2}.</value></data>
+  <data name="Finding_WeakGovernorateNoReason" xml:space="preserve"><value>{0} لديها أدنى نسبة نجاح في التوصيل ({1}).</value></data>
+  <data name="Finding_BasketRisk" xml:space="preserve"><value>طلبات {0} تُرجَع {1} ضعف المعدل ({2} مقابل {3}). أكّدها مع الزبون قبل استلامها من المتجر.</value></data>
+  <data name="Finding_RiskyCategory" xml:space="preserve"><value>{0} لديها أعلى نسبة إرجاع ({1}).</value></data>
+  <data name="Finding_PeakTime" xml:space="preserve"><value>يطلب الزبائن أكثر يوم {0} حوالي الساعة {1}. خطّط لمكالمات التأكيد والاستلام صباح اليوم التالي.</value></data>
+  <data name="Finding_Loyalty" xml:space="preserve"><value>الزبائن المتكررون يقدّمون {0} من الطلبات، ويُسلَّم {1} من طلباتهم مقابل {2} للزبائن الجدد.</value></data>
+  <data name="Insights_DemandMap" xml:space="preserve"><value>الطلب في أنحاء العراق</value></data>
+  <data name="Insights_DemandMapHint" xml:space="preserve"><value>حسب محافظة الزبون · اضغط على محافظة لعرض تفاصيلها</value></data>
+  <data name="Measure_Orders" xml:space="preserve"><value>الطلبات</value></data>
+  <data name="Measure_Success" xml:space="preserve"><value>النجاح</value></data>
+  <data name="Measure_Basket" xml:space="preserve"><value>قيمة الطلب</value></data>
+  <data name="Measure_Hours" xml:space="preserve"><value>مدة التوصيل</value></data>
+  <data name="Map_Better" xml:space="preserve"><value>أفضل</value></data>
+  <data name="Map_Worse" xml:space="preserve"><value>أسوأ</value></data>
+  <data name="Insights_Governorates" xml:space="preserve"><value>المحافظات</value></data>
+  <data name="Insights_Previous" xml:space="preserve"><value>الفترة السابقة</value></data>
+  <data name="ViewOrders" xml:space="preserve"><value>عرض الطلبات</value></data>
+  <data name="Col_Growth" xml:space="preserve"><value>النمو</value></data>
+  <data name="Col_AvgBasket" xml:space="preserve"><value>متوسط الطلب</value></data>
+  <data name="Col_TopCategory" xml:space="preserve"><value>الفئة الأولى</value></data>
+  <data name="Col_TopFailure" xml:space="preserve"><value>سبب الفشل الأول</value></data>
+  <data name="Col_Category" xml:space="preserve"><value>الفئة</value></data>
+  <data name="Col_ReturnRate" xml:space="preserve"><value>الإرجاع</value></data>
+  <data name="Col_RefusalRate" xml:space="preserve"><value>الرفض</value></data>
+  <data name="Col_TradeLane" xml:space="preserve"><value>الخط</value></data>
+  <data name="Insights_Categories" xml:space="preserve"><value>ماذا يشتري الزبائن</value></data>
+  <data name="Insights_CategoriesHint" xml:space="preserve"><value>مستخرجة من وصف محتويات الطلبات</value></data>
+  <data name="Insights_OrderTimes" xml:space="preserve"><value>متى يطلب الزبائن</value></data>
+  <data name="Insights_OrderTimesHint" xml:space="preserve"><value>الطلبات حسب اليوم والساعة بتوقيت بغداد</value></data>
+  <data name="Insights_Baskets" xml:space="preserve"><value>قيمة الطلب ونسبة الرفض</value></data>
+  <data name="Insights_BasketsHint" xml:space="preserve"><value>مبلغ الدفع عند الاستلام، وكم مرة يُرجَع كل حجم</value></data>
+  <data name="Basket_NoCod" xml:space="preserve"><value>مدفوع مسبقًا (بلا دفع عند الاستلام)</value></data>
+  <data name="Basket_Under" xml:space="preserve"><value>أقل من {0}</value></data>
+  <data name="Basket_Between" xml:space="preserve"><value>{0} – {1}</value></data>
+  <data name="Basket_Over" xml:space="preserve"><value>{0} فأكثر</value></data>
+  <data name="Insights_Lanes" xml:space="preserve"><value>أكثر خطوط التجارة نشاطًا</value></data>
+  <data name="Insights_LanesHint" xml:space="preserve"><value>محافظة المتجر ← محافظة الزبون</value></data>
+  <data name="Insights_SameCity" xml:space="preserve"><value>نفس المحافظة</value></data>
+  <data name="Insights_Terms" xml:space="preserve"><value>أكثر المنتجات طلبًا</value></data>
+  <data name="Insights_TermsHint" xml:space="preserve"><value>الكلمات الأكثر ذكرًا في الطلبات، حسب عدد الطلبات</value></data>
+  <data name="Insights_Loyalty" xml:space="preserve"><value>الزبائن الجدد والمتكررون</value></data>
+  <data name="Insights_LoyaltyHint" xml:space="preserve"><value>من طلبوا مرتين أو أكثر خلال الفترة مقارنة بالبقية</value></data>
+  <data name="Loyalty_FirstTime" xml:space="preserve"><value>طلب واحد</value></data>
+  <data name="Loyalty_Repeat" xml:space="preserve"><value>زبائن متكررون</value></data>
+  <data name="Insights_DataNote" xml:space="preserve"><value>طلبات التوصيل المحلية المسجّلة خلال الفترة عدا الملغاة. يُحتسب الزبون برقم الموبايل، وتُستخرج الفئات تلقائيًا من وصف المحتويات بالعربية والإنكليزية. النجاح = المُسلَّم ÷ (المُسلَّم + المرتجع).</value></data>
+  <data name="OrdersN" xml:space="preserve"><value>{0} طلب</value></data>
+  <data name="OrdersN_One" xml:space="preserve"><value>طلب واحد</value></data>
+  <data name="OrdersN_Two" xml:space="preserve"><value>طلبان</value></data>
+  <data name="OrdersN_Few" xml:space="preserve"><value>{0} طلبات</value></data>
+  <data name="OrdersN_Many" xml:space="preserve"><value>{0} طلبًا</value></data>
+  <data name="Role_None" xml:space="preserve"><value>بلا صلاحية بعد</value></data>
+  <data name="NoAccess_Title" xml:space="preserve"><value>غير متاحة لدورك</value></data>
+  <data name="NoAccess_Text" xml:space="preserve"><value>دورك ({0}) لا يسمح بفتح هذه الصفحة. اطلبها من مدير النظام في شركتك إن كنت تحتاجها.</value></data>
+  <data name="NoAccess_WaitingTitle" xml:space="preserve"><value>بانتظار الصلاحية</value></data>
+  <data name="NoAccess_WaitingText" xml:space="preserve"><value>سجّلت الدخول، لكن حسابك بلا دور بعد. يمنحك مدير النظام في شركتك دوراً من صفحة «الفريق والصلاحيات»، ثم أعد تحميل هذه الصفحة.</value></data>
+  <data name="Team_Subtitle" xml:space="preserve"><value>من يستطيع الدخول إلى لوجستيكو شركتك وما يسمح به كل دور. الخادم يفرض كل قاعدة.</value></data>
+  <data name="Team_Add" xml:space="preserve"><value>إضافة عضو</value></data>
+  <data name="Team_Members" xml:space="preserve"><value>أعضاء لهم دور</value></data>
+  <data name="Team_Member" xml:space="preserve"><value>العضو</value></data>
+  <data name="Team_Empty" xml:space="preserve"><value>لا أحد هنا بعد</value></data>
+  <data name="Team_TwoFactor" xml:space="preserve"><value>التحقق بخطوتين</value></data>
+  <data name="Team_On" xml:space="preserve"><value>مفعّل</value></data>
+  <data name="Team_Off" xml:space="preserve"><value>غير مفعّل</value></data>
+  <data name="Team_Locked" xml:space="preserve"><value>مقفل</value></data>
+  <data name="Team_You" xml:space="preserve"><value>أنت</value></data>
+  <data name="Team_SelfHint" xml:space="preserve"><value>لا يمكنك تغيير دورك أو قفل حسابك بنفسك؛ يستطيع ذلك مدير آخر.</value></data>
+  <data name="Team_RoleOf" xml:space="preserve"><value>دور {0}</value></data>
+  <data name="Team_Lock" xml:space="preserve"><value>قفل</value></data>
+  <data name="Team_Unlock" xml:space="preserve"><value>فتح القفل</value></data>
+  <data name="Team_LockTitle" xml:space="preserve"><value>قفل هذا الحساب؟</value></data>
+  <data name="Team_LockMessage" xml:space="preserve"><value>لن يتمكن {0} من تسجيل الدخول، وتنتهي جلساته المفتوحة خلال دقيقة.</value></data>
+  <data name="Team_LockedToast" xml:space="preserve"><value>تم قفل حساب {0}</value></data>
+  <data name="Team_UnlockedToast" xml:space="preserve"><value>يستطيع {0} تسجيل الدخول مجدداً</value></data>
+  <data name="Team_RemoveTitle" xml:space="preserve"><value>سحب الصلاحية؟</value></data>
+  <data name="Team_RemoveMessage" xml:space="preserve"><value>سيبقى حساب {0} لكنه لن يرى أي بيانات للشركة حتى يمنحه أحد دوراً من جديد.</value></data>
+  <data name="Team_RemoveConfirm" xml:space="preserve"><value>سحب الصلاحية</value></data>
+  <data name="Team_RoleChanged" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Team_Added" xml:space="preserve"><value>يستطيع {0} الآن تسجيل الدخول. أرسل له كلمة المرور الأولى بشكل خاص.</value></data>
+  <data name="Team_Matrix" xml:space="preserve"><value>ما يستطيعه كل دور</value></data>
+  <data name="Team_MatrixHint" xml:space="preserve"><value>الصفحات والأزرار غير المسموحة لدور ما مخفية، وترفضها الواجهة البرمجية أيضاً.</value></data>
+  <data name="Team_Capability" xml:space="preserve"><value>الصلاحية</value></data>
+  <data name="Capability_Read" xml:space="preserve"><value>الاطلاع على اللوحات والشحنات والخرائط والرؤى</value></data>
+  <data name="Capability_Operate" xml:space="preserve"><value>حجز الطلبات وتعديلها والمسح في المخازن والشاحنات والمندوبين والمرتجعات</value></data>
+  <data name="Capability_Export" xml:space="preserve"><value>تنزيل قوائم الزبائن (CSV)</value></data>
+  <data name="Capability_Finance" xml:space="preserve"><value>أجور التوصيل وتسويات التجار</value></data>
+  <data name="Capability_Administer" xml:space="preserve"><value>قواعد الأتمتة والمخازن والبيانات المفتوحة والفريق</value></data>
+  <data name="Field_Role" xml:space="preserve"><value>الدور</value></data>
+  <data name="FirstPasswordHelper" xml:space="preserve"><value>عشرة أحرف على الأقل فيها حرف كبير وصغير ورقم ورمز. يغيّرها العضو من «حسابي» بعد الدخول.</value></data>
+  <data name="Generate" xml:space="preserve"><value>توليد</value></data>
+  <data name="Yes" xml:space="preserve"><value>نعم</value></data>
+  <data name="No" xml:space="preserve"><value>لا</value></data>
+  <data name="ViewOnly" xml:space="preserve"><value>للاطلاع فقط. يستطيع التعديل: {0}.</value></data>
+  <data name="ListSeparator" xml:space="preserve"><value>، </value></data>
+  <data name="ListAnd" xml:space="preserve"><value> و</value></data>
+  <data name="Track_HelpNumberTitle" xml:space="preserve"><value>أين أجد الرقم؟</value></data>
+  <data name="Track_HelpNumberText" xml:space="preserve"><value>في رسالة SMS أو واتساب الخاصة بطلبك، وعلى ملصق الطرد. يبدأ بـ LX.</value></data>
+  <data name="Track_HelpChangeTitle" xml:space="preserve"><value>غيّره بنفسك</value></data>
+  <data name="Track_HelpChangeText" xml:space="preserve"><value>اختر يوماً آخر أو عنواناً جديداً أو رقماً آخر، وتأكّد بآخر 4 أرقام من هاتفك.</value></data>
+  <data name="Track_HelpConfirmTitle" xml:space="preserve"><value>أكّد وقيّم</value></data>
+  <data name="Track_HelpConfirmText" xml:space="preserve"><value>أكّد طلبك قبل الشحن، وأخبرنا كيف كان التوصيل.</value></data>
+</root>

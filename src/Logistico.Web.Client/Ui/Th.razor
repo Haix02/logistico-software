@@ -1,0 +1,16 @@
+@* Table header that becomes sortable when the table has a SortState. *@
+@if (Sort is null)
+{
+    <th class="@CssClass">@Text</th>
+}
+else
+{
+    <SortHeader Key="@Key" Text="@Text" CssClass="@CssClass" />
+}
+
+@code {
+    [CascadingParameter] public SortState? Sort { get; set; }
+    [Parameter, EditorRequired] public string Key { get; set; } = "";
+    [Parameter, EditorRequired] public string Text { get; set; } = "";
+    [Parameter] public string? CssClass { get; set; }
+}

@@ -1,0 +1,292 @@
+@page "/transfers/{Id:guid}"
+@inject OperationsApi Operations
+@inject OpsState Ops
+@inject Confirmer Confirmer
+@inject Toaster Toaster
+@inject IJSRuntime JS
+
+@if (transfer is null)
+{
+    @if (notFound)
+    {
+        <NonIdealState Icon="drive-time" Title="@L["TruckNotFound"]">
+            <LinkButton Href="transfers" Icon="@Bidi.Back" Text="@L["Nav_Transfers"]" />
+        </NonIdealState>
+    }
+    else
+    {
+        <Skeleton Lines="8" />
+    }
+}
+else
+{
+    var t = transfer.Summary;
+    <PageTitle>@t.Number · @L["AppName"]</PageTitle>
+    <PageHeader Title="@t.Number" Icon="drive-time" Breadcrumbs="@([(L["Nav_Transfers"].Value, "transfers")])"
+                Subtitle="@($"{Fmt.Hub(t.FromHubCode)} {Bidi.Arrow} {Fmt.Hub(t.ToHubCode)}")">
+        <TitleExtra>
+            <Tag Large="true" Intent="@(t.IsOverdue ? Intent.Danger : t.Status == TransferStatus.InTransit ? Intent.Primary : t.Status == TransferStatus.Loading ? Intent.Warning : Intent.Success)">@ShipmentTexts.Of(t.Status)</Tag>
+        </TitleExtra>
+        <Actions>
+            <Button Icon="print" Text="@L["PrintManifest"]" OnClick="@(() => JS.InvokeVoidAsync("lx.print"))" />
+            <Allowed Policy="@StaffPolicies.Operate">
+                @if (t.Status == TransferStatus.Loading)
+                {
+                    <Button Icon="drive-time" Text="@L["Depart"]" Intent="Intent.Primary" Disabled="@(t.Loaded == 0)" OnClick="@(() => departOpen = true)" />
+                }
+                else if (t.Status == TransferStatus.InTransit)
+                {
+                    <Button Icon="tick-circle" Text="@L["CloseManifest"]" Intent="Intent.Warning" OnClick="CloseAsync" />
+                }
+            </Allowed>
+        </Actions>
+    </PageHeader>
+
+    <div class="lx-split">
+        <div class="lx-stack" style="gap:18px">
+            @if (t.Status != TransferStatus.Received)
+            {
+                <Allowed Policy="@StaffPolicies.Operate">
+                    <div class="lx-card lx-scan-box lx-no-print">
+                        <form @onsubmit="ScanAsync" class="bp6-form-group" style="margin:0">
+                            <label class="bp6-label" for="lx-scan">@(t.Status == TransferStatus.Loading ? string.Format(CultureInfo.CurrentCulture, L["ScanToLoad"], Fmt.Hub(t.FromHubCode)) : string.Format(CultureInfo.CurrentCulture, L["ScanToUnload"], Fmt.Hub(t.ToHubCode)))</label>
+                            <div class="bp6-control-group bp6-fill bp6-large">
+                                <div class="bp6-input-group bp6-large bp6-fill lx-scan-input">
+                                    <span class="bp6-icon bp6-icon-large bp6-icon-barcode"></span>
+                                    <input id="lx-scan" class="bp6-input bp6-large lx-upper" dir="ltr" placeholder="LX26…" @bind="scan" autocomplete="off" />
+                                </div>
+                                <Button Type="submit" Intent="Intent.Primary" Large="true" Icon="tick" Text="@(t.Status == TransferStatus.Loading ? L["Mode_Load"] : L["Unload"])" Loading="busy" />
+                            </div>
+                        </form>
+                        @if (lastMessage is not null)
+                        {
+                            <div class="@Bp.Cls("lx-scan-result", lastOk ? "lx-scan-ok" : "lx-scan-error")" role="status">
+                                <Icon Name="@(lastOk ? "tick-circle" : "error")" Large="true" /><div class="lx-stack"><Mixed Text="@lastMessage" /></div>
+                            </div>
+                        }
+                    </div>
+                </Allowed>
+            }
+
+            <div class="lx-table-card lx-print-sheet">
+                <div class="lx-toolbar">
+                    <span class="lx-strong">@L["Col_Manifest"]</span>
+                    <span class="lx-spacer"></span>
+                    @foreach (var group in transfer.Items.GroupBy(i => i.State))
+                    {
+                        <Tag Intent="@IntentOf(group.Key)">@ShipmentTexts.Of(group.Key) · @Fmt.Number(group.Count())</Tag>
+                    }
+                </div>
+                <DataTable TItem="TransferItemView" Items="transfer.Items" ColumnCount="7" EmptyIcon="box" EmptyTitle="@L["ManifestEmpty"]"
+                           RowClass="@(i => i.State == TransferItemState.Missing ? "lx-row-danger" : i.State == TransferItemState.Planned ? "lx-row-warning" : null)">
+                    <Header>
+                        <th>@L["Col_Tracking"]</th>
+                        <th>@L["Col_Status"]</th>
+                        <th>@L["Col_Customer"]</th>
+                        <th>@L["Col_Destination"]</th>
+                        <th class="lx-num">@L["Col_Cod"]</th>
+                        <th>@L["Col_Timing"]</th>
+                    </Header>
+                    <Row Context="i">
+                        <td>
+                            <Cell Sub="@(i.IsReturn ? L["ReturnParcel"].Value : null)">
+                                <TitleContent><a class="lx-code" href="@($"shipments/{i.ShipmentId}")">@i.TrackingNumber</a></TitleContent>
+                            </Cell>
+                        </td>
+                        <td><Tag Intent="@IntentOf(i.State)">@ShipmentTexts.Of(i.State)</Tag></td>
+                        <td><Cell Title="@i.ConsigneeName" Sub="@i.MerchantName" /></td>
+                        <td>@Fmt.Place(i.DestinationCode)</td>
+                        <td class="lx-num">@Fmt.Money(i.CodAmount, i.CodCurrency)</td>
+                        <td class="lx-nowrap bp6-text-muted lx-small">@Fmt.Time(i.ReceivedAt ?? i.LoadedAt ?? i.PlannedAt)</td>
+                    </Row>
+                </DataTable>
+            </div>
+        </div>
+
+        <div class="lx-stack" style="gap:18px">
+            <Section Title="@L["TruckDetails"]" Icon="info-sign">
+                <div class="lx-progress-row lx-mb">
+                    <ProgressBar Value="@Progress" Intent="@(t.Missing > 0 ? Intent.Danger : Intent.Success)" />
+                    <span class="lx-small lx-nowrap">@(Progress.ToString("P0", CultureInfo.CurrentCulture))</span>
+                </div>
+                <dl class="lx-props">
+                    <dt>@L["Col_Route"]</dt><dd><HubRoute Current="@t.FromHubCode" Target="@t.ToHubCode" /></dd>
+                    <dt>@L["Col_Driver"]</dt><dd><Mixed Text="@(t.DriverName ?? "—")" /></dd>
+                    <dt>@L["Field_VehiclePlate"]</dt><dd><bdi dir="ltr">@(t.VehiclePlate ?? "—")</bdi></dd>
+                    <dt>@L["Field_Seal"]</dt><dd><bdi dir="ltr">@(t.SealNumber ?? "—")</bdi></dd>
+                    <dt>@L["Opened"]</dt><dd>@Fmt.DateTime(t.CreatedAt)</dd>
+                    @if (t.DepartedAt is { } left)
+                    {
+                        <dt>@L["Departed"]</dt><dd>@Fmt.DateTime(left)</dd>
+                    }
+                    @if (t.ExpectedAt is { } eta && t.Status == TransferStatus.InTransit)
+                    {
+                        <dt>@L["ExpectedArrival"]</dt><dd class="@Bp.When(t.IsOverdue, "lx-intent-danger")">@Fmt.DateTime(eta)</dd>
+                    }
+                    @if (t.ArrivedAt is { } arrived)
+                    {
+                        <dt>@L["Arrived"]</dt><dd>@Fmt.DateTime(arrived)</dd>
+                    }
+                    <dt>@L["RecordedBy"]</dt><dd><Mixed Text="@(transfer.DepartedBy ?? transfer.CreatedBy ?? "—")" /></dd>
+                    @if (transfer.Notes is not null)
+                    {
+                        <dt>@L["Field_Notes"]</dt><dd><Mixed Text="@transfer.Notes" /></dd>
+                    }
+                </dl>
+            </Section>
+            @if (t.Status == TransferStatus.Loading && t.Planned > 0)
+            {
+                <Callout Intent="Intent.Warning" Icon="info-sign" Title="@L.Count("PlannedNotLoaded", t.Planned)">@L["PlannedNotLoadedHint"]</Callout>
+            }
+            @if (t.Missing > 0)
+            {
+                <Callout Intent="Intent.Danger" Icon="error" Title="@string.Format(CultureInfo.CurrentCulture, L["MissingN"], Fmt.Number(t.Missing))">@L["MissingHint"]</Callout>
+            }
+        </div>
+    </div>
+
+    <Dialog @bind-IsOpen="departOpen" Title="@L["Depart"]" Icon="drive-time" Width="480px">
+        <ChildContent>
+            <p>@L.Count("DepartConfirm", t.Loaded, Fmt.Hub(t.ToHubCode))</p>
+            <div class="lx-form-grid">
+                <FormField TValue="string" Label="@L["Field_VehiclePlate"]">
+                    <input class="bp6-input bp6-fill lx-upper" dir="ltr" @bind="depart.VehiclePlate" />
+                </FormField>
+                <FormField TValue="string" Label="@L["Col_Driver"]">
+                    <input class="bp6-input bp6-fill" @bind="depart.DriverName" />
+                </FormField>
+                <FormField TValue="string" Label="@L["Field_Seal"]" Hint="@L["Optional"]" CssClass="lx-span-2">
+                    <input class="bp6-input bp6-fill lx-upper" dir="ltr" @bind="depart.SealNumber" />
+                </FormField>
+            </div>
+        </ChildContent>
+        <Footer>
+            <Button Text="@L["Cancel"]" OnClick="@(() => departOpen = false)" />
+            <Button Intent="Intent.Primary" Icon="drive-time" Text="@L["Depart"]" Loading="busy" OnClick="DepartAsync" />
+        </Footer>
+    </Dialog>
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private TransferDetails? transfer;
+    private DepartTransferRequest depart = new();
+    private bool notFound;
+    private bool busy;
+    private bool departOpen;
+    private string? scan;
+    private string? lastMessage;
+    private bool lastOk;
+
+    private double Progress => transfer?.Summary is not { } t ? 0
+        : t.Status == TransferStatus.Loading ? Ratio(t.Loaded, t.Planned + t.Loaded)
+        : Ratio(t.Received, t.OnBoard);
+
+    private static double Ratio(int done, int total) => total == 0 ? 0 : done / (double)total;
+
+    protected override Task OnParametersSetAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        transfer = await Operations.GetTransferAsync(Id);
+        notFound = transfer is null;
+        if (transfer is not null)
+        {
+            depart = new DepartTransferRequest { VehiclePlate = transfer.Summary.VehiclePlate, DriverName = transfer.Summary.DriverName, SealNumber = transfer.Summary.SealNumber };
+        }
+    }
+
+    private async Task ScanAsync()
+    {
+        var number = TrackingNumber.Normalize(scan ?? "");
+        if (number.Length == 0 || busy || transfer is null)
+        {
+            return;
+        }
+
+        busy = true;
+        scan = null;
+        var t = transfer.Summary;
+        try
+        {
+            var outcome = await Operations.ScanAsync(t.Status == TransferStatus.Loading
+                ? new ScanRequest { Operation = ScanOperation.Load, TrackingNumber = number, HubCode = t.FromHubCode, TransferId = t.Id }
+                : new ScanRequest { Operation = ScanOperation.Receive, TrackingNumber = number, HubCode = t.ToHubCode });
+            (lastOk, lastMessage) = (true, $"{number} · {outcome.Message}");
+            await JS.InvokeVoidAsync("lx.beep", true);
+        }
+        catch (ApiException ex)
+        {
+            (lastOk, lastMessage) = (false, $"{number} · {ex.UserMessage}");
+            await JS.InvokeVoidAsync("lx.beep", false);
+        }
+        finally
+        {
+            busy = false;
+        }
+
+        await LoadAsync();
+        await JS.InvokeVoidAsync("lx.focus", "lx-scan");
+    }
+
+    private async Task DepartAsync()
+    {
+        if (transfer is null)
+        {
+            return;
+        }
+
+        busy = true;
+        try
+        {
+            await Operations.DepartTransferAsync(transfer.Summary.Id, transfer.Version, depart);
+            departOpen = false;
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["TruckDeparted"], transfer.Summary.Number));
+            await LoadAsync();
+            await Ops.RefreshAsync();
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private async Task CloseAsync()
+    {
+        if (transfer is null)
+        {
+            return;
+        }
+
+        var waiting = transfer.Summary.Loaded;
+        var message = waiting > 0 ? L.Count("CloseManifestMissing", waiting) : L["CloseManifestOk"].Value;
+        if (!await Confirmer.AskAsync(L["CloseManifest"], message, L["CloseManifest"], waiting > 0 ? Intent.Danger : Intent.Primary, waiting > 0 ? "warning-sign" : "tick-circle"))
+        {
+            return;
+        }
+
+        try
+        {
+            await Operations.CloseTransferAsync(transfer.Summary.Id, transfer.Version, new CloseTransferRequest());
+            await LoadAsync();
+            await Ops.RefreshAsync();
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+    }
+
+    private static Intent IntentOf(TransferItemState state) => state switch
+    {
+        TransferItemState.Planned => Intent.Warning,
+        TransferItemState.Loaded => Intent.Primary,
+        TransferItemState.Received => Intent.Success,
+        _ => Intent.Danger,
+    };
+}
