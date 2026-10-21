@@ -91,6 +91,9 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
             e.Ignore(x => x.NeedsTransfer);
 
             e.HasIndex(x => new { x.TenantId, x.TrackingNumber }).IsUnique();
+            // Public tracking and customer self-service find a parcel by its number across companies, so numbers must be
+            // unique everywhere, not only within a company (they come from one shared sequence; this makes it a guarantee).
+            e.HasIndex(x => x.TrackingNumber).IsUnique().HasDatabaseName("ux_shipments_tracking_number");
             // Automation sweeps and hub screens: "parcels in status X since before T", "parcels at hub H".
             e.HasIndex(x => new { x.TenantId, x.Status, x.LastStatusAt });
             e.HasIndex(x => new { x.TenantId, x.CurrentHubCode, x.Status }).HasFilter("current_hub_code IS NOT NULL");

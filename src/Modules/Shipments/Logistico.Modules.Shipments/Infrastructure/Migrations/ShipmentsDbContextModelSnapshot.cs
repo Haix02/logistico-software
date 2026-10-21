@@ -1411,6 +1411,10 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("MerchantName"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("MerchantName"), new[] { "gin_trgm_ops" });
 
+                    b.HasIndex("TrackingNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ux_shipments_tracking_number");
+
                     b.HasIndex("TenantId", "CodCollectedAt")
                         .HasDatabaseName("ix_shipments_tenant_id_cod_collected_at")
                         .HasFilter("cod_collected_at IS NOT NULL");

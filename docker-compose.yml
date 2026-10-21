@@ -5,7 +5,7 @@
 #
 # This stack is for evaluation and development. It runs in the Development environment (plain HTTP,
 # detailed errors, demo data, self-registration) — never expose it to the internet as is.
-# For production, see docs/05-infrastructure-and-deployment.md and docs/10-security-and-compliance.md.
+# For production, see docs/15-production-readiness.md and docs/10-security-and-compliance.md.
 
 name: logistico
 
@@ -38,7 +38,8 @@ services:
       Seed__DemoShipments: "600"
       Seed__DemoTeam: "true"
     ports:
-      - "5210:8080"
+      # Only this computer can open it; the evaluation stack is not meant to be reachable from the network.
+      - "127.0.0.1:5210:8080"
     volumes:
       - data-protection-keys:/keys
     healthcheck:

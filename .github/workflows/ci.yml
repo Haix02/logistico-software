@@ -118,11 +118,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # The image is named after the repository that builds it (ghcr.io/<owner>/<repo>), so every repository and fork
+      # publishes to a package it owns.
       - name: Publish container image (.NET SDK container support, no Dockerfile)
         run: >
           dotnet publish src/Logistico.Web -c Release -t:PublishContainer
           -p:ContainerRegistry=ghcr.io
-          -p:ContainerRepository=${{ github.repository_owner }}/logistico-web
+          -p:ContainerRepository=${{ github.repository }}
           -p:ContainerImageTags='"${{ github.sha }};main"'
 
       # Production applies migrations from these bundles before the new version starts (docs/11-ci-cd-and-devops.md).
