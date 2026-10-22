@@ -29,10 +29,11 @@ Status: **Accepted** (adopted and built, or binding for new code) · **Proposed*
 | ADR-022 | Built-in SVG map of Iraq (no map service) | Accepted |
 | ADR-023 | Hub network with line-haul trucks and a persistent scan log | Accepted (implementation detail) |
 | ADR-024 | In-process automation engine with per-company rules | Accepted (implementation detail) |
-| ADR-025 | Dark operations-console theme by default | Accepted |
+| ADR-025 | Dark operations-console theme by default | Superseded by ADR-029 |
 | ADR-026 | Demand intelligence from each company's own orders; anonymised open-data export | Accepted |
 | ADR-027 | Open source under Apache-2.0; Docker Compose for evaluation | Accepted |
 | ADR-028 | Staff roles: one role per person, five roles, policies enforced by the API and followed by the UI | Accepted |
+| ADR-029 | GitLab Pajamas look on Blueprint mechanics; Blueprint in a cascade layer; light by default | Accepted |
 | — | React + DevExtreme web, Tauri desktop, React Native mobile, Keycloak | Superseded by ADR-001/002/005 |
 
 ---
@@ -142,7 +143,7 @@ Status: **Accepted** (adopted and built, or binding for new code) · **Proposed*
 **Alternatives.** A separate worker service with a job library (Hangfire, Quartz, Wolverine); database triggers.
 **Consequences.** No extra infrastructure for the pilot. When the event bus arrives (ADR-011), the sweep can react to events instead of polling. Tests set `Automation:Enabled=false` and run the sweep on demand with a controllable clock.
 
-### ADR-025: Dark operations-console theme by default — Accepted (19 Oct 2026)
+### ADR-025: Dark operations-console theme by default — Superseded by ADR-029 (22 Oct 2026)
 **Context.** Staff work in Logistico all day, often in hubs and at night; the project wanted a Palantir-like operations-console look.
 Blueprint already gives the components; the default light theme read as a generic web dashboard.
 **Decision.** Dark is the default theme (light remains available and remembered per browser). All colours are `--lx-*`
@@ -185,3 +186,20 @@ lock so a company always keeps an active administrator. Accounts without a role 
 **Alternatives.** Several roles per person (more flexible, harder to explain on a hub floor); fine-grained permissions
 per action (planned only if companies ask; the policies already group actions by job).
 **Consequences.** New endpoints are safe by default; a new job (for example a seller portal) is a new role plus a policy.
+
+### ADR-029: GitLab Pajamas look on Blueprint mechanics — Accepted (22 Oct 2026)
+**Context.** The console look (ADR-025) suited a hub at night but read as heavy for the office, the seller portal and
+people new to the system. The project wanted the clean, calm look of GitLab's Pajamas design system, while keeping
+Blueprint for what Palantir built it for: dense tables, menus, popovers, dialogs and drawers, form controls, icons.
+**Decision.** Pajamas sets the look and Blueprint the mechanics. Pajamas' colour, type, radius and shadow values (from
+the MIT-licensed `@gitlab/ui` design tokens) are copied into `app.css` section 1 as `--gl-color-*` primitives and
+`--lx-*` semantic tokens, and Blueprint's own `--bp-*` variables point at them. Blueprint's stylesheets are wrapped in a
+`blueprint` cascade layer by `scripts/vendor-ui-assets.sh`; `app.css` is not layered, so its component rules (buttons,
+inputs, badges, alerts, tabs, menus, dialogs, drawers, toasts, tables) always win without specificity fights. Light is
+the default (GitLab's), dark is one click away. The Blazor components still emit Blueprint markup, so no page changed
+for the switch. Almarai stays the typeface (Arabic first); Blueprint's icons stay. Rules in [08 §8](08-ui-ux-design-system.md).
+**Alternatives.** Vendor `@gitlab/ui` (Vue components, not usable from Blazor); copy GitLab's whole 140 KB token file
+(mostly unused); override Blueprint selector by selector (fragile, five-class selectors).
+**Consequences.** One token file drives both themes and both design systems. A new Blueprint widget gets the Pajamas look
+by adding its rule to section 3b. Re-vendoring Blueprint keeps the layer because the script adds it.
+

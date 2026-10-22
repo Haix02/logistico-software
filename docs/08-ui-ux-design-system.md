@@ -1,8 +1,13 @@
-# 08 — UI/UX Design System (Blueprint, Arabic-first)
+# 08 — UI/UX Design System (GitLab Pajamas look on Blueprint, Arabic-first)
 
 ## 1. Goal
 
-Logistico screens are **dense, fast and keyboard-friendly**, like the DevExpress VCL desktop apps the business is used to. They are built on **Blueprint 6** (Palantir, Apache-2.0), a design system made for data-heavy professional tools. Arabic is the default language, so every screen works **right-to-left** first.
+Logistico screens are **dense, fast and keyboard-friendly**, like the DevExpress VCL desktop apps the business is used to, and **clean and calm** like GitLab. Two design systems share the work:
+
+- **GitLab Pajamas** ([design.gitlab.com](https://design.gitlab.com)) sets the **look**: colours, type scale, spacing, corner radii, and how buttons, inputs, badges, alerts, tabs, cards, tables, dialogs, drawers and toasts appear.
+- **Blueprint 6** (Palantir, Apache-2.0) supplies the **mechanics** it is built for: dense tables, menus, popovers, dialogs and drawers, form controls, the omnibar, icons and hotkeys.
+
+Arabic is the default language, so every screen works **right-to-left** first.
 
 **How Blueprint is used:** Blueprint ships React components, and Logistico is .NET. We use Blueprint's official **stylesheets and icon font** and write our own **Blazor components** that output Blueprint markup. There is no React and no paid licence.
 
@@ -12,8 +17,9 @@ Logistico screens are **dense, fast and keyboard-friendly**, like the DevExpress
 | `@blueprintjs/select` CSS | 6.4.0 | Omnibar styles for the command palette (`blueprint-select[.rtl].css`) |
 | `@blueprintjs/icons` | 6.14.1 | Icon font, 700+ icons |
 | Almarai | `@fontsource/almarai` 5.3.0 (weights 300/400/700/800) | Arabic + Latin in one family, SIL OFL |
+| GitLab Pajamas tokens | `@gitlab/ui` 138 design tokens (MIT) | Values copied into `app.css` §1 (`--gl-color-*`); nothing loaded at runtime |
 
-`scripts/vendor-ui-assets.sh` downloads the pinned versions into `wwwroot/lib` and generates the **RTL builds with RTLCSS 4.3.0** (a build-time tool; nothing runs in the browser). `App.razor` loads the `.rtl.css` files for Arabic and the originals for English, so Blueprint's own margins, carets, menus and input icons mirror correctly.
+`scripts/vendor-ui-assets.sh` downloads the pinned versions into `wwwroot/lib`, generates the **RTL builds with RTLCSS 4.3.0** (a build-time tool; nothing runs in the browser) and wraps every Blueprint stylesheet in the **`blueprint` cascade layer**. `App.razor` loads the `.rtl.css` files for Arabic and the originals for English, so Blueprint's own margins, carets, menus and input icons mirror correctly. Because `app.css` is not layered, its rules always win over Blueprint's, whatever the selector: that is how the Pajamas look is applied to Blueprint's markup.
 
 ## 2. Principles
 
@@ -21,7 +27,7 @@ Logistico screens are **dense, fast and keyboard-friendly**, like the DevExpress
 2. **Every list is a tool.** Search, filter, sort, page and export on the server, with the filters kept in the URL so views can be shared.
 3. **Arabic-first, RTL-correct.** Layout mirrors properly; numbers, tracking codes and phone numbers stay left-to-right inside Arabic text (§7).
 4. **Nothing overlaps, nothing pushes the page sideways.** Rows that can be too wide (tables, tab strips, segmented controls) scroll inside themselves; the page itself never scrolls horizontally, down to 390 px phones.
-5. **Readable.** Body text is 15 px and controls are 36 px tall, larger than Blueprint's 14 px / 30 px defaults.
+5. **Readable.** Body text is 14 px (15 px in Arabic) on a 1.5 line height, and controls are 32 px tall, as in Pajamas; touch screens (courier app, hub station) use the 40 px large size.
 6. **Status is consistent everywhere.** The same colour, icon and wording for a status on the dashboard, list, map, timeline, label and public page.
 7. **Hardware-friendly.** Scan inputs keep focus, accept Enter from keyboard-wedge scanners, and give sound and visual feedback.
 
@@ -42,6 +48,7 @@ Logistico screens are **dense, fast and keyboard-friendly**, like the DevExpress
 └──────────────────────────────────────────────────────────┴───────────────────────────┘
 ```
 
+- **Paneled layout (GitLab):** the top bar and the side menu sit on the grey *application chrome*; the page is a white panel with 12 px corners beside them. Public pages, the courier app and the seller portal are white with a hairline under the top bar.
 - **Top bar:** search trigger (opens the command palette), live hub radar (scans in the last minutes), alert bell, new order, language switch, dark mode, user menu.
 - **Side menu:** grouped by job (operations, intelligence, hubs and trucks, customer care, sellers and money). Counters for trucks on the road, returns waiting, open requests and open alerts come from `OpsState`, polled by the layout. The menu can collapse to icons.
 - **Phones (≤ 860 px):** one-row icon top bar; the side menu becomes a slide-in drawer over a dimmed backdrop. Two KPI cards per row, forms in one column.
@@ -107,24 +114,33 @@ The map is built into the app; there is no map service, API key or tile server.
 | Dates | Gregorian, Iraqi month names in Arabic (تشرين الأول), `Asia/Baghdad` display |
 | Phones | Stored as `+9647XXXXXXXXX`, shown as `0770 123 4567`, always LTR |
 
-## 8. Theme: an operations console
+## 8. Theme: GitLab Pajamas on Blueprint
 
-The look follows Palantir's own tools (Blueprint is their design system): an **operations console** rather than a
-marketing dashboard.
+The look follows GitLab's Pajamas design system; Blueprint's components are restyled to it, not replaced.
 
-- **Dark is the default** (`bp6-dark` on `<body>`); light is one click away and remembered per browser.
-- Near-black canvas with a faint dot grid, graphite panels with hairline borders, 3–4 px corners, flat shadows.
-- Quiet chrome: a slim top bar with a brand-colour status rail, a dense side menu with monospace counters, and a page
-  **eyebrow** naming the menu group above every title.
-- Colour is reserved for status: KPI tiles carry an intent-coloured top rail; rate chips (green ≥ 90 %, orange ≥ 75 %,
-  red below) are monospace.
-- English micro-labels (menu groups, table headers, KPI and section titles) are upper-case and letter-spaced;
-  **Arabic is never letter-spaced or case-transformed** (the rules are scoped to `html[lang^="en"]`).
-- Every colour is a token in `app.css` section 1 (`--lx-*`), including text tones on soft backgrounds
-  (`--lx-warning-text`…), chart series and the map ramps (`--lx-map-0…6` sequential, `--lx-map-d0…d6` diverging).
-  Section 14 only redefines tokens for dark, so both themes stay in step.
-- Sizes are raised through Blueprint's `--bp-typography-size-*` variables. The file is organised in numbered sections
-  (tokens, shell, page furniture, tables, forms, map, print…).
+- **Light is the default**, as in GitLab; dark is one click away (top bar or user menu) and remembered per browser
+  (`bp6-dark` on `<body>`). The browser bar colour follows the chrome.
+- **Colour**: Pajamas' warm neutrals for surfaces and text, blue for links, focus rings and "info", green, orange and
+  red for status only. Every value is a token in `app.css` §1: `--gl-color-*` are Pajamas primitives, `--lx-*` are
+  the semantic tokens the rules use (`--lx-surface`, `--lx-text-strong`, `--lx-badge-info-bg`…). Section 14 redefines
+  only the semantic tokens for dark mode. Blueprint's `--bp-*` variables point at the same values.
+- **Shape**: 4 px small details, 8 px controls and alerts, 12 px cards and sections, 16 px dialogs and drawers; cards
+  have a 1 px border and no drop shadow; overlays use Pajamas' soft shadows.
+- **Components (§3b)**:
+  - Buttons are Pajamas buttons: default (white with a border), **primary = near-black** (the "confirm" action, light
+    in dark mode), danger red, minimal = tertiary. Success and warning keep their colour where it carries meaning
+    (delivered, scan actions). Use **one primary action per view**; row actions in tables are default buttons.
+  - Blueprint tags are **badges** (pills tinted by meaning; no intent = neutral, minimal = muted).
+  - Callouts are **alerts** (tinted box, border in the same hue, coloured icon).
+  - Segmented controls are a quiet track with a raised white choice; tabs have a 2 px dark indicator.
+  - Inputs are 32 px with a visible border; focus = dark border plus a blue ring.
+  - Toasts are dark, at the bottom start corner; only the icon carries the intent.
+- **Type**: Almarai for Arabic and Latin; headings, labels and emphasis are bold (700), everything else regular.
+  Labels and headers are sentence case in both languages (no upper-case micro-labels).
+- **Data visualisation**: the map and heat grid use Pajamas' data blue ramp (`--lx-map-0…6`), rates a red → green
+  diverging ramp (`--lx-map-d0…d6`), product categories the Pajamas data palette.
+- The file is organised in numbered sections (tokens, base, utilities, components, shell, page furniture, overlays,
+  tables, forms, tracking, operations, map, labels, public pages, dark theme, small screens, print).
 
 ## 9. Accessibility
 

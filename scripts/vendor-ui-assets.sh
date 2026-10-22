@@ -32,6 +32,20 @@ for sheet in blueprint blueprint-select; do
   npx --yes "rtlcss@$RTLCSS" --silent "$OUT/blueprint/$sheet.css" "$OUT/blueprint/$sheet.rtl.css"
 done
 
+# Blueprint goes into the "blueprint" cascade layer. app.css is not layered, so it always wins over Blueprint whatever
+# the selector: Blueprint provides structure and behaviour, app.css the look (GitLab Pajamas, see docs/08).
+for sheet in blueprint blueprint.rtl blueprint-select blueprint-select.rtl; do
+  python3 -I - "$OUT/blueprint/$sheet.css" <<'PY'
+import sys
+path = sys.argv[1]
+css = open(path, encoding="utf-8").read()
+if "@layer blueprint {" not in css:
+    charset = '@charset "UTF-8";'
+    body = css[len(charset):] if css.startswith(charset) else css
+    open(path, "w", encoding="utf-8").write(charset + "\n@layer blueprint {\n" + body.strip() + "\n}\n")
+PY
+done
+
 # Blueprint icon fonts (16 px and 20 px grids)
 for size in 16 20; do
   for ext in woff2 woff; do

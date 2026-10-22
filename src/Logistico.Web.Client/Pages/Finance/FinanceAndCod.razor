@@ -48,7 +48,7 @@ else
                     @if (b.DeliveredUnsettledCount > 0)
                     {
                         <Allowed Policy="@StaffPolicies.Finance">
-                            <Button Small="true" Intent="Intent.Primary" Icon="bank-account" Text="@L["SettlePayout"]" OnClick="@(() => OpenSettle(b))" />
+                            <Button Small="true" Icon="bank-account" Text="@L["SettlePayout"]" OnClick="@(() => OpenSettle(b))" />
                         </Allowed>
                     }
                 </td>

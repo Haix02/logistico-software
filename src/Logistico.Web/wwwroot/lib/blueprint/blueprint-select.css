@@ -1,3 +1,5 @@
+@charset "UTF-8";
+@layer blueprint {
 .bp6-multi-select{
   min-width:150px;
 }
@@ -122,4 +124,5 @@
 .bp6-suggest-popover.bp6-popover-match-target-width .bp6-menu{
   max-width:none;
   min-width:0;
+}
 }

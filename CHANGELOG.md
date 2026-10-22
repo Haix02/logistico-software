@@ -5,6 +5,17 @@ versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- **New look: GitLab's Pajamas design system on Blueprint.** Navigation sits on a quiet grey frame and each page is a
+  white panel; buttons, inputs, badges, alerts, tabs, tables, dialogs, drawers and toasts follow Pajamas (32 px
+  controls, 8 px corners, a near-black main action, blue links and focus rings, colour kept for status). Blueprint
+  still does the work underneath (tables, menus, popovers, dialogs, icons, hotkeys); it now loads in a CSS cascade
+  layer so the Pajamas rules always apply. **Light is the default**; dark mode follows Pajamas' dark palette and is one
+  click away. Arabic stays first-class (Almarai, right-to-left).
+
+### Fixed
+- Status badges are as wide as their text in lists, instead of stretching across the cell.
+
 ### Added
 - **Courier app** (`/courier`): couriers sign in on their phone and see only the parcels out for delivery with them,
   with the customer, address and nearest landmark, the cash to collect, one-tap call and WhatsApp, and Delivered or

@@ -43,7 +43,7 @@
                                 {
                                     <Button Small="true" Minimal="true" Icon="cross" Text="@L["Clear"]" OnClick="@(() => smartPasteText = "")" />
                                 }
-                                <Button Small="true" Intent="Intent.Primary" Icon="flash" Text="@L["SmartPasteAction"]"
+                                <Button Small="true" Icon="flash" Text="@L["SmartPasteAction"]"
                                         Disabled="@string.IsNullOrWhiteSpace(smartPasteText)" OnClick="ApplySmartPaste" />
                             </div>
                         </div>
@@ -218,7 +218,7 @@ else
                         <button type="button" class="lx-chip" @onclick="LoadBatchSample">
                             <Icon Name="flash" /> @L["BatchSampleAction"]
                         </button>
-                        <Button Small="true" Intent="Intent.Primary" Icon="tick" Text="@L["ParseBatchAction"]"
+                        <Button Small="true" Icon="tick" Text="@L["ParseBatchAction"]"
                                 Disabled="@string.IsNullOrWhiteSpace(batchRawText)" OnClick="ParseBatch" />
                     </div>
                     <textarea class="bp6-input bp6-fill" rows="5" @bind="batchRawText" @bind:event="oninput" placeholder="@L["BatchPastePlaceholder"]"></textarea>

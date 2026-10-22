@@ -10,7 +10,7 @@
 @using System.Security.Claims
 
 <div class="@Bp.Cls("lx-app", Bp.When(menuOpen, "lx-menu-open"), Bp.When(collapsed, "lx-sidebar-collapsed"), Bp.When(!staff, "lx-no-sidebar"))">
-    <header class="bp6-navbar bp6-dark lx-topbar">
+    <header class="bp6-navbar lx-topbar">
         <div class="bp6-navbar-group lx-topbar-start">
             @if (staff)
             {

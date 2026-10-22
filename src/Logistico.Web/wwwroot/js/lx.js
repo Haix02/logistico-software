@@ -25,12 +25,17 @@
 
 window.lx = {
     culture: () => document.documentElement.lang || "ar-IQ",
-    // Dark is the default look (an operations console); people who pick light keep it.
-    isDark: () => { try { return localStorage.getItem("lx.theme") !== "light"; } catch { return true; } },
-    applyTheme: () => { if (window.lx.isDark()) document.body.classList.add("bp6-dark"); },
+    // Light is the default look (GitLab Pajamas); people who pick dark keep it.
+    isDark: () => { try { return localStorage.getItem("lx.theme") === "dark"; } catch { return false; } },
+    applyTheme: () => { window.lx._chrome(window.lx.isDark()); },
     setDark: (on) => {
         try { localStorage.setItem("lx.theme", on ? "dark" : "light"); } catch { /* private mode */ }
-        document.body.classList.toggle("bp6-dark", on);
+        window.lx._chrome(on);
+    },
+    // The browser's own bars follow the application chrome colour.
+    _chrome: (dark) => {
+        document.body.classList.toggle("bp6-dark", dark);
+        document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#050408" : "#ecebea");
     },
     isMuted: () => { try { return localStorage.getItem("lx.muted") === "true"; } catch { return false; } },
     setMuted: (muted) => {

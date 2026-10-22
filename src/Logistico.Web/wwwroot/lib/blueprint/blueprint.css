@@ -1,4 +1,5 @@
 @charset "UTF-8";
+@layer blueprint {
 :root{
   --bp-emphasis-transition-duration:100ms;
   --bp-emphasis-ease-default:cubic-bezier(0.4, 1, 0.75, 0.9);
@@ -16372,4 +16373,5 @@ a > .bp6-dark .bp6-tooltip .bp6-running-text code{
 }
 .bp6-dark .bp6-tree-node.bp6-tree-node-selected > .bp6-tree-node-content .bp6-icon, .bp6-dark .bp6-tree-node.bp6-tree-node-selected > .bp6-tree-node-content .bp6-icon-standard, .bp6-dark .bp6-tree-node.bp6-tree-node-selected > .bp6-tree-node-content .bp6-icon-large{
   color:#ffffff;
+}
 }

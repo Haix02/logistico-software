@@ -1,10 +1,11 @@
 @implements IDisposable
 @inject Toaster Toaster
 
-<div class="bp6-toast-container bp6-toast-container-top bp6-toast-container-in-portal lx-toasts" aria-live="polite">
+@* Pajamas toasts: always dark, at the bottom start corner; the intent only colours the icon. *@
+<div class="bp6-toast-container bp6-toast-container-in-portal lx-toasts" aria-live="polite">
     @foreach (var toast in Toaster.Items)
     {
-        <div class="@Bp.Cls("bp6-toast", Bp.IntentClass(toast.Intent), "bp6-overlay-content", "lx-toast")" role="status">
+        <div class="@Bp.Cls("bp6-toast", "bp6-overlay-content", "lx-toast", toast.Intent == Intent.None ? null : "lx-toast-" + toast.Intent.ToString().ToLowerInvariant())" role="status">
             <Icon Name="@toast.Icon" />
             <span class="bp6-toast-message">@toast.Message</span>
             <div class="bp6-button-group bp6-minimal">
