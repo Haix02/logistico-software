@@ -17,7 +17,7 @@
         </div>
     </nav>
     <main class="lx-public-main">
-        @Body
+        <PageBoundary @ref="page">@Body</PageBoundary>
     </main>
 </div>
 
@@ -31,6 +31,11 @@
 </div>
 
 @code {
+    private PageBoundary? page;
+
+    // A new page (navigation) starts without the previous page's error.
+    protected override void OnParametersSet() => page?.Recover();
+
     /// <summary>The portal's own start page ("courier" or "seller").</summary>
     private string Home => Navigation.ToBaseRelativePath(Navigation.Uri).Split('/', '?', '#')[0];
 

@@ -1,6 +1,7 @@
 using Logistico.Modules.Shipments.Contracts;
 using Logistico.Modules.Shipments.Contracts.Rules;
 using Logistico.Modules.Shipments.Domain;
+using Logistico.SharedKernel;
 using Logistico.SharedKernel.Iraq;
 using Microsoft.EntityFrameworkCore;
 
@@ -77,30 +78,38 @@ internal static class ShipmentSearch
             source = source.Where(s => s.CourierName != null && EF.Functions.ILike(s.CourierName, pattern));
         }
 
-        if (!string.IsNullOrWhiteSpace(query.Q))
+        return ByText(source, query.Q);
+    }
+
+    /// <summary>The folded search column (see <see cref="SearchText"/>), kept by PostgreSQL.</summary>
+    public const string Column = "SearchText";
+
+    /// <summary>
+    /// Free-text search: a whole tracking number or Iraqi mobile number is an exact match (index lookups); anything else
+    /// matches when every word appears in the parcel's folded search text.
+    /// </summary>
+    public static IQueryable<Shipment> ByText(IQueryable<Shipment> source, string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
         {
-            var term = query.Q.Trim();
-            var tracking = TrackingNumber.Normalize(term);
-            var phone = IraqPhone.Normalize(term);
-            if (TrackingNumber.IsValid(tracking))
-            {
-                source = source.Where(s => s.TrackingNumber == tracking);
-            }
-            else if (phone is not null)
-            {
-                source = source.Where(s => s.ConsigneePhone == phone);
-            }
-            else
-            {
-                var pattern = $"%{term}%";
-                source = source.Where(s =>
-                    EF.Functions.ILike(s.TrackingNumber, pattern)
-                    || EF.Functions.ILike(s.ConsigneeName, pattern)
-                    || (s.MerchantName != null && EF.Functions.ILike(s.MerchantName, pattern))
-                    || EF.Functions.ILike(s.ShipperName, pattern)
-                    || (s.ExternalReference != null && EF.Functions.ILike(s.ExternalReference, pattern))
-                    || (s.ConsigneePhone != null && EF.Functions.ILike(s.ConsigneePhone, pattern)));
-            }
+            return source;
+        }
+
+        var tracking = TrackingNumber.Normalize(text);
+        if (TrackingNumber.IsValid(tracking))
+        {
+            return source.Where(s => s.TrackingNumber == tracking);
+        }
+
+        if (IraqPhone.Normalize(text) is { } phone)
+        {
+            return source.Where(s => s.ConsigneePhone == phone);
+        }
+
+        foreach (var word in SearchText.Words(text))
+        {
+            var pattern = SearchText.Pattern(word);
+            source = source.Where(s => EF.Functions.Like(EF.Property<string>(s, Column), pattern));
         }
 
         return source;

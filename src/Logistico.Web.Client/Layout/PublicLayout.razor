@@ -15,7 +15,7 @@
         </div>
     </nav>
     <main class="lx-public-main">
-        @Body
+        <PageBoundary @ref="page">@Body</PageBoundary>
     </main>
     <footer class="lx-public-footer bp6-text-muted">@L["PublicFooter"]</footer>
 </div>
@@ -29,6 +29,11 @@
 </div>
 
 @code {
+    private PageBoundary? page;
+
+    // A new page (navigation) starts without the previous page's error.
+    protected override void OnParametersSet() => page?.Recover();
+
     private void SwitchLanguage()
     {
         var target = AppCultures.IsArabic ? AppCultures.English : AppCultures.Arabic;

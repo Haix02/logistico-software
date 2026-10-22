@@ -8,6 +8,9 @@ internal sealed class MerchantsDbContext(DbContextOptions<MerchantsDbContext> op
 {
     public const string Schema = "merchant";
 
+    /// <summary>The folded search column (see <see cref="SearchText"/>), kept by PostgreSQL.</summary>
+    public const string SearchColumn = "SearchText";
+
     public DbSet<Merchant> Merchants => Set<Merchant>();
 
     private Guid CurrentTenantId => tenant.TenantId;
@@ -32,6 +35,11 @@ internal sealed class MerchantsDbContext(DbContextOptions<MerchantsDbContext> op
             e.HasIndex(x => new { x.TenantId, x.InstagramHandle }).IsUnique().HasFilter("instagram_handle IS NOT NULL");
             e.HasIndex(x => new { x.TenantId, x.Name });
             e.HasIndex(x => new { x.TenantId, x.Phone });
+
+            // Free-text search reads one folded column (SearchText): name, Instagram handle, contact and phone.
+            e.Property<string>(SearchColumn)
+                .HasColumnName("search_text")
+                .HasComputedColumnSql(SearchText.Sql("name || ' ' || coalesce(instagram_handle, '') || ' ' || contact_name || ' ' || phone"), stored: true);
 
             e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
         });

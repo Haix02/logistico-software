@@ -1,0 +1,19 @@
+@* Keeps one failing page from breaking the app: the error is shown in place of the page with a way to try again, and
+   the next navigation starts clean (the layouts reset it). *@
+<ErrorBoundary @ref="boundary">
+    <ChildContent>@ChildContent</ChildContent>
+    <ErrorContent>
+        <NonIdealState Icon="error" Title="@L["PageError_Title"]" Description="@L["PageError_Text"]">
+            <Button Icon="refresh" Text="@L["PageError_Retry"]" Intent="Intent.Primary" OnClick="Recover" />
+        </NonIdealState>
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+    private ErrorBoundary? boundary;
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Shows the page again after an error (called by the layouts on every navigation).</summary>
+    public void Recover() => boundary?.Recover();
+}

@@ -414,7 +414,11 @@ create policy tenant_isolation on shipment.shipments
 1. Every query path used by a screen has an index whose **leading columns match its filter** (`tenant_id`, then the selective filter, then the sort).
 2. **Partial indexes** for "active" work queues: most shipments are delivered and never queried operationally again.
 3. **BRIN** indexes on append-only time columns (events, ledger, audit). Tiny and fast for range scans.
-4. **Trigram GIN** for "contains" search on tracking numbers, names and phone numbers.
+4. **Trigram GIN** for "contains" search: shipments and merchants keep one stored, generated `search_text` column
+   (tracking number, names, phone, shop, order reference, area and destination governorate in both languages), folded by
+   `SearchText` (lower case; أ إ آ ٱ → ا, ة → ه, ى → ي, ؤ → و, ئ → ي; Arabic-Indic digits → 0–9; harakat and tatweel
+   dropped). One GIN trigram index on it serves every word of a query; a whole tracking number or mobile number is an
+   exact index lookup instead.
 5. Foreign keys are indexed (PostgreSQL does not do this automatically).
 6. **No** `SELECT *` in read models. Covering indexes (`INCLUDE (...)`) for the top 20 hot queries.
 7. PostgreSQL 18's **B-tree skip scan** helps multi-column indexes when the leading column is not filtered, but we still design for leading-column use.

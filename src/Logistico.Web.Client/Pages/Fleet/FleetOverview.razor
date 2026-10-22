@@ -243,13 +243,23 @@
         loading = true;
         try
         {
-            overview = await Shipments.GetFleetOverviewAsync(q, governorateFilter, null);
+            var (isLatest, value) = await latest.RunAsync(ct => Shipments.GetFleetOverviewAsync(q, governorateFilter, null, ct));
+            if (isLatest)
+            {
+                overview = value;
+            }
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
         }
         finally
         {
-            loading = false;
+            loading = latest.Busy;
         }
     }
+
+    private readonly LatestLoad latest = new();
 
     private string SuccessRate(CourierListItem c)
     {

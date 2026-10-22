@@ -1342,6 +1342,12 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("returned_at");
 
+                    b.Property<string>("SearchText")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("text")
+                        .HasColumnName("search_text")
+                        .HasComputedColumnSql("translate(lower(' ' || tracking_number || ' ' || consignee_name || ' ' || coalesce(consignee_phone, '') || ' ' || coalesce(merchant_name, '') || ' ' || shipper_name || ' ' || coalesce(external_reference, '') || ' ' || coalesce(destination_city, '') || ' ' || CASE destination_code WHEN 'IQ-BG' THEN 'Baghdad بغداد' WHEN 'IQ-BA' THEN 'Basra البصرة' WHEN 'IQ-NI' THEN 'Nineveh نينوى' WHEN 'IQ-AR' THEN 'Erbil أربيل' WHEN 'IQ-SU' THEN 'Sulaymaniyah السليمانية' WHEN 'IQ-DA' THEN 'Duhok دهوك' WHEN 'IQ-KI' THEN 'Kirkuk كركوك' WHEN 'IQ-NA' THEN 'Najaf النجف' WHEN 'IQ-KA' THEN 'Karbala كربلاء' WHEN 'IQ-BB' THEN 'Babil بابل' WHEN 'IQ-DI' THEN 'Diyala ديالى' WHEN 'IQ-AN' THEN 'Anbar الأنبار' WHEN 'IQ-SD' THEN 'Saladin صلاح الدين' WHEN 'IQ-WA' THEN 'Wasit واسط' WHEN 'IQ-QA' THEN 'Al-Qadisiyah القادسية' WHEN 'IQ-MU' THEN 'Muthanna المثنى' WHEN 'IQ-DQ' THEN 'Dhi Qar ذي قار' WHEN 'IQ-MA' THEN 'Maysan ميسان' WHEN 'IQ-HA' THEN 'Halabja حلبجة' ELSE '' END), 'أإآٱىةؤئ٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹ـًٌٍَُِّْٰ', 'اااايهوي01234567890123456789')", true);
+
                     b.Property<string>("ServiceType")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -1399,17 +1405,11 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_shipments");
 
-                    b.HasIndex("ConsigneeName")
-                        .HasDatabaseName("ix_shipments_consignee_name");
+                    b.HasIndex("SearchText")
+                        .HasDatabaseName("ix_shipments_search_text");
 
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("ConsigneeName"), "gin");
-                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("ConsigneeName"), new[] { "gin_trgm_ops" });
-
-                    b.HasIndex("MerchantName")
-                        .HasDatabaseName("ix_shipments_merchant_name");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("MerchantName"), "gin");
-                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("MerchantName"), new[] { "gin_trgm_ops" });
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchText"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("SearchText"), new[] { "gin_trgm_ops" });
 
                     b.HasIndex("TrackingNumber")
                         .IsUnique()

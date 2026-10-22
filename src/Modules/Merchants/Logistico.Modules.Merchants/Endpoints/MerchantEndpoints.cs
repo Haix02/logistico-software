@@ -38,16 +38,18 @@ internal static class MerchantEndpoints
         var size = Math.Clamp(pageSize ?? 50, 1, 200);
         var number = Paging.Page(page);
         var query = db.Merchants.AsNoTracking();
-        if (!string.IsNullOrWhiteSpace(q))
+        if (IraqPhone.Normalize(q) is { } phone)
         {
-            var term = q.Trim();
-            var phone = IraqPhone.Normalize(term);
-            var handle = Merchant.NormalizeHandle(term);
-            query = query.Where(m =>
-                EF.Functions.ILike(m.Name, $"%{term}%")
-                || (m.InstagramHandle != null && EF.Functions.ILike(m.InstagramHandle, $"%{handle}%"))
-                || (phone != null && m.Phone == phone)
-                || EF.Functions.ILike(m.ContactName, $"%{term}%"));
+            query = query.Where(m => m.Phone == phone);
+        }
+        else
+        {
+            // Every word must appear in the shop's name, Instagram handle, contact or phone (see SearchText).
+            foreach (var word in SearchText.Words(q))
+            {
+                var pattern = SearchText.Pattern(word);
+                query = query.Where(m => EF.Functions.Like(EF.Property<string>(m, MerchantsDbContext.SearchColumn), pattern));
+            }
         }
 
         var total = await query.CountAsync(ct);

@@ -101,7 +101,8 @@ internal static class ShipmentProjections
         s.ConfirmationAttempts,
         s.ConfirmationBy,
         s.Rating,
-        s.RatingComment);
+        s.RatingComment,
+        s.CodSettledAt);
 
     public static PublicTrackingView ToPublicView(Shipment s, DateTimeOffset now, int openRequests)
     {

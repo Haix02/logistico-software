@@ -258,8 +258,14 @@
         error = null;
         try
         {
-            result = await Shipments.ListAsync(query);
-            foreach (var item in result.Items)
+            var (isLatest, page) = await latest.RunAsync(ct => Shipments.ListAsync(query, ct));
+            if (!isLatest)
+            {
+                return; // a newer search or filter replaced this one
+            }
+
+            result = page;
+            foreach (var item in page!.Items)
             {
                 trackingById[item.Id] = item.TrackingNumber;
             }
@@ -270,9 +276,11 @@
         }
         finally
         {
-            loading = false;
+            loading = latest.Busy;
         }
     }
+
+    private readonly LatestLoad latest = new();
 
     private async Task RunBulkAsync(ScanOperation operation, string? courier = null)
     {

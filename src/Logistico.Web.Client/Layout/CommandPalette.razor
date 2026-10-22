@@ -3,6 +3,7 @@
 @inject NavigationManager Navigation
 @inject ShipmentsApi Shipments
 @inject MerchantsApi Merchants
+@inject OperationsApi Operations
 @inject OpsState Ops
 @inject IJSRuntime JS
 
@@ -214,7 +215,8 @@
 
             var shipmentsTask = Shipments.ListAsync(new ShipmentQuery { Q = text, PageSize = 6 }, cts.Token);
             var sellersTask = Merchants.ListAsync(text, 1, 4, cts.Token);
-            await Task.WhenAll(shipmentsTask, sellersTask);
+            var referencesTask = ReferencesAsync(text, cts.Token);
+            await Task.WhenAll(shipmentsTask, sellersTask, referencesTask);
 
             if (pending != cts || cts.IsCancellationRequested || !open)
             {
@@ -223,7 +225,8 @@
 
             var found = await shipmentsTask;
             var sellers = await sellersTask;
-            var remote = new List<PaletteItem>();
+            var references = await referencesTask;
+            var remote = new List<PaletteItem>(references);
             remote.AddRange(found.Items.Select(s => new PaletteItem(L["Palette_Shipments"], StatusTag.IconOf(s.Status),
                 $"{s.TrackingNumber} · {s.ConsigneeName}", $"{ShipmentTexts.Of(s.Status)} · {Fmt.Place(s.DestinationCode)}", $"shipments/{s.Id}")));
 
@@ -237,8 +240,9 @@
                 m.InstagramHandle is null ? Fmt.Place(m.Governorate) : "@" + m.InstagramHandle, $"merchants/{m.Id}")));
 
             var local = StaticResults(text);
-            var isTrackingNumber = TrackingNumber.IsValid(TrackingNumber.Normalize(text));
-            results = isTrackingNumber ? [.. remote, .. local] : [.. local, .. remote];
+            // A reference (tracking, truck, request or manifest number) is what the person wants: show it first.
+            var isReference = TrackingNumber.IsValid(TrackingNumber.Normalize(text)) || references.Count > 0;
+            results = isReference ? [.. remote, .. local] : [.. local, .. remote];
             active = results.Count == 0 ? 0 : Math.Clamp(active, 0, results.Count - 1);
         }
         catch (OperationCanceledException) when (cts.IsCancellationRequested)
@@ -285,10 +289,36 @@
         return [.. (text.Length == 0 ? pages.Take(8) : pages), .. actions];
     }
 
-    private static bool Matches(string text, string title, string? keywords) =>
-        text.Length == 0
-        || title.Contains(text, StringComparison.CurrentCultureIgnoreCase)
-        || (keywords?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false);
+    /// <summary>Every typed word appears in the title or keywords, with Arabic letter variants folded (أ = ا, ة = ه…).</summary>
+    private static bool Matches(string text, string title, string? keywords) => SearchText.Matches(text, title, keywords);
+
+    /// <summary>
+    /// Truck (TR-…), request (RQ-…) and return manifest (RM-…) numbers: searched only when the text starts like one, so
+    /// ordinary searches cost no extra requests. A request opens its parcel, where its history is.
+    /// </summary>
+    private async Task<List<PaletteItem>> ReferencesAsync(string text, CancellationToken ct)
+    {
+        var code = text.Trim().ToUpperInvariant();
+        if (code.Length < 4 || code[2] is not ('-' or (>= '0' and <= '9')))
+        {
+            return [];
+        }
+
+        var group = L["Palette_References"].Value;
+        switch (code[..2])
+        {
+            case "TR":
+                var trucks = await Operations.ListTransfersAsync(q: code, pageSize: 3, ct: ct);
+                return trucks.Items.Select(t => new PaletteItem(group, "drive-time", t.Number, $"{Fmt.Hub(t.FromHubCode)} {Bidi.Arrow} {Fmt.Hub(t.ToHubCode)}", $"transfers/{t.Id}")).ToList();
+            case "RQ":
+                var requests = await Operations.ListRequestsAsync(new ServiceRequestQuery { Q = code, PageSize = 3 }, ct);
+                return requests.Items.Select(r => new PaletteItem(group, "inbox", r.Number, $"{ShipmentTexts.Of(r.Type)} · {r.TrackingNumber}", $"shipments/{r.ShipmentId}")).ToList();
+            case "RM" when System.Text.RegularExpressions.Regex.IsMatch(code, @"^RM-\d{4}-\d+$"):
+                return [new(group, "undo", code, null, $"returns/manifests/{code}")];
+            default:
+                return [];
+        }
+    }
 
     private async Task KeyAsync(KeyboardEventArgs e)
     {

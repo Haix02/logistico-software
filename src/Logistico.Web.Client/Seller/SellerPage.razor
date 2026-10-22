@@ -264,13 +264,19 @@
     {
         try
         {
-            orders = await Seller.GetOrdersAsync(q, view, page);
+            var (isLatest, value) = await latest.RunAsync(ct => Seller.GetOrdersAsync(q, view, page, ct));
+            if (isLatest)
+            {
+                orders = value;
+            }
         }
         catch (ApiException ex)
         {
             Toaster.Error(ex.UserMessage);
         }
     }
+
+    private readonly LatestLoad latest = new();
 
     private async Task RefreshAsync()
     {

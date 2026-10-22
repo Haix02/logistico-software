@@ -84,6 +84,9 @@ public sealed class SellerPortalTests(LogisticoApiFactory factory)
         home = (await seller.GetFromJsonAsync<SellerHome>("/" + ShipmentsApiRoutes.Seller))!;
         Assert.Equal((0m, 50_000m - fee), (home.OwedIqd, home.PaidIqd));
         var payout = Assert.Single(home.Payouts);
+        var paid = await admin.GetShipmentAsync(delivered.Id);
+        Assert.Equal(payout.SettlementNumber, paid.CodSettlementNumber); // the order says which payout carried its cash
+        Assert.NotNull(paid.CodSettledAt);
         var statement = await seller.GetAsync("/" + ShipmentsApiRoutes.SellerStatement(payout.Id));
         Assert.Equal(HttpStatusCode.OK, statement.StatusCode);
         Assert.Contains(delivered.TrackingNumber, await statement.Content.ReadAsStringAsync(), StringComparison.Ordinal);

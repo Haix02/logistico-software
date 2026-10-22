@@ -119,14 +119,24 @@
         loading = true;
         try
         {
-            result = await Operations.ListTransfersAsync(
-                Enum.TryParse<TransferStatus>(Status, out var status) ? status : null, Hub, Overdue, Q, Page ?? 1, PageSize ?? 25);
+            var status = Enum.TryParse<TransferStatus>(Status, out var parsed) ? parsed : (TransferStatus?)null;
+            var (isLatest, page) = await latest.RunAsync(ct => Operations.ListTransfersAsync(status, Hub, Overdue, Q, Page ?? 1, PageSize ?? 25, ct));
+            if (isLatest)
+            {
+                result = page;
+            }
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
         }
         finally
         {
-            loading = false;
+            loading = latest.Busy;
         }
     }
+
+    private readonly LatestLoad latest = new();
 
     private void Go(string? q = null, string? hub = null, int? page = null, int? pageSize = null)
     {

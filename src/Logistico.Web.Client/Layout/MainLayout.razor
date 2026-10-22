@@ -113,7 +113,7 @@
         <main class="lx-main" id="main">
             @if (!staff || HubCatalog.IsLoaded || networkUnavailable)
             {
-                @Body
+                <PageBoundary @ref="page">@Body</PageBoundary>
             }
             else
             {
@@ -204,6 +204,11 @@
     private bool staff;
 
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    private PageBoundary? page;
+
+    // A new page (navigation) starts without the previous page's error.
+    protected override void OnParametersSet() => page?.Recover();
 
     protected override async Task OnInitializedAsync()
     {

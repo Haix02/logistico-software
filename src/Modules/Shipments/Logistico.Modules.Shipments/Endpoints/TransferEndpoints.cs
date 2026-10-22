@@ -62,13 +62,14 @@ internal static class TransferEndpoints
             filtered = filtered.Where(t => t.Status == TransferStatus.InTransit && t.ExpectedAt < overdueBefore);
         }
 
-        if (!string.IsNullOrWhiteSpace(query.Q))
+        // Every word must appear in the truck's number, plate or driver, or be part of a parcel on it.
+        foreach (var word in SearchText.Words(query.Q))
         {
-            var pattern = $"%{query.Q.Trim()}%";
-            filtered = filtered.Where(t => EF.Functions.ILike(t.Number, pattern)
-                || (t.VehiclePlate != null && EF.Functions.ILike(t.VehiclePlate, pattern))
-                || (t.DriverName != null && EF.Functions.ILike(t.DriverName, pattern))
-                || t.Items.Any(i => EF.Functions.ILike(i.TrackingNumber, pattern)));
+            var pattern = SearchText.Pattern(word);
+            filtered = filtered.Where(t => EF.Functions.Like(SearchSql.Fold(" " + t.Number), pattern)
+                || (t.VehiclePlate != null && EF.Functions.Like(SearchSql.Fold(" " + t.VehiclePlate), pattern))
+                || (t.DriverName != null && EF.Functions.Like(SearchSql.Fold(" " + t.DriverName), pattern))
+                || t.Items.Any(i => EF.Functions.Like(SearchSql.Fold(" " + i.TrackingNumber), pattern)));
         }
 
         var total = await filtered.CountAsync(ct);

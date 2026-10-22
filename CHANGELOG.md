@@ -14,7 +14,24 @@ versions follow [Semantic Versioning](https://semver.org/).
   click away. Arabic stays first-class (Almarai, right-to-left).
 
 ### Fixed
+- **Search finds what people type.** Arabic letters written either way match (احمد = أحمد, فاطمه = فاطمة,
+  الاناقة = الأناقة), as do Arabic-Indic digits and words with harakat. Part of a phone number works with or without the
+  leading 0 or +964 (`0770 123`, `770123`). Several words match across fields in any order (customer + area, customer +
+  governorate in Arabic or English, `@handle` for a shop). Very short words match the start of a word, so `1` no longer
+  matches every number containing a 1. The same rules apply to the global search, the Shipments, Sellers, Requests,
+  Trucks, Customs and Order confirmation lists, the courier list and the seller portal.
+- The global search (`Ctrl K`) also finds truck (`TR-…`), request (`RQ-…`) and return manifest (`RM-…`) numbers, and
+  matches page names with Arabic letter variants.
+- Search-as-you-type lists no longer show an older, slower result after a newer one; failed loads show a message
+  instead of breaking the page.
+- A page that fails shows "This page could not be shown" with a retry button; the rest of the app keeps working.
+- Dark mode: "Lock" and other minimal danger buttons were filled red; outlined buttons lost their text colour on hover.
+- Small dropdowns (the Team page roles) no longer draw the arrow over the text.
 - Status badges are as wide as their text in lists, instead of stretching across the cell.
+
+### Performance
+- Search reads one indexed column instead of six: with 50,000 parcels a two-word Arabic search takes about 4 ms and every
+  list and dashboard call stays under 75 ms.
 
 ### Added
 - **Courier app** (`/courier`): couriers sign in on their phone and see only the parcels out for delivery with them,
@@ -32,6 +49,8 @@ versions follow [Semantic Versioning](https://semver.org/).
 - **Seller role**: administrators give an account the Seller role on the Team page and link it to one shop. Sellers
   see no other company data. `Seed:DemoTeam` adds `seller@logistico.local` for the demo shop "بوتيك لمار".
 - **Install on a phone**: a web app manifest and icons, so Logistico can be added to the home screen.
+- **Paid to seller** on an order: once its cash is collected, the order shows the payout (settlement number and date)
+  that carried it to the seller, or "Not paid yet".
 
 ## [3.0.0] - 2026-10-21
 

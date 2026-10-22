@@ -77,9 +77,7 @@ internal static class FleetEndpoints
 
         if (!string.IsNullOrWhiteSpace(q))
         {
-            var term = q.Trim();
-            filtered = filtered.Where(c => c.Name.Contains(term, StringComparison.OrdinalIgnoreCase) || c.Code.Contains(term, StringComparison.OrdinalIgnoreCase)
-                || c.Phone.Contains(term, StringComparison.OrdinalIgnoreCase) || (c.VehiclePlate?.Contains(term, StringComparison.OrdinalIgnoreCase) == true));
+            filtered = filtered.Where(c => SearchText.Matches(q, c.Name, c.Code, c.Phone, c.VehiclePlate));
         }
 
         return TypedResults.Ok(new FleetOverviewResult(items.Count(c => c.IsActive), totals?.Out ?? 0, totals?.DeliveredToday ?? 0, totals?.Failed ?? 0,

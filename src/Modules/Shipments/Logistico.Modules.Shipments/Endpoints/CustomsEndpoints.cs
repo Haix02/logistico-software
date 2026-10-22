@@ -101,15 +101,14 @@ internal static class CustomsEndpoints
                     : queue.Where(r => r.Declaration != null && r.Declaration.CustomsOfficeCode == code);
         }
 
-        if (!string.IsNullOrWhiteSpace(q))
+        // Every word must appear in the parcel's search text or in the declaration number or HS code.
+        foreach (var word in SearchText.Words(q))
         {
-            var pattern = $"%{q.Trim()}%";
+            var pattern = SearchText.Pattern(word);
             queue = queue.Where(r =>
-                EF.Functions.ILike(r.Shipment.TrackingNumber, pattern)
-                || EF.Functions.ILike(r.Shipment.ConsigneeName, pattern)
-                || EF.Functions.ILike(r.Shipment.ShipperName, pattern)
-                || (r.Declaration != null && r.Declaration.DeclarationNumber != null && EF.Functions.ILike(r.Declaration.DeclarationNumber, pattern))
-                || (r.Declaration != null && r.Declaration.HsCode != null && EF.Functions.ILike(r.Declaration.HsCode, pattern)));
+                EF.Functions.Like(EF.Property<string>(r.Shipment, ShipmentSearch.Column), pattern)
+                || (r.Declaration != null && r.Declaration.DeclarationNumber != null && EF.Functions.ILike(" " + r.Declaration.DeclarationNumber, pattern))
+                || (r.Declaration != null && r.Declaration.HsCode != null && EF.Functions.ILike(" " + r.Declaration.HsCode, pattern)));
         }
 
         var total = await queue.CountAsync(ct);

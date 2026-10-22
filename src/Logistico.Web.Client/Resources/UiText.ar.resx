@@ -368,6 +368,7 @@
   <data name="Field_Phone" xml:space="preserve"><value>الموبايل</value></data>
   <data name="Field_PhoneLast4" xml:space="preserve"><value>آخر 4 أرقام من موبايلك</value></data>
   <data name="Field_PickupAddress" xml:space="preserve"><value>عنوان الاستلام</value></data>
+  <data name="Field_PaidToSeller" xml:space="preserve"><value>حُوِّل للمتجر</value></data>
   <data name="Field_Pieces" xml:space="preserve"><value>عدد القطع</value></data>
   <data name="Field_PreferredDate" xml:space="preserve"><value>يوم التوصيل</value></data>
   <data name="Field_Promised" xml:space="preserve"><value>موعد التسليم المتفق عليه</value></data>
@@ -661,6 +662,10 @@
   <data name="Pager_PageSize" xml:space="preserve"><value>الصفوف</value></data>
   <data name="Pager_Previous" xml:space="preserve"><value>الصفحة السابقة</value></data>
   <data name="Pager_Showing" xml:space="preserve"><value>عرض</value></data>
+  <data name="PageError_Title" xml:space="preserve"><value>تعذّر عرض هذه الصفحة</value></data>
+  <data name="PageError_Text" xml:space="preserve"><value>حدث خطأ أثناء عرض هذه الصفحة. أعد المحاولة، وإذا تكرر الأمر فأبلغ مدير النظام.</value></data>
+  <data name="PageError_Retry" xml:space="preserve"><value>إعادة المحاولة</value></data>
+  <data name="NotPaidYet" xml:space="preserve"><value>لم يُحوَّل بعد</value></data>
   <data name="Palette_Actions" xml:space="preserve"><value>إجراءات</value></data>
   <data name="Palette_AllResults" xml:space="preserve"><value>عرض كل النتائج ({0})</value></data>
   <data name="Palette_Error" xml:space="preserve"><value>البحث في الشحنات والمتاجر غير متاح مؤقتاً.</value></data>
@@ -669,6 +674,7 @@
   <data name="Palette_Open" xml:space="preserve"><value>فتح</value></data>
   <data name="Palette_Pages" xml:space="preserve"><value>الصفحات</value></data>
   <data name="Palette_Placeholder" xml:space="preserve"><value>رقم التتبع أو الهاتف أو الزبون أو المتجر أو اسم صفحة…</value></data>
+  <data name="Palette_References" xml:space="preserve"><value>الشاحنات والطلبات والكشوف</value></data>
   <data name="Palette_ResultCount" xml:space="preserve"><value>نتائج البحث: {0}</value></data>
   <data name="Palette_Retry" xml:space="preserve"><value>إعادة المحاولة</value></data>
   <data name="Palette_ScanParcel" xml:space="preserve"><value>مسح طرد في مركز</value></data>

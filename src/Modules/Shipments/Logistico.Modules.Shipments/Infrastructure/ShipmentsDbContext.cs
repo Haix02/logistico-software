@@ -32,10 +32,17 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
     // Referenced by the query filters so EF Core parameterises the tenant per context instance.
     private Guid CurrentTenantId => tenant.TenantId;
 
+    /// <summary>SQL naming a governorate code in English and Arabic (empty for other codes), for the search column.</summary>
+    private static string GovernorateNamesSql(string column) =>
+        $"CASE {column} "
+        + string.Concat(Logistico.SharedKernel.Iraq.IraqGovernorates.All.Select(g => $"WHEN '{g.Code}' THEN '{g.NameEn.Replace("'", "''", StringComparison.Ordinal)} {g.NameAr}' "))
+        + "ELSE '' END";
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema(Schema);
         modelBuilder.HasPostgresExtension("pg_trgm");
+        SearchSql.Register(modelBuilder);
         modelBuilder.HasSequence<long>(TrackingSequence).StartsAt(1).IncrementsBy(1);
         modelBuilder.HasSequence<long>(TransferSequence).StartsAt(1).IncrementsBy(1);
         modelBuilder.HasSequence<long>(RequestSequence).StartsAt(1).IncrementsBy(1);
@@ -110,9 +117,16 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
             e.HasIndex(x => new { x.TenantId, x.RatedAt }).HasFilter("rated_at IS NOT NULL");
             e.HasIndex(x => new { x.TenantId, x.ReturnRequestedAt }).HasFilter("return_requested_at IS NOT NULL");
             e.HasIndex(x => new { x.TenantId, x.CodCollectedAt }).HasFilter("cod_collected_at IS NOT NULL");
-            // Trigram indexes make "contains" search on names fast (ILIKE '%…%').
-            e.HasIndex(x => x.ConsigneeName).HasMethod("gin").HasOperators("gin_trgm_ops");
-            e.HasIndex(x => x.MerchantName).HasMethod("gin").HasOperators("gin_trgm_ops");
+            // Free-text search reads one folded column (SearchText): tracking number, customer, phone, shop, shipper, the
+            // shop's order number, the area and the destination governorate in both languages. PostgreSQL keeps it
+            // current; a trigram index makes "contains" fast.
+            e.Property<string>(ShipmentSearch.Column)
+                .HasColumnName("search_text")
+                .HasComputedColumnSql(SearchText.Sql(
+                    "tracking_number || ' ' || consignee_name || ' ' || coalesce(consignee_phone, '') || ' ' || coalesce(merchant_name, '') || ' ' "
+                    + "|| shipper_name || ' ' || coalesce(external_reference, '') || ' ' || coalesce(destination_city, '') || ' ' || "
+                    + GovernorateNamesSql("destination_code")), stored: true);
+            e.HasIndex(ShipmentSearch.Column).HasMethod("gin").HasOperators("gin_trgm_ops").HasDatabaseName("ix_shipments_search_text");
 
             e.HasMany(x => x.Events).WithOne().HasForeignKey(x => x.ShipmentId).OnDelete(DeleteBehavior.Restrict);
             e.Navigation(x => x.Events).UsePropertyAccessMode(PropertyAccessMode.Field);

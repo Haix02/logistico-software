@@ -62,12 +62,7 @@ internal static class ConfirmationEndpoints
             pending = pending.Where(s => s.MerchantId == seller);
         }
 
-        if (!string.IsNullOrWhiteSpace(q))
-        {
-            var term = q.Trim();
-            var phone = Logistico.SharedKernel.Iraq.IraqPhone.Normalize(term);
-            pending = pending.Where(s => s.TrackingNumber == term.ToUpper() || s.ConsigneePhone == phone || EF.Functions.ILike(s.ConsigneeName, "%" + term + "%"));
-        }
+        pending = ShipmentSearch.ByText(pending, q);
 
         var overdueBefore = now.AddHours(-(await policies.GetAsync(tenant.TenantId, ct)).ConfirmationHours);
         var total = await pending.CountAsync(ct);

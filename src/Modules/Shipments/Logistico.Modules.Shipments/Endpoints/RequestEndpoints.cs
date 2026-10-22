@@ -66,11 +66,11 @@ internal static class RequestEndpoints
             filtered = filtered.Where(r => (r.Status == RequestStatus.Open || r.Status == RequestStatus.InProgress) && r.DueAt < now);
         }
 
-        if (!string.IsNullOrWhiteSpace(query.Q))
+        foreach (var word in SearchText.Words(query.Q))
         {
-            var pattern = $"%{query.Q.Trim()}%";
-            filtered = filtered.Where(r => EF.Functions.ILike(r.Number, pattern) || EF.Functions.ILike(r.TrackingNumber, pattern)
-                || (r.Details != null && EF.Functions.ILike(r.Details, pattern)));
+            var pattern = SearchText.Pattern(word);
+            filtered = filtered.Where(r => EF.Functions.Like(SearchSql.Fold(" " + r.Number), pattern) || EF.Functions.Like(SearchSql.Fold(" " + r.TrackingNumber), pattern)
+                || (r.Details != null && EF.Functions.Like(SearchSql.Fold(" " + r.Details), pattern)));
         }
 
         var total = await filtered.CountAsync(ct);

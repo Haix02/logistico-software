@@ -200,7 +200,14 @@ internal static class ShipmentEndpoints
         }
 
         response.Headers.ETag = Api.ETag(shipment.Version);
-        return TypedResults.Ok(ShipmentProjections.ToDetails(shipment));
+        var details = ShipmentProjections.ToDetails(shipment);
+        if (shipment.CodSettlementId is { } settlementId)
+        {
+            // Which payout carried this order's cash to the seller (the Finance page lists it by number).
+            details = details with { CodSettlementNumber = await db.CodSettlements.AsNoTracking().Where(c => c.Id == settlementId).Select(c => c.SettlementNumber).FirstOrDefaultAsync(ct) };
+        }
+
+        return TypedResults.Ok(details);
     }
 
     private static async Task<IResult> CreateAsync(CreateShipmentRequest request, ClaimsPrincipal user, OrderDesk orders, CancellationToken ct)

@@ -112,7 +112,9 @@ public sealed record ShipmentDetails(
     int ConfirmationAttempts = 0,
     string? ConfirmationBy = null,
     int? Rating = null,
-    string? RatingComment = null)
+    string? RatingComment = null,
+    DateTimeOffset? CodSettledAt = null,
+    string? CodSettlementNumber = null)
 {
     /// <summary>Where the parcel must go next: the destination hub, or the seller's hub when it is being returned.</summary>
     public string TargetHubCode => Rules.ShipmentLifecycle.IsReturning(Status) || Status == ShipmentStatus.Returned

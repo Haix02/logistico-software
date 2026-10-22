@@ -397,13 +397,16 @@ body:has(.lx-app, .lx-public, .lx-boot, .lx-account) .lx-boot-splash { display: 
 .bp6-button.bp6-minimal.bp6-intent-warning:hover { background: color-mix(in srgb, var(--gl-color-orange-500) 12%, transparent); }
 .bp6-button.bp6-minimal:disabled, .bp6-button.bp6-minimal.bp6-disabled { background: transparent !important; box-shadow: none !important; }
 
-/* Outlined = Pajamas secondary: white with the intent's colour as border and text. */
-.bp6-button.bp6-outlined { background: var(--lx-surface); box-shadow: inset 0 0 0 1px var(--lx-button-border); color: var(--lx-text); }
-.bp6-button.bp6-outlined.bp6-intent-primary { box-shadow: inset 0 0 0 1px var(--lx-selected); color: var(--lx-text-strong); }
-.bp6-button.bp6-outlined.bp6-intent-danger { box-shadow: inset 0 0 0 1px var(--lx-danger); color: var(--lx-danger); }
-.bp6-button.bp6-outlined.bp6-intent-success { box-shadow: inset 0 0 0 1px var(--lx-success); color: var(--lx-success-text); }
-.bp6-button.bp6-outlined.bp6-intent-warning { box-shadow: inset 0 0 0 1px var(--lx-warning); color: var(--lx-warning-text); }
-.bp6-button.bp6-outlined:hover { background: var(--lx-button-hover); }
+/* Outlined = Pajamas secondary: white with the intent's colour as border and text, also when hovered or pressed. */
+.bp6-button.bp6-outlined, .bp6-button.bp6-outlined:is(:hover, :active, .bp6-active) { background: var(--lx-surface); box-shadow: inset 0 0 0 1px var(--lx-button-border); color: var(--lx-text); }
+.bp6-button.bp6-outlined:is(:hover, :active, .bp6-active) { background: var(--lx-button-hover); }
+.bp6-button.bp6-outlined.bp6-intent-primary, .bp6-button.bp6-outlined.bp6-intent-primary:is(:hover, :active, .bp6-active) { box-shadow: inset 0 0 0 1px var(--lx-selected); color: var(--lx-text-strong); }
+.bp6-button.bp6-outlined.bp6-intent-danger, .bp6-button.bp6-outlined.bp6-intent-danger:is(:hover, :active, .bp6-active) { box-shadow: inset 0 0 0 1px var(--lx-danger); color: var(--lx-danger); }
+.bp6-button.bp6-outlined.bp6-intent-success, .bp6-button.bp6-outlined.bp6-intent-success:is(:hover, :active, .bp6-active) { box-shadow: inset 0 0 0 1px var(--lx-success); color: var(--lx-success-text); }
+.bp6-button.bp6-outlined.bp6-intent-warning, .bp6-button.bp6-outlined.bp6-intent-warning:is(:hover, :active, .bp6-active) { box-shadow: inset 0 0 0 1px var(--lx-warning); color: var(--lx-warning-text); }
+.bp6-button.bp6-outlined.bp6-intent-danger:is(:hover, :active) { background: var(--lx-danger-soft); }
+.bp6-button.bp6-outlined.bp6-intent-warning:is(:hover, :active) { background: var(--lx-warning-soft); }
+.bp6-button.bp6-outlined.bp6-intent-success:is(:hover, :active) { background: var(--lx-success-soft); }
 
 .bp6-button-group { display: inline-flex; gap: 0; }
 .bp6-button-group > .bp6-button:not(:first-child) { border-start-start-radius: 0; border-end-start-radius: 0; margin-inline-start: -1px; }
@@ -449,6 +452,9 @@ a.bp6-button, a.bp6-button:hover { text-decoration: none; }
 .bp6-input[readonly] { background-color: var(--lx-surface-2); }
 .bp6-input.bp6-large, .bp6-large .bp6-input, .bp6-html-select.bp6-large select { height: var(--lx-control-height-lg); line-height: var(--lx-control-height-lg); font-size: 16px; }
 .bp6-input.bp6-small, .bp6-small .bp6-input, .bp6-html-select.bp6-small select { height: var(--lx-control-height-sm); line-height: var(--lx-control-height-sm); font-size: 13px; padding-inline: 8px; }
+/* Selects keep room for their arrow at every size. */
+.bp6-html-select.bp6-small select, .bp6-select.bp6-small select { padding-inline-end: 26px; }
+.bp6-html-select.bp6-small .bp6-icon, .bp6-select.bp6-small .bp6-icon { inset-inline-end: 6px; }
 textarea.bp6-input { height: auto; min-height: 72px; line-height: 1.5; padding-block: 6px; resize: vertical; }
 .bp6-input.invalid, .bp6-form-group.bp6-intent-danger .bp6-input, .bp6-input.bp6-intent-danger { box-shadow: inset 0 0 0 1px var(--lx-danger-border); }
 .bp6-input.invalid:focus, .bp6-form-group.bp6-intent-danger .bp6-input:focus { box-shadow: inset 0 0 0 1px var(--lx-danger-border), 0 0 0 1px var(--lx-focus-inner), 0 0 0 3px var(--lx-danger-border); }
@@ -1130,7 +1136,7 @@ button.lx-list-item { width: 100%; background: none; border: 0; border-block-end
 .lx-fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .lx-row-muted > td { opacity: .62; }
 .lx-ms-xs { margin-inline-start: 6px; }
-.lx-role-select select { min-width: 9.5em; }
+.lx-role-select select { min-width: 11.5em; }
 html table.bp6-html-table.lx-table.lx-role-matrix tbody th[scope="row"] {
     position: static; min-width: 150px; font-size: var(--lx-font-size); font-weight: 400; text-transform: none; letter-spacing: normal;
     color: var(--lx-text); white-space: normal; line-height: 1.45; background: none; border-block-end: 1px solid var(--lx-border);
@@ -1820,12 +1826,13 @@ body.bp6-dark { color: var(--lx-text); background: var(--lx-bg); color-scheme: d
 .bp6-dark .lx-nav-item.active::before { background: var(--gl-color-blue-300); }
 .bp6-dark .lx-segmented-raised, .bp6-dark .bp6-segmented-control > .bp6-button.bp6-intent-primary,
 .bp6-dark .bp6-segmented-control > .bp6-button.bp6-intent-primary:hover { background: var(--gl-color-neutral-700); box-shadow: none; }
-.bp6-dark .bp6-button.bp6-intent-danger { background: var(--gl-color-red-500); box-shadow: none; }
-.bp6-dark .bp6-button.bp6-intent-danger:hover { background: var(--gl-color-red-600); }
-.bp6-dark .bp6-button.bp6-intent-success { background: var(--gl-color-green-500); }
-.bp6-dark .bp6-button.bp6-intent-success:hover { background: var(--gl-color-green-600); }
-.bp6-dark .bp6-button.bp6-intent-warning { background: var(--gl-color-orange-500); }
-.bp6-dark .bp6-button.bp6-intent-warning:hover { background: var(--gl-color-orange-600); }
+/* Filled intent buttons only: minimal and outlined ones keep their transparent background. */
+.bp6-dark .bp6-button.bp6-intent-danger:not(.bp6-minimal):not(.bp6-outlined) { background: var(--gl-color-red-500); box-shadow: none; }
+.bp6-dark .bp6-button.bp6-intent-danger:not(.bp6-minimal):not(.bp6-outlined):hover { background: var(--gl-color-red-600); }
+.bp6-dark .bp6-button.bp6-intent-success:not(.bp6-minimal):not(.bp6-outlined) { background: var(--gl-color-green-500); }
+.bp6-dark .bp6-button.bp6-intent-success:not(.bp6-minimal):not(.bp6-outlined):hover { background: var(--gl-color-green-600); }
+.bp6-dark .bp6-button.bp6-intent-warning:not(.bp6-minimal):not(.bp6-outlined) { background: var(--gl-color-orange-500); }
+.bp6-dark .bp6-button.bp6-intent-warning:not(.bp6-minimal):not(.bp6-outlined):hover { background: var(--gl-color-orange-600); }
 .bp6-dark .bp6-button[class*="bp6-intent-"]:not(.bp6-minimal):not(.bp6-outlined) .bp6-spinner-track { stroke: rgba(0, 0, 0, 0.25); }
 .bp6-dark .bp6-input, .bp6-dark .bp6-html-select select { color: var(--lx-text-strong); }
 .bp6-dark .bp6-html-select option { background: var(--gl-color-neutral-900); color: var(--lx-text); }

@@ -214,7 +214,7 @@
         loading = true;
         try
         {
-            result = await Operations.ListRequestsAsync(new ServiceRequestQuery
+            var query = new ServiceRequestQuery
             {
                 Status = (Status ?? "open") switch
                 {
@@ -228,13 +228,24 @@
                 Q = Q,
                 Page = Page,
                 PageSize = PageSize,
-            });
+            };
+            var (isLatest, page) = await latest.RunAsync(ct => Operations.ListRequestsAsync(query, ct));
+            if (isLatest)
+            {
+                result = page;
+            }
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
         }
         finally
         {
-            loading = false;
+            loading = latest.Busy;
         }
     }
+
+    private readonly LatestLoad latest = new();
 
     private void Go(string? q = null, string? status = null, string? type = null, string? source = null, int? page = null, int? pageSize = null) =>
         Navigation.NavigateTo(Url.With("requests", ("status", status ?? Status), ("type", type ?? Type), ("source", source ?? Source),
