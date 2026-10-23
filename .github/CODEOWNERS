@@ -1,0 +1,3 @@
+# Every change to Logistico is reviewed by the maintainers before it reaches main.
+# Branch protection on main requires a code-owner approval and a green "Build & test" check.
+* @Haix02
