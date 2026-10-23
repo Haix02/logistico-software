@@ -1,7 +1,9 @@
 using System.Security.Claims;
+using Logistico.Modules.Audit;
 using Logistico.Modules.Merchants;
 using Logistico.Modules.Merchants.Contracts;
 using Logistico.Modules.Shipments;
+using Logistico.SharedKernel;
 using Logistico.SharedKernel.Identity;
 using Logistico.Web.Data;
 using Microsoft.AspNetCore.Identity;
@@ -36,9 +38,13 @@ internal static class DatabaseInitializer
                 await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.MigrateAsync();
             }
 
+            await app.Services.MigrateAuditDatabaseAsync();
             await app.Services.MigrateMerchantsDatabaseAsync();
             await app.Services.MigrateShipmentsDatabaseAsync();
         }
+
+        // What start-up writes comes from configuration, not from someone's change: it stays out of the audit trail.
+        using var unaudited = AuditScope.Suppress();
 
         // The staff roles are reference data: every company needs them before anyone can be given a role.
         await EnsureStaffRolesAsync(app.Services);

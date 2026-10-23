@@ -87,7 +87,8 @@ Target: **OWASP ASVS Level 2** for the web app and API. ✅ = implemented, 🟡 
 ## 5. Audit
 
 - Who did what, when: `created_by`/`recorded_by` on shipments and events, `updated_by` on warehouses, rate cards and rules, and log entries for every team change (who added, changed or reset whom). ✅
-- A full **audit log** (🟡 Phase 1): append-only, hash-chained per tenant ([04](04-database-design.md) §4.6), covering logins, permission changes, exports, sensitive reads, and every change to customs, finance and shipment data.
+- **Audit log** ✅: every saved change to orders, customs, payouts and cash, prices, rules, warehouses, couriers, sellers and staff accounts (roles and links included) is recorded with who, when, from which address and each field before and after, in the same transaction as the change ([ADR-030](14-architecture-decisions.md)). Secrets are recorded as changed, never with their value. The table is append-only (a trigger refuses updates and deletes); administrators read it on the Audit log page.
+- Still planned: the per-tenant hash chain for tamper evidence ([04](04-database-design.md) §4.6), sign-in events, exports and sensitive reads.
 
 ## 6. Trade compliance (built into Customs, Phase 1–3)
 
@@ -116,7 +117,7 @@ The full deployment checklist is in [15 — Production readiness](15-production-
 1. Real email sender (account confirmation, password reset by email; administrators can already set a new password on the Team page).
 2. MFA enforcement for staff.
 3. Inline `style` attributes still need `style-src 'unsafe-inline'`; moving them to classes would allow a stricter policy.
-4. Audit log of who changed what (roles are in place, §2).
+4. Hash-chain the audit log and add sign-ins, exports and sensitive reads to it (§5).
 5. Keep the .NET runtime on servers patched (development uses SDK 10.0.4xx / runtime 10.0.13).
 
 Data Protection keys are already required on a durable shared volume outside Development (`DataProtection:KeyRingPath`;

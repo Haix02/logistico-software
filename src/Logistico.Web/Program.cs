@@ -1,4 +1,5 @@
 using System.Threading.RateLimiting;
+using Logistico.Modules.Audit;
 using Logistico.Modules.Merchants;
 using Logistico.Modules.Shipments;
 using Logistico.SharedKernel;
@@ -81,9 +82,10 @@ builder.Services.AddSingleton<Microsoft.AspNetCore.Authorization.IAuthorizationM
 // Roles live in the sign-in cookie: re-check the account every minute so role changes and locks apply quickly.
 builder.Services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.FromMinutes(1));
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options
+builder.Services.AddDbContext<ApplicationDbContext>((services, options) => options
     .UseNpgsql(connectionString, npgsql => npgsql.MigrationsHistoryTable("__ef_migrations_history", ApplicationDbContext.Schema))
-    .UseSnakeCaseNamingConvention());
+    .UseSnakeCaseNamingConvention()
+    .AddInterceptors(services.GetServices<Microsoft.EntityFrameworkCore.Diagnostics.ISaveChangesInterceptor>())); // the audit trail
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
@@ -165,6 +167,7 @@ builder.Services.AddResponseCompression(options =>
 });
 
 // Modules
+builder.Services.AddAuditModule(connectionString);
 builder.Services.AddMerchantsModule(connectionString);
 builder.Services.AddShipmentsModule(connectionString);
 
@@ -240,6 +243,7 @@ app.MapTeamEndpoints();
 
 // Module APIs: reading needs a staff role, changing data needs Operations or Admin unless an endpoint asks for more.
 var modules = app.MapGroup("").RequireStaffRoles();
+modules.MapAuditModule();
 modules.MapMerchantsModule();
 modules.MapShipmentsModule();
 

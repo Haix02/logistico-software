@@ -54,7 +54,7 @@ flowchart LR
 
 - EF Core migrations live **per module** (`src/Logistico.Web/Data/Migrations` for Identity, `Modules/X/Infrastructure/Migrations` for each module), each with its own history table in its own schema.
 - **Development:** the app migrates on start-up (`Database:MigrateOnStartup=true` in `appsettings.Development.json`).
-- **Production:** never migrate from the app. The pipeline produces **three self-contained migration bundles** (`migrate-identity`, `migrate-merchants`, and `migrate-shipments`), and the deploy step runs all three **before** the new version starts (Kubernetes Job / Argo CD PreSync hook).
+- **Production:** never migrate from the app. The pipeline produces **four self-contained migration bundles** (`migrate-audit`, `migrate-identity`, `migrate-merchants`, and `migrate-shipments`), and the deploy step runs all four, `migrate-audit` first, **before** the new version starts (Kubernetes Job / Argo CD PreSync hook).
 - Rules: expand → migrate → contract for breaking schema changes; `lock_timeout` in migration sessions; review the generated SQL (`dotnet ef migrations script --idempotent`) in every PR that adds a migration.
 
 Production also requires a durable shared Data Protection key volume. Set `DataProtection__KeyRingPath` to its mounted path (for example `/var/lib/logistico/keys`) on every replica. The host fails fast when this is absent, preventing cookies from becoming invalid after a restart or when requests move between replicas.
