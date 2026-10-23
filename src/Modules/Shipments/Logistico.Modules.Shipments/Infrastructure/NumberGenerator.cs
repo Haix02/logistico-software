@@ -26,6 +26,9 @@ internal sealed class NumberGenerator(ShipmentsDbContext db, TimeProvider clock)
     /// <summary>COD settlement batch, e.g. STL-2026-0007.</summary>
     public Task<string> SettlementNumberAsync(CancellationToken ct) => FormattedAsync("STL", ShipmentsDbContext.SettlementSequence, 4, ct);
 
+    /// <summary>A courier's cash hand-in at the office, e.g. CH-2026-000031.</summary>
+    public Task<string> CashHandoverNumberAsync(CancellationToken ct) => FormattedAsync("CH", ShipmentsDbContext.CashHandoverSequence, 6, ct);
+
     /// <summary>
     /// Moves every number sequence past the highest number already stored (data imported or seeded before the
     /// sequences existed), so the next document never collides with an old one. Safe to run on every start.
@@ -46,6 +49,8 @@ internal sealed class NumberGenerator(ShipmentsDbContext db, TimeProvider clock)
                 $"SELECT MAX(split_part(return_manifest_number, '-', 3)::bigint) FROM {schema}.shipments WHERE return_manifest_number ~ {Formatted}"),
             (ShipmentsDbContext.SettlementSequence,
                 $"SELECT MAX(split_part(settlement_number, '-', 3)::bigint) FROM {schema}.cod_settlements WHERE settlement_number ~ {Formatted}"),
+            (ShipmentsDbContext.CashHandoverSequence,
+                $"SELECT MAX(split_part(number, '-', 3)::bigint) FROM {schema}.cash_handovers WHERE number ~ {Formatted}"),
         ];
 
         // Plain SQL on purpose: sequences are shared by all companies, so the highest number counts across tenants.

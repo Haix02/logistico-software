@@ -10,7 +10,9 @@ public sealed record CourierRun(
     int DeliveredToday,
     int FailedToday,
     decimal CashCollectedTodayIqd,
-    IReadOnlyList<CourierStop> Stops);
+    IReadOnlyList<CourierStop> Stops,
+    decimal CashToHandInIqd = 0,
+    int ParcelsToHandIn = 0);
 
 /// <summary>One parcel out for delivery with everything the courier needs at the door.</summary>
 public sealed record CourierStop(

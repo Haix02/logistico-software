@@ -59,7 +59,7 @@
             }
         </HtmlSelect>
     </div>
-    <DataTable TItem="CourierListItem" Items="overview?.Couriers" Loading="loading" ColumnCount="8" OnRowClick="OpenEdit" EmptyIcon="people" EmptyTitle="@L["NoCouriers"]">
+    <DataTable TItem="CourierListItem" Items="overview?.Couriers" Loading="loading" ColumnCount="9" OnRowClick="OpenEdit" EmptyIcon="people" EmptyTitle="@L["NoCouriers"]">
         <Header>
             <th>@L["Field_Courier"]</th>
             <th>@L["Col_Hub"]</th>
@@ -68,6 +68,7 @@
             <th class="lx-num">@L["Col_DeliveredToday"]</th>
             <th class="lx-num">@L["Col_SuccessRate"]</th>
             <th class="lx-num">@L["Col_CashOnRun"]</th>
+            <th class="lx-num">@L["Col_CashToHandIn"]</th>
             <th class="lx-col-actions"></th>
         </Header>
         <Row Context="c">
@@ -82,16 +83,122 @@
             <td class="lx-num">@Fmt.Number(c.DeliveredTodayCount)</td>
             <td class="lx-num">@SuccessRate(c)</td>
             <td class="lx-num">@Fmt.Money(c.CashOnRunIqd, "IQD")</td>
+            <td class="lx-num">
+                @if (c.CashToHandInIqd > 0)
+                {
+                    <span class="lx-strong">@Fmt.Money(c.CashToHandInIqd, "IQD")</span>
+                    <div class="lx-cell-sub">@L.Count("ParcelsN", c.ParcelsToHandIn)</div>
+                }
+                else
+                {
+                    <span class="bp6-text-muted">—</span>
+                }
+            </td>
             <td class="lx-col-actions" @onclick:stopPropagation="true">
                 @if (!c.IsActive)
                 {
                     <Tag>@L["Inactive"]</Tag>
                 }
-                <Button Small="true" Icon="clipboard" Text="@L["OpenRunsheet"]" OnClick="@(() => OpenRunsheetAsync(c))" />
+                @if (canOperate && c.CashToHandInIqd > 0)
+                {
+                    <Button Small="true" Icon="bank-account" Text="@L["ReceiveCash"]" OnClick="@(() => OpenCashAsync(c))" />
+                }
+                <Button Small="true" Icon="clipboard" Tip="@L["OpenRunsheet"]" AriaLabel="@L["OpenRunsheet"]" OnClick="@(() => OpenRunsheetAsync(c))" />
             </td>
         </Row>
     </DataTable>
 </div>
+
+<Section Title="@L["CashHandoversTitle"]" Subtitle="@L["CashHandoversSubtitle"]" Icon="bank-account" Padded="false" CssClass="lx-mt-lg">
+    <DataTable TItem="CashHandoverItem" Items="handovers?.Items" Loading="handovers is null" ColumnCount="7" EmptyIcon="bank-account" EmptyTitle="@L["NoCashHandovers"]">
+        <Header>
+            <th>@L["Col_HandIn"]</th>
+            <th>@L["Field_Courier"]</th>
+            <th class="lx-num">@L["Col_Parcels"]</th>
+            <th class="lx-num">@L["Col_Expected"]</th>
+            <th class="lx-num">@L["Col_Received"]</th>
+            <th class="lx-num">@L["Col_Difference"]</th>
+            <th>@L["Col_HandedInAt"]</th>
+        </Header>
+        <Row Context="h">
+            <td><span class="lx-code">@h.Number</span></td>
+            <td><Cell Title="@h.CourierName" Sub="@h.ReceivedBy" /></td>
+            <td class="lx-num">@Fmt.Number(h.ParcelCount)</td>
+            <td class="lx-num">@Fmt.Money(h.ExpectedIqd, "IQD")</td>
+            <td class="lx-num lx-strong">@Fmt.Money(h.ReceivedIqd, "IQD")</td>
+            <td class="lx-num">
+                @if (h.DifferenceIqd == 0)
+                {
+                    <Tag Intent="Intent.Success" Minimal="true" Icon="tick">@L["CashExact"]</Tag>
+                }
+                else
+                {
+                    <Tag Intent="@(h.DifferenceIqd < 0 ? Intent.Danger : Intent.Warning)">@Fmt.Money(h.DifferenceIqd, "IQD")</Tag>
+                }
+            </td>
+            <td><Cell Title="@Fmt.DateTime(h.ReceivedAt)" Sub="@h.Notes" /></td>
+        </Row>
+    </DataTable>
+</Section>
+
+<Dialog IsOpen="cashFor is not null" IsOpenChanged="@(open => { if (!open) cashFor = null; })"
+        Title="@string.Format(CultureInfo.CurrentCulture, L["ReceiveCashTitle"], cashFor?.DisplayLabel)" Icon="bank-account" Width="640px">
+    <ChildContent>
+        @if (cash is null)
+        {
+            <Skeleton Lines="4" />
+        }
+        else if (cash.Parcels.Count == 0)
+        {
+            <NonIdealState Icon="tick-circle" Title="@L["NothingToHandIn"]" />
+        }
+        else
+        {
+            <p class="bp6-text-muted lx-mb">@L["ReceiveCashHelper"]</p>
+            <div class="lx-table-wrap lx-table-scroll lx-card lx-mb">
+                <table class="bp6-html-table lx-table lx-table-compact">
+                    <thead><tr><th>@L["Col_Tracking"]</th><th>@L["Col_Customer"]</th><th class="lx-num">@L["Field_Cod"]</th><th>@L["Col_Delivered"]</th></tr></thead>
+                    <tbody>
+                        @foreach (var p in cash.Parcels)
+                        {
+                            <tr>
+                                <td><span class="lx-code">@p.TrackingNumber</span></td>
+                                <td><Cell Title="@p.ConsigneeName" Sub="@p.MerchantName" /></td>
+                                <td class="lx-num">@Fmt.Money(p.CodAmount, "IQD")</td>
+                                <td class="bp6-text-muted">@Fmt.DateTime(p.DeliveredAt)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="lx-form-grid">
+                <FormField TValue="string" Label="@L["Col_Expected"]">
+                    <div class="lx-strong" style="font-size:20px">@Fmt.Money(cash.ExpectedIqd, "IQD")</div>
+                </FormField>
+                <FormField TValue="string" Label="@L["Field_CashCounted"]" Required="true" For="lx-cash-counted">
+                    <div class="bp6-input-group bp6-fill">
+                        <input id="lx-cash-counted" class="bp6-input" type="number" min="0" step="250" dir="ltr" @bind="counted" />
+                        <span class="bp6-input-action lx-input-suffix">@L["Iqd"]</span>
+                    </div>
+                </FormField>
+            </div>
+            @if (counted is { } amount && amount != cash.ExpectedIqd)
+            {
+                <Callout Intent="@(amount < cash.ExpectedIqd ? Intent.Danger : Intent.Warning)" Icon="warning-sign" CssClass="lx-mb">
+                    @string.Format(CultureInfo.CurrentCulture, L[amount < cash.ExpectedIqd ? "CashShortBy" : "CashOverBy"], Fmt.Money(Math.Abs(amount - cash.ExpectedIqd), "IQD"))
+                </Callout>
+            }
+            <FormField TValue="string" Label="@L["Field_Notes"]" Hint="@L["Optional"]" For="lx-cash-notes">
+                <textarea id="lx-cash-notes" class="bp6-input bp6-fill" rows="2" @bind="cashNotes"></textarea>
+            </FormField>
+        }
+    </ChildContent>
+    <Footer>
+        <Button Text="@L["Cancel"]" OnClick="@(() => cashFor = null)" />
+        <Button Intent="Intent.Primary" Icon="tick" Text="@L["ConfirmCashReceived"]" Loading="receiving"
+                Disabled="@(cash is not { Parcels.Count: > 0 } || counted is null || counted < 0)" OnClick="ReceiveCashAsync" />
+    </Footer>
+</Dialog>
 
 <Drawer @bind-IsOpen="runsheetOpen" Title="@string.Format(CultureInfo.CurrentCulture, L["RunsheetTitle"], runsheetCourier?.DisplayLabel ?? "")" Icon="clipboard" Width="640px">
     <ChildContent>
@@ -235,7 +342,7 @@
     protected override async Task OnInitializedAsync()
     {
         canOperate = await AuthState.CanAsync(StaffPolicies.Operate);
-        await LoadAsync();
+        await Task.WhenAll(LoadAsync(), LoadHandoversAsync());
     }
 
     private async Task LoadAsync()
@@ -260,6 +367,70 @@
     }
 
     private readonly LatestLoad latest = new();
+
+    private PagedResult<CashHandoverItem>? handovers;
+    private CourierListItem? cashFor;
+    private CourierCash? cash;
+    private decimal? counted;
+    private string? cashNotes;
+    private bool receiving;
+
+    private async Task LoadHandoversAsync()
+    {
+        try
+        {
+            handovers = await Shipments.ListCashHandoversAsync(pageSize: 10);
+        }
+        catch (ApiException ex)
+        {
+            handovers = new PagedResult<CashHandoverItem>([], 0, 1, 10);
+            Toaster.Error(ex.UserMessage);
+        }
+    }
+
+    /// <summary>Opens the hand-in for a courier: the parcels whose cash they hold, with the expected amount ready to confirm.</summary>
+    private async Task OpenCashAsync(CourierListItem courier)
+    {
+        cashFor = courier;
+        cash = null;
+        cashNotes = null;
+        try
+        {
+            cash = await Shipments.GetCourierCashAsync(courier.Id);
+            counted = decimal.Round(cash.ExpectedIqd, 0); // dinars have no fractions; the database keeps four places
+        }
+        catch (ApiException ex)
+        {
+            cashFor = null;
+            Toaster.Error(ex.UserMessage);
+        }
+    }
+
+    private async Task ReceiveCashAsync()
+    {
+        if (cashFor is not { } courier || counted is not { } amount)
+        {
+            return;
+        }
+
+        receiving = true;
+        try
+        {
+            var handover = await Shipments.ReceiveCashAsync(courier.Id, new ReceiveCashRequest { ReceivedIqd = amount, Notes = cashNotes });
+            Toaster.Show(string.Format(CultureInfo.CurrentCulture, L["CashReceivedToast"], handover.Number, Fmt.Money(handover.ReceivedIqd, "IQD")),
+                handover.DifferenceIqd < 0 ? Intent.Warning : Intent.Success, "bank-account");
+            cashFor = null;
+            await Task.WhenAll(LoadAsync(), LoadHandoversAsync());
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            receiving = false;
+        }
+    }
 
     private string SuccessRate(CourierListItem c)
     {

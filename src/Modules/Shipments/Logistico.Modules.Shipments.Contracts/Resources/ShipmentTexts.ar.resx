@@ -66,6 +66,9 @@
   <data name="Payout_ZainCash" xml:space="preserve"><value>محفظة زين كاش</value></data>
   <data name="Problem_alert.not_found" xml:space="preserve"><value>التنبيه غير موجود.</value></data>
   <data name="Problem_automation.stale" xml:space="preserve"><value>عدّل شخص آخر هذه القواعد. حدّث الصفحة وأعد المحاولة.</value></data>
+  <data name="Problem_cash.negative" xml:space="preserve"><value>لا يمكن أن يكون المبلغ المستلم سالباً.</value></data>
+  <data name="Problem_cash.not_with_courier" xml:space="preserve"><value>مبلغ الطرد {0} ليس لدى المندوب.</value></data>
+  <data name="Problem_cash.nothing_to_hand_in" xml:space="preserve"><value>لا توجد لدى هذا المندوب مبالغ محصَّلة للتسليم.</value></data>
   <data name="Problem_courier.code_taken" xml:space="preserve"><value>يوجد مندوب آخر يستخدم الرمز {0}.</value></data>
   <data name="Problem_courier.not_found" xml:space="preserve"><value>المندوب غير موجود.</value></data>
   <data name="Problem_courier.not_linked" xml:space="preserve"><value>هذا الحساب غير مرتبط بمندوب فعّال. اطلب من المدير ربطه من صفحة الفريق.</value></data>
@@ -75,6 +78,7 @@
   <data name="Problem_customs.stale" xml:space="preserve"><value>قام مستخدم آخر بتعديل هذا البيان الجمركي</value></data>
   <data name="Problem_customs.everification_required" xml:space="preserve"><value>لا يمكن الإفراج الجمركي قبل إدخال رقم تصريحة أسيكودا وإتمام التحقق الإلكتروني الإلزامي لشهادة المنشأ والفاتورة التجارية.</value></data>
   <data name="Problem_customs.hold_reason_required" xml:space="preserve"><value>يجب ذكر سبب الحجز الجمركي.</value></data>
+  <data name="Problem_finance.cash_with_couriers" xml:space="preserve"><value>مبالغ {0} من طلبات هذا المتجر المسلَّمة ما زالت لدى المندوبين. استلمها أولاً من صفحة الأسطول.</value></data>
   <data name="Problem_finance.nothing_to_settle" xml:space="preserve"><value>لا توجد طلبات مسلّمة غير مسددة لهذا المتجر.</value></data>
   <data name="Problem_finance.settlement_not_found" xml:space="preserve"><value>كشف التسوية غير موجود.</value></data>
   <data name="Problem_if_match_required" xml:space="preserve"><value>ترويسة ⁦If-Match⁩ مطلوبة</value></data>

@@ -20,6 +20,7 @@ else
 {
     <div class="lx-kpis">
         <KpiCard Icon="truck" Label="@L["Kpi_PendingCodCollection"]" Amount="summary.PendingCodToCollectIqd" />
+        <KpiCard Icon="people" Label="@L["Kpi_CodWithCouriers"]" Amount="summary.CodWithCouriersIqd" Hint="@L["Kpi_CodWithCouriersHint"]" Href="fleet" />
         <KpiCard Icon="dollar" Label="@L["Kpi_UnsettledCod"]" Amount="summary.UnsettledCodCollectedIqd" Intent="Intent.Primary" />
         <KpiCard Icon="bank-account" Label="@L["Kpi_NetPayableToSellers"]" Amount="summary.UnsettledNetPayableIqd" Intent="Intent.Warning" />
         <KpiCard Icon="tick-circle" Label="@L["Kpi_TotalSettled"]" Amount="summary.TotalSettledNetPaidIqd" Intent="Intent.Success" />
@@ -50,6 +51,11 @@ else
                         <Allowed Policy="@StaffPolicies.Finance">
                             <Button Small="true" Icon="bank-account" Text="@L["SettlePayout"]" OnClick="@(() => OpenSettle(b))" />
                         </Allowed>
+                    }
+                    @if (b.WithCouriersCount > 0)
+                    {
+                        @* Paid out only once the couriers hand the cash in (Fleet page). *@
+                        <a href="fleet"><Tag Minimal="true" Icon="people" Title="@Fmt.Money(b.WithCouriersIqd, "IQD")">@L.Count("WithCouriersN", b.WithCouriersCount)</Tag></a>
                     }
                 </td>
             </Row>

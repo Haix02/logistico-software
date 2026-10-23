@@ -70,6 +70,10 @@ internal sealed class Shipment
     public DateTimeOffset? CodCollectedAt { get; private set; }
     public Guid? CodSettlementId { get; private set; }
     public DateTimeOffset? CodSettledAt { get; private set; }
+
+    /// <summary>When the courier handed this parcel's collected cash in at the office (see <see cref="CashHandover"/>).</summary>
+    public DateTimeOffset? CodHandedOverAt { get; private set; }
+    public Guid? CashHandoverId { get; private set; }
     public decimal? DeliveryFee { get; private set; }
     public string? WarehouseBin { get; private set; }
     public string? CourierName { get; private set; }
@@ -689,6 +693,19 @@ internal sealed class Shipment
         }
 
         StartReturn(Contracts.ReturnReason.SellerCancelled, reason, actor, now);
+    }
+
+    /// <summary>The courier handed this parcel's collected cash in at the office.</summary>
+    public void MarkCashHandedOver(Guid handoverId, DateTimeOffset now)
+    {
+        if (CodCollectedAt is null || CodHandedOverAt is not null)
+        {
+            throw Rule("cash.not_with_courier", "This parcel's cash is not with the courier.", TrackingNumber);
+        }
+
+        CashHandoverId = handoverId;
+        CodHandedOverAt = now;
+        UpdatedAt = now;
     }
 
     /// <summary>Marks a delivered COD shipment as remitted to the seller in a settlement batch.</summary>

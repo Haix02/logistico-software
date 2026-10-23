@@ -151,7 +151,9 @@ public sealed record CourierListItem(
     int TotalDeliveredCount,
     int FailedCount,
     decimal CashOnRunIqd,
-    uint Version)
+    uint Version,
+    decimal CashToHandInIqd = 0,
+    int ParcelsToHandIn = 0)
 {
     public string DisplayLabel => $"{Name} ({Code})";
 }
@@ -222,7 +224,9 @@ public sealed record SellerCodBalance(
     decimal DeliveryFeesIqd,
     decimal NetPayableIqd,
     int InProgressCount,
-    decimal InProgressCodIqd);
+    decimal InProgressCodIqd,
+    int WithCouriersCount = 0,
+    decimal WithCouriersIqd = 0);
 
 public sealed record CodSettlementItem(
     Guid Id,
@@ -248,7 +252,8 @@ public sealed record FinanceSummary(
     decimal TotalSettledNetPaidIqd,
     decimal TotalDeliveryRevenueIqd,
     IReadOnlyList<SellerCodBalance> SellerBalances,
-    IReadOnlyList<CodSettlementItem> RecentSettlements);
+    IReadOnlyList<CodSettlementItem> RecentSettlements,
+    decimal CodWithCouriersIqd = 0);
 
 public sealed class CreateCodSettlementRequest
 {

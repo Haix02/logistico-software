@@ -124,6 +124,7 @@ internal sealed class ShipmentsDemoSeeder(
         }
 
         await SeedCustomsDeclarationsAsync(random, ct);
+        await SeedCashHandoversAsync(ct);
         await SeedCodSettlementsAsync(ct);
         await SeedRatingsAsync(random, ct);
         await automation.SweepAsync(tenant.TenantId, ct);
@@ -242,6 +243,42 @@ internal sealed class ShipmentsDemoSeeder(
         await db.SaveChangesAsync(ct);
     }
 
+    /// <summary>
+    /// Couriers handed in each earlier day's cash in the evening (one short by 5,000 IQD); today's cash is still with them.
+    /// </summary>
+    private async Task SeedCashHandoversAsync(CancellationToken ct)
+    {
+        if (await db.CashHandovers.AnyAsync(ct))
+        {
+            return;
+        }
+
+        var baghdad = clock.GetUtcNow().ToOffset(TimeSpan.FromHours(3));
+        var today = new DateTimeOffset(baghdad.Date, baghdad.Offset).ToUniversalTime();
+        var couriers = await db.Couriers.ToListAsync(ct);
+        var collected = await db.Shipments
+            .Where(s => s.CodCollectedAt != null && s.CodHandedOverAt == null && s.CourierName != null && s.DeliveredAt < today)
+            .ToListAsync(ct);
+        var first = true;
+        foreach (var day in collected.GroupBy(s => new { s.CourierName, Day = s.DeliveredAt!.Value.ToOffset(TimeSpan.FromHours(3)).Date }).OrderBy(g => g.Key.Day))
+        {
+            if (couriers.FirstOrDefault(c => c.DisplayLabel == day.Key.CourierName) is not { } courier)
+            {
+                continue;
+            }
+
+            var parcels = day.ToList();
+            var expected = parcels.Sum(p => p.CodAmount ?? 0m);
+            var at = parcels.Max(p => p.DeliveredAt)!.Value.AddHours(2);
+            var shortBy = first ? 5_000m : 0m;
+            first = false;
+            db.CashHandovers.Add(CashHandover.Create(tenant.TenantId, await numbers.CashHandoverNumberAsync(ct), courier, parcels, expected - shortBy,
+                shortBy > 0 ? "نقص 5,000 د.ع — يُخصم من المندوب" : null, "seed", at));
+        }
+
+        await db.SaveChangesAsync(ct);
+    }
+
     private async Task SeedCodSettlementsAsync(CancellationToken ct)
     {
         if (await db.CodSettlements.AnyAsync(ct))
@@ -252,7 +289,7 @@ internal sealed class ShipmentsDemoSeeder(
         var now = clock.GetUtcNow();
         var cutoff = now.AddDays(-7);
         var olderDelivered = await db.Shipments
-            .Where(s => s.ServiceType == ServiceType.Domestic && s.Status == ShipmentStatus.Delivered && s.CodCollectedAt != null && s.CodSettlementId == null && s.CodAmount > 0 && s.MerchantId != null && s.DeliveredAt < cutoff)
+            .Where(s => s.ServiceType == ServiceType.Domestic && s.Status == ShipmentStatus.Delivered && s.CodHandedOverAt != null && s.CodSettlementId == null && s.CodAmount > 0 && s.MerchantId != null && s.DeliveredAt < cutoff)
             .OrderBy(s => s.DeliveredAt)
             .ToListAsync(ct);
 

@@ -121,7 +121,35 @@
   <data name="Col_Age" xml:space="preserve"><value>منذ</value></data>
   <data name="Col_Alert" xml:space="preserve"><value>التنبيه</value></data>
   <data name="Col_AvgDelivery" xml:space="preserve"><value>متوسط المدة</value></data>
-  <data name="Col_CashOnRun" xml:space="preserve"><value>النقد في الذمة (د.ع)</value></data>
+  <data name="CashExact" xml:space="preserve"><value>مطابق</value></data>
+  <data name="CashHandoversSubtitle" xml:space="preserve"><value>المبالغ التي سلّمها المندوبون للمكتب، مع أي نقص</value></data>
+  <data name="CashHandoversTitle" xml:space="preserve"><value>آخر عمليات استلام المبالغ</value></data>
+  <data name="CashOverBy" xml:space="preserve"><value>زيادة بمقدار {0} عن المتوقع: تُسجَّل.</value></data>
+  <data name="CashReceivedToast" xml:space="preserve"><value>تم تسجيل استلام المبالغ {0} — {1}</value></data>
+  <data name="CashShortBy" xml:space="preserve"><value>نقص بمقدار {0}: يُسجَّل على المندوب.</value></data>
+  <data name="Col_CashToHandIn" xml:space="preserve"><value>للتسليم للمكتب</value></data>
+  <data name="Col_Difference" xml:space="preserve"><value>الفرق</value></data>
+  <data name="Col_Expected" xml:space="preserve"><value>المتوقع</value></data>
+  <data name="Col_HandIn" xml:space="preserve"><value>رقم الاستلام</value></data>
+  <data name="Col_HandedInAt" xml:space="preserve"><value>وقت التسليم</value></data>
+  <data name="Col_Parcels" xml:space="preserve"><value>الطرود</value></data>
+  <data name="Col_Received" xml:space="preserve"><value>المستلم</value></data>
+  <data name="ConfirmCashReceived" xml:space="preserve"><value>تأكيد الاستلام</value></data>
+  <data name="Courier_HandIn" xml:space="preserve"><value>سلّم {0} في المكتب ({1}).</value></data>
+  <data name="Field_CashCounted" xml:space="preserve"><value>المبلغ المعدود</value></data>
+  <data name="Kpi_CodWithCouriers" xml:space="preserve"><value>لدى المندوبين</value></data>
+  <data name="Kpi_CodWithCouriersHint" xml:space="preserve"><value>حُصِّلت ولم تُسلَّم للمكتب بعد</value></data>
+  <data name="NoCashHandovers" xml:space="preserve"><value>لم تُسلَّم أي مبالغ بعد</value></data>
+  <data name="NothingToHandIn" xml:space="preserve"><value>لا توجد مبالغ للتسليم</value></data>
+  <data name="ReceiveCash" xml:space="preserve"><value>استلام المبالغ</value></data>
+  <data name="ReceiveCashHelper" xml:space="preserve"><value>عُدّ المبالغ مع المندوب. تُسجَّل كل الطرود أدناه على أنها سُلِّمت، ويُحفظ أي فرق.</value></data>
+  <data name="ReceiveCashTitle" xml:space="preserve"><value>استلام المبالغ من {0}</value></data>
+  <data name="WithCouriersN" xml:space="preserve"><value>نقود {0} طرد لدى المندوبين</value></data>
+  <data name="WithCouriersN_Few" xml:space="preserve"><value>نقود {0} طرود لدى المندوبين</value></data>
+  <data name="WithCouriersN_Many" xml:space="preserve"><value>نقود {0} طردًا لدى المندوبين</value></data>
+  <data name="WithCouriersN_One" xml:space="preserve"><value>نقود طرد واحد لدى مندوب</value></data>
+  <data name="WithCouriersN_Two" xml:space="preserve"><value>نقود طردين لدى المندوبين</value></data>
+  <data name="Col_CashOnRun" xml:space="preserve"><value>مبالغ الطرود الخارجة</value></data>
   <data name="Col_Cod" xml:space="preserve"><value>المبلغ عند الاستلام</value></data>
   <data name="Col_Compliance" xml:space="preserve"><value>التحقق الإلكتروني</value></data>
   <data name="Col_Created" xml:space="preserve"><value>تاريخ الإنشاء</value></data>
@@ -922,12 +950,12 @@
   <data name="Seller_NoPayoutsTitle" xml:space="preserve"><value>لا توجد تحويلات بعد</value></data>
   <data name="Seller_NotLinkedText" xml:space="preserve"><value>اطلب من شركة التوصيل ربط حسابك بمتجرك من صفحة الفريق.</value></data>
   <data name="Seller_NotLinkedTitle" xml:space="preserve"><value>الحساب غير مرتبط بمتجر بعد</value></data>
-  <data name="Seller_OnTheWay" xml:space="preserve"><value>مبالغ لم تُحصَّل بعد</value></data>
-  <data name="Seller_OnTheWayHint" xml:space="preserve"><value>{0} طلب لم يُسلَّم بعد</value></data>
-  <data name="Seller_OnTheWayHint_Few" xml:space="preserve"><value>{0} طلبات لم تُسلَّم بعد</value></data>
-  <data name="Seller_OnTheWayHint_Many" xml:space="preserve"><value>{0} طلبًا لم يُسلَّم بعد</value></data>
-  <data name="Seller_OnTheWayHint_One" xml:space="preserve"><value>طلب واحد لم يُسلَّم بعد</value></data>
-  <data name="Seller_OnTheWayHint_Two" xml:space="preserve"><value>طلبان لم يُسلَّما بعد</value></data>
+  <data name="Seller_OnTheWay" xml:space="preserve"><value>مبالغ في الطريق إليك</value></data>
+  <data name="Seller_OnTheWayHint" xml:space="preserve"><value>من {0} طلب</value></data>
+  <data name="Seller_OnTheWayHint_Few" xml:space="preserve"><value>من {0} طلبات</value></data>
+  <data name="Seller_OnTheWayHint_Many" xml:space="preserve"><value>من {0} طلبًا</value></data>
+  <data name="Seller_OnTheWayHint_One" xml:space="preserve"><value>من طلب واحد</value></data>
+  <data name="Seller_OnTheWayHint_Two" xml:space="preserve"><value>من طلبين</value></data>
   <data name="Seller_Orders" xml:space="preserve"><value>الطلبات</value></data>
   <data name="Seller_OrdersN" xml:space="preserve"><value>{0} طلب</value></data>
   <data name="Seller_OrdersN_Few" xml:space="preserve"><value>{0} طلبات</value></data>

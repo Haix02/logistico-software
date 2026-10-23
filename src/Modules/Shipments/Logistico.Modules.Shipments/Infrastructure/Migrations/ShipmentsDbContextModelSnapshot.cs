@@ -25,6 +25,8 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.HasSequence("cash_handover_seq");
+
             modelBuilder.HasSequence("request_number_seq");
 
             modelBuilder.HasSequence("return_manifest_seq");
@@ -170,6 +172,78 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                         .HasName("pk_automation_settings");
 
                     b.ToTable("automation_settings", "shipment");
+                });
+
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.CashHandover", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CourierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("courier_id");
+
+                    b.Property<string>("CourierLabel")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)")
+                        .HasColumnName("courier_label");
+
+                    b.Property<decimal>("DifferenceIqd")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("numeric(19,4)")
+                        .HasColumnName("difference_iqd");
+
+                    b.Property<decimal>("ExpectedIqd")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("numeric(19,4)")
+                        .HasColumnName("expected_iqd");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("notes");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("number");
+
+                    b.Property<int>("ParcelCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("parcel_count");
+
+                    b.Property<DateTimeOffset>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("received_at");
+
+                    b.Property<string>("ReceivedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("received_by");
+
+                    b.Property<decimal>("ReceivedIqd")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("numeric(19,4)")
+                        .HasColumnName("received_iqd");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_cash_handovers");
+
+                    b.HasIndex("TenantId", "Number")
+                        .IsUnique()
+                        .HasDatabaseName("ix_cash_handovers_tenant_id_number");
+
+                    b.HasIndex("TenantId", "CourierId", "ReceivedAt")
+                        .HasDatabaseName("ix_cash_handovers_tenant_id_courier_id_received_at");
+
+                    b.ToTable("cash_handovers", "shipment");
                 });
 
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.CodSettlement", b =>
@@ -1092,6 +1166,10 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<Guid?>("CashHandoverId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("cash_handover_id");
+
                     b.Property<decimal>("ChargeableWeightKg")
                         .HasPrecision(12, 3)
                         .HasColumnType("numeric(12,3)")
@@ -1111,6 +1189,10 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                         .HasColumnType("character(3)")
                         .HasColumnName("cod_currency")
                         .IsFixedLength();
+
+                    b.Property<DateTimeOffset?>("CodHandedOverAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("cod_handed_over_at");
 
                     b.Property<DateTimeOffset?>("CodSettledAt")
                         .HasColumnType("timestamp with time zone")
@@ -1429,6 +1511,10 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
 
                     b.HasIndex("TenantId", "ConsigneePhone")
                         .HasDatabaseName("ix_shipments_tenant_id_consignee_phone");
+
+                    b.HasIndex("TenantId", "CourierName")
+                        .HasDatabaseName("ix_shipments_cash_with_couriers")
+                        .HasFilter("cod_collected_at IS NOT NULL AND cod_handed_over_at IS NULL");
 
                     b.HasIndex("TenantId", "CreatedAt")
                         .HasDatabaseName("ix_shipments_tenant_id_created_at");

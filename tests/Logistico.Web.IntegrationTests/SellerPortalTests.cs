@@ -72,6 +72,11 @@ public sealed class SellerPortalTests(LogisticoApiFactory factory)
         await admin.ScanAsync(ScanOperation.Deliver, delivered.TrackingNumber, IraqHubs.Baghdad, courier: "حيدر (Baghdad-02)");
         var fee = (await admin.GetShipmentAsync(delivered.Id)).DeliveryFee!.Value;
 
+        // Still with the courier: on its way to the shop, not owed yet.
+        var early = (await seller.GetFromJsonAsync<SellerHome>("/" + ShipmentsApiRoutes.Seller))!;
+        Assert.Equal((0m, 80_000m), (early.OwedIqd, early.OnTheWayIqd));
+        await admin.HandInCashAsync(await admin.EnsureCourierAsync());
+
         var home = (await seller.GetFromJsonAsync<SellerHome>("/" + ShipmentsApiRoutes.Seller))!;
         Assert.Equal(("Seller Money Shop", 1, 1), (home.MerchantName, home.ActiveOrders, home.DeliveredLast30Days));
         Assert.Equal((50_000m - fee, 1), (home.OwedIqd, home.OwedOrders));

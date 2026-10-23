@@ -57,7 +57,15 @@ internal static class CourierAppEndpoints
         var failed = await db.ShipmentEvents.AsNoTracking()
             .CountAsync(e => e.CourierName == label && e.Status == ShipmentStatus.DeliveryFailed && e.OccurredAt >= startOfDay, ct);
 
-        return TypedResults.Ok(new CourierRun(courier.Code, courier.Name, delivered?.Count ?? 0, failed, delivered?.Cash ?? 0, stops));
+        // Everything collected and not handed in at the office yet, whichever day it was collected.
+        var toHandIn = await db.Shipments.AsNoTracking()
+            .Where(s => s.CourierName == label && s.CodCollectedAt != null && s.CodHandedOverAt == null)
+            .GroupBy(_ => 1)
+            .Select(g => new { Count = g.Count(), Cash = g.Sum(s => s.CodAmount ?? 0) })
+            .FirstOrDefaultAsync(ct);
+
+        return TypedResults.Ok(new CourierRun(courier.Code, courier.Name, delivered?.Count ?? 0, failed, delivered?.Cash ?? 0, stops,
+            toHandIn?.Cash ?? 0, toHandIn?.Count ?? 0));
     }
 
     private static Task<IResult> DeliveredAsync(Guid id, ClaimsPrincipal user, ShipmentsDbContext db, WarehouseScanner scanner, CancellationToken ct) =>

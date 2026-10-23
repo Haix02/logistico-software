@@ -1,4 +1,5 @@
 using Logistico.Modules.Shipments.Contracts;
+using Logistico.SharedKernel;
 
 namespace Logistico.Web.Client.Services;
 
@@ -89,6 +90,15 @@ internal sealed class ShipmentsApi(HttpClient http) : ApiClient(http)
 
     public Task<FleetOverviewResult> GetFleetOverviewAsync(string? q = null, string? governorate = null, bool? activeOnly = null, CancellationToken ct = default) =>
         GetAsync<FleetOverviewResult>(ShipmentsApiRoutes.Fleet + Query(("q", q), ("governorate", governorate), ("activeOnly", activeOnly)), ct);
+
+    public Task<CourierCash> GetCourierCashAsync(Guid courierId, CancellationToken ct = default) =>
+        GetAsync<CourierCash>(ShipmentsApiRoutes.CourierCash(courierId), ct);
+
+    public Task<CashHandoverItem> ReceiveCashAsync(Guid courierId, ReceiveCashRequest request, CancellationToken ct = default) =>
+        SendAsync<CashHandoverItem>(HttpMethod.Post, ShipmentsApiRoutes.CourierCash(courierId), request, null, ct);
+
+    public Task<PagedResult<CashHandoverItem>> ListCashHandoversAsync(Guid? courierId = null, int page = 1, int pageSize = 10, CancellationToken ct = default) =>
+        GetAsync<PagedResult<CashHandoverItem>>(ShipmentsApiRoutes.CashHandovers + Query(("courierId", courierId), ("page", page), ("pageSize", pageSize)), ct);
 
     public async Task<IReadOnlyList<CourierLookupItem>> LookupCouriersAsync(CancellationToken ct = default) =>
         await GetAsync<List<CourierLookupItem>>(ShipmentsApiRoutes.FleetLookup, ct);
