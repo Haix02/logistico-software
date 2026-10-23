@@ -63,7 +63,8 @@ public static class ShipmentsModule
         .MapFleetEndpoints()
         .MapCourierAppEndpoints()
         .MapSellerPortalEndpoints()
-        .MapFinanceEndpoints();
+        .MapFinanceEndpoints()
+        .MapViewEndpoints();
 
     public static async Task MigrateShipmentsDatabaseAsync(this IServiceProvider services, CancellationToken ct = default)
     {

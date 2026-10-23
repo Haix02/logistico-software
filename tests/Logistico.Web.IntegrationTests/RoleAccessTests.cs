@@ -49,7 +49,8 @@ public sealed class RoleAccessTests(LogisticoApiFactory factory)
             }
 
             var writes = methods.Any(m => m is not ("GET" or "HEAD"));
-            var allowed = writes ? [StaffPolicies.Operate, StaffPolicies.Care, StaffPolicies.Finance, StaffPolicies.Administer, StaffPolicies.Deliver, StaffPolicies.Sell] : StaffPolicies.All;
+            // Personal: a person's own settings (saved views), which change nobody else's data.
+            var allowed = writes ? [StaffPolicies.Operate, StaffPolicies.Care, StaffPolicies.Finance, StaffPolicies.Administer, StaffPolicies.Deliver, StaffPolicies.Sell, StaffPolicies.Personal] : StaffPolicies.All;
             if (!policies.Overlaps(allowed) && route != "api/v1/account/logout")
             {
                 problems.Add($"{string.Join(',', methods)} {route} has no staff policy ({string.Join(',', policies)})");

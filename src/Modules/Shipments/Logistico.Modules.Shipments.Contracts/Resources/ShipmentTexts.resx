@@ -81,6 +81,7 @@
   <data name="Problem_customs.already_released" xml:space="preserve"><value>This declaration is already released; it can no longer be put on hold.</value></data>
   <data name="Problem_customs.value_required" xml:space="preserve"><value>Enter the customs value in US dollars before releasing.</value></data>
   <data name="Problem_customs.payment_required" xml:space="preserve"><value>Enter the treasury receipt number of the paid duties and fees before releasing.</value></data>
+  <data name="Problem_views.too_many" xml:space="preserve"><value>You have saved as many views of this list as allowed ({0}); remove one first.</value></data>
   <data name="Problem_finance.cash_with_couriers" xml:space="preserve"><value>The cash for {0} of this seller's delivered orders is still with the couriers. Receive it on the Fleet page first.</value></data>
   <data name="Problem_finance.nothing_to_settle" xml:space="preserve"><value>This seller has no unsettled delivered cash-on-delivery orders.</value></data>
   <data name="Problem_finance.settlement_not_found" xml:space="preserve"><value>Settlement not found.</value></data>

@@ -6,6 +6,10 @@ versions follow [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **Saved views and columns** (Shipments): choose which columns the list shows (courier, created, shelf, time in status…)
+  and save the current filters, sort and columns under a name; your views appear as chips beside the quick views, open
+  with one click and are removed with ×. Views are personal (on your account, so they follow you to another computer)
+  and every office role, read-only ones included, can keep them. Your usual columns are remembered on each device.
 - **Audit log** (Administration → Audit log, and "History of changes" on each order): who changed what and when — orders,
   customs, payouts and cash hand-ins, delivery prices, automation rules, warehouses, couriers, sellers and staff accounts
   (roles and links included) — with each field before and after, the person and their address. Entries are written in
