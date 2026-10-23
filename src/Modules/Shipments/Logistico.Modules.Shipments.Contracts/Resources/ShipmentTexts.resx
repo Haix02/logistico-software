@@ -78,6 +78,9 @@
   <data name="Problem_customs.stale" xml:space="preserve"><value>Someone else changed this declaration</value></data>
   <data name="Problem_customs.everification_required" xml:space="preserve"><value>Cannot release from customs until the ASYCUDA declaration number is entered and both Certificate of Origin (CoO) and Commercial Invoice are electronically verified.</value></data>
   <data name="Problem_customs.hold_reason_required" xml:space="preserve"><value>A hold reason is required when placing a shipment on customs hold.</value></data>
+  <data name="Problem_customs.already_released" xml:space="preserve"><value>This declaration is already released; it can no longer be put on hold.</value></data>
+  <data name="Problem_customs.value_required" xml:space="preserve"><value>Enter the customs value in US dollars before releasing.</value></data>
+  <data name="Problem_customs.payment_required" xml:space="preserve"><value>Enter the treasury receipt number of the paid duties and fees before releasing.</value></data>
   <data name="Problem_finance.cash_with_couriers" xml:space="preserve"><value>The cash for {0} of this seller's delivered orders is still with the couriers. Receive it on the Fleet page first.</value></data>
   <data name="Problem_finance.nothing_to_settle" xml:space="preserve"><value>This seller has no unsettled delivered cash-on-delivery orders.</value></data>
   <data name="Problem_finance.settlement_not_found" xml:space="preserve"><value>Settlement not found.</value></data>

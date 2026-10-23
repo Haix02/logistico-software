@@ -17,6 +17,18 @@ versions follow [Semantic Versioning](https://semver.org/).
   payout waits for the next one. 0 % (the default) keeps returns free.
 
 ### Fixed
+- **Customs value in the right currency.** An import declared in dinars was valued as if the amount were US dollars
+  (a 6.55 million IQD parcel was assessed as $6.55 million); dinars are now converted at the official rate, and other
+  currencies, or no declared value, are left for the clerk to enter in dollars from the invoice instead of an invented
+  $1,000. The customs form shows what the shipper declared.
+- **Customs release follows ASYCUDA's order:** a declaration is released only with a customs value and, when duties or
+  fees are due, the treasury receipt of their payment. Saving a released declaration again keeps its first release
+  date, and a released declaration can no longer be put on hold.
+- **Dashboard comparisons are like for like.** "Today" was compared with all of yesterday, so at 10 a.m. bookings looked
+  ~60 % down on a normal day; every period is now compared with the same stretch of the period before (until the same
+  hour). Demand intelligence does the same.
+- Switches in their "off" state were invisible apart from the knob; they now show a grey track (Pajamas toggle), and
+  keyboard focus on a switch is visible.
 - **Sellers are paid only from cash the company holds.** A payout used to include parcels whose cash was still in a
   courier's pocket; now only handed-in cash is owed and paid, the Finance page shows the cash still with couriers, and
   paying a seller whose cash has not arrived explains why. Existing data counts as handed in.

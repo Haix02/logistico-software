@@ -180,7 +180,8 @@
 
                     <h6 class="bp6-heading lx-mt lx-mb">@L["Sec_ValuationAndDuties"]</h6>
                     <div class="lx-form-grid">
-                        <FormField Label="@L["Field_CustomsValueUsd"]" Field="() => draft.CustomsValueUsd">
+                        <FormField Label="@L["Field_CustomsValueUsd"]" Field="() => draft.CustomsValueUsd"
+                                   Helper="@DeclaredValueHelper(selected)">
                             <InputNumber class="bp6-input bp6-fill" @bind-Value="draft.CustomsValueUsd" @bind-Value:after="RecalculateDuties" dir="ltr" step="0.01" />
                         </FormField>
                         <FormField Label="@L["Field_DutyRate"]" Field="() => draft.DutyRatePercent">
@@ -195,7 +196,7 @@
                         <FormField Label="@L["Field_AssessmentNo"]" Hint="@L["Optional"]" Field="() => draft.AssessmentNumber">
                             <InputText class="bp6-input bp6-fill lx-mono" @bind-Value="draft.AssessmentNumber" dir="ltr" />
                         </FormField>
-                        <FormField Label="@L["Field_ReceiptNo"]" Hint="@L["Optional"]" Field="() => draft.ReceiptNumber">
+                        <FormField Label="@L["Field_ReceiptNo"]" Hint="@L["Customs_NeededToRelease"]" Field="() => draft.ReceiptNumber">
                             <InputText class="bp6-input bp6-fill lx-mono" @bind-Value="draft.ReceiptNumber" dir="ltr" />
                         </FormField>
                         <FormField Label="@L["Field_HoldReason"]" Hint="@L["Optional"]" Field="() => draft.HoldReason" CssClass="lx-span-2">
@@ -236,6 +237,14 @@
 </Dialog>
 
 @code {
+    /// <summary>What the shipper declared, when it was not in dollars: dinars are converted at the official rate, other currencies are for the clerk.</summary>
+    private string? DeclaredValueHelper(CustomsQueueItem item) => (item.DeclaredValue, item.DeclaredCurrency) switch
+    {
+        ( > 0, "IQD") => string.Format(CultureInfo.CurrentCulture, L["Customs_DeclaredInDinars"], Fmt.Money(item.DeclaredValue, "IQD"), Fmt.Number(CustomsDutyCalculator.OfficialUsdToIqdRate, 0)),
+        ( > 0, not "USD") => string.Format(CultureInfo.CurrentCulture, L["Customs_DeclaredAs"], Fmt.Money(item.DeclaredValue, item.DeclaredCurrency)),
+        _ => null,
+    };
+
     [SupplyParameterFromQuery(Name = "shipmentId")] public Guid? ShipmentId { get; set; }
 
     private CustomsSummary? summary;

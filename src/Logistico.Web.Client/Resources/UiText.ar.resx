@@ -360,6 +360,9 @@
   <data name="Field_CustomerPhone" xml:space="preserve"><value>موبايل الزبون</value></data>
   <data name="Field_CustomsOffice" xml:space="preserve"><value>منفذ التخليص الجمركي</value></data>
   <data name="Field_CustomsValueUsd" xml:space="preserve"><value>القيمة الجمركية (دولار)</value></data>
+  <data name="Customs_NeededToRelease" xml:space="preserve"><value>مطلوب للإفراج</value></data>
+  <data name="Customs_DeclaredAs" xml:space="preserve"><value>صرّح المرسل بقيمة {0}؛ أدخلها بالدولار من الفاتورة.</value></data>
+  <data name="Customs_DeclaredInDinars" xml:space="preserve"><value>صرّح المرسل بقيمة {0}، محوّلة بالسعر الرسمي {1} دينار للدولار.</value></data>
   <data name="Field_DeclarationNo" xml:space="preserve"><value>رقم تسجيل أسيكودا</value></data>
   <data name="Field_DeclaredValue" xml:space="preserve"><value>القيمة المصرّح بها</value></data>
   <data name="Field_DeliveryFee" xml:space="preserve"><value>أجور التوصيل</value></data>

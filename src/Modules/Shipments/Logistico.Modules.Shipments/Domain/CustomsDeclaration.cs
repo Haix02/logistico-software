@@ -54,7 +54,7 @@ internal sealed class CustomsDeclaration
         }
 
         var originCountry = shipment.OriginCode.Length >= 2 ? shipment.OriginCode[..2].ToUpperInvariant() : "CN";
-        var customsValueUsd = shipment.DeclaredValue ?? 1_000m;
+        var customsValueUsd = CustomsDutyCalculator.CustomsValueUsd(shipment.DeclaredValue, shipment.DeclaredCurrency);
         var dutyIqd = CustomsDutyCalculator.CalculateDutyIqd(customsValueUsd, 5m);
         var feesIqd = CustomsDutyCalculator.CalculateStampAndPortFeesIqd(customsValueUsd);
 
@@ -136,6 +136,11 @@ internal sealed class CustomsDeclaration
                     throw new DomainException("customs.hold_reason_required", "A hold reason is required when placing a shipment on customs hold.");
                 }
 
+                if (ReleasedAt is not null)
+                {
+                    throw new DomainException("customs.already_released", "This declaration is already released; it can no longer be put on hold.");
+                }
+
                 if (shipment.Status == ShipmentStatus.ArrivedPortOfEntry)
                 {
                     shipment.AdvanceTo(ShipmentStatus.CustomsPending, now, new MilestoneDetails(Location: officeName), "customs", user, now);
@@ -156,7 +161,18 @@ internal sealed class CustomsDeclaration
                         "Cannot release from customs until the ASYCUDA declaration number is entered and both Certificate of Origin (CoO) and Commercial Invoice are electronically verified.");
                 }
 
-                ReleasedAt = now;
+                // ASYCUDA issues the release order after valuation and payment of what was assessed.
+                if (CustomsValueUsd <= 0)
+                {
+                    throw new DomainException("customs.value_required", "Enter the customs value in US dollars before releasing.");
+                }
+
+                if (AssessedDutyIqd + TaxAndFeesIqd > 0 && ReceiptNumber is null)
+                {
+                    throw new DomainException("customs.payment_required", "Enter the treasury receipt number of the paid duties and fees before releasing.");
+                }
+
+                ReleasedAt ??= now;
                 ReleaseOrderNumber ??= $"REL-{now.Year}-{Id.ToString("N")[^10..].ToUpperInvariant()}"; // until ASYCUDA's own number is entered
                 HoldReason = null;
 

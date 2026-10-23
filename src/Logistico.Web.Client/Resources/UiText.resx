@@ -334,6 +334,9 @@
   <data name="Field_CustomerPhone" xml:space="preserve"><value>Customer mobile</value></data>
   <data name="Field_CustomsOffice" xml:space="preserve"><value>Customs clearance office</value></data>
   <data name="Field_CustomsValueUsd" xml:space="preserve"><value>Customs value (USD)</value></data>
+  <data name="Customs_NeededToRelease" xml:space="preserve"><value>Needed to release</value></data>
+  <data name="Customs_DeclaredAs" xml:space="preserve"><value>The shipper declared {0}; enter it in US dollars from the invoice.</value></data>
+  <data name="Customs_DeclaredInDinars" xml:space="preserve"><value>The shipper declared {0}, converted at the official rate of {1} dinars per dollar.</value></data>
   <data name="Field_DeclarationNo" xml:space="preserve"><value>ASYCUDA registration no.</value></data>
   <data name="Field_DeclaredValue" xml:space="preserve"><value>Declared value</value></data>
   <data name="Field_DeliveryFee" xml:space="preserve"><value>Delivery fee</value></data>

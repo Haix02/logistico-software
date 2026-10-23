@@ -61,11 +61,15 @@ public sealed class OperationsModulesApiTests(LogisticoApiFactory factory)
             Assert.Equal("customs.everification_required", problem.RootElement.GetProperty("code").GetString());
         }
 
-        // 3. Complete mandatory e-verification and release
+        // 3. Complete mandatory e-verification; the duties must be paid (ASYCUDA receipt) before release
         registerReq.CooEVerified = true;
         registerReq.InvoiceEVerified = true;
         registerReq.SelectivityLane = CustomsLane.Green;
         registerReq.Action = CustomsAction.Release;
+        var unpaid = await client.PutWithETagAsync(ShipmentsApiRoutes.CustomsByShipment(booked.Id), registerReq, etag);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, unpaid.StatusCode);
+        Assert.Contains("customs.payment_required", await unpaid.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+        registerReq.ReceiptNumber = "RCP-2026-77001";
         var releaseResp = await client.PutWithETagAsync(ShipmentsApiRoutes.CustomsByShipment(booked.Id), registerReq, etag);
         Assert.Equal(HttpStatusCode.OK, releaseResp.StatusCode);
         var releasedItem = (await releaseResp.Content.ReadFromJsonAsync<CustomsQueueItem>())!;

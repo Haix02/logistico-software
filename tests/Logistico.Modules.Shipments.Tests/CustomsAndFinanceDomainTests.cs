@@ -43,6 +43,51 @@ public class CustomsAndFinanceDomainTests
         Assert.True(CustomsDutyCalculator.CanRelease("2026-IQUQR-IM4-10001", cooEVerified: true, invoiceEVerified: true));
     }
 
+    [Theory]
+    [InlineData(10_000, "USD", 10_000)]
+    [InlineData(13_100_000, "IQD", 10_000)]
+    [InlineData(10_000, "EUR", 0)] // no official rate: the clerk enters dollars from the invoice
+    [InlineData(null, "USD", 0)]
+    public void The_customs_value_is_in_dollars_whatever_currency_was_declared(int? declared, string currency, int usd) =>
+        Assert.Equal((decimal)usd, CustomsDutyCalculator.CustomsValueUsd((decimal?)declared, currency));
+
+    [Fact]
+    public void Customs_releases_only_valued_and_paid_declarations_and_keeps_the_first_release()
+    {
+        var shipment = BookedInternational();
+        foreach (var (status, day) in new[] { (ShipmentStatus.ReceivedAtOrigin, 0), (ShipmentStatus.DepartedOrigin, 1), (ShipmentStatus.ArrivedPortOfEntry, 2) })
+        {
+            shipment.AdvanceTo(status, Now.AddDays(day), new MilestoneDetails(), "system", "agent", Now.AddDays(day));
+        }
+
+        var decl = CustomsDeclaration.CreateFor(shipment, Now.AddDays(2));
+        var release = new UpsertCustomsDeclarationRequest
+        {
+            CustomsOfficeCode = "IQUQR",
+            Regime = "IM4",
+            DeclarationNumber = "2026-IQUQR-IM4-50002",
+            CountryOfOrigin = "CN",
+            CooEVerified = true,
+            InvoiceEVerified = true,
+            CustomsValueUsd = 0m,
+            DutyRatePercent = 5m,
+            Action = CustomsAction.Release,
+        };
+
+        Assert.Equal("customs.value_required", Assert.Throws<DomainException>(() => decl.Apply(release, shipment, "broker", Now.AddDays(3))).Code);
+        release.CustomsValueUsd = 10_000m;
+        Assert.Equal("customs.payment_required", Assert.Throws<DomainException>(() => decl.Apply(release, shipment, "broker", Now.AddDays(3))).Code);
+
+        release.ReceiptNumber = "RCP-2026-50002";
+        decl.Apply(release, shipment, "broker", Now.AddDays(3));
+        decl.Apply(release, shipment, "broker", Now.AddDays(5)); // saved again later
+        Assert.Equal((ShipmentStatus.Released, Now.AddDays(3)), (shipment.Status, decl.ReleasedAt));
+
+        release.Action = CustomsAction.Hold;
+        release.HoldReason = "Inspection";
+        Assert.Equal("customs.already_released", Assert.Throws<DomainException>(() => decl.Apply(release, shipment, "broker", Now.AddDays(6))).Code);
+    }
+
     [Fact]
     public void Customs_declaration_enforces_mandatory_iraq_everification_before_release_and_exports_sad_xml()
     {
@@ -107,6 +152,7 @@ public class CustomsAndFinanceDomainTests
             CommercialInvoiceNumber = "INV-9001",
             InvoiceEVerified = true,
             CocNumber = "COC-IQ-9001",
+            ReceiptNumber = "RCP-2026-9001",
             Action = CustomsAction.Release,
         }, shipment, "broker", at);
 

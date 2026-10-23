@@ -493,11 +493,14 @@ textarea.bp6-input { height: auto; min-height: 72px; line-height: 1.5; padding-b
 }
 .bp6-control:hover input:checked ~ .bp6-control-indicator { background-color: var(--lx-selected-hover); }
 .bp6-control input:focus-visible ~ .bp6-control-indicator { outline: none; box-shadow: var(--lx-focus-ring); }
-.bp6-control.bp6-switch .bp6-control-indicator { background: var(--lx-control-bg); box-shadow: inset 0 0 0 1px var(--lx-control-border) !important; }
-.bp6-control.bp6-switch .bp6-control-indicator::before { background: var(--lx-selected); box-shadow: none; }
+/* Off = a grey track with a white knob (Pajamas toggle); Blueprint's own !important box-shadow wins from its layer, so no outline. */
+.bp6-control.bp6-switch .bp6-control-indicator { background: var(--lx-control-border); }
+.bp6-control.bp6-switch .bp6-control-indicator::before { background: var(--gl-color-neutral-0); box-shadow: none; }
 .bp6-control.bp6-switch input:checked ~ .bp6-control-indicator { background: var(--lx-selected); box-shadow: none !important; }
 .bp6-control.bp6-switch input:checked ~ .bp6-control-indicator::before { background: var(--lx-surface); }
 .bp6-control.bp6-switch:hover input:checked ~ .bp6-control-indicator { background: var(--lx-selected-hover); }
+.bp6-control.bp6-switch input:disabled ~ .bp6-control-indicator { opacity: .5; }
+.bp6-control.bp6-switch input:focus-visible ~ .bp6-control-indicator { outline: 2px solid var(--lx-focus); outline-offset: 2px; }
 .bp6-control.bp6-disabled { color: var(--lx-faint); }
 
 /* Badges (Pajamas badge): pills tinted by meaning. Blueprint tags without an intent are neutral,

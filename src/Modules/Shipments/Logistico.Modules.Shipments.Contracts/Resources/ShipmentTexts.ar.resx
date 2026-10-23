@@ -78,6 +78,9 @@
   <data name="Problem_customs.stale" xml:space="preserve"><value>قام مستخدم آخر بتعديل هذا البيان الجمركي</value></data>
   <data name="Problem_customs.everification_required" xml:space="preserve"><value>لا يمكن الإفراج الجمركي قبل إدخال رقم تصريحة أسيكودا وإتمام التحقق الإلكتروني الإلزامي لشهادة المنشأ والفاتورة التجارية.</value></data>
   <data name="Problem_customs.hold_reason_required" xml:space="preserve"><value>يجب ذكر سبب الحجز الجمركي.</value></data>
+  <data name="Problem_customs.already_released" xml:space="preserve"><value>تم الإفراج عن هذا البيان، فلا يمكن حجزه بعد الآن.</value></data>
+  <data name="Problem_customs.value_required" xml:space="preserve"><value>أدخل القيمة الجمركية بالدولار الأمريكي قبل الإفراج.</value></data>
+  <data name="Problem_customs.payment_required" xml:space="preserve"><value>أدخل رقم وصل الخزينة للرسوم والضرائب المدفوعة قبل الإفراج.</value></data>
   <data name="Problem_finance.cash_with_couriers" xml:space="preserve"><value>مبالغ {0} من طلبات هذا المتجر المسلَّمة ما زالت لدى المندوبين. استلمها أولاً من صفحة الأسطول.</value></data>
   <data name="Problem_finance.nothing_to_settle" xml:space="preserve"><value>لا توجد طلبات مسلّمة غير مسددة لهذا المتجر.</value></data>
   <data name="Problem_finance.settlement_not_found" xml:space="preserve"><value>كشف التسوية غير موجود.</value></data>
