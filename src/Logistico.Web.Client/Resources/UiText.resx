@@ -103,6 +103,10 @@
   <data name="CloseManifestOk" xml:space="preserve"><value>Every parcel was unloaded. Close the manifest?</value></data>
   <data name="CodHelper" xml:space="preserve"><value>What the courier collects from the customer. Leave empty if prepaid.</value></data>
   <data name="CodTotal" xml:space="preserve"><value>Cash on delivery</value></data>
+  <data name="Col_ReturnFees" xml:space="preserve"><value>Return fees</value></data>
+  <data name="ReturnFeesLine" xml:space="preserve"><value>Returns {0} ({1})</value></data>
+  <data name="Settle_ReturnFeesCarry" xml:space="preserve"><value>Return fees larger than what is left of this payout are not deducted now; they wait for the next payout.</value></data>
+  <data name="Col_ReturnFee" xml:space="preserve"><value>Return fee</value></data>
   <data name="Col_Action" xml:space="preserve"><value>Action</value></data>
   <data name="Col_Age" xml:space="preserve"><value>In this status</value></data>
   <data name="Col_Alert" xml:space="preserve"><value>Alert</value></data>
@@ -168,7 +172,6 @@
   <data name="Col_Route" xml:space="preserve"><value>Route</value></data>
   <data name="Col_Seller" xml:space="preserve"><value>Seller / shipper</value></data>
   <data name="Col_Service" xml:space="preserve"><value>Service</value></data>
-  <data name="Col_SettledAt" xml:space="preserve"><value>Settled at</value></data>
   <data name="Col_SettlementNo" xml:space="preserve"><value>Settlement no.</value></data>
   <data name="Col_Shipment" xml:space="preserve"><value>Shipment</value></data>
   <data name="Col_Source" xml:space="preserve"><value>From</value></data>
@@ -698,6 +701,8 @@
   <data name="Price_DiscountPart" xml:space="preserve"><value>− {0}% seller discount</value></data>
   <data name="Price_WeightPart" xml:space="preserve"><value>+ {0} weight</value></data>
   <data name="PricesSaved" xml:space="preserve"><value>Prices saved. New orders use them now.</value></data>
+  <data name="Pricing_ReturnFeeHint" xml:space="preserve"><value>Charged to the seller when a parcel goes back to them, as a share of its delivery fee: refused, unreachable, returned by the customer, cancelled after pickup or a wrong address. Not for damage in our care. 0% = returns are free.</value></data>
+  <data name="Pricing_ReturnFee" xml:space="preserve"><value>Return fee</value></data>
   <data name="Pricing_Basics" xml:space="preserve"><value>Basics</value></data>
   <data name="Pricing_ByGovernorate" xml:space="preserve"><value>Price by destination</value></data>
   <data name="Pricing_ByGovernorateHint" xml:space="preserve"><value>For customers outside the seller's governorate, grouped by the warehouse that delivers.</value></data>
@@ -886,6 +891,7 @@
   <data name="SellerCreated" xml:space="preserve"><value>Seller “{0}” added</value></data>
   <data name="SellerNotFound" xml:space="preserve"><value>Seller not found</value></data>
   <data name="SellerReceives" xml:space="preserve"><value>Seller receives</value></data>
+  <data name="Seller_ReturnFeeN" xml:space="preserve"><value>Return fee {0}</value></data>
   <data name="Seller_Active" xml:space="preserve"><value>Orders in progress</value></data>
   <data name="Seller_Cancel" xml:space="preserve"><value>Cancel order</value></data>
   <data name="Seller_CancelMessage" xml:space="preserve"><value>Order {0} has not been picked up yet. Cancelling takes it off the courier's pickups.</value></data>

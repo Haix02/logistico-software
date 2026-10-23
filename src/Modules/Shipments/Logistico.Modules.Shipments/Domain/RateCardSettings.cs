@@ -17,6 +17,7 @@ internal sealed class RateCardSettings
     public decimal DefaultFee { get; private set; }
     public decimal IncludedWeightKg { get; private set; }
     public decimal ExtraKgFee { get; private set; }
+    public decimal ReturnFeePercent { get; private set; }
 
     /// <summary>Governorate prices as JSON ({"IQ-BA": 7000, …}).</summary>
     public string GovernorateFees { get; private set; } = "{}";
@@ -41,6 +42,7 @@ internal sealed class RateCardSettings
         DefaultFee = card.DefaultFee;
         IncludedWeightKg = card.IncludedWeightKg;
         ExtraKgFee = card.ExtraKgFee;
+        ReturnFeePercent = card.ReturnFeePercent;
         GovernorateFees = JsonSerializer.Serialize(
             card.GovernorateFees.ToDictionary(f => f.Key.ToUpperInvariant(), f => f.Value), Json);
         SellerDiscounts = JsonSerializer.Serialize(card.SellerDiscounts.Where(d => d.Percent > 0).ToList(), Json);
@@ -57,6 +59,7 @@ internal sealed class RateCardSettings
             DefaultFee = DefaultFee,
             IncludedWeightKg = IncludedWeightKg,
             ExtraKgFee = ExtraKgFee,
+            ReturnFeePercent = ReturnFeePercent,
             GovernorateFees = new Dictionary<string, decimal>(fees, StringComparer.OrdinalIgnoreCase),
             SellerDiscounts = JsonSerializer.Deserialize<List<SellerDiscount>>(SellerDiscounts, Json) ?? [],
             Version = Version,

@@ -71,6 +71,9 @@ internal sealed class Shipment
     public Guid? CodSettlementId { get; private set; }
     public DateTimeOffset? CodSettledAt { get; private set; }
 
+    /// <summary>Charged to the seller for sending this parcel back (set when it is handed over; see RateCard.ReturnFee).</summary>
+    public decimal? ReturnFee { get; private set; }
+
     /// <summary>When the courier handed this parcel's collected cash in at the office (see <see cref="CashHandover"/>).</summary>
     public DateTimeOffset? CodHandedOverAt { get; private set; }
     public Guid? CashHandoverId { get; private set; }
@@ -431,8 +434,8 @@ internal sealed class Shipment
         }
     }
 
-    /// <summary>The seller (or their representative) collects the returned parcel at the hub.</summary>
-    public void HandOverToSeller(string manifestNumber, string? receivedBy, Actor actor, DateTimeOffset now)
+    /// <summary>The seller (or their representative) collects the returned parcel at the hub; <paramref name="returnFee"/> is charged to them.</summary>
+    public void HandOverToSeller(string manifestNumber, string? receivedBy, decimal returnFee, Actor actor, DateTimeOffset now)
     {
         if (Status != ShipmentStatus.ReturnAtHub)
         {
@@ -442,6 +445,7 @@ internal sealed class Shipment
         var location = CurrentHubCode;
         AdvanceTo(ShipmentStatus.Returned, now, new MilestoneDetails(Location: location, Notes: receivedBy is null ? manifestNumber : $"{manifestNumber} · {receivedBy}"), actor.Source, actor.Name, now);
         ReturnManifestNumber = manifestNumber;
+        ReturnFee = returnFee > 0 ? returnFee : null;
     }
 
     /// <summary>

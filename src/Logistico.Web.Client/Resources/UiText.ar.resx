@@ -117,6 +117,10 @@
   <data name="CloseManifestOk" xml:space="preserve"><value>تم تفريغ كل الطرود. هل تريد إغلاق الكشف؟</value></data>
   <data name="CodHelper" xml:space="preserve"><value>المبلغ الذي يستلمه المندوب من الزبون. اتركه فارغاً إذا كان مدفوعاً مسبقاً.</value></data>
   <data name="CodTotal" xml:space="preserve"><value>الدفع عند الاستلام</value></data>
+  <data name="Col_ReturnFees" xml:space="preserve"><value>أجور الإرجاع</value></data>
+  <data name="ReturnFeesLine" xml:space="preserve"><value>مرتجعات {0} ({1})</value></data>
+  <data name="Settle_ReturnFeesCarry" xml:space="preserve"><value>أجور الإرجاع التي تزيد على ما يتبقّى من هذه التسوية لا تُخصم الآن، وتنتظر التسوية القادمة.</value></data>
+  <data name="Col_ReturnFee" xml:space="preserve"><value>أجور الإرجاع</value></data>
   <data name="Col_Action" xml:space="preserve"><value>العملية</value></data>
   <data name="Col_Age" xml:space="preserve"><value>منذ</value></data>
   <data name="Col_Alert" xml:space="preserve"><value>التنبيه</value></data>
@@ -182,7 +186,6 @@
   <data name="Col_Route" xml:space="preserve"><value>المسار</value></data>
   <data name="Col_Seller" xml:space="preserve"><value>المتجر / المرسل</value></data>
   <data name="Col_Service" xml:space="preserve"><value>الخدمة</value></data>
-  <data name="Col_SettledAt" xml:space="preserve"><value>تاريخ التسوية</value></data>
   <data name="Col_SettlementNo" xml:space="preserve"><value>رقم التسوية</value></data>
   <data name="Col_Shipment" xml:space="preserve"><value>الشحنة</value></data>
   <data name="Col_Source" xml:space="preserve"><value>المصدر</value></data>
@@ -746,6 +749,8 @@
   <data name="Price_DiscountPart" xml:space="preserve"><value>− خصم المتجر {0}%</value></data>
   <data name="Price_WeightPart" xml:space="preserve"><value>+ {0} وزن</value></data>
   <data name="PricesSaved" xml:space="preserve"><value>حُفظت الأسعار. الطلبات الجديدة تستخدمها الآن.</value></data>
+  <data name="Pricing_ReturnFeeHint" xml:space="preserve"><value>تُحسب على المتجر عند إعادة الطرد إليه، كنسبة من أجور توصيله: رفض الزبون، تعذّر الوصول، إرجاع من الزبون، إلغاء بعد الاستلام أو عنوان خاطئ. لا تُحسب عند تلف الطرد لدينا. 0٪ = الإرجاع مجاني.</value></data>
+  <data name="Pricing_ReturnFee" xml:space="preserve"><value>أجور الإرجاع</value></data>
   <data name="Pricing_Basics" xml:space="preserve"><value>الأساسيات</value></data>
   <data name="Pricing_ByGovernorate" xml:space="preserve"><value>السعر حسب الوجهة</value></data>
   <data name="Pricing_ByGovernorateHint" xml:space="preserve"><value>للزبائن خارج محافظة المتجر، مجمّعة حسب المخزن الذي يوصل.</value></data>
@@ -936,6 +941,7 @@
   <data name="SellerCreated" xml:space="preserve"><value>تمت إضافة المتجر «{0}»</value></data>
   <data name="SellerNotFound" xml:space="preserve"><value>المتجر غير موجود</value></data>
   <data name="SellerReceives" xml:space="preserve"><value>يستلم المتجر</value></data>
+  <data name="Seller_ReturnFeeN" xml:space="preserve"><value>أجور الإرجاع {0}</value></data>
   <data name="Seller_Active" xml:space="preserve"><value>طلبات قيد التوصيل</value></data>
   <data name="Seller_Cancel" xml:space="preserve"><value>إلغاء الطلب</value></data>
   <data name="Seller_CancelMessage" xml:space="preserve"><value>لم يُستلم الطلب {0} بعد. إلغاؤه يحذفه من قائمة الاستلام لدى المندوب.</value></data>

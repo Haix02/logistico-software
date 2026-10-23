@@ -82,6 +82,7 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
             e.Property(x => x.CodAmount).HasPrecision(19, 4);
             e.Property(x => x.CodCurrency).HasMaxLength(3).IsFixedLength();
             e.Property(x => x.DeliveryFee).HasPrecision(19, 4);
+            e.Property(x => x.ReturnFee).HasPrecision(19, 4);
             e.Property(x => x.WarehouseBin).HasMaxLength(20);
             e.Property(x => x.CourierName).HasMaxLength(100);
             e.Property(x => x.LastFailureReason).HasConversion<string>().HasMaxLength(32);
@@ -241,6 +242,7 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
             e.Property(x => x.Currency).HasMaxLength(3).IsFixedLength();
             e.Property(x => x.GrossCodAmount).HasPrecision(19, 4);
             e.Property(x => x.DeliveryFeesAmount).HasPrecision(19, 4);
+            e.Property(x => x.ReturnFeesAmount).HasPrecision(19, 4);
             e.Property(x => x.NetPayoutAmount).HasPrecision(19, 4);
             e.Property(x => x.PayoutMethod).HasConversion<string>().HasMaxLength(16);
             e.Property(x => x.PayoutReference).HasMaxLength(100);
@@ -416,6 +418,7 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
             e.Property(x => x.DefaultFee).HasPrecision(12, 2);
             e.Property(x => x.IncludedWeightKg).HasPrecision(8, 2);
             e.Property(x => x.ExtraKgFee).HasPrecision(12, 2);
+            e.Property(x => x.ReturnFeePercent).HasPrecision(5, 2);
             e.Property(x => x.GovernorateFees).HasColumnType("jsonb");
             e.Property(x => x.SellerDiscounts).HasColumnType("jsonb");
             e.Property(x => x.UpdatedBy).HasMaxLength(256);

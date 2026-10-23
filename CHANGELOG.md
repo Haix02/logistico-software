@@ -10,11 +10,18 @@ versions follow [Semantic Versioning](https://semver.org/).
   amount expected, enters the amount counted, and any shortage or extra is recorded (`CH-…` numbers, recent hand-ins
   listed with differences). The courier app reminds couriers how much to hand in. Two people receiving the same cash at
   the same moment cannot count it twice.
+- **Return fee** (Delivery prices page): a share of the delivery fee charged to the seller when a parcel goes back to
+  them — refused, unreachable, returned by the customer, cancelled after pickup or a wrong address; never for damage in
+  the company's care. It is fixed on the parcel when the seller collects it, shown on the order (office and seller
+  portal) and deducted from the seller's next payout, listed in the statement CSV. A fee larger than what is left of a
+  payout waits for the next one. 0 % (the default) keeps returns free.
 
 ### Fixed
 - **Sellers are paid only from cash the company holds.** A payout used to include parcels whose cash was still in a
   courier's pocket; now only handed-in cash is owed and paid, the Finance page shows the cash still with couriers, and
   paying a seller whose cash has not arrived explains why. Existing data counts as handed in.
+- The payout history on the Finance page no longer runs off the side of the screen in Arabic: the date sits under the
+  payout number and the statement download is an icon.
 - "COD with couriers" on the Fleet page reset at midnight, so cash a courier kept overnight disappeared from view; it
   now shows all collected cash not handed in, whatever the day.
 

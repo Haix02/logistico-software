@@ -243,7 +243,7 @@ internal sealed class DemoJourneys(Random random, DateTimeOffset now, Guid tenan
 
             foreach (var j in group)
             {
-                j.S.HandOverToSeller(number, "مندوب المتجر", Actor.Scan(Operators[j.S.CurrentHubCode!]), at);
+                j.S.HandOverToSeller(number, "مندوب المتجر", 0m, Actor.Scan(Operators[j.S.CurrentHubCode!]), at);
             }
         }
     }

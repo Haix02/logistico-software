@@ -153,6 +153,7 @@ public class CustomsAndFinanceDomainTests
             shop.Id,
             shop.Name,
             [s1],
+            [],
             PayoutMethod.ZainCash,
             "ZC-12345",
             "Weekly payout",

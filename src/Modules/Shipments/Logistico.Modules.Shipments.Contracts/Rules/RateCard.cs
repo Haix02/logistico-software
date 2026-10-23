@@ -33,6 +33,13 @@ public sealed class RateCard : IValidatableObject
     /// <summary>Sellers with a special price: a percentage off every delivery.</summary>
     public List<SellerDiscount> SellerDiscounts { get; set; } = [];
 
+    /// <summary>
+    /// Charged to the seller when a parcel goes back to them, as a percentage of its delivery fee (0 = returns are free).
+    /// See <see cref="ReturnFee"/> for which returns pay.
+    /// </summary>
+    [Range(0, 100, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Range))]
+    public decimal ReturnFeePercent { get; set; }
+
     public uint Version { get; set; }
     public DateTimeOffset? UpdatedAt { get; set; }
     public string? UpdatedBy { get; set; }
@@ -49,6 +56,21 @@ public sealed class RateCard : IValidatableObject
         var discount = merchantId is { } id ? SellerDiscounts.FirstOrDefault(d => d.MerchantId == id)?.Percent ?? 0m : 0m;
         var fee = Math.Round(gross * (100m - discount) / 100m / Rounding, MidpointRounding.AwayFromZero) * Rounding;
         return new PriceQuote(fee, baseFee, extraKg * ExtraKgFee, discount, local);
+    }
+
+    /// <summary>
+    /// The fee for sending a parcel back to its seller, rounded like delivery fees. Returns on the seller's or their
+    /// customer's side pay (refused, unreachable, returned by the customer, cancelled after pickup, wrong address);
+    /// damage in the company's care and other reasons do not.
+    /// </summary>
+    public decimal ReturnFee(decimal? deliveryFee, ReturnReason? reason)
+    {
+        if (ReturnFeePercent <= 0 || deliveryFee is not > 0 || reason is null or ReturnReason.Damaged or ReturnReason.Other)
+        {
+            return 0m;
+        }
+
+        return Math.Round(deliveryFee.Value * ReturnFeePercent / 100m / Rounding, MidpointRounding.AwayFromZero) * Rounding;
     }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

@@ -311,6 +311,7 @@ internal sealed class ShipmentsDemoSeeder(
                 group.Key.MerchantId,
                 group.Key.MerchantName,
                 batch,
+                [],
                 methods[(seq - 1) % methods.Length],
                 $"REF-{settledAt:MMdd}-{1000 + seq}",
                 "تسوية أسبوعية لمبالغ الدفع عند الاستلام",

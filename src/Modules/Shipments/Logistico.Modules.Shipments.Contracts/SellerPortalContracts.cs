@@ -39,7 +39,8 @@ public sealed record SellerOrder(
     string? ExternalReference,
     DateTimeOffset CreatedAt,
     DateTimeOffset LastStatusAt,
-    bool PaidOut);
+    bool PaidOut,
+    decimal? ReturnFee = null);
 
 public sealed record SellerOrderList(IReadOnlyList<SellerOrder> Items, int Total, int Page, int PageSize);
 

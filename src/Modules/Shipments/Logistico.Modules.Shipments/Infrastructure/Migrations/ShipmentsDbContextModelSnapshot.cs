@@ -300,6 +300,15 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("payout_reference");
 
+                    b.Property<int>("ReturnCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("return_count");
+
+                    b.Property<decimal>("ReturnFeesAmount")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("numeric(19,4)")
+                        .HasColumnName("return_fees_amount");
+
                     b.Property<DateTimeOffset>("SettledAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("settled_at");
@@ -1002,6 +1011,11 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                         .HasColumnType("numeric(8,2)")
                         .HasColumnName("included_weight_kg");
 
+                    b.Property<decimal>("ReturnFeePercent")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("return_fee_percent");
+
                     b.Property<decimal>("SameGovernorateFee")
                         .HasPrecision(12, 2)
                         .HasColumnType("numeric(12,2)")
@@ -1405,6 +1419,11 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("RescheduledTo")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("rescheduled_to");
+
+                    b.Property<decimal?>("ReturnFee")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("numeric(19,4)")
+                        .HasColumnName("return_fee");
 
                     b.Property<string>("ReturnManifestNumber")
                         .HasMaxLength(24)
