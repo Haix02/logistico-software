@@ -107,7 +107,35 @@
   <data name="Col_Age" xml:space="preserve"><value>In this status</value></data>
   <data name="Col_Alert" xml:space="preserve"><value>Alert</value></data>
   <data name="Col_AvgDelivery" xml:space="preserve"><value>Avg. time</value></data>
-  <data name="Col_CashOnRun" xml:space="preserve"><value>Cash on run (IQD)</value></data>
+  <data name="CashExact" xml:space="preserve"><value>Exact</value></data>
+  <data name="CashHandoversSubtitle" xml:space="preserve"><value>Cash the couriers handed in at the office, with any shortage</value></data>
+  <data name="CashHandoversTitle" xml:space="preserve"><value>Recent cash hand-ins</value></data>
+  <data name="CashOverBy" xml:space="preserve"><value>{0} more than expected: recorded.</value></data>
+  <data name="CashReceivedToast" xml:space="preserve"><value>Cash hand-in {0} recorded — {1}</value></data>
+  <data name="CashShortBy" xml:space="preserve"><value>Short by {0}: recorded against the courier.</value></data>
+  <data name="Col_CashToHandIn" xml:space="preserve"><value>To hand in</value></data>
+  <data name="Col_Difference" xml:space="preserve"><value>Difference</value></data>
+  <data name="Col_Expected" xml:space="preserve"><value>Expected</value></data>
+  <data name="Col_HandIn" xml:space="preserve"><value>Hand-in</value></data>
+  <data name="Col_HandedInAt" xml:space="preserve"><value>Handed in</value></data>
+  <data name="Col_Parcels" xml:space="preserve"><value>Parcels</value></data>
+  <data name="Col_Received" xml:space="preserve"><value>Received</value></data>
+  <data name="ConfirmCashReceived" xml:space="preserve"><value>Confirm receipt</value></data>
+  <data name="Courier_HandIn" xml:space="preserve"><value>Hand in {0} at the office ({1}).</value></data>
+  <data name="Field_CashCounted" xml:space="preserve"><value>Amount counted</value></data>
+  <data name="Kpi_CodWithCouriers" xml:space="preserve"><value>With couriers</value></data>
+  <data name="Kpi_CodWithCouriersHint" xml:space="preserve"><value>Collected, not handed in yet</value></data>
+  <data name="NoCashHandovers" xml:space="preserve"><value>No cash handed in yet</value></data>
+  <data name="NothingToHandIn" xml:space="preserve"><value>Nothing to hand in</value></data>
+  <data name="ReceiveCash" xml:space="preserve"><value>Receive cash</value></data>
+  <data name="ReceiveCashHelper" xml:space="preserve"><value>Count the cash with the courier. Every parcel below is marked as handed in; any difference is recorded.</value></data>
+  <data name="ReceiveCashTitle" xml:space="preserve"><value>Receive cash from {0}</value></data>
+  <data name="WithCouriersN" xml:space="preserve"><value>{0} parcels' cash with couriers</value></data>
+  <data name="WithCouriersN_Few" xml:space="preserve"><value>{0} parcels' cash with couriers</value></data>
+  <data name="WithCouriersN_Many" xml:space="preserve"><value>{0} parcels' cash with couriers</value></data>
+  <data name="WithCouriersN_One" xml:space="preserve"><value>1 parcel's cash with a courier</value></data>
+  <data name="WithCouriersN_Two" xml:space="preserve"><value>2 parcels' cash with couriers</value></data>
+  <data name="Col_CashOnRun" xml:space="preserve"><value>COD out for delivery</value></data>
   <data name="Col_Cod" xml:space="preserve"><value>COD</value></data>
   <data name="Col_Compliance" xml:space="preserve"><value>E-verification</value></data>
   <data name="Col_Created" xml:space="preserve"><value>Created</value></data>
@@ -872,12 +900,12 @@
   <data name="Seller_NoPayoutsTitle" xml:space="preserve"><value>No payouts yet</value></data>
   <data name="Seller_NotLinkedText" xml:space="preserve"><value>Ask the delivery company to link your account to your shop on their Team page.</value></data>
   <data name="Seller_NotLinkedTitle" xml:space="preserve"><value>Not linked to a shop yet</value></data>
-  <data name="Seller_OnTheWay" xml:space="preserve"><value>Cash still to collect</value></data>
-  <data name="Seller_OnTheWayHint" xml:space="preserve"><value>{0} orders not delivered yet</value></data>
-  <data name="Seller_OnTheWayHint_Few" xml:space="preserve"><value>{0} orders not delivered yet</value></data>
-  <data name="Seller_OnTheWayHint_Many" xml:space="preserve"><value>{0} orders not delivered yet</value></data>
-  <data name="Seller_OnTheWayHint_One" xml:space="preserve"><value>1 order not delivered yet</value></data>
-  <data name="Seller_OnTheWayHint_Two" xml:space="preserve"><value>2 orders not delivered yet</value></data>
+  <data name="Seller_OnTheWay" xml:space="preserve"><value>Cash on its way to you</value></data>
+  <data name="Seller_OnTheWayHint" xml:space="preserve"><value>From {0} orders</value></data>
+  <data name="Seller_OnTheWayHint_Few" xml:space="preserve"><value>From {0} orders</value></data>
+  <data name="Seller_OnTheWayHint_Many" xml:space="preserve"><value>From {0} orders</value></data>
+  <data name="Seller_OnTheWayHint_One" xml:space="preserve"><value>From 1 order</value></data>
+  <data name="Seller_OnTheWayHint_Two" xml:space="preserve"><value>From 2 orders</value></data>
   <data name="Seller_Orders" xml:space="preserve"><value>Orders</value></data>
   <data name="Seller_OrdersN" xml:space="preserve"><value>{0} orders</value></data>
   <data name="Seller_OrdersN_Few" xml:space="preserve"><value>{0} orders</value></data>

@@ -36,9 +36,11 @@ internal sealed class LatestLoad
         }
         finally
         {
+            // The newest load is over: forget its token before disposing it, so the next load does not cancel a disposed one.
             if (ReferenceEquals(cts, current))
             {
                 Busy = false;
+                current = null;
             }
 
             cts.Dispose();

@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Logistico.Modules.Shipments.Contracts;
 using Logistico.Modules.Shipments.Domain;
 using Logistico.Modules.Shipments.Infrastructure;
@@ -26,6 +27,10 @@ internal static class FleetEndpoints
             .RequireAuthorization(StaffPolicies.Operate);
         fleet.MapPut("/couriers/{id:guid}", UpdateAsync).WithSummary("Updates a courier. Requires If-Match with the current ETag.")
             .RequireAuthorization(StaffPolicies.Operate);
+        fleet.MapGet("/couriers/{id:guid}/cash", CashAsync).WithSummary("The cash a courier collected on delivery and has not handed in yet, parcel by parcel.");
+        fleet.MapPost("/couriers/{id:guid}/cash", ReceiveCashAsync).WithSummary("Records a courier's cash hand-in: every collected parcel not handed in yet, with the amount counted.")
+            .RequireAuthorization(StaffPolicies.Operate);
+        fleet.MapGet("/cash-handovers", HandoversAsync).WithSummary("Cash hand-ins, newest first, with any shortage.");
         return app;
     }
 
@@ -45,8 +50,10 @@ internal static class FleetEndpoints
                 DeliveredToday = g.Count(s => s.Status == ShipmentStatus.Delivered && s.DeliveredAt >= startOfDay),
                 Delivered = g.Count(s => s.Status == ShipmentStatus.Delivered),
                 Failed = g.Count(s => s.Status == ShipmentStatus.DeliveryFailed),
-                Cash = g.Sum(s => s.CodAmount != null && (s.Status == ShipmentStatus.OutForDelivery
-                    || (s.Status == ShipmentStatus.Delivered && s.DeliveredAt >= startOfDay && s.CodSettledAt == null)) ? s.CodAmount.Value : 0m),
+                // Cash still to collect on today's run, and cash collected but not handed in yet (whatever the day).
+                Cash = g.Sum(s => s.CodAmount != null && s.Status == ShipmentStatus.OutForDelivery ? s.CodAmount.Value : 0m),
+                ToHandIn = g.Sum(s => s.CodCollectedAt != null && s.CodHandedOverAt == null ? s.CodAmount ?? 0m : 0m),
+                ParcelsToHandIn = g.Count(s => s.CodCollectedAt != null && s.CodHandedOverAt == null),
             })
             .ToListAsync(ct);
 
@@ -54,7 +61,8 @@ internal static class FleetEndpoints
         {
             var mine = stats.Where(s => Matches(s.Name, c)).ToList();
             return new CourierListItem(c.Id, c.Code, c.Name, c.Phone, c.Governorate, c.VehicleType, c.VehiclePlate, c.IsActive, c.Notes,
-                mine.Sum(s => s.Out), mine.Sum(s => s.DeliveredToday), mine.Sum(s => s.Delivered), mine.Sum(s => s.Failed), mine.Sum(s => s.Cash), c.Version);
+                mine.Sum(s => s.Out), mine.Sum(s => s.DeliveredToday), mine.Sum(s => s.Delivered), mine.Sum(s => s.Failed), mine.Sum(s => s.Cash), c.Version,
+                mine.Sum(s => s.ToHandIn), mine.Sum(s => s.ParcelsToHandIn));
         }).ToList();
 
         var totals = await db.Shipments.AsNoTracking().GroupBy(_ => 1).Select(g => new
@@ -62,6 +70,7 @@ internal static class FleetEndpoints
             Out = g.Count(s => s.Status == ShipmentStatus.OutForDelivery),
             DeliveredToday = g.Count(s => s.Status == ShipmentStatus.Delivered && s.DeliveredAt >= startOfDay),
             Failed = g.Count(s => s.Status == ShipmentStatus.DeliveryFailed),
+            WithCouriers = g.Sum(s => s.CodCollectedAt != null && s.CodHandedOverAt == null ? s.CodAmount ?? 0m : 0m),
         }).SingleOrDefaultAsync(ct);
 
         IEnumerable<CourierListItem> filtered = items;
@@ -81,8 +90,73 @@ internal static class FleetEndpoints
         }
 
         return TypedResults.Ok(new FleetOverviewResult(items.Count(c => c.IsActive), totals?.Out ?? 0, totals?.DeliveredToday ?? 0, totals?.Failed ?? 0,
-            items.Sum(c => c.CashOnRunIqd), filtered.ToList()));
+            totals?.WithCouriers ?? 0m, filtered.ToList()));
     }
+
+    private static async Task<IResult> CashAsync(Guid id, ShipmentsDbContext db, CancellationToken ct)
+    {
+        if (await db.Couriers.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id, ct) is not { } courier)
+        {
+            return Api.NotFound("courier.not_found");
+        }
+
+        var label = courier.DisplayLabel;
+        var parcels = await WithCourier(db.Shipments.AsNoTracking(), label)
+            .OrderBy(s => s.DeliveredAt)
+            .Select(s => new CourierCashParcel(s.Id, s.TrackingNumber, s.ConsigneeName, s.MerchantName, s.CodAmount ?? 0m, s.DeliveredAt))
+            .ToListAsync(ct);
+        return TypedResults.Ok(new CourierCash(courier.Id, courier.Code, courier.Name, parcels.Sum(p => p.CodAmount), parcels));
+    }
+
+    private static async Task<IResult> ReceiveCashAsync(
+        Guid id, ReceiveCashRequest request, ClaimsPrincipal user, ShipmentsDbContext db, NumberGenerator numbers, ITenantContext tenant, TimeProvider clock, CancellationToken ct)
+    {
+        if (await db.Couriers.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id, ct) is not { } courier)
+        {
+            return Api.NotFound("courier.not_found");
+        }
+
+        var parcels = await WithCourier(db.Shipments, courier.DisplayLabel).OrderBy(s => s.DeliveredAt).ToListAsync(ct);
+        try
+        {
+            var handover = CashHandover.Create(tenant.TenantId, await numbers.CashHandoverNumberAsync(ct), courier, parcels, request.ReceivedIqd!.Value, request.Notes,
+                user.UserName(), clock.GetUtcNow());
+            db.CashHandovers.Add(handover);
+            await db.SaveChangesAsync(ct);
+            return TypedResults.Created("/" + ShipmentsApiRoutes.CashHandovers, ToItem(handover));
+        }
+        catch (DomainException ex)
+        {
+            return Api.Rule(ex);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            // Someone else received this courier's cash at the same moment: nothing is counted twice.
+            return Api.Stale();
+        }
+    }
+
+    private static async Task<Ok<PagedResult<CashHandoverItem>>> HandoversAsync(Guid? courierId, int? page, int? pageSize, ShipmentsDbContext db, CancellationToken ct)
+    {
+        var size = Math.Clamp(pageSize ?? 25, 1, 200);
+        var number = Paging.Page(page);
+        var query = db.CashHandovers.AsNoTracking();
+        if (courierId is { } courier)
+        {
+            query = query.Where(h => h.CourierId == courier);
+        }
+
+        var total = await query.CountAsync(ct);
+        var items = await query.OrderByDescending(h => h.ReceivedAt).Skip((number - 1) * size).Take(size).ToListAsync(ct);
+        return TypedResults.Ok(new PagedResult<CashHandoverItem>(items.Select(ToItem).ToList(), total, number, size));
+    }
+
+    /// <summary>Parcels whose cash on delivery this courier collected and has not handed in yet.</summary>
+    private static IQueryable<Shipment> WithCourier(IQueryable<Shipment> shipments, string label) =>
+        shipments.Where(s => s.CourierName == label && s.CodCollectedAt != null && s.CodHandedOverAt == null && s.CodAmount > 0);
+
+    private static CashHandoverItem ToItem(CashHandover h) =>
+        new(h.Id, h.Number, h.CourierId, h.CourierLabel, h.ParcelCount, h.ExpectedIqd, h.ReceivedIqd, h.DifferenceIqd, h.ReceivedAt, h.ReceivedBy, h.Notes);
 
     /// <summary>Courier names on deliveries are stored as "Name (CODE)"; older rows may hold the name or code alone.</summary>
     private static bool Matches(string recorded, Courier c)

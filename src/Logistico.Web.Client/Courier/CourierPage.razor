@@ -37,6 +37,13 @@
         {
             <p class="bp6-text-muted lx-small lx-courier-failed">@L.Count("Courier_FailedN", run.FailedToday)</p>
         }
+        @if (run.CashToHandInIqd > 0)
+        {
+            @* Cash collected and not handed in at the office yet, whichever day it was collected. *@
+            <Callout Intent="Intent.Primary" Icon="bank-account" CssClass="lx-mt">
+                @string.Format(CultureInfo.CurrentCulture, L["Courier_HandIn"], Fmt.Money(run.CashToHandInIqd, "IQD"), L.Count("ParcelsN", run.ParcelsToHandIn))
+            </Callout>
+        }
 
         @if (run.Stops.Count == 0)
         {

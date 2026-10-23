@@ -5,6 +5,19 @@ versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- **Courier cash hand-in** (Fleet page): the office receives a courier's cash with the list of parcels it covers and the
+  amount expected, enters the amount counted, and any shortage or extra is recorded (`CH-…` numbers, recent hand-ins
+  listed with differences). The courier app reminds couriers how much to hand in. Two people receiving the same cash at
+  the same moment cannot count it twice.
+
+### Fixed
+- **Sellers are paid only from cash the company holds.** A payout used to include parcels whose cash was still in a
+  courier's pocket; now only handed-in cash is owed and paid, the Finance page shows the cash still with couriers, and
+  paying a seller whose cash has not arrived explains why. Existing data counts as handed in.
+- "COD with couriers" on the Fleet page reset at midnight, so cash a courier kept overnight disappeared from view; it
+  now shows all collected cash not handed in, whatever the day.
+
 ### Changed
 - **New look: GitLab's Pajamas design system on Blueprint.** Navigation sits on a quiet grey frame and each page is a
   white panel; buttons, inputs, badges, alerts, tabs, tables, dialogs, drawers and toasts follow Pajamas (32 px

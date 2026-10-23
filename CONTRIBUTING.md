@@ -116,6 +116,8 @@ Every behaviour change needs a test that would have failed before it; a bug fix 
 
 ## Commits and pull requests
 
+- `main` is protected: changes arrive through a pull request that passes the **Build & test** check and is approved by
+  a maintainer (see `.github/CODEOWNERS`). Direct pushes and force-pushes to `main` are refused.
 - Small, focused pull requests with a clear description of the *why*; link the issue.
 - Add or update tests with every behaviour change.
 - For UI changes, add screenshots in Arabic and English (and at phone width if the layout changed). No real customer data.

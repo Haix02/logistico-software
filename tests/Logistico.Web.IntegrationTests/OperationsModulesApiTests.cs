@@ -128,8 +128,9 @@ public sealed class OperationsModulesApiTests(LogisticoApiFactory factory)
     [Fact]
     public async Task Finance_reconciles_delivered_cod_orders_and_settles_net_payout_to_seller()
     {
-        var client = factory.CreateUserClient();
+        var client = factory.CreateUserClient(tenant: Guid.CreateVersion7());
         var shop = await client.CreateMerchantAsync("متجر النهرين", "nahrain.store.test");
+        var courier = await client.EnsureCourierAsync();
 
         // Book, receive, dispatch, and deliver 2 COD orders inside Baghdad (65,000 IQD COD, 8,000 IQD fee each -> 57,000 IQD net each)
         for (var i = 1; i <= 2; i++)
@@ -142,6 +143,13 @@ public sealed class OperationsModulesApiTests(LogisticoApiFactory factory)
             var del = await client.RecordAsync(booked.Id, new RecordShipmentEventRequest { Status = ShipmentStatus.Delivered }, await client.ETagAsync(booked.Id));
             Assert.Equal(HttpStatusCode.OK, del.StatusCode);
         }
+
+        // Delivered cash is with the courier until it is handed in: nothing can be paid out yet.
+        var early = await client.PostAsJsonAsync("/" + ShipmentsApiRoutes.FinanceSettlements, new CreateCodSettlementRequest { MerchantId = shop, PayoutMethod = PayoutMethod.Cash });
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, early.StatusCode);
+        Assert.Contains("finance.cash_with_couriers", await early.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+        Assert.Equal(130_000m, (await client.GetFromJsonAsync<FinanceSummary>("/" + ShipmentsApiRoutes.FinanceSummary + $"?merchantId={shop}"))!.CodWithCouriersIqd);
+        Assert.Equal(130_000m, (await client.HandInCashAsync(courier)).ReceivedIqd);
 
         // Check finance summary for this seller
         var summaryBefore = (await client.GetFromJsonAsync<FinanceSummary>("/" + ShipmentsApiRoutes.FinanceSummary + $"?merchantId={shop}"))!;

@@ -55,47 +55,56 @@ internal static class FinanceEndpoints
             {
                 g.Key.MerchantId,
                 g.Key.MerchantName,
-                UnsettledCount = g.Count(s => s.CodCurrency == "IQD" && s.Status == ShipmentStatus.Delivered && s.CodCollectedAt != null && s.CodSettlementId == null),
-                Gross = g.Sum(s => s.CodCurrency == "IQD" && s.Status == ShipmentStatus.Delivered && s.CodCollectedAt != null && s.CodSettlementId == null ? s.CodAmount ?? 0m : 0m),
-                Fees = g.Sum(s => s.CodCurrency == "IQD" && s.Status == ShipmentStatus.Delivered && s.CodCollectedAt != null && s.CodSettlementId == null ? s.DeliveryFee ?? 0m : 0m),
+                UnsettledCount = g.Count(s => s.CodCurrency == "IQD" && s.Status == ShipmentStatus.Delivered && s.CodHandedOverAt != null && s.CodSettlementId == null),
+                Gross = g.Sum(s => s.CodCurrency == "IQD" && s.Status == ShipmentStatus.Delivered && s.CodHandedOverAt != null && s.CodSettlementId == null ? s.CodAmount ?? 0m : 0m),
+                Fees = g.Sum(s => s.CodCurrency == "IQD" && s.Status == ShipmentStatus.Delivered && s.CodHandedOverAt != null && s.CodSettlementId == null ? s.DeliveryFee ?? 0m : 0m),
                 InProgressCount = g.Count(s => s.CodCurrency == "IQD" && s.CodAmount > 0 && s.CodCollectedAt == null && s.Status != ShipmentStatus.Returned && !returning.Contains(s.Status)),
                 InProgressCod = g.Sum(s => s.CodCurrency == "IQD" && s.CodAmount > 0 && s.CodCollectedAt == null && s.Status != ShipmentStatus.Returned && !returning.Contains(s.Status) ? s.CodAmount ?? 0m : 0m),
+                // Collected by a courier but not handed in at the office yet: owed once it arrives.
+                WithCouriersCount = g.Count(s => s.CodCurrency == "IQD" && s.CodCollectedAt != null && s.CodHandedOverAt == null && s.CodSettlementId == null),
+                WithCouriers = g.Sum(s => s.CodCurrency == "IQD" && s.CodCollectedAt != null && s.CodHandedOverAt == null && s.CodSettlementId == null ? s.CodAmount ?? 0m : 0m),
             })
             .ToListAsync(ct);
 
         var totals = await shipments.GroupBy(_ => 1).Select(g => new
         {
             Pending = g.Sum(s => s.CodCurrency == "IQD" && s.CodAmount > 0 && s.CodCollectedAt == null && s.Status != ShipmentStatus.Returned && !returning.Contains(s.Status) ? s.CodAmount ?? 0m : 0m),
-            Gross = g.Sum(s => s.CodCurrency == "IQD" && s.Status == ShipmentStatus.Delivered && s.CodCollectedAt != null && s.CodSettlementId == null ? s.CodAmount ?? 0m : 0m),
-            Fees = g.Sum(s => s.CodCurrency == "IQD" && s.Status == ShipmentStatus.Delivered && s.CodCollectedAt != null && s.CodSettlementId == null ? s.DeliveryFee ?? 0m : 0m),
+            Gross = g.Sum(s => s.CodCurrency == "IQD" && s.Status == ShipmentStatus.Delivered && s.CodHandedOverAt != null && s.CodSettlementId == null ? s.CodAmount ?? 0m : 0m),
+            Fees = g.Sum(s => s.CodCurrency == "IQD" && s.Status == ShipmentStatus.Delivered && s.CodHandedOverAt != null && s.CodSettlementId == null ? s.DeliveryFee ?? 0m : 0m),
             Revenue = g.Sum(s => s.Status == ShipmentStatus.Delivered ? s.DeliveryFee ?? 0m : 0m),
+            WithCouriers = g.Sum(s => s.CodCurrency == "IQD" && s.CodCollectedAt != null && s.CodHandedOverAt == null && s.CodSettlementId == null ? s.CodAmount ?? 0m : 0m),
         }).SingleOrDefaultAsync(ct);
 
         var recent = await settlements.OrderByDescending(s => s.SettledAt).Take(50).Select(s => ToItem(s)).ToListAsync(ct);
         var paid = await settlements.SumAsync(s => (decimal?)s.NetPayoutAmount, ct) ?? 0m;
 
         var sellerBalances = balances
-            .Where(b => b.UnsettledCount > 0 || b.InProgressCount > 0)
-            .Select(b => new SellerCodBalance(b.MerchantId!.Value, b.MerchantName ?? "—", b.UnsettledCount, b.Gross, b.Fees, b.Gross - b.Fees, b.InProgressCount, b.InProgressCod))
+            .Where(b => b.UnsettledCount > 0 || b.InProgressCount > 0 || b.WithCouriersCount > 0)
+            .Select(b => new SellerCodBalance(b.MerchantId!.Value, b.MerchantName ?? "—", b.UnsettledCount, b.Gross, b.Fees, b.Gross - b.Fees, b.InProgressCount, b.InProgressCod,
+                b.WithCouriersCount, b.WithCouriers))
             .OrderByDescending(b => b.NetPayableIqd)
             .ThenByDescending(b => b.InProgressCodIqd)
             .ToList();
 
         var gross = totals?.Gross ?? 0m;
         var fees = totals?.Fees ?? 0m;
-        return new FinanceSummary(totals?.Pending ?? 0m, gross, fees, gross - fees, paid, totals?.Revenue ?? 0m, sellerBalances, recent);
+        return new FinanceSummary(totals?.Pending ?? 0m, gross, fees, gross - fees, paid, totals?.Revenue ?? 0m, sellerBalances, recent, totals?.WithCouriers ?? 0m);
     }
 
     private static async Task<IResult> SettleAsync(CreateCodSettlementRequest request, ClaimsPrincipal user, ShipmentsDbContext db, NumberGenerator numbers, ITenantContext tenant, TimeProvider clock, CancellationToken ct)
     {
         var merchantId = request.MerchantId!.Value;
         var unsettled = await db.Shipments
-            .Where(s => s.MerchantId == merchantId && s.CodCurrency == "IQD" && s.Status == ShipmentStatus.Delivered && s.CodCollectedAt != null && s.CodSettlementId == null && s.CodAmount > 0)
+            .Where(s => s.MerchantId == merchantId && s.CodCurrency == "IQD" && s.Status == ShipmentStatus.Delivered && s.CodHandedOverAt != null && s.CodSettlementId == null && s.CodAmount > 0)
             .OrderBy(s => s.DeliveredAt)
             .ToListAsync(ct);
         if (unsettled.Count == 0)
         {
-            return Api.Rule(new DomainException("finance.nothing_to_settle", "This seller has no unsettled delivered cash-on-delivery orders."));
+            // Only cash the company holds is paid out: say so when it is still with the couriers.
+            var withCouriers = await db.Shipments.CountAsync(s => s.MerchantId == merchantId && s.CodCollectedAt != null && s.CodHandedOverAt == null && s.CodSettlementId == null, ct);
+            return Api.Rule(withCouriers > 0
+                ? new DomainException("finance.cash_with_couriers", "The cash for this seller's delivered orders is still with the couriers.", withCouriers)
+                : new DomainException("finance.nothing_to_settle", "This seller has no unsettled delivered cash-on-delivery orders."));
         }
 
         try

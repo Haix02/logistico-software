@@ -146,6 +146,29 @@ internal static class ApiTestHelpers
         message.Headers.IfMatch.Add(etag);
         return await client.SendAsync(message);
     }
+
+    /// <summary>Registers courier "حيدر (Baghdad-02)" in the client's company (once) and returns its id.</summary>
+    public static async Task<Guid> EnsureCourierAsync(this HttpClient client, string code = "Baghdad-02", string name = "حيدر")
+    {
+        var known = (await client.GetFromJsonAsync<List<CourierLookupItem>>("/" + ShipmentsApiRoutes.FleetLookup))!.FirstOrDefault(c => c.Code == code);
+        if (known is not null)
+        {
+            return known.Id;
+        }
+
+        var response = await client.PostAsJsonAsync("/" + ShipmentsApiRoutes.FleetCouriers, new CourierRequest { Code = code, Name = name, Phone = "07802223344", Governorate = "IQ-BG" });
+        Assert.True(response.IsSuccessStatusCode, await response.Content.ReadAsStringAsync());
+        return (await client.GetFromJsonAsync<List<CourierLookupItem>>("/" + ShipmentsApiRoutes.FleetLookup))!.Single(c => c.Code == code).Id;
+    }
+
+    /// <summary>The courier hands in all the cash they collected, counted exactly.</summary>
+    public static async Task<CashHandoverItem> HandInCashAsync(this HttpClient client, Guid courierId)
+    {
+        var cash = (await client.GetFromJsonAsync<CourierCash>("/" + ShipmentsApiRoutes.CourierCash(courierId)))!;
+        var response = await client.PostAsJsonAsync("/" + ShipmentsApiRoutes.CourierCash(courierId), new ReceiveCashRequest { ReceivedIqd = cash.ExpectedIqd });
+        Assert.True(response.StatusCode == HttpStatusCode.Created, await response.Content.ReadAsStringAsync());
+        return (await response.Content.ReadFromJsonAsync<CashHandoverItem>())!;
+    }
 }
 
 public sealed record AutomationEngineResult(bool Ran, int Raised, int Resolved, int Planned, int ReturnsReady, int AutoCancelled = 0);

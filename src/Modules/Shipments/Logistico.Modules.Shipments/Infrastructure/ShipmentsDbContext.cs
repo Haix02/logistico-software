@@ -12,12 +12,14 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
     public const string RequestSequence = "request_number_seq";
     public const string ReturnManifestSequence = "return_manifest_seq";
     public const string SettlementSequence = "settlement_number_seq";
+    public const string CashHandoverSequence = "cash_handover_seq";
 
     public DbSet<Shipment> Shipments => Set<Shipment>();
     public DbSet<ShipmentEvent> ShipmentEvents => Set<ShipmentEvent>();
     public DbSet<CustomsDeclaration> CustomsDeclarations => Set<CustomsDeclaration>();
     public DbSet<Courier> Couriers => Set<Courier>();
     public DbSet<CodSettlement> CodSettlements => Set<CodSettlement>();
+    public DbSet<CashHandover> CashHandovers => Set<CashHandover>();
     public DbSet<HubTransfer> Transfers => Set<HubTransfer>();
     public DbSet<TransferItem> TransferItems => Set<TransferItem>();
     public DbSet<ServiceRequest> Requests => Set<ServiceRequest>();
@@ -48,6 +50,7 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
         modelBuilder.HasSequence<long>(RequestSequence).StartsAt(1).IncrementsBy(1);
         modelBuilder.HasSequence<long>(ReturnManifestSequence).StartsAt(1).IncrementsBy(1);
         modelBuilder.HasSequence<long>(SettlementSequence).StartsAt(1).IncrementsBy(1);
+        modelBuilder.HasSequence<long>(CashHandoverSequence).StartsAt(1).IncrementsBy(1);
 
         modelBuilder.Entity<Shipment>(e =>
         {
@@ -117,6 +120,9 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
             e.HasIndex(x => new { x.TenantId, x.RatedAt }).HasFilter("rated_at IS NOT NULL");
             e.HasIndex(x => new { x.TenantId, x.ReturnRequestedAt }).HasFilter("return_requested_at IS NOT NULL");
             e.HasIndex(x => new { x.TenantId, x.CodCollectedAt }).HasFilter("cod_collected_at IS NOT NULL");
+            // Cash still with couriers: collected on delivery, not yet handed in at the office.
+            e.HasIndex(x => new { x.TenantId, x.CourierName }).HasFilter("cod_collected_at IS NOT NULL AND cod_handed_over_at IS NULL")
+                .HasDatabaseName("ix_shipments_cash_with_couriers");
             // Free-text search reads one folded column (SearchText): tracking number, customer, phone, shop, shipper, the
             // shop's order number, the area and the destination governorate in both languages. PostgreSQL keeps it
             // current; a trigram index makes "contains" fast.
@@ -204,6 +210,24 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
             e.HasIndex(x => new { x.TenantId, x.Code }).IsUnique();
             e.HasIndex(x => new { x.TenantId, x.IsActive, x.Governorate });
 
+            e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
+        });
+
+        modelBuilder.Entity<CashHandover>(e =>
+        {
+            e.ToTable("cash_handovers");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).ValueGeneratedNever();
+            e.Property(x => x.Number).HasMaxLength(32);
+            e.Property(x => x.CourierLabel).HasMaxLength(160);
+            e.Property(x => x.ExpectedIqd).HasPrecision(19, 4);
+            e.Property(x => x.ReceivedIqd).HasPrecision(19, 4);
+            e.Property(x => x.DifferenceIqd).HasPrecision(19, 4);
+            e.Property(x => x.Notes).HasMaxLength(500);
+            e.Property(x => x.ReceivedBy).HasMaxLength(256);
+
+            e.HasIndex(x => new { x.TenantId, x.Number }).IsUnique();
+            e.HasIndex(x => new { x.TenantId, x.CourierId, x.ReceivedAt });
             e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
         });
 

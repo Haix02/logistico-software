@@ -67,7 +67,7 @@ internal static class SellerPortalEndpoints
             shop.Id, shop.Name, shop.Governorate,
             counts?.Active ?? 0, counts?.Returning ?? 0, counts?.Delivered ?? 0, counts?.Returned ?? 0,
             money.UnsettledNetPayableIqd, balance?.DeliveredUnsettledCount ?? 0,
-            money.PendingCodToCollectIqd, balance?.InProgressCount ?? 0,
+            money.PendingCodToCollectIqd + money.CodWithCouriersIqd, (balance?.InProgressCount ?? 0) + (balance?.WithCouriersCount ?? 0),
             money.TotalSettledNetPaidIqd, money.RecentSettlements));
     }
 

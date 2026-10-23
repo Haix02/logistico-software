@@ -43,6 +43,7 @@ public static class ShipmentsApiRoutes
     public const string Fleet = "api/v1/fleet";
     public const string FleetCouriers = Fleet + "/couriers";
     public const string FleetLookup = Fleet + "/lookup";
+    public const string CashHandovers = Fleet + "/cash-handovers";
 
     /// <summary>The courier app: the signed-in courier's own run.</summary>
     public const string CourierRun = "api/v1/courier/run";
@@ -80,6 +81,8 @@ public static class ShipmentsApiRoutes
     public static string CustomsByShipment(Guid shipmentId) => $"{Customs}/{shipmentId}";
     public static string CustomsSadXml(Guid shipmentId) => $"{Customs}/{shipmentId}/sad.xml";
     public static string CourierById(Guid id) => $"{FleetCouriers}/{id}";
+
+    public static string CourierCash(Guid id) => $"{FleetCouriers}/{id}/cash";
 
     public static string CourierDelivered(Guid shipmentId) => $"{CourierRun}/{shipmentId}/delivered";
 
