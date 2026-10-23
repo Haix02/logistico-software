@@ -57,12 +57,15 @@ public static class StaffPolicies
     /// <summary>The seller portal: one shop's own orders and payouts (see <see cref="LogisticoClaimTypes.MerchantId"/>).</summary>
     public const string Sell = "sell";
 
-    public static readonly IReadOnlyList<string> All = [Staff, Operate, Care, Finance, Administer, Deliver, Sell];
+    /// <summary>A person's own settings, such as saved list views: every office role, read-only ones included.</summary>
+    public const string Personal = "personal";
+
+    public static readonly IReadOnlyList<string> All = [Staff, Operate, Care, Finance, Administer, Deliver, Sell, Personal];
 
     /// <summary>The roles that satisfy a policy.</summary>
     public static IReadOnlyList<string> RolesFor(string policy) => policy switch
     {
-        Staff => StaffRoles.All,
+        Staff or Personal => StaffRoles.All,
         Operate => [StaffRoles.Admin, StaffRoles.Operations],
         Care => [StaffRoles.Admin, StaffRoles.Operations, StaffRoles.CustomerSupport],
         Finance => [StaffRoles.Admin, StaffRoles.Finance],

@@ -3,6 +3,7 @@ using Logistico.Modules.Merchants.Endpoints;
 using Logistico.Modules.Merchants.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logistico.Modules.Merchants;
@@ -12,9 +13,11 @@ public static class MerchantsModule
 {
     public static IServiceCollection AddMerchantsModule(this IServiceCollection services, string connectionString)
     {
-        services.AddDbContext<MerchantsDbContext>(options => options
+        // Registered save interceptors (the audit trail) record every change this module saves.
+        services.AddDbContext<MerchantsDbContext>((sp, options) => options
             .UseNpgsql(connectionString, npgsql => npgsql.MigrationsHistoryTable("__ef_migrations_history", MerchantsDbContext.Schema))
-            .UseSnakeCaseNamingConvention());
+            .UseSnakeCaseNamingConvention()
+            .AddInterceptors(sp.GetServices<ISaveChangesInterceptor>()));
         services.AddScoped<IMerchantDirectory, MerchantDirectory>();
         services.AddScoped<MerchantsDemoSeeder>();
         return services;

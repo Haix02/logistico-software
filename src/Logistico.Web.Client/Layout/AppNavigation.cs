@@ -53,6 +53,7 @@ public static class AppNavigation
         new("Nav_AdminSection",
         [
             new("team", "Nav_Team", "key", "x", "team users staff roles access permissions الفريق المستخدمين الصلاحيات الأدوار", Policy: StaffPolicies.Administer),
+            new("audit", "Nav_Audit", "history", "l", "audit log trail history changes who changed what سجل التغييرات تدقيق من غيّر", Policy: StaffPolicies.Administer),
         ]),
     ];
 

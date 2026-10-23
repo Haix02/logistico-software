@@ -26,6 +26,9 @@ Shipments (international and domestic), hub network and trucks, hub station with
 - **Courier app:** couriers deliver from their phones (their own parcels only), with call and WhatsApp, cash to collect and failure reasons; the app can be installed on the home screen.
 - **Seller portal:** shops book their own orders at the company's prices, follow them and their returns, cancel before pickup, and see what they are owed and every payout with its statement (their own shop only).
 - **Courier cash hand-in:** the office receives each courier's collected cash against the parcels it covers, shortages are recorded, and sellers are paid only from cash the company holds.
+- **Saved views:** each person keeps named views of the shipments list (filters, sort and columns) and their usual columns.
+- **Audit log:** who changed what and when, for every order, price, rule, payout, seller and staff account, with each field before and after; append-only, recorded in the same transaction as the change.
+- **Return fee:** an optional share of the delivery fee charged to the seller for parcels sent back to them (not for damage in our care), deducted from their next payout.
 
 ## Next
 
@@ -33,11 +36,11 @@ These are the most useful next steps, roughly in order.
 
 | Item | Why it matters | Notes |
 |---|---|---|
-| **Audit log** | Who changed what, for every order, price, rule and account | Append-only, per tenant ([04](04-database-design.md) §4.6) |
+| **Audit log, part 2** | Tamper evidence and the rest of the security events | Per-tenant hash chain, monthly partitions, sign-ins, exports and sensitive reads ([04](04-database-design.md) §4.6) |
 | **Real email and MFA enforcement** | Password reset and confirmation in production; second factor for staff | [10](10-security-and-compliance.md) §8 |
 | **Customer OTP or signed links** | Self-service on the tracking page without relying on knowing the phone number | WhatsApp or SMS provider needed |
 | **WhatsApp Business API sending** | Today messages are queued and sent by staff with one click | Provider-neutral interface |
-| **Saved list views** | Each user keeps their filters and columns | Small, self-contained |
+| **Saved views on more lists** | The same named views on returns, transfers, customs and finance | The API already takes a list name |
 | **Kurdish (Sorani)** | Third language, RTL | Texts only; the RTL work is done |
 | **Load tests and telemetry** | Turn the targets in [00](00-overview.md) §6 into measurements | OpenTelemetry, k6 or NBomber |
 
@@ -53,7 +56,7 @@ These are the most useful next steps, roughly in order.
 
 - The confirmation, rating and request actions on the public tracking page verify the last four digits of the order's mobile number, with a 24-hour lock after five wrong answers. That is knowledge-based. Treat it as a convenience, not strong authentication.
 - Email sending is a no-op: password reset and email confirmation do not send anything until a sender is configured.
-- There is no audit log yet beyond the shipment timeline and `updated_by` fields.
+- The audit log records changes, not reads, sign-ins or exports, and is not hash-chained yet.
 - Performance targets have not been measured under production load.
 
 Production requirements are listed in [15 — Production readiness](15-production-readiness.md).

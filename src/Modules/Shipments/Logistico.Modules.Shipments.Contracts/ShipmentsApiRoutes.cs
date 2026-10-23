@@ -53,6 +53,7 @@ public static class ShipmentsApiRoutes
     public const string SellerQuote = Seller + "/quote";
     public const string Finance = "api/v1/finance";
     public const string FinanceSummary = Finance + "/summary";
+    public const string Views = "api/v1/views";
     public const string FinanceSettlements = Finance + "/settlements";
 
     public static string ById(Guid id) => $"{Shipments}/{id}";
@@ -91,5 +92,6 @@ public static class ShipmentsApiRoutes
     public static string SellerCancel(Guid shipmentId) => $"{SellerOrders}/{shipmentId}/cancel";
 
     public static string SellerStatement(Guid settlementId) => $"{Seller}/payouts/{settlementId}/statement.csv";
+    public static string ViewById(Guid id) => $"{Views}/{id}";
     public static string SettlementExport(Guid id) => $"{FinanceSettlements}/{id}/export.csv";
 }

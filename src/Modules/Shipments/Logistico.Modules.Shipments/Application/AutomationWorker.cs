@@ -56,6 +56,7 @@ internal sealed class AutomationWorker(IServiceScopeFactory scopes, IConfigurati
         foreach (var tenantId in tenants)
         {
             using (TenantScope.Begin(tenantId))
+            using (AuditScope.As("automation"))
             {
                 try
                 {

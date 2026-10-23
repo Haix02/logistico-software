@@ -1,4 +1,6 @@
 using System.Reflection;
+using Logistico.Modules.Audit;
+using Logistico.Modules.Audit.Contracts;
 using Logistico.Modules.Merchants;
 using Logistico.Modules.Merchants.Contracts;
 using Logistico.Modules.Shipments;
@@ -13,10 +15,13 @@ public class ModuleBoundaryTests
     private static readonly Assembly ShipmentsContracts = typeof(ShipmentListItem).Assembly;
     private static readonly Assembly MerchantsImplementation = typeof(MerchantsModule).Assembly;
     private static readonly Assembly MerchantsContracts = typeof(MerchantListItem).Assembly;
+    private static readonly Assembly AuditImplementation = typeof(AuditModule).Assembly;
+    private static readonly Assembly AuditContracts = typeof(AuditEntryItem).Assembly;
     private static readonly Assembly SharedKernel = typeof(Logistico.SharedKernel.ITenantContext).Assembly;
     private static readonly Assembly BrowserClient = typeof(Logistico.Web.Client._Imports).Assembly;
 
-    public static TheoryData<string> ContractAssemblies => [ShipmentsContracts.GetName().Name!, MerchantsContracts.GetName().Name!, SharedKernel.GetName().Name!];
+    public static TheoryData<string> ContractAssemblies =>
+        [ShipmentsContracts.GetName().Name!, MerchantsContracts.GetName().Name!, AuditContracts.GetName().Name!, SharedKernel.GetName().Name!];
 
     private static string[] References(Assembly assembly) =>
         assembly.GetReferencedAssemblies().Select(a => a.Name!).ToArray();
@@ -34,6 +39,7 @@ public class ModuleBoundaryTests
         Assert.DoesNotContain(refs, r => r.StartsWith("Npgsql", StringComparison.Ordinal));
         Assert.DoesNotContain(ShipmentsImplementation.GetName().Name, refs);
         Assert.DoesNotContain(MerchantsImplementation.GetName().Name, refs);
+        Assert.DoesNotContain(AuditImplementation.GetName().Name, refs);
     }
 
     [Fact]
@@ -43,6 +49,7 @@ public class ModuleBoundaryTests
 
         Assert.DoesNotContain(ShipmentsImplementation.GetName().Name, refs);
         Assert.DoesNotContain(MerchantsImplementation.GetName().Name, refs);
+        Assert.DoesNotContain(AuditImplementation.GetName().Name, refs);
         Assert.DoesNotContain(refs, r => r.StartsWith("Microsoft.EntityFrameworkCore", StringComparison.Ordinal));
         Assert.DoesNotContain(refs, r => r.StartsWith("Npgsql", StringComparison.Ordinal));
         Assert.DoesNotContain("Logistico.Web", refs);
@@ -54,6 +61,12 @@ public class ModuleBoundaryTests
         Assert.DoesNotContain(MerchantsImplementation.GetName().Name, References(ShipmentsImplementation));
         Assert.DoesNotContain(ShipmentsImplementation.GetName().Name, References(MerchantsImplementation));
         Assert.Contains(MerchantsContracts.GetName().Name, References(ShipmentsImplementation));
+
+        // The audit trail reaches the other modules through EF's save interceptors, never through a reference.
+        Assert.DoesNotContain(AuditImplementation.GetName().Name, References(ShipmentsImplementation));
+        Assert.DoesNotContain(AuditImplementation.GetName().Name, References(MerchantsImplementation));
+        Assert.DoesNotContain(ShipmentsImplementation.GetName().Name, References(AuditImplementation));
+        Assert.DoesNotContain(MerchantsImplementation.GetName().Name, References(AuditImplementation));
     }
 
     [Fact]
@@ -61,11 +74,13 @@ public class ModuleBoundaryTests
     {
         Assert.DoesNotContain("Logistico.Web", References(ShipmentsImplementation));
         Assert.DoesNotContain("Logistico.Web", References(MerchantsImplementation));
+        Assert.DoesNotContain("Logistico.Web", References(AuditImplementation));
     }
 
     [Theory]
     [InlineData(typeof(ShipmentsModule))]
     [InlineData(typeof(MerchantsModule))]
+    [InlineData(typeof(AuditModule))]
     public void Only_the_module_entry_point_and_migrations_are_public(Type entryPoint)
     {
         var leaked = entryPoint.Assembly.GetExportedTypes()

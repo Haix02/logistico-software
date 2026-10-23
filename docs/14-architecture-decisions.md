@@ -203,3 +203,22 @@ for the switch. Almarai stays the typeface (Arabic first); Blueprint's icons sta
 **Consequences.** One token file drives both themes and both design systems. A new Blueprint widget gets the Pajamas look
 by adding its rule to section 3b. Re-vendoring Blueprint keeps the layer because the script adds it.
 
+### ADR-030: Audit trail recorded by a save interceptor, in its own module — Accepted (23 Oct 2026)
+**Context.** Companies need to know who changed an order, a price, a rule, a payout or an account, and when; the
+security plan asks for an append-only log ([10 §5](10-security-and-compliance.md)). Writing an entry by hand in every
+endpoint would miss some, and an entry saved apart from its change can disagree with it.
+**Decision.** A new Audit module owns `audit.entries` ([04 §4.6](04-database-design.md)) and registers an EF Core
+`ISaveChangesInterceptor`. Every module's database context (and the host's Identity context) adds the registered
+interceptors, so the modules never reference the Audit module. Before a save the interceptor reads the change tracker
+(record, action, each changed field before and after, a readable label such as the tracking number), opens a
+transaction if none is open, and after the save inserts all entries in one statement in that same transaction. Secrets
+(password hash, security stamp) are recorded as changed without their value; bookkeeping fields and records with a
+history of their own (timeline, scans, logs) are skipped; JSON columns are compared by meaning. `AuditScope` names
+background actors ("automation") and keeps start-up seeding out. A trigger makes the table append-only. Administrators
+read it on the Audit log page and from each order.
+**Alternatives.** Explicit calls in each endpoint (easy to forget); PostgreSQL triggers per table (no user or IP, schema
+knowledge in SQL); an outbox to a separate store (the change and its entry could diverge until processed).
+**Consequences.** Any new record type is audited without code. Bulk `ExecuteUpdate`/`ExecuteDelete` bypass the change
+tracker and so the trail; none are used today, and new ones must record their own entry. Still planned: the per-tenant
+hash chain, monthly partitions and a retention job (§4.6), and read access logging (sensitive reads, exports).
+

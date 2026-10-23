@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Logistico.Modules.Shipments.Application;
 
 /// <summary>Starts returns and hands returned parcels back to sellers against a signed manifest.</summary>
-internal sealed class ReturnDesk(ShipmentsDbContext db, NumberGenerator numbers, AutomationPolicies policies, TransferPlanner planner, Activity activity, TimeProvider clock)
+internal sealed class ReturnDesk(ShipmentsDbContext db, NumberGenerator numbers, AutomationPolicies policies, TransferPlanner planner, Activity activity, Pricing pricing, TimeProvider clock)
 {
     public async Task StartAsync(Shipment shipment, ReturnReason reason, string? notes, string? by, CancellationToken ct)
     {
@@ -41,10 +41,11 @@ internal sealed class ReturnDesk(ShipmentsDbContext db, NumberGenerator numbers,
         var number = await numbers.ReturnManifestNumberAsync(ct);
         var now = clock.GetUtcNow();
         var actor = new Actor(by);
+        var prices = await pricing.GetAsync(shipments[0].TenantId, ct);
         foreach (var shipment in shipments)
         {
             var hub = shipment.CurrentHubCode;
-            shipment.HandOverToSeller(number, request.ReceivedBy, actor, now);
+            shipment.HandOverToSeller(number, request.ReceivedBy, prices.ReturnFee(shipment.DeliveryFee, shipment.ReturnReason), actor, now);
             db.HubScans.Add(HubScan.Record(shipment.TenantId, hub ?? shipment.TargetHubCode, ScanOperation.HandOver, shipment.TrackingNumber, shipment,
                 true, false, null, null, $"{number} · {ShipmentTexts.Of(shipment.Status)}", null, by, now));
         }

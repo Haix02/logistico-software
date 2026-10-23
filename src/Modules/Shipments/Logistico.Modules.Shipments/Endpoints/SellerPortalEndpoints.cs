@@ -100,7 +100,7 @@ internal static class SellerPortalEndpoints
             .Select(s => new SellerOrder(
                 s.Id, s.TrackingNumber, s.Status, s.ConsigneeName, s.ConsigneePhone, s.DestinationCode, s.DestinationCity, s.ItemsDescription,
                 s.CodAmount, s.DeliveryFee, s.DeliveryAttempts, s.LastFailureReason, s.ReturnReason, s.ExternalReference, s.CreatedAt, s.LastStatusAt,
-                s.CodSettlementId != null))
+                s.CodSettlementId != null, s.ReturnFee))
             .ToListAsync(ct);
         return TypedResults.Ok(new SellerOrderList(items, total, search.EffectivePage, search.EffectivePageSize));
     }

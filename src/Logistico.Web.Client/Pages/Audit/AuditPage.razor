@@ -1,0 +1,213 @@
+@page "/audit"
+@attribute [Authorize(Policy = StaffPolicies.Administer)]
+@inject AuditApi Audit
+@inject NavigationManager Navigation
+
+<PageTitle>@L["Nav_Audit"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["Nav_Audit"]" Subtitle="@L["Audit_Subtitle"]" Icon="history" />
+
+<div class="lx-toolbar lx-card lx-mb">
+    <SearchInput CssClass="lx-toolbar-search" Value="@q" Placeholder="@L["Audit_SearchPlaceholder"]" OnSearch="SearchAsync" />
+    <HtmlSelect Value="@(Entity ?? "")" Label="@L["Audit_Record"]" ValueChanged="FilterAsync">
+        <option value="">@L["Audit_AllRecords"]</option>
+        @foreach (var entity in Entities)
+        {
+            <option value="@entity">@EntityName(entity)</option>
+        }
+    </HtmlSelect>
+    @if (EntityId is not null)
+    {
+        <Tag Icon="filter" Large="true">
+            @L["Audit_OneRecord"] <Mixed Text="@(Label ?? EntityId)" />
+            <button type="button" class="bp6-tag-remove" aria-label="@L["Audit_AllRecords"]" @onclick="ShowAll"></button>
+        </Tag>
+    }
+</div>
+
+<div class="bp6-card lx-table-card">
+    <DataTable TItem="AuditEntryItem" Items="result?.Items" Loading="loads.Busy && result is null" ColumnCount="4" EmptyIcon="history" EmptyTitle="@L["Audit_Empty"]">
+        <Header>
+            <th>@L["Audit_When"]</th>
+            <th>@L["Audit_Who"]</th>
+            <th>@L["Audit_Record"]</th>
+            <th>@L["Audit_Change"]</th>
+        </Header>
+        <Row Context="e">
+            <td class="lx-nowrap">
+                @Fmt.Date(e.OccurredAt)
+                <div class="bp6-text-muted lx-small">@Fmt.Time(e.OccurredAt):@e.OccurredAt.ToLocalTime().ToString("ss", CultureInfo.InvariantCulture)</div>
+            </td>
+            <td>
+                <Cell>
+                    <TitleContent><Mixed Text="@ActorName(e.Actor)" /></TitleContent>
+                    <SubContent>@if (e.ActorIp is not null) { <span dir="ltr" class="lx-mono">@e.ActorIp</span> }</SubContent>
+                </Cell>
+            </td>
+            <td>
+                <Tag Intent="@ActionIntent(e.Action)">@ActionName(e.Action)</Tag>
+                <span class="lx-strong lx-ms-xs">@EntityName(e.Entity)</span>
+                <div class="lx-small">
+                    @if (RecordLink(e) is { } href)
+                    {
+                        <a href="@href"><Mixed Text="@(e.Label ?? e.EntityId)" /></a>
+                    }
+                    else if (e.Label is not null)
+                    {
+                        <Mixed Text="@e.Label" />
+                    }
+                </div>
+            </td>
+            <td class="lx-audit-changes">
+                @{
+                    var shown = expanded.Contains(e.Id) ? e.Changes : e.Changes.Take(Collapsed).ToList();
+                }
+                @foreach (var c in shown)
+                {
+                    <div class="lx-audit-change">
+                        <bdi class="lx-audit-field">@Humanize(c.Field)</bdi>
+                        @if (e.Action == AuditActions.Update)
+                        {
+                            <bdi class="lx-audit-old">@Value(e, c.Field, c.Old)</bdi>
+                            <Icon Name="@Bidi.Forward" CssClass="lx-audit-arrow" />
+                        }
+                        <bdi class="@(e.Action == AuditActions.Delete ? "lx-audit-old" : "lx-audit-new")">@Value(e, c.Field, e.Action == AuditActions.Delete ? c.Old : c.New)</bdi>
+                    </div>
+                }
+                @if (e.Changes.Count > Collapsed)
+                {
+                    <Button Minimal="true" Small="true" Icon="@(expanded.Contains(e.Id) ? "chevron-up" : "chevron-down")"
+                            Text="@(expanded.Contains(e.Id) ? L["Audit_Less"].Value : L.Count("Audit_MoreN", e.Changes.Count - Collapsed))"
+                            OnClick="@(() => Toggle(e.Id))" />
+                }
+            </td>
+        </Row>
+    </DataTable>
+    @if (result is not null)
+    {
+        <Pager Page="result.Page" PageSize="result.PageSize" Total="result.TotalCount" OnPage="PageAsync" OnPageSize="PageSizeAsync" />
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "entity")] public string? Entity { get; set; }
+    [SupplyParameterFromQuery(Name = "entityId")] public string? EntityId { get; set; }
+    [SupplyParameterFromQuery(Name = "label")] public string? Label { get; set; }
+
+    /// <summary>The records people change, in the order of the side menu.</summary>
+    private static readonly string[] Entities =
+    [
+        "Shipment", "CustomsDeclaration", "Warehouse", "HubTransfer", "ServiceRequest", "AutomationSettings",
+        "Merchant", "CodSettlement", "CashHandover", "RateCardSettings", "Courier", "ApplicationUser", "IdentityUserRole", "IdentityUserClaim",
+    ];
+
+    private const int Collapsed = 4;
+
+    private readonly LatestLoad loads = new();
+    private readonly HashSet<Guid> expanded = [];
+    private PagedResult<AuditEntryItem>? result;
+    private string? q;
+    private int page = 1;
+    private int pageSize = 50;
+
+    protected override Task OnParametersSetAsync()
+    {
+        page = 1;
+        return LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        var (latest, value) = await loads.RunAsync(ct => Audit.ListAsync(q, Entity, EntityId, page, pageSize, ct));
+        if (latest)
+        {
+            result = value;
+            expanded.Clear();
+        }
+    }
+
+    private Task SearchAsync(string? text)
+    {
+        q = text;
+        page = 1;
+        return LoadAsync();
+    }
+
+    /// <summary>A record type from the list; the address keeps it, so the page can be shared or reloaded.</summary>
+    private void FilterAsync(string? entity) =>
+        Navigation.NavigateTo(Navigation.GetUriWithQueryParameters(new Dictionary<string, object?> { ["entity"] = string.IsNullOrEmpty(entity) ? null : entity, ["entityId"] = null, ["label"] = null }));
+
+    private void ShowAll() => FilterAsync(null);
+
+    private Task PageAsync(int p)
+    {
+        page = p;
+        return LoadAsync();
+    }
+
+    private Task PageSizeAsync(int size)
+    {
+        pageSize = size;
+        page = 1;
+        return LoadAsync();
+    }
+
+    private void Toggle(Guid id)
+    {
+        if (!expanded.Remove(id))
+        {
+            expanded.Add(id);
+        }
+    }
+
+    private string EntityName(string entity) => L[$"AuditEntity_{entity}"] is { ResourceNotFound: false } text ? text.Value : entity;
+
+    private string ActorName(string actor) => actor is AuditActors.System or AuditActors.Anonymous or "automation" ? L[$"AuditActor_{actor}"] : actor;
+
+    private string ActionName(string action) => L[$"AuditAction_{action}"];
+
+    private static Intent ActionIntent(string action) => action switch
+    {
+        AuditActions.Create => Intent.Success,
+        AuditActions.Delete => Intent.Danger,
+        _ => Intent.Primary,
+    };
+
+    private static string? RecordLink(AuditEntryItem e) => (e.Entity, Guid.TryParse(e.EntityId, out var id)) switch
+    {
+        ("Shipment", true) => $"shipments/{id}",
+        ("Merchant", true) => $"merchants/{id}",
+        ("HubTransfer", true) => $"transfers/{id}",
+        _ => null,
+    };
+
+    /// <summary>"CodAmount" → "Cod amount": the field names are the system's own, made readable.</summary>
+    private static string Humanize(string field)
+    {
+        var words = new System.Text.StringBuilder(field.Length + 8);
+        for (var i = 0; i < field.Length; i++)
+        {
+            if (i > 0 && char.IsUpper(field[i]) && !char.IsUpper(field[i - 1]))
+            {
+                words.Append(' ').Append(char.ToLowerInvariant(field[i]));
+            }
+            else
+            {
+                words.Append(field[i]);
+            }
+        }
+
+        return words.ToString();
+    }
+
+    /// <summary>A recorded value as people read it: yes/no, local date and time, an order's status in their language.</summary>
+    private string Value(AuditEntryItem e, string field, string? value) => value switch
+    {
+        null or "" => "—",
+        _ when e.Entity == "Shipment" && field == "Status" && Enum.TryParse<ShipmentStatus>(value, out var status) => ShipmentTexts.Of(status),
+        "true" => L["Yes"],
+        "false" => L["No"],
+        _ when value.Length >= 20 && value[4] == '-' && value[10] == 'T' && DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var at) => Fmt.DateTime(at),
+        _ => value,
+    };
+}

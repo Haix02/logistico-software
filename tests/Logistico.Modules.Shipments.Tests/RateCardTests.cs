@@ -1,3 +1,4 @@
+using Logistico.Modules.Shipments.Contracts;
 using Logistico.Modules.Shipments.Contracts.Rules;
 
 namespace Logistico.Modules.Shipments.Tests;
@@ -36,4 +37,16 @@ public class RateCardTests
 
         Assert.Equal(9_000m, card.Quote("IQ-BG", "IQ-MU", 1).Fee);
     }
+
+    [Theory]
+    [InlineData(0, 5_000, ReturnReason.CustomerRefused, 0)]
+    [InlineData(50, 5_000, ReturnReason.CustomerRefused, 2_500)]
+    [InlineData(50, 7_000, ReturnReason.MaxAttemptsReached, 3_500)]
+    [InlineData(30, 7_000, ReturnReason.SellerCancelled, 2_000)]
+    [InlineData(100, 6_000, ReturnReason.WrongAddress, 6_000)]
+    [InlineData(100, 6_000, ReturnReason.CustomerReturn, 6_000)]
+    [InlineData(100, 6_000, ReturnReason.Damaged, 0)]
+    [InlineData(100, 6_000, ReturnReason.Other, 0)]
+    public void Return_fees_are_a_share_of_the_delivery_fee_for_returns_on_the_sellers_side(int percent, int deliveryFee, ReturnReason reason, int expected) =>
+        Assert.Equal(expected, new RateCard { ReturnFeePercent = percent }.ReturnFee(deliveryFee, reason));
 }

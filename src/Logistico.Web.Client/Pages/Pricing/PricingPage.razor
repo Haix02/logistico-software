@@ -38,13 +38,20 @@ else
                         </FormField>
                         <FormField TValue="decimal" Label="@L["Pricing_IncludedWeight"]" Helper="@L["Pricing_IncludedWeightHint"]">
                             <div class="bp6-input-group bp6-fill">
-                                <input class="bp6-input" type="number" min="0" step="0.5" dir="ltr" value="@card.IncludedWeightKg.ToString(CultureInfo.InvariantCulture)"
+                                <input class="bp6-input" type="number" min="0" step="0.5" dir="ltr" value="@card.IncludedWeightKg.ToString("0.##", CultureInfo.InvariantCulture)"
                                        @onchange="@(e => card.IncludedWeightKg = ParseDecimal(e.Value, card.IncludedWeightKg))" />
                                 <span class="bp6-input-action lx-input-suffix">@L["Kg"]</span>
                             </div>
                         </FormField>
                         <FormField TValue="decimal" Label="@L["Pricing_ExtraKg"]" Helper="@L["Pricing_ExtraKgHint"]">
                             <MoneyInput @bind-Value="card.ExtraKgFee" />
+                        </FormField>
+                        <FormField TValue="decimal" Label="@L["Pricing_ReturnFee"]" Helper="@L["Pricing_ReturnFeeHint"]" CssClass="lx-span-2">
+                            <div class="bp6-input-group bp6-fill">
+                                <input class="bp6-input" type="number" min="0" max="100" step="5" dir="ltr" value="@card.ReturnFeePercent.ToString("0.##", CultureInfo.InvariantCulture)"
+                                       aria-label="@L["Pricing_ReturnFee"]" @onchange="@(e => card.ReturnFeePercent = Math.Clamp(ParseDecimal(e.Value, card.ReturnFeePercent), 0, 100))" />
+                                <span class="bp6-input-action lx-input-suffix">%</span>
+                            </div>
                         </FormField>
                     </div>
                 </Section>
@@ -122,7 +129,7 @@ else
                                         <span class="lx-list-icon lx-list-icon-primary"><Icon Name="shop" /></span>
                                         <span class="lx-list-body"><span class="lx-list-title"><Mixed Text="@d.MerchantName" /></span></span>
                                         <div class="bp6-input-group" style="width:120px">
-                                            <input class="bp6-input bp6-small" type="number" min="0" max="100" step="1" dir="ltr" value="@d.Percent.ToString(CultureInfo.InvariantCulture)"
+                                            <input class="bp6-input bp6-small" type="number" min="0" max="100" step="1" dir="ltr" value="@d.Percent.ToString("0.##", CultureInfo.InvariantCulture)"
                                                    @onchange="@(e => UpdateDiscount(d, ParseDecimal(e.Value, d.Percent)))" aria-label="@L["Pricing_Discount"]" />
                                             <span class="bp6-input-action lx-input-suffix">%</span>
                                         </div>
@@ -156,7 +163,7 @@ else
                 </FormField>
                 <div class="lx-form-grid">
                     <FormField TValue="decimal" Label="@L["Field_WeightKg"]">
-                        <input class="bp6-input bp6-fill" type="number" min="0" step="0.5" dir="ltr" value="@weight.ToString(CultureInfo.InvariantCulture)" @onchange="@(e => weight = ParseDecimal(e.Value, weight))" />
+                        <input class="bp6-input bp6-fill" type="number" min="0" step="0.5" dir="ltr" value="@weight.ToString("0.##", CultureInfo.InvariantCulture)" @onchange="@(e => weight = ParseDecimal(e.Value, weight))" />
                     </FormField>
                     <FormField TValue="string" Label="@L["Field_Seller"]">
                         <HtmlSelect Value="@quoteSeller?.ToString()" ValueChanged="@(v => quoteSeller = Guid.TryParse(v, out var id) ? id : null)" Fill="true" Label="@L["Field_Seller"]">
@@ -244,6 +251,7 @@ else
         card.DefaultFee = standard.DefaultFee;
         card.IncludedWeightKg = standard.IncludedWeightKg;
         card.ExtraKgFee = standard.ExtraKgFee;
+        card.ReturnFeePercent = standard.ReturnFeePercent;
         card.GovernorateFees = standard.GovernorateFees;
     }
 

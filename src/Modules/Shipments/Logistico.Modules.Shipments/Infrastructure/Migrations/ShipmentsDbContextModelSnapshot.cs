@@ -300,6 +300,15 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("payout_reference");
 
+                    b.Property<int>("ReturnCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("return_count");
+
+                    b.Property<decimal>("ReturnFeesAmount")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("numeric(19,4)")
+                        .HasColumnName("return_fees_amount");
+
                     b.Property<DateTimeOffset>("SettledAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("settled_at");
@@ -1002,6 +1011,11 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                         .HasColumnType("numeric(8,2)")
                         .HasColumnName("included_weight_kg");
 
+                    b.Property<decimal>("ReturnFeePercent")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("return_fee_percent");
+
                     b.Property<decimal>("SameGovernorateFee")
                         .HasPrecision(12, 2)
                         .HasColumnType("numeric(12,2)")
@@ -1031,6 +1045,54 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                         .HasName("pk_rate_cards");
 
                     b.ToTable("rate_cards", "shipment");
+                });
+
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.SavedView", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("List")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("list");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Query")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("query");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_saved_views");
+
+                    b.HasIndex("TenantId", "UserId", "List", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_saved_views_tenant_id_user_id_list_name");
+
+                    b.ToTable("saved_views", "shipment");
                 });
 
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ServiceRequest", b =>
@@ -1405,6 +1467,11 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("RescheduledTo")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("rescheduled_to");
+
+                    b.Property<decimal?>("ReturnFee")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("numeric(19,4)")
+                        .HasColumnName("return_fee");
 
                     b.Property<string>("ReturnManifestNumber")
                         .HasMaxLength(24)

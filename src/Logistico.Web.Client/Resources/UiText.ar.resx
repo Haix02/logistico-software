@@ -117,6 +117,10 @@
   <data name="CloseManifestOk" xml:space="preserve"><value>تم تفريغ كل الطرود. هل تريد إغلاق الكشف؟</value></data>
   <data name="CodHelper" xml:space="preserve"><value>المبلغ الذي يستلمه المندوب من الزبون. اتركه فارغاً إذا كان مدفوعاً مسبقاً.</value></data>
   <data name="CodTotal" xml:space="preserve"><value>الدفع عند الاستلام</value></data>
+  <data name="Col_ReturnFees" xml:space="preserve"><value>أجور الإرجاع</value></data>
+  <data name="ReturnFeesLine" xml:space="preserve"><value>مرتجعات {0} ({1})</value></data>
+  <data name="Settle_ReturnFeesCarry" xml:space="preserve"><value>أجور الإرجاع التي تزيد على ما يتبقّى من هذه التسوية لا تُخصم الآن، وتنتظر التسوية القادمة.</value></data>
+  <data name="Col_ReturnFee" xml:space="preserve"><value>أجور الإرجاع</value></data>
   <data name="Col_Action" xml:space="preserve"><value>العملية</value></data>
   <data name="Col_Age" xml:space="preserve"><value>منذ</value></data>
   <data name="Col_Alert" xml:space="preserve"><value>التنبيه</value></data>
@@ -182,7 +186,6 @@
   <data name="Col_Route" xml:space="preserve"><value>المسار</value></data>
   <data name="Col_Seller" xml:space="preserve"><value>المتجر / المرسل</value></data>
   <data name="Col_Service" xml:space="preserve"><value>الخدمة</value></data>
-  <data name="Col_SettledAt" xml:space="preserve"><value>تاريخ التسوية</value></data>
   <data name="Col_SettlementNo" xml:space="preserve"><value>رقم التسوية</value></data>
   <data name="Col_Shipment" xml:space="preserve"><value>الشحنة</value></data>
   <data name="Col_Source" xml:space="preserve"><value>المصدر</value></data>
@@ -357,6 +360,9 @@
   <data name="Field_CustomerPhone" xml:space="preserve"><value>موبايل الزبون</value></data>
   <data name="Field_CustomsOffice" xml:space="preserve"><value>منفذ التخليص الجمركي</value></data>
   <data name="Field_CustomsValueUsd" xml:space="preserve"><value>القيمة الجمركية (دولار)</value></data>
+  <data name="Customs_NeededToRelease" xml:space="preserve"><value>مطلوب للإفراج</value></data>
+  <data name="Customs_DeclaredAs" xml:space="preserve"><value>صرّح المرسل بقيمة {0}؛ أدخلها بالدولار من الفاتورة.</value></data>
+  <data name="Customs_DeclaredInDinars" xml:space="preserve"><value>صرّح المرسل بقيمة {0}، محوّلة بالسعر الرسمي {1} دينار للدولار.</value></data>
   <data name="Field_DeclarationNo" xml:space="preserve"><value>رقم تسجيل أسيكودا</value></data>
   <data name="Field_DeclaredValue" xml:space="preserve"><value>القيمة المصرّح بها</value></data>
   <data name="Field_DeliveryFee" xml:space="preserve"><value>أجور التوصيل</value></data>
@@ -602,6 +608,39 @@
   <data name="Nav_Sellers" xml:space="preserve"><value>المتاجر</value></data>
   <data name="Nav_Shipments" xml:space="preserve"><value>الشحنات</value></data>
   <data name="Nav_Team" xml:space="preserve"><value>الفريق والصلاحيات</value></data>
+  <data name="Nav_Audit" xml:space="preserve"><value>سجل التغييرات</value></data>
+  <data name="Audit_Subtitle" xml:space="preserve"><value>من غيّر ماذا ومتى: الطلبات والأسعار والقواعد والجمارك والتسويات والمتاجر وحسابات الموظفين. لا يمكن تعديل السجل أو حذفه.</value></data>
+  <data name="Audit_SearchPlaceholder" xml:space="preserve"><value>الشخص أو رقم التتبع أو البريد أو الاسم…</value></data>
+  <data name="Audit_Record" xml:space="preserve"><value>السجل</value></data>
+  <data name="Audit_AllRecords" xml:space="preserve"><value>كل السجلات</value></data>
+  <data name="Audit_OneRecord" xml:space="preserve"><value>فقط:</value></data>
+  <data name="Audit_Empty" xml:space="preserve"><value>لا توجد تغييرات مسجّلة</value></data>
+  <data name="Audit_When" xml:space="preserve"><value>متى</value></data>
+  <data name="Audit_Who" xml:space="preserve"><value>من</value></data>
+  <data name="Audit_Change" xml:space="preserve"><value>التغيير</value></data>
+  <data name="Audit_Less" xml:space="preserve"><value>عرض أقل</value></data>
+  <data name="Audit_MoreN" xml:space="preserve"><value>عرض المزيد ({0})</value></data>
+  <data name="Audit_History" xml:space="preserve"><value>سجل التغييرات</value></data>
+  <data name="AuditAction_create" xml:space="preserve"><value>إنشاء</value></data>
+  <data name="AuditAction_update" xml:space="preserve"><value>تعديل</value></data>
+  <data name="AuditAction_delete" xml:space="preserve"><value>حذف</value></data>
+  <data name="AuditActor_system" xml:space="preserve"><value>النظام</value></data>
+  <data name="AuditActor_automation" xml:space="preserve"><value>الأتمتة</value></data>
+  <data name="AuditActor_anonymous" xml:space="preserve"><value>غير مسجّل الدخول</value></data>
+  <data name="AuditEntity_Shipment" xml:space="preserve"><value>طلب</value></data>
+  <data name="AuditEntity_CustomsDeclaration" xml:space="preserve"><value>بيان جمركي</value></data>
+  <data name="AuditEntity_Warehouse" xml:space="preserve"><value>مخزن</value></data>
+  <data name="AuditEntity_HubTransfer" xml:space="preserve"><value>شاحنة</value></data>
+  <data name="AuditEntity_ServiceRequest" xml:space="preserve"><value>طلب زبون</value></data>
+  <data name="AuditEntity_AutomationSettings" xml:space="preserve"><value>قواعد الأتمتة</value></data>
+  <data name="AuditEntity_Merchant" xml:space="preserve"><value>متجر</value></data>
+  <data name="AuditEntity_CodSettlement" xml:space="preserve"><value>تسوية متجر</value></data>
+  <data name="AuditEntity_CashHandover" xml:space="preserve"><value>تسليم نقد</value></data>
+  <data name="AuditEntity_RateCardSettings" xml:space="preserve"><value>أسعار التوصيل</value></data>
+  <data name="AuditEntity_Courier" xml:space="preserve"><value>مندوب</value></data>
+  <data name="AuditEntity_ApplicationUser" xml:space="preserve"><value>حساب موظف</value></data>
+  <data name="AuditEntity_IdentityUserRole" xml:space="preserve"><value>دور الحساب</value></data>
+  <data name="AuditEntity_IdentityUserClaim" xml:space="preserve"><value>ربط الحساب</value></data>
   <data name="Nav_Track" xml:space="preserve"><value>تتبع شحنة</value></data>
   <data name="Nav_Transfers" xml:space="preserve"><value>الشاحنات بين المراكز</value></data>
   <data name="Nav_Warehouse" xml:space="preserve"><value>محطة المركز</value></data>
@@ -746,6 +785,8 @@
   <data name="Price_DiscountPart" xml:space="preserve"><value>− خصم المتجر {0}%</value></data>
   <data name="Price_WeightPart" xml:space="preserve"><value>+ {0} وزن</value></data>
   <data name="PricesSaved" xml:space="preserve"><value>حُفظت الأسعار. الطلبات الجديدة تستخدمها الآن.</value></data>
+  <data name="Pricing_ReturnFeeHint" xml:space="preserve"><value>تُحسب على المتجر عند إعادة الطرد إليه، كنسبة من أجور توصيله: رفض الزبون، تعذّر الوصول، إرجاع من الزبون، إلغاء بعد الاستلام أو عنوان خاطئ. لا تُحسب عند تلف الطرد لدينا. 0٪ = الإرجاع مجاني.</value></data>
+  <data name="Pricing_ReturnFee" xml:space="preserve"><value>أجور الإرجاع</value></data>
   <data name="Pricing_Basics" xml:space="preserve"><value>الأساسيات</value></data>
   <data name="Pricing_ByGovernorate" xml:space="preserve"><value>السعر حسب الوجهة</value></data>
   <data name="Pricing_ByGovernorateHint" xml:space="preserve"><value>للزبائن خارج محافظة المتجر، مجمّعة حسب المخزن الذي يوصل.</value></data>
@@ -783,6 +824,14 @@
   <data name="QuickDispatchHint" xml:space="preserve"><value>اختر المندوب وامسح أو اكتب رقم التتبع لتسليمه الطرد فوراً.</value></data>
   <data name="QuickDispatchTitle" xml:space="preserve"><value>إرسال سريع مع المندوب</value></data>
   <data name="QuickViews" xml:space="preserve"><value>عروض سريعة</value></data>
+  <data name="Columns" xml:space="preserve"><value>الأعمدة</value></data>
+  <data name="Columns_Default" xml:space="preserve"><value>الأعمدة المعتادة</value></data>
+  <data name="Views_Save" xml:space="preserve"><value>حفظ طريقة العرض</value></data>
+  <data name="Views_Name" xml:space="preserve"><value>اسم طريقة العرض</value></data>
+  <data name="Views_NamePlaceholder" xml:space="preserve"><value>مثلاً: البصرة مع المندوبين</value></data>
+  <data name="Views_Saved" xml:space="preserve"><value>حُفظت طريقة العرض «{0}»</value></data>
+  <data name="Views_Remove" xml:space="preserve"><value>حذف طريقة العرض</value></data>
+  <data name="Views_RemoveNamed" xml:space="preserve"><value>حذف طريقة العرض {0}</value></data>
   <data name="RatingsN" xml:space="preserve"><value>{0} تقييم في هذه الفترة</value></data>
   <data name="RatingsN_Few" xml:space="preserve"><value>{0} تقييمات في هذه الفترة</value></data>
   <data name="RatingsN_Many" xml:space="preserve"><value>{0} تقييماً في هذه الفترة</value></data>
@@ -936,6 +985,7 @@
   <data name="SellerCreated" xml:space="preserve"><value>تمت إضافة المتجر «{0}»</value></data>
   <data name="SellerNotFound" xml:space="preserve"><value>المتجر غير موجود</value></data>
   <data name="SellerReceives" xml:space="preserve"><value>يستلم المتجر</value></data>
+  <data name="Seller_ReturnFeeN" xml:space="preserve"><value>أجور الإرجاع {0}</value></data>
   <data name="Seller_Active" xml:space="preserve"><value>طلبات قيد التوصيل</value></data>
   <data name="Seller_Cancel" xml:space="preserve"><value>إلغاء الطلب</value></data>
   <data name="Seller_CancelMessage" xml:space="preserve"><value>لم يُستلم الطلب {0} بعد. إلغاؤه يحذفه من قائمة الاستلام لدى المندوب.</value></data>

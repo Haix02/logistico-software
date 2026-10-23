@@ -226,7 +226,9 @@ public sealed record SellerCodBalance(
     int InProgressCount,
     decimal InProgressCodIqd,
     int WithCouriersCount = 0,
-    decimal WithCouriersIqd = 0);
+    decimal WithCouriersIqd = 0,
+    int ReturnCount = 0,
+    decimal ReturnFeesIqd = 0);
 
 public sealed record CodSettlementItem(
     Guid Id,
@@ -242,7 +244,9 @@ public sealed record CodSettlementItem(
     string? PayoutReference,
     string? Notes,
     DateTimeOffset SettledAt,
-    string? SettledBy);
+    string? SettledBy,
+    int ReturnCount = 0,
+    decimal ReturnFeesAmount = 0);
 
 public sealed record FinanceSummary(
     decimal PendingCodToCollectIqd,
@@ -253,7 +257,8 @@ public sealed record FinanceSummary(
     decimal TotalDeliveryRevenueIqd,
     IReadOnlyList<SellerCodBalance> SellerBalances,
     IReadOnlyList<CodSettlementItem> RecentSettlements,
-    decimal CodWithCouriersIqd = 0);
+    decimal CodWithCouriersIqd = 0,
+    decimal UnsettledReturnFeesIqd = 0);
 
 public sealed class CreateCodSettlementRequest
 {

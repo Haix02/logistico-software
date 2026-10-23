@@ -6,15 +6,43 @@ versions follow [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **Saved views and columns** (Shipments): choose which columns the list shows (courier, created, shelf, time in status…)
+  and save the current filters, sort and columns under a name; your views appear as chips beside the quick views, open
+  with one click and are removed with ×. Views are personal (on your account, so they follow you to another computer)
+  and every office role, read-only ones included, can keep them. Your usual columns are remembered on each device.
+- **Audit log** (Administration → Audit log, and "History of changes" on each order): who changed what and when — orders,
+  customs, payouts and cash hand-ins, delivery prices, automation rules, warehouses, couriers, sellers and staff accounts
+  (roles and links included) — with each field before and after, the person and their address. Entries are written in
+  the same transaction as the change, cannot be edited or deleted, and never contain passwords. Automation is named as
+  such; start-up seeding is left out.
 - **Courier cash hand-in** (Fleet page): the office receives a courier's cash with the list of parcels it covers and the
   amount expected, enters the amount counted, and any shortage or extra is recorded (`CH-…` numbers, recent hand-ins
   listed with differences). The courier app reminds couriers how much to hand in. Two people receiving the same cash at
   the same moment cannot count it twice.
+- **Return fee** (Delivery prices page): a share of the delivery fee charged to the seller when a parcel goes back to
+  them — refused, unreachable, returned by the customer, cancelled after pickup or a wrong address; never for damage in
+  the company's care. It is fixed on the parcel when the seller collects it, shown on the order (office and seller
+  portal) and deducted from the seller's next payout, listed in the statement CSV. A fee larger than what is left of a
+  payout waits for the next one. 0 % (the default) keeps returns free.
 
 ### Fixed
+- **Customs value in the right currency.** An import declared in dinars was valued as if the amount were US dollars
+  (a 6.55 million IQD parcel was assessed as $6.55 million); dinars are now converted at the official rate, and other
+  currencies, or no declared value, are left for the clerk to enter in dollars from the invoice instead of an invented
+  $1,000. The customs form shows what the shipper declared.
+- **Customs release follows ASYCUDA's order:** a declaration is released only with a customs value and, when duties or
+  fees are due, the treasury receipt of their payment. Saving a released declaration again keeps its first release
+  date, and a released declaration can no longer be put on hold.
+- **Dashboard comparisons are like for like.** "Today" was compared with all of yesterday, so at 10 a.m. bookings looked
+  ~60 % down on a normal day; every period is now compared with the same stretch of the period before (until the same
+  hour). Demand intelligence does the same.
+- Switches in their "off" state were invisible apart from the knob; they now show a grey track (Pajamas toggle), and
+  keyboard focus on a switch is visible.
 - **Sellers are paid only from cash the company holds.** A payout used to include parcels whose cash was still in a
   courier's pocket; now only handed-in cash is owed and paid, the Finance page shows the cash still with couriers, and
   paying a seller whose cash has not arrived explains why. Existing data counts as handed in.
+- The payout history on the Finance page no longer runs off the side of the screen in Arabic: the date sits under the
+  payout number and the statement download is an icon.
 - "COD with couriers" on the Fleet page reset at midnight, so cash a courier kept overnight disappeared from view; it
   now shows all collected cash not handed in, whatever the day.
 

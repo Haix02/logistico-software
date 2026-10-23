@@ -7,6 +7,10 @@
     <Project Path="src/Modules/Shipments/Logistico.Modules.Shipments/Logistico.Modules.Shipments.csproj" />
   </Folder>
   <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Audit/">
+    <Project Path="src/Modules/Audit/Logistico.Modules.Audit.Contracts/Logistico.Modules.Audit.Contracts.csproj" />
+    <Project Path="src/Modules/Audit/Logistico.Modules.Audit/Logistico.Modules.Audit.csproj" />
+  </Folder>
   <Folder Name="/src/Modules/Merchants/">
     <Project Path="src/Modules/Merchants/Logistico.Modules.Merchants.Contracts/Logistico.Modules.Merchants.Contracts.csproj" />
     <Project Path="src/Modules/Merchants/Logistico.Modules.Merchants/Logistico.Modules.Merchants.csproj" />

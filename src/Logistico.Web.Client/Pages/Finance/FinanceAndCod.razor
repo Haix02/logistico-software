@@ -42,14 +42,20 @@ else
                 <td><a class="lx-strong" href="@($"merchants/{b.MerchantId}")">@b.MerchantName</a></td>
                 <td class="lx-num">@Fmt.Number(b.DeliveredUnsettledCount)</td>
                 <td class="lx-num">@Fmt.Money(b.GrossCodIqd, "IQD")</td>
-                <td class="lx-num bp6-text-muted">@Fmt.Money(b.DeliveryFeesIqd, "IQD")</td>
+                <td class="lx-num bp6-text-muted">
+                    @Fmt.Money(b.DeliveryFeesIqd, "IQD")
+                    @if (b.ReturnCount > 0)
+                    {
+                        <div class="lx-small lx-intent-warning">@string.Format(CultureInfo.CurrentCulture, L["ReturnFeesLine"], Fmt.Money(b.ReturnFeesIqd, "IQD"), Fmt.Number(b.ReturnCount))</div>
+                    }
+                </td>
                 <td class="lx-num lx-strong">@Fmt.Money(b.NetPayableIqd, "IQD")</td>
                 <td class="lx-num bp6-text-muted">@Fmt.Money(b.InProgressCodIqd, "IQD") (@Fmt.Number(b.InProgressCount))</td>
                 <td>
                     @if (b.DeliveredUnsettledCount > 0)
                     {
                         <Allowed Policy="@StaffPolicies.Finance">
-                            <Button Small="true" Icon="bank-account" Text="@L["SettlePayout"]" OnClick="@(() => OpenSettle(b))" />
+                            <Button Small="true" Icon="bank-account" Text="@L["SettlePayout"]" CssClass="lx-nowrap" OnClick="@(() => OpenSettle(b))" />
                         </Allowed>
                     }
                     @if (b.WithCouriersCount > 0)
@@ -63,7 +69,7 @@ else
     </Section>
 
     <Section Title="@L["SettlementsHistoryTitle"]" Subtitle="@L["SettlementsHistorySubtitle"]" Icon="history" Padded="false">
-        <DataTable TItem="CodSettlementItem" Items="summary.RecentSettlements" ColumnCount="9" EmptyIcon="bank-account" EmptyTitle="@L["NoSettlementsYet"]">
+        <DataTable TItem="CodSettlementItem" Items="summary.RecentSettlements" ColumnCount="8" EmptyIcon="bank-account" EmptyTitle="@L["NoSettlementsYet"]">
             <Header>
                 <th>@L["Col_SettlementNo"]</th>
                 <th>@L["Col_Seller"]</th>
@@ -72,15 +78,23 @@ else
                 <th class="lx-num">@L["Col_DeliveryFees"]</th>
                 <th class="lx-num">@L["Col_NetPayout"]</th>
                 <th>@L["Col_PayoutMethod"]</th>
-                <th>@L["Col_SettledAt"]</th>
                 <th>@L["Col_Action"]</th>
             </Header>
             <Row Context="s">
-                <td class="lx-code lx-nowrap" dir="ltr">@s.SettlementNumber</td>
+                <td class="lx-nowrap">
+                    <span class="lx-code" dir="ltr">@s.SettlementNumber</span>
+                    <div class="bp6-text-muted lx-small">@Fmt.DateTime(s.SettledAt)</div>
+                </td>
                 <td><a href="@($"merchants/{s.MerchantId}")">@s.MerchantName</a></td>
                 <td class="lx-num">@Fmt.Number(s.ShipmentCount)</td>
                 <td class="lx-num">@Fmt.Money(s.GrossCodAmount, s.Currency)</td>
-                <td class="lx-num bp6-text-muted">@Fmt.Money(s.DeliveryFeesAmount, s.Currency)</td>
+                <td class="lx-num bp6-text-muted">
+                    @Fmt.Money(s.DeliveryFeesAmount, s.Currency)
+                    @if (s.ReturnCount > 0)
+                    {
+                        <div class="lx-small lx-intent-warning">@string.Format(CultureInfo.CurrentCulture, L["ReturnFeesLine"], Fmt.Money(s.ReturnFeesAmount, s.Currency), Fmt.Number(s.ReturnCount))</div>
+                    }
+                </td>
                 <td class="lx-num lx-strong">@Fmt.Money(s.NetPayoutAmount, s.Currency)</td>
                 <td>
                     <Tag Intent="Intent.Success">@ShipmentTexts.Of(s.PayoutMethod)</Tag>
@@ -89,10 +103,9 @@ else
                         <div class="bp6-text-muted lx-small lx-mono" dir="ltr">@s.PayoutReference</div>
                     }
                 </td>
-                <td class="bp6-text-muted lx-nowrap">@Fmt.DateTime(s.SettledAt)</td>
                 <td>
                     <Allowed Policy="@StaffPolicies.Finance">
-                        <LinkButton Href="@Shipments.SettlementExportUrl(s.Id)" Target="_blank" Small="true" Minimal="true" Icon="download" Text="@L["DownloadStatement"]" CssClass="lx-nowrap" />
+                        <LinkButton Href="@Shipments.SettlementExportUrl(s.Id)" Target="_blank" Small="true" Minimal="true" Icon="download" Tip="@L["DownloadStatement"]" AriaLabel="@L["DownloadStatement"]" />
                     </Allowed>
                 </td>
             </Row>
@@ -112,10 +125,19 @@ else
                     <dd>@Fmt.Money(selectedSeller.GrossCodIqd, "IQD")</dd>
                     <dt>@L["Col_DeliveryFees"]</dt>
                     <dd>@Fmt.Money(selectedSeller.DeliveryFeesIqd, "IQD")</dd>
+                    @if (selectedSeller.ReturnCount > 0)
+                    {
+                        <dt>@L["Col_ReturnFees"]</dt>
+                        <dd>@Fmt.Money(selectedSeller.ReturnFeesIqd, "IQD") · @L.Count("ParcelsN", selectedSeller.ReturnCount)</dd>
+                    }
                     <dt>@L["Col_NetPayout"]</dt>
                     <dd class="lx-strong">@Fmt.Money(selectedSeller.NetPayableIqd, "IQD")</dd>
                 </dl>
             </div>
+            @if (selectedSeller.ReturnFeesIqd > selectedSeller.GrossCodIqd - selectedSeller.DeliveryFeesIqd)
+            {
+                <Callout Intent="Intent.Warning" Icon="info-sign" CssClass="lx-mb">@L["Settle_ReturnFeesCarry"]</Callout>
+            }
             <EditForm Model="draft" OnValidSubmit="ConfirmSettlementAsync" id="settle-form">
                 <DataAnnotationsValidator />
                 <div class="lx-form-grid">

@@ -5,7 +5,7 @@ namespace Logistico.Modules.Shipments.Domain;
 
 /// <summary>
 /// A seller COD remittance batch settling all delivered cash-on-delivery orders for a merchant up to that point.
-/// Net payout = Gross COD collected − Delivery fees.
+/// Net payout = Gross COD collected − Delivery fees − Return fees (parcels sent back to the seller, see RateCard.ReturnFee).
 /// </summary>
 internal sealed class CodSettlement
 {
@@ -22,6 +22,8 @@ internal sealed class CodSettlement
     public int ShipmentCount { get; private set; }
     public decimal GrossCodAmount { get; private set; }
     public decimal DeliveryFeesAmount { get; private set; }
+    public int ReturnCount { get; private set; }
+    public decimal ReturnFeesAmount { get; private set; }
     public decimal NetPayoutAmount { get; private set; }
     public PayoutMethod PayoutMethod { get; private set; }
     public string? PayoutReference { get; private set; }
@@ -35,6 +37,7 @@ internal sealed class CodSettlement
         Guid merchantId,
         string merchantName,
         IReadOnlyCollection<Shipment> shipments,
+        IReadOnlyCollection<Shipment> returns,
         PayoutMethod payoutMethod,
         string? payoutReference,
         string? notes,
@@ -48,10 +51,23 @@ internal sealed class CodSettlement
 
         var gross = shipments.Sum(s => s.CodAmount ?? 0m);
         var fees = shipments.Sum(s => s.DeliveryFee ?? 0m);
-        var net = gross - fees;
-        var id = Guid.CreateVersion7(now);
 
-        foreach (var shipment in shipments)
+        // Return fees come off what is left after the delivery fees, oldest first; a fee that does not fit waits for the next payout.
+        var left = gross - fees;
+        var charged = new List<Shipment>();
+        foreach (var parcel in returns.Where(s => s.ReturnFee > 0).OrderBy(s => s.LastStatusAt))
+        {
+            if (parcel.ReturnFee!.Value <= left)
+            {
+                charged.Add(parcel);
+                left -= parcel.ReturnFee.Value;
+            }
+        }
+
+        var returnFees = charged.Sum(s => s.ReturnFee!.Value);
+        var net = gross - fees - returnFees;
+        var id = Guid.CreateVersion7(now);
+        foreach (var shipment in shipments.Concat(charged))
         {
             shipment.MarkCodSettled(id, now);
         }
@@ -67,6 +83,8 @@ internal sealed class CodSettlement
             ShipmentCount = shipments.Count,
             GrossCodAmount = gross,
             DeliveryFeesAmount = fees,
+            ReturnCount = charged.Count,
+            ReturnFeesAmount = returnFees,
             NetPayoutAmount = net,
             PayoutMethod = payoutMethod,
             PayoutReference = string.IsNullOrWhiteSpace(payoutReference) ? null : payoutReference.Trim(),

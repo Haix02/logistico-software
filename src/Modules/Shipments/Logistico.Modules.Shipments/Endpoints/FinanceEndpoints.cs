@@ -63,6 +63,9 @@ internal static class FinanceEndpoints
                 // Collected by a courier but not handed in at the office yet: owed once it arrives.
                 WithCouriersCount = g.Count(s => s.CodCurrency == "IQD" && s.CodCollectedAt != null && s.CodHandedOverAt == null && s.CodSettlementId == null),
                 WithCouriers = g.Sum(s => s.CodCurrency == "IQD" && s.CodCollectedAt != null && s.CodHandedOverAt == null && s.CodSettlementId == null ? s.CodAmount ?? 0m : 0m),
+                // Parcels sent back to the seller with a return fee not yet deducted from a payout.
+                ReturnCount = g.Count(s => s.Status == ShipmentStatus.Returned && s.ReturnFee > 0 && s.CodSettlementId == null),
+                ReturnFees = g.Sum(s => s.Status == ShipmentStatus.Returned && s.CodSettlementId == null ? s.ReturnFee ?? 0m : 0m),
             })
             .ToListAsync(ct);
 
@@ -71,7 +74,8 @@ internal static class FinanceEndpoints
             Pending = g.Sum(s => s.CodCurrency == "IQD" && s.CodAmount > 0 && s.CodCollectedAt == null && s.Status != ShipmentStatus.Returned && !returning.Contains(s.Status) ? s.CodAmount ?? 0m : 0m),
             Gross = g.Sum(s => s.CodCurrency == "IQD" && s.Status == ShipmentStatus.Delivered && s.CodHandedOverAt != null && s.CodSettlementId == null ? s.CodAmount ?? 0m : 0m),
             Fees = g.Sum(s => s.CodCurrency == "IQD" && s.Status == ShipmentStatus.Delivered && s.CodHandedOverAt != null && s.CodSettlementId == null ? s.DeliveryFee ?? 0m : 0m),
-            Revenue = g.Sum(s => s.Status == ShipmentStatus.Delivered ? s.DeliveryFee ?? 0m : 0m),
+            Revenue = g.Sum(s => s.Status == ShipmentStatus.Delivered ? s.DeliveryFee ?? 0m : s.Status == ShipmentStatus.Returned ? s.ReturnFee ?? 0m : 0m),
+            ReturnFees = g.Sum(s => s.Status == ShipmentStatus.Returned && s.CodSettlementId == null ? s.ReturnFee ?? 0m : 0m),
             WithCouriers = g.Sum(s => s.CodCurrency == "IQD" && s.CodCollectedAt != null && s.CodHandedOverAt == null && s.CodSettlementId == null ? s.CodAmount ?? 0m : 0m),
         }).SingleOrDefaultAsync(ct);
 
@@ -79,16 +83,18 @@ internal static class FinanceEndpoints
         var paid = await settlements.SumAsync(s => (decimal?)s.NetPayoutAmount, ct) ?? 0m;
 
         var sellerBalances = balances
-            .Where(b => b.UnsettledCount > 0 || b.InProgressCount > 0 || b.WithCouriersCount > 0)
-            .Select(b => new SellerCodBalance(b.MerchantId!.Value, b.MerchantName ?? "—", b.UnsettledCount, b.Gross, b.Fees, b.Gross - b.Fees, b.InProgressCount, b.InProgressCod,
-                b.WithCouriersCount, b.WithCouriers))
+            .Where(b => b.UnsettledCount > 0 || b.InProgressCount > 0 || b.WithCouriersCount > 0 || b.ReturnCount > 0)
+            .Select(b => new SellerCodBalance(b.MerchantId!.Value, b.MerchantName ?? "—", b.UnsettledCount, b.Gross, b.Fees, b.Gross - b.Fees - b.ReturnFees, b.InProgressCount, b.InProgressCod,
+                b.WithCouriersCount, b.WithCouriers, b.ReturnCount, b.ReturnFees))
             .OrderByDescending(b => b.NetPayableIqd)
             .ThenByDescending(b => b.InProgressCodIqd)
             .ToList();
 
         var gross = totals?.Gross ?? 0m;
         var fees = totals?.Fees ?? 0m;
-        return new FinanceSummary(totals?.Pending ?? 0m, gross, fees, gross - fees, paid, totals?.Revenue ?? 0m, sellerBalances, recent, totals?.WithCouriers ?? 0m);
+        var returnFees = totals?.ReturnFees ?? 0m;
+        return new FinanceSummary(totals?.Pending ?? 0m, gross, fees, gross - fees - returnFees, paid, totals?.Revenue ?? 0m, sellerBalances, recent,
+            totals?.WithCouriers ?? 0m, returnFees);
     }
 
     private static async Task<IResult> SettleAsync(CreateCodSettlementRequest request, ClaimsPrincipal user, ShipmentsDbContext db, NumberGenerator numbers, ITenantContext tenant, TimeProvider clock, CancellationToken ct)
@@ -107,9 +113,14 @@ internal static class FinanceEndpoints
                 : new DomainException("finance.nothing_to_settle", "This seller has no unsettled delivered cash-on-delivery orders."));
         }
 
+        // Return fees not yet deducted come off this payout.
+        var returns = await db.Shipments
+            .Where(s => s.MerchantId == merchantId && s.Status == ShipmentStatus.Returned && s.ReturnFee > 0 && s.CodSettlementId == null)
+            .ToListAsync(ct);
+
         try
         {
-            var settlement = CodSettlement.Create(tenant.TenantId, await numbers.SettlementNumberAsync(ct), merchantId, unsettled[0].MerchantName ?? "—", unsettled,
+            var settlement = CodSettlement.Create(tenant.TenantId, await numbers.SettlementNumberAsync(ct), merchantId, unsettled[0].MerchantName ?? "—", unsettled, returns,
                 request.PayoutMethod, request.PayoutReference, request.Notes, user.UserName(), clock.GetUtcNow());
             db.CodSettlements.Add(settlement);
             await db.SaveChangesAsync(ct);
@@ -143,17 +154,20 @@ internal static class FinanceEndpoints
 
         var csv = new StringBuilder();
         csv.Append('﻿'); // UTF-8 BOM for Excel Arabic support
-        csv.AppendLine("Settlement number,Seller,Tracking number,Order ref,Customer,Governorate,Delivered at,Gross COD (IQD),Delivery fee (IQD),Net seller payout (IQD),Payout method,Payout reference");
+        csv.AppendLine("Settlement number,Seller,Tracking number,Order ref,Customer,Governorate,Delivered at,Gross COD (IQD),Delivery fee (IQD),Net seller payout (IQD),Payout method,Payout reference,Line");
         foreach (var s in shipments)
         {
-            var gross = s.CodAmount ?? 0m;
-            var fee = s.DeliveryFee ?? 0m;
+            // A returned parcel brings no cash and costs its return fee.
+            var returned = s.Status == ShipmentStatus.Returned;
+            var gross = returned ? 0m : s.CodAmount ?? 0m;
+            var fee = returned ? s.ReturnFee ?? 0m : s.DeliveryFee ?? 0m;
             csv.AppendJoin(',',
                 Api.Csv(settlement.SettlementNumber), Api.Csv(settlement.MerchantName), Api.Csv(s.TrackingNumber), Api.Csv(s.ExternalReference),
                 Api.Csv(s.ConsigneeName), Api.Csv(IraqGovernorates.NameOrCode(s.DestinationCode)),
-                s.DeliveredAt?.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) ?? "",
+                (returned ? s.LastStatusAt : s.DeliveredAt)?.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) ?? "",
                 gross.ToString(CultureInfo.InvariantCulture), fee.ToString(CultureInfo.InvariantCulture), (gross - fee).ToString(CultureInfo.InvariantCulture),
-                Api.Csv(ShipmentTexts.Of(settlement.PayoutMethod)), Api.Csv(settlement.PayoutReference));
+                Api.Csv(ShipmentTexts.Of(settlement.PayoutMethod)), Api.Csv(settlement.PayoutReference),
+                Api.Csv(returned ? ShipmentTexts.Of(ShipmentStatus.Returned) : ShipmentTexts.Of(ShipmentStatus.Delivered)));
             csv.AppendLine();
         }
 
@@ -163,5 +177,5 @@ internal static class FinanceEndpoints
 
     private static CodSettlementItem ToItem(CodSettlement s) => new(
         s.Id, s.SettlementNumber, s.MerchantId, s.MerchantName, s.Currency, s.ShipmentCount, s.GrossCodAmount, s.DeliveryFeesAmount,
-        s.NetPayoutAmount, s.PayoutMethod, s.PayoutReference, s.Notes, s.SettledAt, s.SettledBy);
+        s.NetPayoutAmount, s.PayoutMethod, s.PayoutReference, s.Notes, s.SettledAt, s.SettledBy, s.ReturnCount, s.ReturnFeesAmount);
 }

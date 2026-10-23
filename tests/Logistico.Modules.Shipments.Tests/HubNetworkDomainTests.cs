@@ -126,9 +126,37 @@ public class HubNetworkDomainTests
         // Back at the seller's hub (same city): ready to hand over, then handed over.
         parcel.ReceiveAtHub(Baghdad, "R-01", Clerk, Now.AddHours(30));
         Assert.Equal(ShipmentStatus.ReturnAtHub, parcel.Status);
-        parcel.HandOverToSeller("RM-2026-000001", "أبو حسن", Clerk, Now.AddHours(31));
+        parcel.HandOverToSeller("RM-2026-000001", "أبو حسن", 2_500m, Clerk, Now.AddHours(31));
+        Assert.Equal(2_500m, parcel.ReturnFee);
         Assert.Equal(ShipmentStatus.Returned, parcel.Status);
         Assert.Equal("RM-2026-000001", parcel.ReturnManifestNumber);
+    }
+
+    [Fact]
+    public void Return_fees_that_do_not_fit_in_a_payout_wait_for_the_next_one()
+    {
+        var delivered = Order("IQ-BG");
+        delivered.ReceiveAtHub(Baghdad, null, Clerk, Now.AddHours(1));
+        delivered.DispatchToCourier(Baghdad, "مصطفى (Baghdad-01)", Clerk, Now.AddHours(2));
+        delivered.AdvanceTo(ShipmentStatus.Delivered, Now.AddHours(3), new MilestoneDetails(), "user", "courier", Now.AddHours(3));
+        var older = Returned(40_000m, Now.AddHours(4));
+        var newer = Returned(30_000m, Now.AddHours(5));
+
+        // 65,000 collected: the older fee fits, the newer one would leave less than nothing.
+        var payout = CodSettlement.Create(Tenants.Default, "STL-1", Shop.Id, Shop.Name, [delivered], [newer, older], PayoutMethod.Cash, null, null, "finance", Now.AddHours(6));
+
+        Assert.Equal((1, 40_000m, 25_000m), (payout.ReturnCount, payout.ReturnFeesAmount, payout.NetPayoutAmount));
+        Assert.Equal(payout.Id, older.CodSettlementId);
+        Assert.Null(newer.CodSettlementId);
+
+        static Shipment Returned(decimal fee, DateTimeOffset at)
+        {
+            var parcel = Order("IQ-BG");
+            parcel.ReceiveAtHub(Baghdad, null, Clerk, at);
+            parcel.StartReturn(ReturnReason.CustomerRefused, null, Clerk, at);
+            parcel.HandOverToSeller("RM-1", null, fee, Clerk, at);
+            return parcel;
+        }
     }
 
     [Fact]
@@ -141,7 +169,7 @@ public class HubNetworkDomainTests
         Assert.Equal(ShipmentStatus.ReturnInitiated, parcel.Status);
         Assert.Equal(IraqHubs.Baghdad, parcel.TargetHubCode);
         Assert.True(parcel.NeedsTransfer);
-        Assert.Throws<DomainException>(() => parcel.HandOverToSeller("RM-1", null, Clerk, Now.AddHours(3)));
+        Assert.Throws<DomainException>(() => parcel.HandOverToSeller("RM-1", null, 0m, Clerk, Now.AddHours(3)));
     }
 
     [Fact]

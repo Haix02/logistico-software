@@ -31,6 +31,17 @@ public static class CustomsDutyCalculator
     public static string OfficeNameOrCode(string? code) =>
         Offices.FirstOrDefault(o => string.Equals(o.Code, code, StringComparison.OrdinalIgnoreCase))?.Name ?? code ?? "";
 
+    /// <summary>
+    /// The customs value in US dollars of what the shipper declared: dollars as they are, dinars at the official rate.
+    /// Other currencies, and no declared value, give 0: the clerk enters the dollar value from the commercial invoice.
+    /// </summary>
+    public static decimal CustomsValueUsd(decimal? declaredValue, string? currency) => (declaredValue, currency?.ToUpperInvariant()) switch
+    {
+        ( > 0 and var value, "USD") => value,
+        ( > 0 and var value, "IQD") => Math.Round(value / OfficialUsdToIqdRate, 2, MidpointRounding.AwayFromZero),
+        _ => 0m,
+    };
+
     public static decimal CalculateDutyIqd(decimal customsValueUsd, decimal dutyRatePercent)
     {
         if (customsValueUsd <= 0 || dutyRatePercent <= 0)

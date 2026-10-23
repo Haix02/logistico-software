@@ -14,6 +14,8 @@ COPY src/Modules/Merchants/Logistico.Modules.Merchants/Logistico.Modules.Merchan
 COPY src/Modules/Merchants/Logistico.Modules.Merchants.Contracts/Logistico.Modules.Merchants.Contracts.csproj src/Modules/Merchants/Logistico.Modules.Merchants.Contracts/
 COPY src/Modules/Shipments/Logistico.Modules.Shipments/Logistico.Modules.Shipments.csproj src/Modules/Shipments/Logistico.Modules.Shipments/
 COPY src/Modules/Shipments/Logistico.Modules.Shipments.Contracts/Logistico.Modules.Shipments.Contracts.csproj src/Modules/Shipments/Logistico.Modules.Shipments.Contracts/
+COPY src/Modules/Audit/Logistico.Modules.Audit/Logistico.Modules.Audit.csproj src/Modules/Audit/Logistico.Modules.Audit/
+COPY src/Modules/Audit/Logistico.Modules.Audit.Contracts/Logistico.Modules.Audit.Contracts.csproj src/Modules/Audit/Logistico.Modules.Audit.Contracts/
 RUN dotnet restore src/Logistico.Web/Logistico.Web.csproj
 
 COPY src/ src/

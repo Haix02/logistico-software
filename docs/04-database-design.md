@@ -382,6 +382,9 @@ create table docs.print_jobs (
 );
 
 -- Audit (partitioned monthly, hash-chained per tenant for tamper evidence)
+-- Built so far (ADR-030): a plain table with actor, actor_id, actor_ip, action, entity, entity_id, a readable label and
+-- changes as a JSON array of [field, before, after] (jsonb keeps array order, not object key order); a trigger makes it
+-- append-only. Partitions, the hash chain and client are still to come.
 create table audit.entries (
   id uuid not null default uuidv7(),
   tenant_id uuid not null,

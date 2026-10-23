@@ -3,6 +3,7 @@ using Logistico.Modules.Shipments.Endpoints;
 using Logistico.Modules.Shipments.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logistico.Modules.Shipments;
@@ -18,9 +19,11 @@ public static class ShipmentsModule
 
     public static IServiceCollection AddShipmentsModule(this IServiceCollection services, string connectionString)
     {
-        services.AddDbContext<ShipmentsDbContext>(options => options
+        // Registered save interceptors (the audit trail) record every change this module saves.
+        services.AddDbContext<ShipmentsDbContext>((sp, options) => options
             .UseNpgsql(connectionString, npgsql => npgsql.MigrationsHistoryTable("__ef_migrations_history", ShipmentsDbContext.Schema))
-            .UseSnakeCaseNamingConvention());
+            .UseSnakeCaseNamingConvention()
+            .AddInterceptors(sp.GetServices<ISaveChangesInterceptor>()));
         services.AddMemoryCache();
         services.AddSingleton<CustomerVerification>();
         services.AddScoped<NumberGenerator>();
@@ -60,7 +63,8 @@ public static class ShipmentsModule
         .MapFleetEndpoints()
         .MapCourierAppEndpoints()
         .MapSellerPortalEndpoints()
-        .MapFinanceEndpoints();
+        .MapFinanceEndpoints()
+        .MapViewEndpoints();
 
     public static async Task MigrateShipmentsDatabaseAsync(this IServiceProvider services, CancellationToken ct = default)
     {
