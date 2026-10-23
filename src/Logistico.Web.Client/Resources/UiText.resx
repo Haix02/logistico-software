@@ -776,6 +776,14 @@
   <data name="QuickDispatchHint" xml:space="preserve"><value>Select a courier and scan or enter a tracking number to hand off the parcel immediately.</value></data>
   <data name="QuickDispatchTitle" xml:space="preserve"><value>Quick courier dispatch</value></data>
   <data name="QuickViews" xml:space="preserve"><value>Quick views</value></data>
+  <data name="Columns" xml:space="preserve"><value>Columns</value></data>
+  <data name="Columns_Default" xml:space="preserve"><value>Usual columns</value></data>
+  <data name="Views_Save" xml:space="preserve"><value>Save view</value></data>
+  <data name="Views_Name" xml:space="preserve"><value>Name of this view</value></data>
+  <data name="Views_NamePlaceholder" xml:space="preserve"><value>e.g. Basra with couriers</value></data>
+  <data name="Views_Saved" xml:space="preserve"><value>View "{0}" saved</value></data>
+  <data name="Views_Remove" xml:space="preserve"><value>Remove this view</value></data>
+  <data name="Views_RemoveNamed" xml:space="preserve"><value>Remove the view {0}</value></data>
   <data name="RatingsN" xml:space="preserve"><value>{0} ratings in this period</value></data>
   <data name="RatingsN_Few" xml:space="preserve"><value>{0} ratings in this period</value></data>
   <data name="RatingsN_Many" xml:space="preserve"><value>{0} ratings in this period</value></data>

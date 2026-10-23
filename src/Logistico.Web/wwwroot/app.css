@@ -1962,3 +1962,16 @@ body.bp6-dark { color: var(--lx-text); background: var(--lx-bg); color-scheme: d
 .lx-audit-old { color: var(--lx-muted); text-decoration: line-through; overflow-wrap: anywhere; }
 .lx-audit-new { color: var(--lx-text-strong); overflow-wrap: anywhere; }
 .lx-audit-arrow { color: var(--lx-faint); align-self: center; }
+
+/* Saved list views: a chip that opens the view, with its own remove button. */
+.lx-chip-saved { padding-inline-end: 4px; gap: 2px; }
+.lx-chip-link { display: inline-flex; align-items: center; gap: 6px; color: inherit !important; text-decoration: none !important; }
+.lx-chip-remove {
+    display: inline-grid; place-items: center; width: 20px; height: 20px; padding: 0; border: 0; border-radius: 50%;
+    background: transparent; color: inherit; opacity: .55; cursor: pointer;
+}
+.lx-chip-remove:hover { opacity: 1; background: var(--lx-button-hover); }
+.lx-chip-remove:focus-visible { outline: none; box-shadow: var(--lx-focus-ring); opacity: 1; }
+.lx-chip-active .lx-chip-remove:hover { background: rgba(255, 255, 255, .18); }
+.lx-column-chooser { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 12px 6px; }
+.lx-column-chooser .bp6-control { margin-block-end: 6px; }

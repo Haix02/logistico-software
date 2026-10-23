@@ -27,6 +27,25 @@
             <Icon Name="@view.Icon" /> @L[view.TextKey]
         </a>
     }
+    @foreach (var view in views)
+    {
+        var active = view.Query == CurrentViewQuery;
+        <span class="@Bp.Cls("lx-chip lx-chip-saved", Bp.When(active, "lx-chip-active"))">
+            <a href="@($"shipments{view.Query}")" class="lx-chip-link"><Icon Name="bookmark" /> <Mixed Text="@view.Name" /></a>
+            <button type="button" class="lx-chip-remove" title="@L["Views_Remove"]" aria-label="@string.Format(CultureInfo.CurrentCulture, L["Views_RemoveNamed"], view.Name)"
+                    @onclick="@(() => RemoveViewAsync(view))"><Icon Name="small-cross" /></button>
+        </span>
+    }
+    @if (CurrentViewQuery.Length > 0 && !views.Any(v => v.Query == CurrentViewQuery))
+    {
+        <Popover Small="true" Minimal="true" Icon="bookmark" Text="@L["Views_Save"]" Align="start" Width="280px" @bind-IsOpen="saveOpen">
+            <form class="lx-popover-body lx-stack" style="gap:8px" @onsubmit="SaveViewAsync" @onsubmit:preventDefault>
+                <label class="bp6-label" for="view-name">@L["Views_Name"]</label>
+                <input id="view-name" class="bp6-input bp6-fill" maxlength="60" placeholder="@L["Views_NamePlaceholder"]" @bind="viewName" @bind:event="oninput" />
+                <Button Type="submit" Intent="Intent.Primary" Icon="tick" Text="@L["Save"]" Loading="savingView" Disabled="@string.IsNullOrWhiteSpace(viewName)" />
+            </form>
+        </Popover>
+    }
 </div>
 
 <div class="lx-table-card">
@@ -58,6 +77,22 @@
         @if (HasFilters)
         {
             <Button Minimal="true" Icon="filter-remove" Text="@L["ClearFilters"]" OnClick="@(() => Navigation.NavigateTo("shipments"))" />
+        }
+        @if (!board)
+        {
+            <Popover Minimal="true" Icon="column-layout" Text="@L["Columns"]" Title="@L["Columns"]" Width="240px">
+                <div class="lx-popover-body lx-column-chooser">
+                    @foreach (var column in Choosable)
+                    {
+                        <label class="bp6-control bp6-checkbox">
+                            <input type="checkbox" class="bp6-control-input" checked="@columns.HasFlag(column)" @onchange="@(() => ToggleColumnAsync(column))" />
+                            <span class="bp6-control-indicator"></span>
+                            @ColumnName(column)
+                        </label>
+                    }
+                    <Button Minimal="true" Small="true" Icon="reset" Text="@L["Columns_Default"]" Disabled="@(columns == ShipmentColumns.List)" OnClick="@(() => SetColumnsAsync(ShipmentColumns.List))" />
+                </div>
+            </Popover>
         }
     </div>
 
@@ -125,7 +160,7 @@
     else
     {
         <CascadingValue Value="sort">
-            <ShipmentTable Items="result?.Items" Loading="loading" Columns="ShipmentColumns.List" Selectable="canOperate" @bind-Selected="selected"
+            <ShipmentTable Items="result?.Items" Loading="loading" Columns="columns" Selectable="canOperate" @bind-Selected="selected"
                            EmptyTitle="@L["NoShipments"]" EmptyDescription="@L["NoShipmentsHint"]" />
         </CascadingValue>
     }
@@ -161,6 +196,24 @@
 
     /// <summary>"board" shows the pipeline board; kept in the address so the view can be shared like the filters.</summary>
     [SupplyParameterFromQuery(Name = "view")] public string? View { get; set; }
+
+    /// <summary>The columns shown ("Status,Courier,Cod"); also in the address, so a saved view keeps them.</summary>
+    [SupplyParameterFromQuery(Name = "cols")] public string? Cols { get; set; }
+
+    /// <summary>Columns people may add or remove; the tracking number is always there.</summary>
+    private static readonly ShipmentColumns[] Choosable =
+    [
+        ShipmentColumns.Status, ShipmentColumns.Seller, ShipmentColumns.Customer, ShipmentColumns.Destination, ShipmentColumns.Route,
+        ShipmentColumns.Courier, ShipmentColumns.Cod, ShipmentColumns.Eta, ShipmentColumns.Age, ShipmentColumns.Created, ShipmentColumns.Shelf,
+    ];
+
+    private const string ColumnsPref = "shipments.columns";
+    private ShipmentColumns columns = ShipmentColumns.List;
+    private ShipmentColumns? myColumns;
+    private IReadOnlyList<SavedViewItem> views = [];
+    private string viewName = "";
+    private bool saveOpen;
+    private bool savingView;
 
     private sealed record QuickView(string TextKey, string Icon, ShipmentQuery Query)
     {
@@ -222,9 +275,20 @@
     {
         sort = new SortState(SortByAsync);
         canOperate = await AuthState.CanAsync(StaffPolicies.Operate);
+        try
+        {
+            myColumns = ParseColumns(await JS.InvokeAsync<string?>("lx.getPref", ColumnsPref));
+        }
+        catch (JSException)
+        {
+            // no stored preference
+        }
+
+        var viewsTask = Shipments.ListViewsAsync(SavedViewLists.Shipments);
         var merchantsTask = Merchants.LookupAsync();
         couriers = await Shipments.LookupCouriersAsync();
         merchants = await merchantsTask;
+        views = await viewsTask;
     }
 
     protected override async Task OnParametersSetAsync()
@@ -247,6 +311,7 @@
             PageSize = PageSize is > 0 and not 25 ? PageSize : null,
         };
         board = string.Equals(View, "board", StringComparison.OrdinalIgnoreCase);
+        columns = ParseColumns(Cols) ?? myColumns ?? ShipmentColumns.List;
         sort ??= new SortState(SortByAsync);
         sort.Set(query.Sort ?? "createdAt", query.Desc ?? true);
         await LoadAsync();
@@ -346,9 +411,130 @@
             next.Page = null;
         }
 
-        var url = "shipments" + next.ToQueryString();
-        Navigation.NavigateTo(board ? url + (url.Contains('?', StringComparison.Ordinal) ? "&" : "?") + "view=board" : url);
+        Navigation.NavigateTo("shipments" + ViewQuery(next, columns));
         return Task.CompletedTask;
+    }
+
+    /// <summary>The address query of a list view: its filters and sort, the board, and columns other than the usual ones.</summary>
+    private string ViewQuery(ShipmentQuery filters, ShipmentColumns shown)
+    {
+        var query = filters.ToQueryString();
+        void Add(string part) => query += (query.Length == 0 ? "?" : "&") + part;
+        if (board)
+        {
+            Add("view=board");
+        }
+
+        if (shown != ShipmentColumns.List)
+        {
+            Add("cols=" + string.Join(',', Choosable.Where(c => shown.HasFlag(c))));
+        }
+
+        return query;
+    }
+
+    /// <summary>What this view would be saved as: the current address query without the page number.</summary>
+    private string CurrentViewQuery
+    {
+        get
+        {
+            var filters = query.Clone();
+            filters.Page = null;
+            return ViewQuery(filters, columns);
+        }
+    }
+
+    private static ShipmentColumns? ParseColumns(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            return null;
+        }
+
+        var shown = ShipmentColumns.Tracking;
+        foreach (var name in raw.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            if (Enum.TryParse<ShipmentColumns>(name, true, out var column) && Choosable.Contains(column))
+            {
+                shown |= column;
+            }
+        }
+
+        return shown == ShipmentColumns.Tracking ? null : shown;
+    }
+
+    private string ColumnName(ShipmentColumns column) => column switch
+    {
+        ShipmentColumns.Status => L["Col_Status"],
+        ShipmentColumns.Seller => L["Col_Seller"],
+        ShipmentColumns.Customer => L["Col_Customer"],
+        ShipmentColumns.Destination => L["Col_Destination"],
+        ShipmentColumns.Route => L["Col_Route"],
+        ShipmentColumns.Courier => L["Field_Courier"],
+        ShipmentColumns.Cod => L["Col_Cod"],
+        ShipmentColumns.Eta => L["Col_Eta"],
+        ShipmentColumns.Age => L["Col_Age"],
+        ShipmentColumns.Created => L["Col_Created"],
+        ShipmentColumns.Shelf => L["Field_Shelf"],
+        _ => column.ToString(),
+    };
+
+    private Task ToggleColumnAsync(ShipmentColumns column) => SetColumnsAsync(columns ^ column);
+
+    /// <summary>Shows other columns, and remembers them as this person's usual columns on this device.</summary>
+    private async Task SetColumnsAsync(ShipmentColumns shown)
+    {
+        columns = shown | ShipmentColumns.Tracking;
+        myColumns = columns == ShipmentColumns.List ? null : columns;
+        try
+        {
+            await JS.InvokeVoidAsync("lx.setPref", ColumnsPref, myColumns is { } mine ? string.Join(',', Choosable.Where(c => mine.HasFlag(c))) : "");
+        }
+        catch (JSException)
+        {
+            // private mode: the columns still apply to this visit
+        }
+
+        await ApplyAsync(_ => { }, resetPage: false);
+    }
+
+    private async Task SaveViewAsync()
+    {
+        if (string.IsNullOrWhiteSpace(viewName) || savingView)
+        {
+            return;
+        }
+
+        savingView = true;
+        try
+        {
+            var saved = await Shipments.SaveViewAsync(new SaveViewRequest { List = SavedViewLists.Shipments, Name = viewName.Trim(), Query = CurrentViewQuery });
+            views = [.. views.Where(v => v.Id != saved.Id), saved];
+            Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["Views_Saved"], saved.Name));
+            viewName = "";
+            saveOpen = false;
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            savingView = false;
+        }
+    }
+
+    private async Task RemoveViewAsync(SavedViewItem view)
+    {
+        try
+        {
+            await Shipments.DeleteViewAsync(view.Id);
+            views = [.. views.Where(v => v.Id != view.Id)];
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
     }
 
     private static ShipmentStatus[]? ParseStatuses(string[]? raw)

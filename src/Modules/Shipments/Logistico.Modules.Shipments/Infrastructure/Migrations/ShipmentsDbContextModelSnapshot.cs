@@ -1047,6 +1047,54 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                     b.ToTable("rate_cards", "shipment");
                 });
 
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.SavedView", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("List")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("list");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Query")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("query");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_saved_views");
+
+                    b.HasIndex("TenantId", "UserId", "List", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_saved_views_tenant_id_user_id_list_name");
+
+                    b.ToTable("saved_views", "shipment");
+                });
+
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ServiceRequest", b =>
                 {
                     b.Property<Guid>("Id")

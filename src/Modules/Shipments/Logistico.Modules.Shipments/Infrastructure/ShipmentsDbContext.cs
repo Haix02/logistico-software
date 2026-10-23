@@ -30,6 +30,7 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
     public DbSet<HubScan> HubScans => Set<HubScan>();
     public DbSet<Warehouse> Warehouses => Set<Warehouse>();
     public DbSet<RateCardSettings> RateCards => Set<RateCardSettings>();
+    public DbSet<SavedView> SavedViews => Set<SavedView>();
 
     // Referenced by the query filters so EF Core parameterises the tenant per context instance.
     private Guid CurrentTenantId => tenant.TenantId;
@@ -211,6 +212,21 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
             e.HasIndex(x => new { x.TenantId, x.Code }).IsUnique();
             e.HasIndex(x => new { x.TenantId, x.IsActive, x.Governorate });
 
+            e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
+        });
+
+        modelBuilder.Entity<SavedView>(e =>
+        {
+            e.ToTable("saved_views");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).ValueGeneratedNever();
+            e.Property(x => x.UserId).HasMaxLength(64);
+            e.Property(x => x.List).HasMaxLength(32);
+            e.Property(x => x.Name).HasMaxLength(60);
+            e.Property(x => x.Query).HasMaxLength(1000);
+
+            // One name per person and list: saving under a name again replaces that view.
+            e.HasIndex(x => new { x.TenantId, x.UserId, x.List, x.Name }).IsUnique();
             e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
         });
 

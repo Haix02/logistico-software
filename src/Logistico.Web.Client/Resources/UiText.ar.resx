@@ -824,6 +824,14 @@
   <data name="QuickDispatchHint" xml:space="preserve"><value>اختر المندوب وامسح أو اكتب رقم التتبع لتسليمه الطرد فوراً.</value></data>
   <data name="QuickDispatchTitle" xml:space="preserve"><value>إرسال سريع مع المندوب</value></data>
   <data name="QuickViews" xml:space="preserve"><value>عروض سريعة</value></data>
+  <data name="Columns" xml:space="preserve"><value>الأعمدة</value></data>
+  <data name="Columns_Default" xml:space="preserve"><value>الأعمدة المعتادة</value></data>
+  <data name="Views_Save" xml:space="preserve"><value>حفظ طريقة العرض</value></data>
+  <data name="Views_Name" xml:space="preserve"><value>اسم طريقة العرض</value></data>
+  <data name="Views_NamePlaceholder" xml:space="preserve"><value>مثلاً: البصرة مع المندوبين</value></data>
+  <data name="Views_Saved" xml:space="preserve"><value>حُفظت طريقة العرض «{0}»</value></data>
+  <data name="Views_Remove" xml:space="preserve"><value>حذف طريقة العرض</value></data>
+  <data name="Views_RemoveNamed" xml:space="preserve"><value>حذف طريقة العرض {0}</value></data>
   <data name="RatingsN" xml:space="preserve"><value>{0} تقييم في هذه الفترة</value></data>
   <data name="RatingsN_Few" xml:space="preserve"><value>{0} تقييمات في هذه الفترة</value></data>
   <data name="RatingsN_Many" xml:space="preserve"><value>{0} تقييماً في هذه الفترة</value></data>
