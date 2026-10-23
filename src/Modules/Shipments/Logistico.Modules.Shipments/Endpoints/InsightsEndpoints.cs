@@ -51,10 +51,12 @@ internal static class InsightsEndpoints
     internal static async Task<DemandInsights> BuildAsync(ShipmentsDbContext db, Guid tenantId, int span, DateTimeOffset now, CancellationToken ct)
     {
         var from = Api.StartOfBaghdadDay(now).AddDays(-(span - 1));
+        // The period before ends at the same time of day, so a period still under way is compared like for like.
         var previousFrom = from.AddDays(-span);
+        var previousTo = now.AddDays(-span);
         var domestic = db.Shipments.AsNoTracking().Where(s => s.ServiceType == ServiceType.Domestic && s.Status != ShipmentStatus.Cancelled);
         var current = domestic.Where(s => s.CreatedAt >= from && s.CreatedAt < now);
-        var previous = domestic.Where(s => s.CreatedAt >= previousFrom && s.CreatedAt < from);
+        var previous = domestic.Where(s => s.CreatedAt >= previousFrom && s.CreatedAt < previousTo);
 
         var governorates = await current
             .GroupBy(s => s.DestinationCode)

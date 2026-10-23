@@ -30,14 +30,16 @@ internal static class AnalyticsEndpoints
         var now = clock.GetUtcNow();
         var from = Api.StartOfBaghdadDay(now).AddDays(-(span - 1));
         var to = now;
+        // The period before ends at the same time of day: "today so far" is compared with yesterday until this hour, not all of it.
         var previousFrom = from.AddDays(-span);
+        var previousTo = to.AddDays(-span);
         var domestic = db.Shipments.AsNoTracking().Where(s => s.ServiceType == ServiceType.Domestic);
         var returning = new[] { ShipmentStatus.ReturnInitiated, ShipmentStatus.ReturnInTransit, ShipmentStatus.ReturnAtHub, ShipmentStatus.Returned };
 
-        var booked = await domestic.Where(s => s.CreatedAt >= previousFrom && s.CreatedAt < to)
+        var booked = await domestic.Where(s => s.CreatedAt >= previousFrom && s.CreatedAt < previousTo || s.CreatedAt >= from && s.CreatedAt < to)
             .GroupBy(s => s.CreatedAt >= from).Select(g => new { Current = g.Key, Count = g.Count() }).ToListAsync(ct);
 
-        var delivered = await domestic.Where(s => s.DeliveredAt >= previousFrom && s.DeliveredAt < to)
+        var delivered = await domestic.Where(s => s.DeliveredAt >= previousFrom && s.DeliveredAt < previousTo || s.DeliveredAt >= from && s.DeliveredAt < to)
             .GroupBy(s => s.DeliveredAt >= from)
             .Select(g => new
             {
@@ -50,10 +52,10 @@ internal static class AnalyticsEndpoints
             })
             .ToListAsync(ct);
 
-        var returns = await domestic.Where(s => s.ReturnRequestedAt >= previousFrom && s.ReturnRequestedAt < to)
+        var returns = await domestic.Where(s => s.ReturnRequestedAt >= previousFrom && s.ReturnRequestedAt < previousTo || s.ReturnRequestedAt >= from && s.ReturnRequestedAt < to)
             .GroupBy(s => s.ReturnRequestedAt >= from).Select(g => new { Current = g.Key, Count = g.Count() }).ToListAsync(ct);
 
-        var cod = await domestic.Where(s => s.CodCollectedAt >= previousFrom && s.CodCollectedAt < to && s.CodCurrency == "IQD")
+        var cod = await domestic.Where(s => (s.CodCollectedAt >= previousFrom && s.CodCollectedAt < previousTo || s.CodCollectedAt >= from && s.CodCollectedAt < to) && s.CodCurrency == "IQD")
             .GroupBy(s => s.CodCollectedAt >= from).Select(g => new { Current = g.Key, Amount = g.Sum(s => s.CodAmount ?? 0) }).ToListAsync(ct);
 
         int CountOf<T>(IEnumerable<T> rows, bool current, Func<T, bool> isCurrent, Func<T, int> value) => rows.Where(r => isCurrent(r) == current).Sum(value);
@@ -122,7 +124,7 @@ internal static class AnalyticsEndpoints
             })
             .ToListAsync(ct);
 
-        var ratings = await domestic.Where(s => s.RatedAt >= previousFrom && s.RatedAt < to && s.Rating != null)
+        var ratings = await domestic.Where(s => (s.RatedAt >= previousFrom && s.RatedAt < previousTo || s.RatedAt >= from && s.RatedAt < to) && s.Rating != null)
             .GroupBy(s => s.RatedAt >= from)
             .Select(g => new { Current = g.Key, Count = g.Count(), Average = g.Average(s => (double)s.Rating!.Value) })
             .ToListAsync(ct);
