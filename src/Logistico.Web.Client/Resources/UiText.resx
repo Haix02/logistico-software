@@ -574,6 +574,39 @@
   <data name="Nav_Sellers" xml:space="preserve"><value>Sellers</value></data>
   <data name="Nav_Shipments" xml:space="preserve"><value>Shipments</value></data>
   <data name="Nav_Team" xml:space="preserve"><value>Team &amp; access</value></data>
+  <data name="Nav_Audit" xml:space="preserve"><value>Audit log</value></data>
+  <data name="Audit_Subtitle" xml:space="preserve"><value>Who changed what, and when: orders, prices, rules, customs, payouts, sellers and staff accounts. Entries cannot be edited or deleted.</value></data>
+  <data name="Audit_SearchPlaceholder" xml:space="preserve"><value>Person, tracking number, e-mail or name…</value></data>
+  <data name="Audit_Record" xml:space="preserve"><value>Record</value></data>
+  <data name="Audit_AllRecords" xml:space="preserve"><value>All records</value></data>
+  <data name="Audit_OneRecord" xml:space="preserve"><value>Only:</value></data>
+  <data name="Audit_Empty" xml:space="preserve"><value>No changes recorded</value></data>
+  <data name="Audit_When" xml:space="preserve"><value>When</value></data>
+  <data name="Audit_Who" xml:space="preserve"><value>Who</value></data>
+  <data name="Audit_Change" xml:space="preserve"><value>Change</value></data>
+  <data name="Audit_Less" xml:space="preserve"><value>Show less</value></data>
+  <data name="Audit_MoreN" xml:space="preserve"><value>Show {0} more</value></data>
+  <data name="Audit_History" xml:space="preserve"><value>History of changes</value></data>
+  <data name="AuditAction_create" xml:space="preserve"><value>Created</value></data>
+  <data name="AuditAction_update" xml:space="preserve"><value>Changed</value></data>
+  <data name="AuditAction_delete" xml:space="preserve"><value>Removed</value></data>
+  <data name="AuditActor_system" xml:space="preserve"><value>System</value></data>
+  <data name="AuditActor_automation" xml:space="preserve"><value>Automation</value></data>
+  <data name="AuditActor_anonymous" xml:space="preserve"><value>Not signed in</value></data>
+  <data name="AuditEntity_Shipment" xml:space="preserve"><value>Order</value></data>
+  <data name="AuditEntity_CustomsDeclaration" xml:space="preserve"><value>Customs declaration</value></data>
+  <data name="AuditEntity_Warehouse" xml:space="preserve"><value>Warehouse</value></data>
+  <data name="AuditEntity_HubTransfer" xml:space="preserve"><value>Truck</value></data>
+  <data name="AuditEntity_ServiceRequest" xml:space="preserve"><value>Customer request</value></data>
+  <data name="AuditEntity_AutomationSettings" xml:space="preserve"><value>Automation rules</value></data>
+  <data name="AuditEntity_Merchant" xml:space="preserve"><value>Seller</value></data>
+  <data name="AuditEntity_CodSettlement" xml:space="preserve"><value>Seller payout</value></data>
+  <data name="AuditEntity_CashHandover" xml:space="preserve"><value>Cash hand-in</value></data>
+  <data name="AuditEntity_RateCardSettings" xml:space="preserve"><value>Delivery prices</value></data>
+  <data name="AuditEntity_Courier" xml:space="preserve"><value>Courier</value></data>
+  <data name="AuditEntity_ApplicationUser" xml:space="preserve"><value>Staff account</value></data>
+  <data name="AuditEntity_IdentityUserRole" xml:space="preserve"><value>Account role</value></data>
+  <data name="AuditEntity_IdentityUserClaim" xml:space="preserve"><value>Account link</value></data>
   <data name="Nav_Track" xml:space="preserve"><value>Track a shipment</value></data>
   <data name="Nav_Transfers" xml:space="preserve"><value>Trucks between hubs</value></data>
   <data name="Nav_Warehouse" xml:space="preserve"><value>Hub station</value></data>

@@ -55,6 +55,9 @@ else
                         <MenuItem Icon="drive-time" Text="@L["OpenTruck"]" Href="@($"transfers/{truck}")" />
                     }
                     <MenuItem Icon="share" Text="@L["PublicPage"]" Href="@($"track/{s.TrackingNumber}")" Target="_blank" />
+                    <Allowed Policy="@StaffPolicies.Administer">
+                        <MenuItem Icon="history" Text="@L["Audit_History"]" Href="@($"audit?entity=Shipment&entityId={s.Id}&label={Uri.EscapeDataString(s.TrackingNumber)}")" />
+                    </Allowed>
                     <MenuDivider />
                     <MenuItem Icon="refresh" Text="@L["Refresh"]" OnClick="ReloadAsync" />
                     @if (CanCancel)

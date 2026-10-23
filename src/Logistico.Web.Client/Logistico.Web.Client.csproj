@@ -19,6 +19,7 @@
     <ProjectReference Include="..\Logistico.SharedKernel\Logistico.SharedKernel.csproj" />
     <ProjectReference Include="..\Modules\Shipments\Logistico.Modules.Shipments.Contracts\Logistico.Modules.Shipments.Contracts.csproj" />
     <ProjectReference Include="..\Modules\Merchants\Logistico.Modules.Merchants.Contracts\Logistico.Modules.Merchants.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Audit\Logistico.Modules.Audit.Contracts\Logistico.Modules.Audit.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

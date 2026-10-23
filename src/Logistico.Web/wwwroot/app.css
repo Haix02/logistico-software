@@ -1954,3 +1954,11 @@ body.bp6-dark { color: var(--lx-text); background: var(--lx-bg); color-scheme: d
     .lx-print-sheet { box-shadow: none !important; }
     .lx-print-sheet table td, .lx-print-sheet table th { font-size: 12px !important; }
 }
+
+/* Audit log: each changed field as "field  before → after", the before value struck through. */
+.lx-audit-changes { min-width: 280px; }
+.lx-audit-change { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; padding-block: 2px; font-size: var(--lx-font-size-sm); }
+.lx-audit-field { color: var(--lx-muted); min-width: 120px; }
+.lx-audit-old { color: var(--lx-muted); text-decoration: line-through; overflow-wrap: anywhere; }
+.lx-audit-new { color: var(--lx-text-strong); overflow-wrap: anywhere; }
+.lx-audit-arrow { color: var(--lx-faint); align-self: center; }

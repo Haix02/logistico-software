@@ -6,6 +6,11 @@ versions follow [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **Audit log** (Administration → Audit log, and "History of changes" on each order): who changed what and when — orders,
+  customs, payouts and cash hand-ins, delivery prices, automation rules, warehouses, couriers, sellers and staff accounts
+  (roles and links included) — with each field before and after, the person and their address. Entries are written in
+  the same transaction as the change, cannot be edited or deleted, and never contain passwords. Automation is named as
+  such; start-up seeding is left out.
 - **Courier cash hand-in** (Fleet page): the office receives a courier's cash with the list of parcels it covers and the
   amount expected, enters the amount counted, and any shortage or extra is recorded (`CH-…` numbers, recent hand-ins
   listed with differences). The courier app reminds couriers how much to hand in. Two people receiving the same cash at

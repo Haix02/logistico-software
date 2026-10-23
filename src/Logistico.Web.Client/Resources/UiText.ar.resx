@@ -608,6 +608,39 @@
   <data name="Nav_Sellers" xml:space="preserve"><value>المتاجر</value></data>
   <data name="Nav_Shipments" xml:space="preserve"><value>الشحنات</value></data>
   <data name="Nav_Team" xml:space="preserve"><value>الفريق والصلاحيات</value></data>
+  <data name="Nav_Audit" xml:space="preserve"><value>سجل التغييرات</value></data>
+  <data name="Audit_Subtitle" xml:space="preserve"><value>من غيّر ماذا ومتى: الطلبات والأسعار والقواعد والجمارك والتسويات والمتاجر وحسابات الموظفين. لا يمكن تعديل السجل أو حذفه.</value></data>
+  <data name="Audit_SearchPlaceholder" xml:space="preserve"><value>الشخص أو رقم التتبع أو البريد أو الاسم…</value></data>
+  <data name="Audit_Record" xml:space="preserve"><value>السجل</value></data>
+  <data name="Audit_AllRecords" xml:space="preserve"><value>كل السجلات</value></data>
+  <data name="Audit_OneRecord" xml:space="preserve"><value>فقط:</value></data>
+  <data name="Audit_Empty" xml:space="preserve"><value>لا توجد تغييرات مسجّلة</value></data>
+  <data name="Audit_When" xml:space="preserve"><value>متى</value></data>
+  <data name="Audit_Who" xml:space="preserve"><value>من</value></data>
+  <data name="Audit_Change" xml:space="preserve"><value>التغيير</value></data>
+  <data name="Audit_Less" xml:space="preserve"><value>عرض أقل</value></data>
+  <data name="Audit_MoreN" xml:space="preserve"><value>عرض المزيد ({0})</value></data>
+  <data name="Audit_History" xml:space="preserve"><value>سجل التغييرات</value></data>
+  <data name="AuditAction_create" xml:space="preserve"><value>إنشاء</value></data>
+  <data name="AuditAction_update" xml:space="preserve"><value>تعديل</value></data>
+  <data name="AuditAction_delete" xml:space="preserve"><value>حذف</value></data>
+  <data name="AuditActor_system" xml:space="preserve"><value>النظام</value></data>
+  <data name="AuditActor_automation" xml:space="preserve"><value>الأتمتة</value></data>
+  <data name="AuditActor_anonymous" xml:space="preserve"><value>غير مسجّل الدخول</value></data>
+  <data name="AuditEntity_Shipment" xml:space="preserve"><value>طلب</value></data>
+  <data name="AuditEntity_CustomsDeclaration" xml:space="preserve"><value>بيان جمركي</value></data>
+  <data name="AuditEntity_Warehouse" xml:space="preserve"><value>مخزن</value></data>
+  <data name="AuditEntity_HubTransfer" xml:space="preserve"><value>شاحنة</value></data>
+  <data name="AuditEntity_ServiceRequest" xml:space="preserve"><value>طلب زبون</value></data>
+  <data name="AuditEntity_AutomationSettings" xml:space="preserve"><value>قواعد الأتمتة</value></data>
+  <data name="AuditEntity_Merchant" xml:space="preserve"><value>متجر</value></data>
+  <data name="AuditEntity_CodSettlement" xml:space="preserve"><value>تسوية متجر</value></data>
+  <data name="AuditEntity_CashHandover" xml:space="preserve"><value>تسليم نقد</value></data>
+  <data name="AuditEntity_RateCardSettings" xml:space="preserve"><value>أسعار التوصيل</value></data>
+  <data name="AuditEntity_Courier" xml:space="preserve"><value>مندوب</value></data>
+  <data name="AuditEntity_ApplicationUser" xml:space="preserve"><value>حساب موظف</value></data>
+  <data name="AuditEntity_IdentityUserRole" xml:space="preserve"><value>دور الحساب</value></data>
+  <data name="AuditEntity_IdentityUserClaim" xml:space="preserve"><value>ربط الحساب</value></data>
   <data name="Nav_Track" xml:space="preserve"><value>تتبع شحنة</value></data>
   <data name="Nav_Transfers" xml:space="preserve"><value>الشاحنات بين المراكز</value></data>
   <data name="Nav_Warehouse" xml:space="preserve"><value>محطة المركز</value></data>

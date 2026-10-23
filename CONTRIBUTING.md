@@ -60,6 +60,10 @@ dotnet ef migrations add <Name> --project src/Modules/Shipments/Logistico.Module
 dotnet ef migrations has-pending-model-changes --project src/Modules/Shipments/Logistico.Modules.Shipments --startup-project src/Logistico.Web --context ShipmentsDbContext
 ```
 
+The contexts are `ShipmentsDbContext`, `MerchantsDbContext` and `AuditDbContext` (in their modules) and
+`ApplicationDbContext` (accounts, in `src/Logistico.Web`). Every change saved through them is recorded in the audit log
+automatically (ADR-030); bulk `ExecuteUpdate`/`ExecuteDelete` skip it, so avoid them for business data.
+
 Never edit a migration that has been released; add a new one. Data changes in a migration must be safe on databases
 that already have the data, and breaking schema changes follow expand → migrate → contract
 ([docs/11](docs/11-ci-cd-and-devops.md)).

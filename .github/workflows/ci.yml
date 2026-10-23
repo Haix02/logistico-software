@@ -69,7 +69,7 @@ jobs:
 
       - name: Check that EF Core migrations match the model
         run: |
-          for ctx in "src/Logistico.Web:ApplicationDbContext" "src/Modules/Shipments/Logistico.Modules.Shipments:ShipmentsDbContext" "src/Modules/Merchants/Logistico.Modules.Merchants:MerchantsDbContext"; do
+          for ctx in "src/Logistico.Web:ApplicationDbContext" "src/Modules/Shipments/Logistico.Modules.Shipments:ShipmentsDbContext" "src/Modules/Merchants/Logistico.Modules.Merchants:MerchantsDbContext" "src/Modules/Audit/Logistico.Modules.Audit:AuditDbContext"; do
             # Note: for dotnet-ef, -c means --context; the build configuration needs the long option.
             dotnet ef migrations has-pending-model-changes --no-build --configuration Release \
               --project "${ctx%%:*}" --startup-project src/Logistico.Web --context "${ctx##*:}"
@@ -131,6 +131,9 @@ jobs:
       - name: Build EF Core migration bundles
         run: |
           dotnet tool restore
+          # The audit table first: every other context records its changes there.
+          dotnet ef migrations bundle --project src/Modules/Audit/Logistico.Modules.Audit --startup-project src/Logistico.Web \
+            --context AuditDbContext -o out/migrate-audit --self-contained -r linux-x64
           dotnet ef migrations bundle --project src/Logistico.Web --startup-project src/Logistico.Web \
             --context ApplicationDbContext -o out/migrate-identity --self-contained -r linux-x64
           dotnet ef migrations bundle --project src/Modules/Shipments/Logistico.Modules.Shipments --startup-project src/Logistico.Web \
