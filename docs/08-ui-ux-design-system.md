@@ -119,7 +119,9 @@ The map is built into the app; there is no map service, API key or tile server.
 The look follows GitLab's Pajamas design system; Blueprint's components are restyled to it, not replaced.
 
 - **Light is the default**, as in GitLab; dark is one click away (top bar or user menu) and remembered per browser
-  (`bp6-dark` on `<body>`). The browser bar colour follows the chrome.
+  (`bp6-dark` on `<body>`). The browser bar colour follows the chrome. In dark mode, card and table borders are
+  faint white hairlines. The card shadow is redefined there, because a shadow computed on the light theme would
+  otherwise keep a bright grey outline.
 - **Colour**: Pajamas' warm neutrals for surfaces and text, blue for links, focus rings and "info", green, orange and
   red for status only. Every value is a token in `app.css` §1: `--gl-color-*` are Pajamas primitives, `--lx-*` are
   the semantic tokens the rules use (`--lx-surface`, `--lx-text-strong`, `--lx-badge-info-bg`…). Section 14 redefines

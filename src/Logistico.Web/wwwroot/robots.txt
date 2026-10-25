@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Public tracking and the sign-in page are the pages meant to be found.
+# The rest of the app is a signed-in operations console on the same origin.

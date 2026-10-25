@@ -46,4 +46,6 @@
   <data name="SignInPoint2" xml:space="preserve"><value>ذكاء الطلب: ماذا يطلب الزبائن وأين ومتى</value></data>
   <data name="SignInPoint3" xml:space="preserve"><value>تسوية مبالغ الدفع عند الاستلام مع التجار شحنةً بشحنة</value></data>
   <data name="OpenSourceLine" xml:space="preserve"><value>مفتوح المصدر · Apache-2.0</value></data>
+  <data name="SeoTitle" xml:space="preserve"><value>لوجستيكو — نظام توصيل مفتوح المصدر للعراق</value></data>
+  <data name="SeoDescription" xml:space="preserve"><value>نظام لوجستي مفتوح المصدر لشركات التوصيل في العراق: الطلبات والمخازن والشاحنات والمندوبون والمرتجعات والدفع عند الاستلام. العربية أولاً والإنجليزية.</value></data>
 </root>

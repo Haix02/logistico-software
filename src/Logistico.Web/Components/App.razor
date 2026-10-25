@@ -1,5 +1,8 @@
 @using System.Globalization
+@using System.Text.Json
+@using Microsoft.Extensions.Localization
 @using Logistico.Web.Infrastructure
+@inject IStringLocalizer<ServerText> T
 <!DOCTYPE html>
 <html lang="@CultureInfo.CurrentUICulture.Name" dir="@(Rtl ? "rtl" : "ltr")">
 
@@ -7,9 +10,23 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#ecebea" />
-    <meta name="color-scheme" content="light dark" />
+    <meta name="color-scheme" content="light" />
+    <meta name="description" content="@T["SeoDescription"]" />
+    <meta name="application-name" content="Logistico" />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="@CanonicalUrl" />
+    <meta property="og:title" content="@T["SeoTitle"]" />
+    <meta property="og:description" content="@T["SeoDescription"]" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="@CanonicalUrl" />
+    <meta property="og:locale" content="@(Rtl ? "ar_IQ" : "en_US")" />
+    <meta property="og:locale:alternate" content="@(Rtl ? "en_US" : "ar_IQ")" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="@T["SeoTitle"]" />
+    <meta name="twitter:description" content="@T["SeoDescription"]" />
     <base href="/" />
-    <title>Logistico</title>
+    <title>@T["SeoTitle"]</title>
+    @((MarkupString)StructuredData)
     <ResourcePreloader />
     <link rel="preload" href="@Assets["lib/almarai/almarai-arabic-400.woff2"]" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="@Assets["lib/almarai/almarai.css"]" />
@@ -77,4 +94,31 @@
         HttpContext.AcceptsInteractiveRouting() ? ClientOnly : null;
 
     private bool IsAccountPage => HttpContext.Request.Path.StartsWithSegments("/Account");
+
+    // Crawlers and link previews read this shell; the WebAssembly UI replaces the title per page after it loads.
+    private string CanonicalUrl =>
+        $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}{HttpContext.Request.PathBase}{HttpContext.Request.Path}";
+
+    // Written as raw markup so the script type stays "application/ld+json" (Razor would encode the plus sign).
+    private string StructuredData =>
+        $"<script type=\"application/ld+json\" nonce=\"{HttpContext.CspNonce()}\">{JsonLd}</script>";
+
+    private string JsonLd => JsonSerializer.Serialize(new Dictionary<string, object?>
+    {
+        ["@context"] = "https://schema.org",
+        ["@type"] = "SoftwareApplication",
+        ["name"] = "Logistico",
+        ["applicationCategory"] = "BusinessApplication",
+        ["operatingSystem"] = "Web",
+        ["description"] = T["SeoDescription"].Value,
+        ["inLanguage"] = new[] { "ar", "en" },
+        ["codeRepository"] = "https://github.com/Haix02/logistico-software",
+        ["license"] = "https://www.apache.org/licenses/LICENSE-2.0.html",
+        ["offers"] = new Dictionary<string, string>
+        {
+            ["@type"] = "Offer",
+            ["price"] = "0",
+            ["priceCurrency"] = "USD",
+        },
+    });
 }

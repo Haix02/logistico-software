@@ -261,6 +261,7 @@ html[lang^="ar"] { --lx-font-size: 15px; --lx-font-size-sm: 13px; }
 html {
     font-size: var(--lx-font-size); -webkit-text-size-adjust: 100%;
     -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    color-scheme: light;
 }
 html, body { margin: 0; min-height: 100%; }
 body {
@@ -1723,9 +1724,10 @@ tr.lx-row-busy { opacity: 0.55; }
     --lx-surface-overlap: var(--gl-color-neutral-900);
     --lx-surface-hover: rgba(255, 255, 255, 0.12);
     --lx-surface-active: rgba(255, 255, 255, 0.08);
-    --lx-border: var(--gl-color-neutral-700);
-    --lx-border-subtle: var(--gl-color-neutral-800);
-    --lx-border-strong: var(--gl-color-neutral-600);
+    /* Hairlines, not wires: a solid mid-grey on near-black reads as a hard grid. */
+    --lx-border: rgba(255, 255, 255, 0.08);
+    --lx-border-subtle: rgba(255, 255, 255, 0.05);
+    --lx-border-strong: rgba(255, 255, 255, 0.14);
     --lx-text: var(--gl-color-neutral-50);
     --lx-text-strong: var(--gl-color-neutral-0);
     --lx-text-2: var(--gl-color-neutral-100);
@@ -1734,8 +1736,8 @@ tr.lx-row-busy { opacity: 0.55; }
     --lx-link: var(--gl-color-blue-200);
 
     --lx-control-bg: rgba(5, 5, 6, 0.4);
-    --lx-control-border: var(--gl-color-neutral-500);
-    --lx-control-border-hover: var(--gl-color-neutral-300);
+    --lx-control-border: rgba(255, 255, 255, 0.2);
+    --lx-control-border-hover: rgba(255, 255, 255, 0.34);
     --lx-control-border-focus: var(--gl-color-neutral-50);
     --lx-control-disabled: rgba(255, 255, 255, 0.04);
     --lx-placeholder: var(--gl-color-neutral-400);
@@ -1743,8 +1745,8 @@ tr.lx-row-busy { opacity: 0.55; }
     --lx-selected-hover: var(--gl-color-neutral-10);
     --lx-selected-active: var(--gl-color-neutral-0);
     --lx-on-selected: var(--gl-color-neutral-950);
-    --lx-button-border: rgba(255, 255, 255, 0.16);
-    --lx-button-border-hover: rgba(255, 255, 255, 0.32);
+    --lx-button-border: rgba(255, 255, 255, 0.1);
+    --lx-button-border-hover: rgba(255, 255, 255, 0.2);
     --lx-button-hover: rgba(137, 136, 141, 0.32);
     --lx-button-active: rgba(137, 136, 141, 0.24);
     --lx-focus: var(--gl-color-blue-400);
@@ -1753,21 +1755,21 @@ tr.lx-row-busy { opacity: 0.55; }
     --lx-primary: var(--gl-color-blue-400);
     --lx-primary-soft: color-mix(in srgb, var(--gl-color-blue-950) 80%, transparent);
     --lx-primary-text: var(--gl-color-blue-200);
-    --lx-primary-border: var(--gl-color-blue-600);
+    --lx-primary-border: color-mix(in srgb, var(--gl-color-blue-300) 42%, transparent);
     --lx-success: var(--gl-color-green-300);
     --lx-success-soft: color-mix(in srgb, var(--gl-color-green-900) 75%, transparent);
     --lx-success-text: var(--gl-color-green-200);
-    --lx-success-border: var(--gl-color-green-600);
+    --lx-success-border: color-mix(in srgb, var(--gl-color-green-300) 40%, transparent);
     --lx-warning: var(--gl-color-orange-300);
     --lx-warning-soft: color-mix(in srgb, var(--gl-color-orange-900) 75%, transparent);
     --lx-warning-text: var(--gl-color-orange-200);
-    --lx-warning-border: var(--gl-color-orange-600);
+    --lx-warning-border: color-mix(in srgb, var(--gl-color-orange-300) 40%, transparent);
     --lx-danger: var(--gl-color-red-300);
     --lx-danger-soft: color-mix(in srgb, var(--gl-color-red-900) 75%, transparent);
     --lx-danger-text: var(--gl-color-red-200);
-    --lx-danger-border: var(--gl-color-red-300);
+    --lx-danger-border: color-mix(in srgb, var(--gl-color-red-300) 42%, transparent);
     --lx-neutral-soft: var(--gl-color-neutral-900);
-    --lx-neutral-border: var(--gl-color-neutral-600);
+    --lx-neutral-border: rgba(255, 255, 255, 0.1);
 
     --lx-badge-neutral-bg: var(--gl-color-neutral-700);
     --lx-badge-neutral-text: var(--gl-color-neutral-50);
@@ -1804,7 +1806,7 @@ tr.lx-row-busy { opacity: 0.55; }
     --lx-map-4: var(--gl-color-data-blue-500);
     --lx-map-5: var(--gl-color-data-blue-300);
     --lx-map-6: var(--gl-color-data-blue-100);
-    --lx-map-stroke: var(--gl-color-neutral-950);
+    --lx-map-stroke: rgba(255, 255, 255, 0.14);
     --lx-map-ink: var(--gl-color-neutral-0);
     --lx-map-halo: rgba(5, 4, 8, 0.85);
     --lx-map-d0: var(--gl-color-red-300);
@@ -1822,13 +1824,23 @@ tr.lx-row-busy { opacity: 0.55; }
     --lx-shadow-sm: 0 0 2px 0 rgba(5, 5, 6, 0.4), 0 1px 4px 0 rgba(5, 5, 6, 0.4);
     --lx-shadow-md: 0 0 1px 0 rgba(5, 5, 6, 0.4), 0 0 2px 0 rgba(5, 5, 6, 0.4), 0 2px 8px 0 rgba(5, 5, 6, 0.4);
     --lx-shadow-lg: 0 0 2px 0 rgba(5, 5, 6, 0.4), 0 0 2px 0 rgba(5, 5, 6, 0.4), 0 4px 12px 0 rgba(5, 5, 6, 0.4);
+    /* Redefined here: these shadows are computed on :root, so they otherwise keep the light-theme border. */
+    --lx-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+    --lx-shadow-interactive: 0 0 0 1px rgba(255, 255, 255, 0.16), var(--lx-shadow-sm);
+    --lx-shadow-raised: 0 0 0 1px rgba(255, 255, 255, 0.14), var(--lx-shadow-lg);
+    --lx-focus-ring: 0 0 0 1px var(--gl-color-neutral-950), 0 0 0 3px var(--gl-color-blue-400);
 }
+html:has(body.bp6-dark) { color-scheme: dark; }
 body.bp6-dark { color: var(--lx-text); background: var(--lx-bg); color-scheme: dark; }
 .bp6-dark ::selection { background: var(--gl-color-blue-900); }
 .bp6-dark .lx-command-card { color: #050408; }
 .bp6-dark .lx-nav-item.active::before { background: var(--gl-color-blue-300); }
 .bp6-dark .lx-segmented-raised, .bp6-dark .bp6-segmented-control > .bp6-button.bp6-intent-primary,
-.bp6-dark .bp6-segmented-control > .bp6-button.bp6-intent-primary:hover { background: var(--gl-color-neutral-700); box-shadow: none; }
+.bp6-dark .bp6-segmented-control > .bp6-button.bp6-intent-primary:hover {
+    background: var(--gl-color-neutral-800); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+.bp6-dark .lx-map-gov:hover { stroke: rgba(255, 255, 255, 0.55); }
+.bp6-dark .lx-map-gov-selected { stroke: var(--gl-color-blue-200) !important; }
 /* Filled intent buttons only: minimal and outlined ones keep their transparent background. */
 .bp6-dark .bp6-button.bp6-intent-danger:not(.bp6-minimal):not(.bp6-outlined) { background: var(--gl-color-red-500); box-shadow: none; }
 .bp6-dark .bp6-button.bp6-intent-danger:not(.bp6-minimal):not(.bp6-outlined):hover { background: var(--gl-color-red-600); }
@@ -1840,7 +1852,7 @@ body.bp6-dark { color: var(--lx-text); background: var(--lx-bg); color-scheme: d
 .bp6-dark .bp6-input, .bp6-dark .bp6-html-select select { color: var(--lx-text-strong); }
 .bp6-dark .bp6-html-select option { background: var(--gl-color-neutral-900); color: var(--lx-text); }
 .bp6-dark .lx-main { box-shadow: 0 0 0 1px var(--lx-border-subtle); }
-.bp6-dark .lx-toast { box-shadow: 0 0 0 1px var(--gl-color-neutral-600), var(--lx-shadow-lg); }
+.bp6-dark .lx-toast { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), var(--lx-shadow-lg); }
 
 
 /* ---------- 15. Small screens ---------- */

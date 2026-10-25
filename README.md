@@ -2,13 +2,17 @@
 
 # Logistico · لوجستيكو
 
-**Open-source logistics and delivery platform built for Iraq: from the Instagram shop to the customer's door, with the data to make Iraqi shipping better.**
+**Open-source logistics and delivery management system: orders, warehouses, trucks, couriers, shipment tracking, returns and cash on delivery — built for Iraq, useful anywhere the address is a neighbourhood and a landmark.**
 
-Version 3.0 · Arabic-first (RTL) · English · .NET 10 · Blazor WebAssembly · PostgreSQL · Blueprint (Palantir's design system)
+Version 3.0 · Arabic-first (RTL) · English · .NET 10 · Blazor WebAssembly · PostgreSQL · Apache-2.0
 
 [Quick start](#quick-start) · [What it does](#what-it-does) · [Demand intelligence](#demand-intelligence-the-data-advantage) · [Docs](#documentation) · [Contributing](CONTRIBUTING.md)
 
-![Operations overview, dark theme](docs/images/dashboard-dark.png)
+A delivery company runs the whole day in one console: book a parcel, scan it through hubs, put it on a truck, hand it to a courier, collect the cash, and see why deliveries fail. The interface is **light by default** (a quiet grey frame and white work panels). Dark mode is one click in the top bar. Arabic is the default language and the layout is right-to-left.
+
+![Operations overview in the light theme: orders, delivery success, cash collected and the daily volume](docs/images/dashboard-light.png)
+
+![The same operations overview in the dark theme](docs/images/dashboard-dark.png)
 
 </div>
 
@@ -47,8 +51,8 @@ do deliveries fail?** Companies can publish anonymised answers as open data, so 
 
 <table>
 <tr>
-<td width="50%"><img src="docs/images/network-map-ar.png" alt="Iraq network map in Arabic"></td>
-<td width="50%"><img src="docs/images/shipments-light.png" alt="Shipments list, light theme"></td>
+<td width="50%"><img src="docs/images/network-map-ar.png" alt="Open-source logistics software: Iraq network map with hubs, trucks and governorates, Arabic right-to-left"></td>
+<td width="50%"><img src="docs/images/shipments-light.png" alt="Delivery management shipment list with tracking numbers, status, cash on delivery and destination"></td>
 </tr>
 <tr>
 <td align="center">Iraq network map (Arabic, right-to-left)</td>
@@ -100,7 +104,7 @@ dotnet run --project src/Logistico.Web --launch-profile http
 ```
 
 - App: http://localhost:5210 · Public tracking: http://localhost:5210/track · OpenAPI: http://localhost:5210/openapi/v1.json
-- The UI is in Arabic by default; switch to English from the top bar. Dark theme by default; light from the top bar.
+- The UI is in Arabic by default; switch to English from the top bar. Light theme by default; dark from the top bar.
 
 ### Tests
 
@@ -117,7 +121,7 @@ Set `LOGISTICO_TEST_DB` to point the integration tests at another PostgreSQL ser
 | Layer | Choice |
 |---|---|
 | Language / runtime | C# on .NET 10 (LTS) |
-| Web UI | Blazor WebAssembly with Logistico's own components on **Blueprint 6** CSS and icons (Palantir, Apache-2.0). Dark operations-console theme by default |
+| Web UI | Blazor WebAssembly with Logistico's own components. **GitLab Pajamas** sets the look (light by default, dark on request); **Blueprint 6** CSS and icons (Palantir, Apache-2.0) supply tables, menus, dialogs and hotkeys |
 | Languages | Arabic (`ar-IQ`, default, RTL) and English; Almarai font; Western digits; Iraqi month names; Arabic plural forms |
 | Backend | ASP.NET Core modular monolith (strict module boundaries, contracts shared with the browser) |
 | Database | PostgreSQL with EF Core 10 (schema per module, snake_case, optimistic concurrency) |

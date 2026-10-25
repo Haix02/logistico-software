@@ -45,7 +45,7 @@ The larger scope ([01](01-research-findings.md), [02](02-domain-model.md)) adds 
 
 | Platform | Technology | Status |
 |---|---|---|
-| Web app (all office roles) | Blazor WebAssembly + Blueprint 6 CSS with our own Blazor components, served by the ASP.NET Core host; dark operations-console theme by default | Built |
+| Web app (all office roles) | Blazor WebAssembly served by the ASP.NET Core host. GitLab Pajamas sets the look (light by default, dark on request); Blueprint 6 supplies the component mechanics | Built |
 | Evaluation | `docker compose up` with demo data, no .NET SDK needed | Built |
 | Public tracking | Same web app, anonymous pages | Built |
 | Desktop app | Installable web app (PWA), .NET MAUI Blazor Hybrid or Avalonia ([09](09-client-applications.md)) | Open for discussion |

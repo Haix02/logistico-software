@@ -32,10 +32,18 @@ window.lx = {
         try { localStorage.setItem("lx.theme", on ? "dark" : "light"); } catch { /* private mode */ }
         window.lx._chrome(on);
     },
-    // The browser's own bars follow the application chrome colour.
+    // The browser's own bars follow the application chrome colour. color-scheme stays explicit:
+    // "light dark" would let the operating system restyle controls while the app is still light.
     _chrome: (dark) => {
         document.body.classList.toggle("bp6-dark", dark);
+        document.documentElement.style.colorScheme = dark ? "dark" : "light";
         document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#050408" : "#ecebea");
+        document.querySelector('meta[name="color-scheme"]')?.setAttribute("content", dark ? "dark" : "light");
+    },
+    shortcutHint: () => {
+        const platform = navigator.userAgentData?.platform || navigator.platform || "";
+        const apple = /mac|iphone|ipad|ipod/i.test(platform) || /Mac|iPhone|iPad/.test(navigator.userAgent);
+        return apple ? "⌘K" : "Ctrl K";
     },
     isMuted: () => { try { return localStorage.getItem("lx.muted") === "true"; } catch { return false; } },
     setMuted: (muted) => {

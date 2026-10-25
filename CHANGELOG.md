@@ -26,6 +26,11 @@ versions follow [Semantic Versioning](https://semver.org/).
   payout waits for the next one. 0 % (the default) keeps returns free.
 
 ### Fixed
+- **Dark mode drew a hard grid.** Cards, tables, the dashboard pulse, shipment rows and the Iraq map used solid mid-grey borders on a near-black surface. Those lines are now faint white hairlines, and status outlines are tinted instead of fully saturated. Inputs stay visible.
+- **The installed app still opened on the old dark splash.** Home-screen colour and the browser chrome now follow the light theme (`#ecebea`), and dark mode still switches them. A computer set to dark mode no longer restyles Logistico's controls unless dark mode is chosen in the app.
+- **The search hint said Ctrl K on a Mac**, where the shortcut is ⌘K. The command palette still opens with either key.
+- **The current page in the account menu disappeared in dark mode** (the highlight was a black tint on a black surface).
+- **Link previews and search engines only saw the word "Logistico".** The public page now has a title and description in Arabic and English, Open Graph tags, and a `robots.txt`.
 - **Customs value in the right currency.** An import declared in dinars was valued as if the amount were US dollars
   (a 6.55 million IQD parcel was assessed as $6.55 million); dinars are now converted at the official rate, and other
   currencies, or no declared value, are left for the clerk to enter in dollars from the invoice instead of an invented
@@ -47,6 +52,7 @@ versions follow [Semantic Versioning](https://semver.org/).
   now shows all collected cash not handed in, whatever the day.
 
 ### Changed
+- **README and docs match the light console.** New screenshots of the dashboard (light and dark), the shipments list, the Iraq map and demand intelligence. Dark-mode borders are documented as hairlines.
 - **New look: GitLab's Pajamas design system on Blueprint.** Navigation sits on a quiet grey frame and each page is a
   white panel; buttons, inputs, badges, alerts, tabs, tables, dialogs, drawers and toasts follow Pajamas (32 px
   controls, 8 px corners, a near-black main action, blue links and focus rings, colour kept for status). Blueprint

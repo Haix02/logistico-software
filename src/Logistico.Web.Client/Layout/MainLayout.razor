@@ -25,7 +25,7 @@
                 <button type="button" class="lx-search-trigger" @onclick="Ops.OpenPalette" aria-label="@L["GlobalSearchPlaceholder"]">
                     <Icon Name="search" />
                     <span class="lx-search-trigger-text">@L["GlobalSearchPlaceholder"]</span>
-                    <kbd class="lx-kbd">Ctrl K</kbd>
+                    <kbd class="lx-kbd">@shortcutHint</kbd>
                 </button>
             }
         </div>
@@ -196,6 +196,7 @@
     private bool radarFlash;
     private bool dark;
     private bool muted;
+    private string shortcutHint = "Ctrl K";
     private HubRadar? radar;
     private bool networkUnavailable;
     private DotNetObjectReference<MainLayout>? selfRef;
@@ -218,6 +219,7 @@
         staff = user.IsStaff();
         dark = await JS.InvokeAsync<bool>("lx.isDark");
         muted = await JS.InvokeAsync<bool>("lx.isMuted");
+        shortcutHint = await JS.InvokeAsync<string>("lx.shortcutHint");
         collapsed = await JS.InvokeAsync<string?>("lx.getPref", "sidebar") == "collapsed";
         if (!staff)
         {

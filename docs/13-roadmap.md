@@ -14,7 +14,7 @@ This is where Logistico is heading. It is a direction, not a promise of dates: i
 - **Delivery ratings** from the tracking page; low ratings open complaints.
 - **Team and roles:** administrators manage staff accounts; five roles (including customer support) enforced by the API on every endpoint and followed by the UI; safe concurrent team changes; password resets by administrators.
 - **Demand intelligence:** what customers order, where and when, basket size against refusals, trade lanes, repeat customers, plain-language findings and an anonymised open-data export.
-- **Operations-console theme** (dark by default), Content-Security-Policy with nonces, compressed API answers, proxy-aware rate limits, truck-manifest guards, customer self-service lockout.
+- **Operations-console theme**, later set to light by default with dark on request ([ADR-029](14-architecture-decisions.md)), Content-Security-Policy with nonces, compressed API answers, proxy-aware rate limits, truck-manifest guards, customer self-service lockout.
 - Translated sign-in and password messages; Docker Compose for evaluation; open-source release (Apache-2.0).
 
 ### 2.1 and earlier

@@ -46,4 +46,6 @@
   <data name="SignInPoint2" xml:space="preserve"><value>Demand intelligence: what customers order, where and when</value></data>
   <data name="SignInPoint3" xml:space="preserve"><value>Cash on delivery settled with sellers, parcel by parcel</value></data>
   <data name="OpenSourceLine" xml:space="preserve"><value>Open source · Apache-2.0</value></data>
+  <data name="SeoTitle" xml:space="preserve"><value>Logistico — open-source delivery software for Iraq</value></data>
+  <data name="SeoDescription" xml:space="preserve"><value>Open-source logistics for Iraqi delivery companies: orders, hubs, trucks, couriers, returns and cash on delivery. Arabic-first and English. Apache-2.0.</value></data>
 </root>
