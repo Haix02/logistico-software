@@ -182,9 +182,13 @@ public sealed class CreateTransferRequest : IValidatableObject
             yield return new(ValidationText.Required, [nameof(FromHubCode)]);
         }
 
-        if (string.IsNullOrWhiteSpace(ToHubCode) || string.Equals(FromHubCode, ToHubCode, StringComparison.OrdinalIgnoreCase))
+        if (string.IsNullOrWhiteSpace(ToHubCode))
         {
             yield return new(ValidationText.Required, [nameof(ToHubCode)]);
+        }
+        else if (string.Equals(FromHubCode, ToHubCode, StringComparison.OrdinalIgnoreCase))
+        {
+            yield return new(ValidationText.SamePlace, [nameof(ToHubCode)]);
         }
     }
 }

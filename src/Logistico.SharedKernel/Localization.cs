@@ -64,6 +64,7 @@ public static class ValidationText
     public static string Phone => Get("Validation_Phone");
     public static string Governorate => Get("Validation_Governorate");
     public static string LocationCode => Get("Validation_LocationCode");
+    public static string SamePlace => Get("Validation_SamePlace");
     public static string Currency => Get("Validation_Currency");
     public static string Incoterm => Get("Validation_Incoterm");
     public static string InstagramHandle => Get("Validation_InstagramHandle");

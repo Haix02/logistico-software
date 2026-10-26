@@ -75,7 +75,7 @@ else
 
 @code {
     private readonly CancellationTokenSource lifetime = new();
-    private CancellationTokenSource? periodLoad;
+    private int analyticsGeneration;
     private ShipmentsSummary? summary;
     private NetworkOverview? network;
     private AlertList? alerts;
@@ -169,7 +169,8 @@ else
 
     private async Task LoadDashboardAsync()
     {
-        periodLoad?.Cancel();
+        var generation = ++analyticsGeneration;
+        var requestedDays = days;
         loading = true;
         error = null;
         try
@@ -178,13 +179,16 @@ else
             var summaryTask = Shipments.GetSummaryAsync(ct: ct);
             var networkTask = Operations.GetNetworkAsync(ct);
             var alertsTask = Operations.ListAlertsAsync(pageSize: 1, ct: ct);
-            var analyticsTask = Operations.GetAnalyticsAsync(days, ct);
+            var analyticsTask = Operations.GetAnalyticsAsync(requestedDays, ct);
 
             await Task.WhenAll(summaryTask, networkTask, alertsTask, analyticsTask, Ops.RefreshAsync());
             summary = await summaryTask;
             network = await networkTask;
             alerts = await alertsTask;
-            analytics = await analyticsTask;
+            if (generation == analyticsGeneration)
+            {
+                analytics = await analyticsTask;
+            }
         }
         catch (OperationCanceledException) when (lifetime.IsCancellationRequested)
         {
@@ -199,7 +203,10 @@ else
         }
         finally
         {
-            loading = false;
+            if (generation == analyticsGeneration)
+            {
+                loading = false;
+            }
         }
     }
 
@@ -211,6 +218,7 @@ else
         }
 
         days = value;
+        var generation = ++analyticsGeneration;
         try
         {
             await JS.InvokeVoidAsync("lx.setPref", "dashboard.days", value.ToString(CultureInfo.InvariantCulture));
@@ -219,31 +227,38 @@ else
         {
         }
 
-        periodLoad?.Cancel();
-        periodLoad?.Dispose();
-        periodLoad = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token);
-        var currentLoad = periodLoad;
-        analytics = null;
         error = null;
         loading = true;
         try
         {
-            analytics = await Operations.GetAnalyticsAsync(days, currentLoad.Token);
+            var next = await Operations.GetAnalyticsAsync(value, lifetime.Token);
+            if (generation != analyticsGeneration)
+            {
+                return;
+            }
+
+            analytics = next;
         }
-        catch (OperationCanceledException) when (currentLoad.IsCancellationRequested)
+        catch (OperationCanceledException) when (lifetime.IsCancellationRequested)
         {
         }
         catch (ApiException ex)
         {
-            error = ex.UserMessage;
+            if (generation == analyticsGeneration)
+            {
+                error = ex.UserMessage;
+            }
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            error = L["ServiceUnavailable"];
+            if (generation == analyticsGeneration)
+            {
+                error = L["ServiceUnavailable"];
+            }
         }
         finally
         {
-            if (ReferenceEquals(currentLoad, periodLoad))
+            if (generation == analyticsGeneration)
             {
                 loading = false;
             }
@@ -254,8 +269,6 @@ else
 
     public void Dispose()
     {
-        periodLoad?.Cancel();
-        periodLoad?.Dispose();
         lifetime.Cancel();
         lifetime.Dispose();
     }

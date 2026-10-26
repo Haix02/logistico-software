@@ -36,7 +36,7 @@
         new("office", L["View_InWarehouse"], Count(ShipmentStatus.AtWarehouse, ShipmentStatus.ReadyForDispatch), "shipments?service=Domestic&inWarehouse=true"),
         new("drive-time", ShipmentTexts.Of(ShipmentStatus.InTransitToHub), Count(ShipmentStatus.InTransitToHub), "shipments?service=Domestic&status=InTransitToHub"),
         new("truck", ShipmentTexts.Of(ShipmentStatus.OutForDelivery), Count(ShipmentStatus.OutForDelivery), "shipments?service=Domestic&status=OutForDelivery"),
-        new("tick-circle", L["Kpi_Delivered"], (int)Analytics.Delivered.Value, "shipments?service=Domestic&status=Delivered", "success"),
+        new("tick-circle", L["DeliveredThisPeriod"], (int)Analytics.Delivered.Value, "shipments?service=Domestic&status=Delivered", "success"),
     ];
 
     private int Count(params ShipmentStatus[] statuses) =>

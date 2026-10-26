@@ -12,7 +12,16 @@
     </Actions>
 </PageHeader>
 
-@if (network is null)
+@if (error is not null && network is null)
+{
+    <Callout Intent="Intent.Danger" Icon="error" Title="@L["UnhandledError"]">
+        <p>@error</p>
+        <div class="lx-callout-actions">
+            <Button Icon="refresh" Text="@L["Refresh"]" Intent="Intent.Primary" Loading="loading" OnClick="LoadAsync" />
+        </div>
+    </Callout>
+}
+else if (network is null)
 {
     <Skeleton Block="true" Lines="2" />
 }
@@ -53,10 +62,10 @@ else
 
             <Section Title="@L["Hubs"]" Subtitle="@L["HubsHint"]" Icon="office" Padded="false">
                 <ul class="lx-list">
-                    @foreach (var hub in network.Hubs)
+                    @foreach (var hub in network.Hubs.OrderByDescending(h => h.OnShelves + h.ToTransfer + h.OpenAlerts))
                     {
                         var info = HubCatalog.FindOrDefault(hub.HubCode);
-                        <li>
+                        <li class="lx-hub-desk">
                             <a class="lx-list-item" href="@($"shipments?hub={hub.HubCode}&inWarehouse=true")">
                                 <span class="@Bp.Cls("lx-list-icon", hub.OpenAlerts > 0 ? "lx-list-icon-danger" : "lx-list-icon-primary")"><span class="lx-code" style="font-size:11px">@info.RoutingTag</span></span>
                                 <span class="lx-list-body">
@@ -70,6 +79,12 @@ else
                                     <Tag Intent="Intent.Danger" Icon="notifications" Round="true">@Fmt.Number(hub.OpenAlerts)</Tag>
                                 }
                             </a>
+                            <div class="lx-hub-desk-actions">
+                                <Allowed Policy="@StaffPolicies.Operate">
+                                    <LinkButton Href="@($"warehouse?hub={hub.HubCode}")" Small="true" Icon="barcode" Text="@L["OpenStation"]" />
+                                </Allowed>
+                                <LinkButton Href="@($"transfers?hub={hub.HubCode}")" Small="true" Minimal="true" Icon="drive-time" Text="@L["Nav_Transfers"]" />
+                            </div>
                         </li>
                     }
                 </ul>
@@ -81,7 +96,8 @@ else
                     <ul class="lx-list">
                         @foreach (var lane in network.Lanes.OrderByDescending(l => l.Overdue).ThenByDescending(l => l.Parcels + l.Waiting))
                         {
-                            <li class="lx-list-item">
+                            <li>
+                                <a class="lx-list-item" href="@($"transfers?hub={lane.FromHubCode}")">
                                 <span class="@Bp.Cls("lx-list-icon", lane.Overdue ? "lx-list-icon-danger" : lane.Trucks > 0 ? "lx-list-icon-primary" : "lx-list-icon-warning")"><Icon Name="drive-time" /></span>
                                 <span class="lx-list-body">
                                     <span class="lx-list-title"><HubRoute Current="@lane.FromHubCode" Target="@lane.ToHubCode" /></span>
@@ -91,6 +107,7 @@ else
                                 {
                                     <Tag Intent="Intent.Danger">@L["Late"]</Tag>
                                 }
+                                </a>
                             </li>
                         }
                         @if (network.Lanes.Count == 0)
@@ -109,7 +126,7 @@ else
             @foreach (var g in network.Governorates.OrderByDescending(MeasureFn))
             {
                 var value = MeasureFn(g);
-                <a class="lx-bar-row" href="@($"shipments?governorate={g.Code}")">
+                <a class="@Bp.Cls("lx-bar-row", Bp.When(selected == g.Code, "lx-bar-selected"))" href="@($"shipments?governorate={g.Code}")">
                     <span class="lx-ellipsis">@(IraqGovernorates.Find(g.Code)?.Name ?? g.Code)</span>
                     <span class="lx-bar-track"><span class="@Bp.Cls("lx-bar-fill", measure is "late" or "failed" ? "lx-bar-fill-warning" : null)" style="@($"width:{(value * 100.0 / max).ToString("0.#", CultureInfo.InvariantCulture)}%")"></span></span>
                     <span class="lx-bar-value">@Fmt.Number(value)</span>
@@ -124,6 +141,8 @@ else
     private string measure = "active";
     private string? selected;
     private bool loading;
+    private string? error;
+    private int loadGeneration;
     private CancellationTokenSource? refresh;
 
     private GovernorateLoad? Selected => selected is null ? null : network?.Governorates.FirstOrDefault(g => g.Code == selected) ?? new GovernorateLoad(selected, 0, 0, 0, 0, 0, 0, 0);
@@ -150,33 +169,60 @@ else
     {
         await LoadAsync();
         refresh = new CancellationTokenSource();
-        var token = refresh.Token;
-        _ = Task.Run(async () =>
+        _ = RefreshLoopAsync(refresh.Token);
+    }
+
+    private async Task RefreshLoopAsync(CancellationToken token)
+    {
+        try
         {
             using var timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
             while (await timer.WaitForNextTickAsync(token))
             {
-                await InvokeAsync(LoadAsync);
+                await LoadAsync();
             }
-        }, token);
+        }
+        catch (OperationCanceledException)
+        {
+        }
     }
 
     private async Task LoadAsync()
     {
+        var generation = ++loadGeneration;
         loading = true;
         try
         {
-            network = await Operations.GetNetworkAsync();
+            var next = await Operations.GetNetworkAsync();
+            if (generation != loadGeneration)
+            {
+                return;
+            }
+
+            network = next;
+            error = null;
         }
         catch (Exception ex) when (ex is HttpRequestException or ApiException)
         {
+            if (generation == loadGeneration)
+            {
+                error = L["ServiceUnavailable"];
+            }
         }
         finally
         {
-            loading = false;
-            StateHasChanged();
+            if (generation == loadGeneration)
+            {
+                loading = false;
+                StateHasChanged();
+            }
         }
     }
 
-    public void Dispose() => refresh?.Cancel();
+    public void Dispose()
+    {
+        loadGeneration++;
+        refresh?.Cancel();
+        refresh?.Dispose();
+    }
 }

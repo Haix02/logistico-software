@@ -368,6 +368,7 @@ else
     private CustomerProfile? customer;
     private string? lookedUpPhone;
     private bool lookingUp;
+    private int lookupGeneration;
     private RateCard prices = new();
 
     /// <summary>The company's price for this seller and destination (the standard prices until the list has loaded).</summary>
@@ -451,10 +452,17 @@ else
             return;
         }
 
+        var generation = ++lookupGeneration;
         lookingUp = true;
         try
         {
-            customer = await Shipments.LookupCustomerAsync(phone);
+            var found = await Shipments.LookupCustomerAsync(phone);
+            if (generation != lookupGeneration)
+            {
+                return; // a newer number was typed while this lookup was in flight
+            }
+
+            customer = found;
 
             // A returning customer: fill what the operator has not typed yet.
             if (customer is { Orders: > 0 } && string.IsNullOrWhiteSpace(model.ConsigneeName))
@@ -468,7 +476,10 @@ else
         }
         finally
         {
-            lookingUp = false;
+            if (generation == lookupGeneration)
+            {
+                lookingUp = false;
+            }
         }
     }
 

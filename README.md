@@ -10,9 +10,7 @@ Version 3.0 · Arabic-first (RTL) · English · .NET 10 · Blazor WebAssembly ·
 
 A delivery company runs the whole day in one console: book a parcel, scan it through hubs, put it on a truck, hand it to a courier, collect the cash, and see why deliveries fail. The interface is **light by default** (a quiet grey frame and white work panels). Dark mode is one click in the top bar. Arabic is the default language and the layout is right-to-left.
 
-![Operations overview in the light theme: orders, delivery success, cash collected and the daily volume](docs/images/dashboard-light.png)
-
-![The same operations overview in the dark theme](docs/images/dashboard-dark.png)
+![Operations overview: orders, delivery success, cash collected and daily volume](docs/images/dashboard-light.png)
 
 </div>
 
@@ -35,7 +33,7 @@ do deliveries fail?** Companies can publish anonymised answers as open data, so 
 | **Order confirmation** | Hold risky orders until the customer confirms by call or on the tracking page; a call queue for customer support; auto-cancel unconfirmed ones |
 | **Warehouses & branches** | Each company manages its own sorting hubs, branches and fulfilment stores per governorate: coverage, map position, shelf capacity, live load; routing and labels follow them |
 | **Dashboard** | Period-over-period KPIs (booked, delivered, success, first attempt, on time, delivery time, returns, COD, customer rating), daily volume, pipeline, failure reasons, sellers, governorates, couriers |
-| **Iraq network** | Built-in map of the 18 governorates, hubs with live load, trucks on the road, misroute alerts |
+| **Hubs and trucks** | Map of the 18 governorates, each hub's shelves and trucks, scan station, and line-haul manifests between hubs |
 | **Hub station** | Barcode-scanner-first receive / load truck / dispatch / route check, shelves, scan log and live radar, printable command barcodes |
 | **Trucks between hubs** | Parcels planned onto the right truck automatically; load, depart and unload by scan; manifests; missing parcels flagged |
 | **Returns** | Start automatically after the last failed attempt or a refusal, travel back by truck, handed over against a manifest |
@@ -51,14 +49,16 @@ do deliveries fail?** Companies can publish anonymised answers as open data, so 
 
 <table>
 <tr>
-<td width="50%"><img src="docs/images/network-map-ar.png" alt="Open-source logistics software: Iraq network map with hubs, trucks and governorates, Arabic right-to-left"></td>
-<td width="50%"><img src="docs/images/shipments-light.png" alt="Delivery management shipment list with tracking numbers, status, cash on delivery and destination"></td>
+<td width="50%"><img src="docs/images/network-map-ar.png" alt="Iraq network map: governorates, sorting hubs and trucks between them"></td>
+<td width="50%"><img src="docs/images/shipments-light.png" alt="Shipments list: tracking number, status, seller, customer and cash on delivery"></td>
 </tr>
 <tr>
-<td align="center">Iraq network map (Arabic, right-to-left)</td>
-<td align="center">Shipments list (light theme)</td>
+<td align="center">Hubs and trucks on the Iraq map</td>
+<td align="center">Shipments list</td>
 </tr>
 </table>
+
+![Warehouses and branches: coverage of the governorates and the live load of each hub](docs/images/warehouses.png)
 
 ## Demand intelligence: the data advantage
 

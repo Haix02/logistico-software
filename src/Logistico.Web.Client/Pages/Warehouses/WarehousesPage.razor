@@ -13,7 +13,16 @@
     </Actions>
 </PageHeader>
 
-@if (list is null)
+@if (error is not null && list is null)
+{
+    <Callout Intent="Intent.Danger" Icon="error" Title="@L["UnhandledError"]">
+        <p>@error</p>
+        <div class="lx-callout-actions">
+            <Button Icon="refresh" Text="@L["Refresh"]" Intent="Intent.Primary" Loading="loading" OnClick="LoadAsync" />
+        </div>
+    </Callout>
+}
+else if (list is null)
 {
     <Skeleton Block="true" Lines="3" />
 }
@@ -80,6 +89,7 @@ else
 @code {
     private WarehouseList? list;
     private bool loading;
+    private string? error;
     private bool editorOpen;
     private WarehouseDetails? editing;
 
@@ -95,6 +105,11 @@ else
         try
         {
             list = await Operations.ListWarehousesAsync();
+            error = null;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or ApiException)
+        {
+            error = L["ServiceUnavailable"];
         }
         finally
         {

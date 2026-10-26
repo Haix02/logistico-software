@@ -23,8 +23,8 @@
             }
 
             var width = 2 + Math.Min(6, (lane.Parcels + lane.Waiting) / 8.0);
-            <path d="@Curve(a, b)" class="@Bp.Cls("lx-map-lane", Bp.When(lane.Trucks > 0, "lx-map-lane-moving"))"
-                  stroke-width="@F(width)" stroke="@(lane.Overdue ? "#cd4246" : lane.Trucks > 0 ? "#2d72d2" : "#8f99a8")">
+            <path d="@Curve(a, b)" class="@Bp.Cls("lx-map-lane", Bp.When(lane.Overdue, "lx-map-lane-late"), Bp.When(!lane.Overdue && lane.Trucks > 0, "lx-map-lane-moving"))"
+                  stroke-width="@F(width)">
                 <title>@HubCatalog.FindOrDefault(lane.FromHubCode).RoutingTag → @HubCatalog.FindOrDefault(lane.ToHubCode).RoutingTag · @string.Format(CultureInfo.CurrentCulture, L["LaneTip"], Fmt.Number(lane.Trucks), Fmt.Number(lane.Parcels), Fmt.Number(lane.Waiting))</title>
             </path>
         }

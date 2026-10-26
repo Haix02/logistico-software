@@ -26,6 +26,8 @@ versions follow [Semantic Versioning](https://semver.org/).
   payout waits for the next one. 0 % (the default) keeps returns free.
 
 ### Fixed
+- **Hubs and trucks.** Each hub on the network map opens its scan station and its trucks. A truck cannot be opened from a hub to itself. Map lanes follow the theme colours. Warehouse list shows an error when the network cannot be loaded.
+- **Operations console.** Changing the dashboard period no longer lets a slower answer overwrite the one just chosen. The Iraq map says when the network could not be loaded instead of spinning forever, and its refresh no longer runs off the page. Typing a customer's phone no longer applies an older lookup. An international booking cannot use the same place twice, and the form asks for the goods.
 - **Dark mode drew a hard grid.** Cards, tables, the dashboard pulse, shipment rows and the Iraq map used solid mid-grey borders on a near-black surface. Those lines are now faint white hairlines, and status outlines are tinted instead of fully saturated. Inputs stay visible.
 - **The installed app still opened on the old dark splash.** Home-screen colour and the browser chrome now follow the light theme (`#ecebea`), and dark mode still switches them. A computer set to dark mode no longer restyles Logistico's controls unless dark mode is chosen in the app.
 - **The search hint said Ctrl K on a Mac**, where the shortcut is ⌘K. The command palette still opens with either key.

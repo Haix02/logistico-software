@@ -16,6 +16,7 @@
   <data name="Validation_InstagramHandle" xml:space="preserve"><value>Instagram handles use letters, numbers, dots and underscores (max 30).</value></data>
   <data name="Validation_IraqiMobile" xml:space="preserve"><value>Enter an Iraqi mobile number, e.g. 0770 123 4567.</value></data>
   <data name="Validation_LocationCode" xml:space="preserve"><value>Use a 3–5 letter location code (UN/LOCODE or IATA), e.g. CNSHA.</value></data>
+  <data name="Validation_SamePlace" xml:space="preserve"><value>Origin and destination must be different places.</value></data>
   <data name="Validation_MaxLength" xml:space="preserve"><value>Use at most {1} characters.</value></data>
   <data name="Validation_Merchant" xml:space="preserve"><value>Choose the seller this account books orders for.</value></data>
   <data name="Validation_NoFriday" xml:space="preserve"><value>Couriers do not deliver on Friday. Please choose another day.</value></data>

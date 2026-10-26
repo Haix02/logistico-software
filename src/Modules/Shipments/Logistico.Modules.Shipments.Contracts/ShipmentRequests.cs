@@ -121,14 +121,21 @@ public sealed partial class CreateShipmentRequest : IValidatableObject
         }
         else
         {
-            if (!LocationCodePattern().IsMatch(OriginCode ?? ""))
+            OriginCode = (OriginCode ?? "").Trim();
+            DestinationCode = (DestinationCode ?? "").Trim();
+
+            if (!LocationCodePattern().IsMatch(OriginCode))
             {
                 yield return new(ValidationText.LocationCode, [nameof(OriginCode)]);
             }
 
-            if (!LocationCodePattern().IsMatch(DestinationCode ?? ""))
+            if (!LocationCodePattern().IsMatch(DestinationCode))
             {
                 yield return new(ValidationText.LocationCode, [nameof(DestinationCode)]);
+            }
+            else if (string.Equals(OriginCode, DestinationCode, StringComparison.OrdinalIgnoreCase))
+            {
+                yield return new(ValidationText.SamePlace, [nameof(DestinationCode)]);
             }
 
             if (string.IsNullOrWhiteSpace(ShipperName))

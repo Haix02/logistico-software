@@ -107,6 +107,9 @@
                     <FormField Label="@L["Field_Notes"]" Hint="@L["Optional"]" Field="() => model.Notes">
                         <InputText class="bp6-input bp6-fill" @bind-Value="model.Notes" />
                     </FormField>
+                    <FormField Label="@L["Field_Items"]" Hint="@L["Optional"]" Field="() => model.ItemsDescription" CssClass="lx-span-2">
+                        <InputText class="bp6-input bp6-fill" @bind-Value="model.ItemsDescription" placeholder="Cotton shirts, 200 pieces" />
+                    </FormField>
                 </div>
             </Section>
         </div>

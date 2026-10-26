@@ -16,6 +16,7 @@
   <data name="Validation_InstagramHandle" xml:space="preserve"><value>اسم حساب انستغرام يتكون من أحرف وأرقام ونقاط وشرطات سفلية (30 كحد أقصى).</value></data>
   <data name="Validation_IraqiMobile" xml:space="preserve"><value>أدخل رقم موبايل عراقي، مثال: ⁦0770 123 4567⁩.</value></data>
   <data name="Validation_LocationCode" xml:space="preserve"><value>استخدم رمز موقع من 3 إلى 5 أحرف (⁦UN/LOCODE⁩ أو IATA)، مثال: CNSHA.</value></data>
+  <data name="Validation_SamePlace" xml:space="preserve"><value>يجب أن يختلف مكان الانطلاق عن مكان الوصول.</value></data>
   <data name="Validation_MaxLength" xml:space="preserve"><value>الحد الأقصى {1} حرفاً.</value></data>
   <data name="Validation_Merchant" xml:space="preserve"><value>اختر المتجر الذي يحجز هذا الحساب طلباته.</value></data>
   <data name="Validation_NoFriday" xml:space="preserve"><value>لا يوجد توصيل يوم الجمعة. يرجى اختيار يوم آخر.</value></data>

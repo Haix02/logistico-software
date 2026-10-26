@@ -434,7 +434,7 @@
   <data name="HubRadar" xml:space="preserve"><value>Hub radar</value></data>
   <data name="HubRadarTitle" xml:space="preserve"><value>Hub radar — latest scans across Iraq</value></data>
   <data name="Hubs" xml:space="preserve"><value>Hubs</value></data>
-  <data name="HubsHint" xml:space="preserve"><value>Click a hub to see its shelves</value></data>
+  <data name="HubsHint" xml:space="preserve"><value>Shelves, parcels waiting for a truck, and the scan station</value></data>
   <data name="HubSwitched" xml:space="preserve"><value>Hub changed to {0}</value></data>
   <data name="Inactive" xml:space="preserve"><value>Inactive</value></data>
   <data name="InboundParcels" xml:space="preserve"><value>On trucks to it</value></data>
@@ -468,6 +468,7 @@
   <data name="Kpi_CustomsHold" xml:space="preserve"><value>On customs hold</value></data>
   <data name="Kpi_DeclinedToday" xml:space="preserve"><value>Cancelled today</value></data>
   <data name="Kpi_Delivered" xml:space="preserve"><value>Delivered</value></data>
+  <data name="DeliveredThisPeriod" xml:space="preserve"><value>Delivered in this period</value></data>
   <data name="Kpi_DeliveredToday" xml:space="preserve"><value>Delivered today</value></data>
   <data name="Kpi_DeliveryRevenue" xml:space="preserve"><value>Delivery fee revenue</value></data>
   <data name="Kpi_FailedAttempts" xml:space="preserve"><value>Failed attempts</value></data>

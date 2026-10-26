@@ -468,7 +468,7 @@
   <data name="HubRadar" xml:space="preserve"><value>رادار المراكز</value></data>
   <data name="HubRadarTitle" xml:space="preserve"><value>رادار المراكز — آخر عمليات المسح في العراق</value></data>
   <data name="Hubs" xml:space="preserve"><value>المراكز</value></data>
-  <data name="HubsHint" xml:space="preserve"><value>اضغط على مركز لعرض رفوفه</value></data>
+  <data name="HubsHint" xml:space="preserve"><value>الرفوف، والطرود بانتظار شاحنة، ومحطة المسح</value></data>
   <data name="HubSwitched" xml:space="preserve"><value>تم تغيير المركز إلى {0}</value></data>
   <data name="Inactive" xml:space="preserve"><value>غير فعّال</value></data>
   <data name="InboundParcels" xml:space="preserve"><value>قادمة بالشاحنات</value></data>
@@ -502,6 +502,7 @@
   <data name="Kpi_CustomsHold" xml:space="preserve"><value>محتجزة في الجمارك</value></data>
   <data name="Kpi_DeclinedToday" xml:space="preserve"><value>أُلغيت اليوم</value></data>
   <data name="Kpi_Delivered" xml:space="preserve"><value>تم تسليمها</value></data>
+  <data name="DeliveredThisPeriod" xml:space="preserve"><value>المُسلَّم في هذه الفترة</value></data>
   <data name="Kpi_DeliveredToday" xml:space="preserve"><value>سُلّمت اليوم</value></data>
   <data name="Kpi_DeliveryRevenue" xml:space="preserve"><value>إيرادات أجور التوصيل</value></data>
   <data name="Kpi_FailedAttempts" xml:space="preserve"><value>محاولات فاشلة</value></data>

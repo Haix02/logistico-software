@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using Logistico.Modules.Shipments.Contracts;
+using Logistico.SharedKernel;
 using Logistico.SharedKernel.Iraq;
 
 namespace Logistico.Modules.Shipments.Tests;
@@ -92,6 +93,34 @@ public class IraqReferenceTests
 
         Assert.Contains(results, r => r.MemberNames.Contains(nameof(CreateShipmentRequest.ConsigneePhone)));
         Assert.Contains(results, r => r.MemberNames.Contains(nameof(CreateShipmentRequest.DeliveryAddress)));
+    }
+
+    [Fact]
+    public void International_booking_rejects_the_same_place_twice()
+    {
+        var previous = CultureInfo.CurrentUICulture;
+        try
+        {
+            CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+            var request = new CreateShipmentRequest
+            {
+                ServiceType = ServiceType.International,
+                Mode = TransportMode.Air,
+                ShipperName = "Shenzhen Shop",
+                ConsigneeName = "Baghdad Buyer",
+                OriginCode = " cnszx ",
+                DestinationCode = "CNSZX",
+            };
+            var results = new List<ValidationResult>();
+            Validator.TryValidateObject(request, new ValidationContext(request), results, validateAllProperties: true);
+
+            Assert.Equal("cnszx", request.OriginCode);
+            Assert.Contains(results, r => r.MemberNames.Contains(nameof(CreateShipmentRequest.DestinationCode)) && r.ErrorMessage == ValidationText.SamePlace);
+        }
+        finally
+        {
+            CultureInfo.CurrentUICulture = previous;
+        }
     }
 
     [Fact]
