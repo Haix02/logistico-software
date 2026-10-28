@@ -1,0 +1,44 @@
+@* The parcels of one kind in a shelf check: tracking number (to the order), where the system had it, and an optional action. *@
+<ul class="lx-list">
+    @foreach (var line in Items)
+    {
+        <li class="lx-list-item">
+            <span class="lx-list-body">
+                <span class="lx-list-title">
+                    @if (line.ShipmentId is { } id)
+                    {
+                        <a href="@($"shipments/{id}")" class="lx-code" dir="ltr">@line.TrackingNumber</a>
+                    }
+                    else
+                    {
+                        <span class="lx-code" dir="ltr">@line.TrackingNumber</span>
+                    }
+                </span>
+                <span class="lx-list-sub">
+                    @if (line.SystemStatus is { } status)
+                    {
+                        @ShipmentTexts.Of(status)
+                    }
+                    @if (line.SystemHubCode is { } hub)
+                    {
+                        <text> · </text>@Fmt.Hub(hub)
+                    }
+                    @if (line.SystemBin is { } bin)
+                    {
+                        <text> · </text><span class="lx-mono" dir="ltr">@bin</span>
+                    }
+                    @if (line.ScannedAt is { } at)
+                    {
+                        <text> · </text>@Fmt.Time(at)
+                    }
+                </span>
+            </span>
+            @Action?.Invoke(line)
+        </li>
+    }
+</ul>
+
+@code {
+    [Parameter, EditorRequired] public IEnumerable<ShelfCheckLineItem> Items { get; set; } = [];
+    [Parameter] public RenderFragment<ShelfCheckLineItem>? Action { get; set; }
+}

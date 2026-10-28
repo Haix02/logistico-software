@@ -13,6 +13,7 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
     public const string ReturnManifestSequence = "return_manifest_seq";
     public const string SettlementSequence = "settlement_number_seq";
     public const string CashHandoverSequence = "cash_handover_seq";
+    public const string ShelfCheckSequence = "shelf_check_seq";
 
     public DbSet<Shipment> Shipments => Set<Shipment>();
     public DbSet<ShipmentEvent> ShipmentEvents => Set<ShipmentEvent>();
@@ -31,6 +32,10 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
     public DbSet<Warehouse> Warehouses => Set<Warehouse>();
     public DbSet<RateCardSettings> RateCards => Set<RateCardSettings>();
     public DbSet<SavedView> SavedViews => Set<SavedView>();
+    public DbSet<DeliveryProof> DeliveryProofs => Set<DeliveryProof>();
+    public DbSet<ShipmentComment> Comments => Set<ShipmentComment>();
+    public DbSet<ShelfCheck> ShelfChecks => Set<ShelfCheck>();
+    public DbSet<ShelfCheckLine> ShelfCheckLines => Set<ShelfCheckLine>();
 
     // Referenced by the query filters so EF Core parameterises the tenant per context instance.
     private Guid CurrentTenantId => tenant.TenantId;
@@ -52,6 +57,7 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
         modelBuilder.HasSequence<long>(ReturnManifestSequence).StartsAt(1).IncrementsBy(1);
         modelBuilder.HasSequence<long>(SettlementSequence).StartsAt(1).IncrementsBy(1);
         modelBuilder.HasSequence<long>(CashHandoverSequence).StartsAt(1).IncrementsBy(1);
+        modelBuilder.HasSequence<long>(ShelfCheckSequence).StartsAt(1).IncrementsBy(1);
 
         modelBuilder.Entity<Shipment>(e =>
         {
@@ -212,6 +218,68 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
             e.HasIndex(x => new { x.TenantId, x.Code }).IsUnique();
             e.HasIndex(x => new { x.TenantId, x.IsActive, x.Governorate });
 
+            e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
+        });
+
+        modelBuilder.Entity<ShelfCheck>(e =>
+        {
+            e.ToTable("shelf_checks");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).ValueGeneratedNever();
+            e.Property(x => x.Number).HasMaxLength(32);
+            e.Property(x => x.HubCode).HasMaxLength(16);
+            e.Property(x => x.Bin).HasMaxLength(20);
+            e.Property(x => x.StartedBy).HasMaxLength(256);
+            e.Property(x => x.FinishedBy).HasMaxLength(256);
+            e.Property(x => x.Version).IsRowVersion();
+            e.HasMany(x => x.Lines).WithOne().HasForeignKey(l => l.ShelfCheckId).OnDelete(DeleteBehavior.Cascade);
+            e.Navigation(x => x.Lines).HasField("_lines").UsePropertyAccessMode(PropertyAccessMode.Field);
+            e.HasIndex(x => new { x.TenantId, x.Number }).IsUnique();
+            e.HasIndex(x => new { x.TenantId, x.HubCode, x.StartedAt });
+            e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
+        });
+
+        modelBuilder.Entity<ShelfCheckLine>(e =>
+        {
+            e.ToTable("shelf_check_lines");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).ValueGeneratedNever();
+            e.Property(x => x.TrackingNumber).HasMaxLength(40);
+            e.Property(x => x.State).HasConversion<string>().HasMaxLength(16);
+            e.Property(x => x.SystemHubCode).HasMaxLength(16);
+            e.Property(x => x.SystemBin).HasMaxLength(20);
+            e.Property(x => x.SystemStatus).HasConversion<string>().HasMaxLength(32);
+
+            // A parcel appears once per check, even when two people scan it at the same moment.
+            e.HasIndex(x => new { x.ShelfCheckId, x.TrackingNumber }).IsUnique();
+            e.HasIndex(x => new { x.ShelfCheckId, x.State });
+        });
+
+        modelBuilder.Entity<ShipmentComment>(e =>
+        {
+            e.ToTable("shipment_comments");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).ValueGeneratedNever();
+            e.Property(x => x.Author).HasMaxLength(256);
+            e.Property(x => x.AuthorName).HasMaxLength(120);
+            e.Property(x => x.Text).HasMaxLength(ShipmentComment.MaxLength);
+            e.HasOne<Shipment>().WithMany().HasForeignKey(x => x.ShipmentId).OnDelete(DeleteBehavior.Cascade);
+            e.HasIndex(x => new { x.TenantId, x.ShipmentId, x.CreatedAt });
+            e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
+        });
+
+        modelBuilder.Entity<DeliveryProof>(e =>
+        {
+            e.ToTable("delivery_proofs");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).ValueGeneratedNever();
+            e.Property(x => x.FailureReason).HasConversion<string>().HasMaxLength(32);
+            e.Property(x => x.ReceivedBy).HasConversion<string>().HasMaxLength(16);
+            e.Property(x => x.CourierLabel).HasMaxLength(160);
+            e.Property(x => x.ReceiverName).HasMaxLength(120);
+            e.Property(x => x.Signature).HasMaxLength(Contracts.CourierDeliveryRequest.MaxSignatureLength);
+            e.HasOne<Shipment>().WithMany().HasForeignKey(x => x.ShipmentId).OnDelete(DeleteBehavior.Cascade);
+            e.HasIndex(x => new { x.TenantId, x.ShipmentId, x.RecordedAt });
             e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
         });
 

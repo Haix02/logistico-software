@@ -237,6 +237,25 @@
   <data name="Courier_FailedToast" xml:space="preserve"><value>{0}: سُجّلت المحاولة.</value></data>
   <data name="Courier_Hello" xml:space="preserve"><value>أهلاً {0}</value></data>
   <data name="Courier_MarkDelivered" xml:space="preserve"><value>تم التسليم</value></data>
+  <data name="Courier_WhoReceived" xml:space="preserve"><value>من استلم الطرد؟</value></data>
+  <data name="Courier_ReceiverName" xml:space="preserve"><value>اسمه</value></data>
+  <data name="Courier_Signature" xml:space="preserve"><value>التوقيع</value></data>
+  <data name="Courier_ClearSignature" xml:space="preserve"><value>مسح</value></data>
+  <data name="Courier_Locating" xml:space="preserve"><value>جارٍ تحديد موقعك…</value></data>
+  <data name="Courier_LocatedN" xml:space="preserve"><value>سُجّل موقعك (بدقة {0} م).</value></data>
+  <data name="Courier_Located" xml:space="preserve"><value>سُجّل موقعك.</value></data>
+  <data name="Courier_NoLocation" xml:space="preserve"><value>تعذّر تحديد موقعك؛ يُحتسب التسليم مع ذلك.</value></data>
+  <data name="Proof_Title" xml:space="preserve"><value>إثبات التسليم</value></data>
+  <data name="Comments_Title" xml:space="preserve"><value>التعليقات</value></data>
+  <data name="Comments_None" xml:space="preserve"><value>لا توجد تعليقات بعد</value></data>
+  <data name="Comments_Hint" xml:space="preserve"><value>ملاحظات للزملاء: ما قاله الزبون، وما يجب التحقق منه في المركز. يراها كل من في المكتب، ولا يراها الزبائن ولا المتاجر.</value></data>
+  <data name="Comments_Placeholder" xml:space="preserve"><value>اكتب ملاحظة لزملائك…</value></data>
+  <data name="Comments_Add" xml:space="preserve"><value>إضافة تعليق</value></data>
+  <data name="Proof_Delivered" xml:space="preserve"><value>سُلّم</value></data>
+  <data name="Proof_Failed" xml:space="preserve"><value>لم يُسلَّم</value></data>
+  <data name="Proof_AccuracyN" xml:space="preserve"><value>بدقة {0} م</value></data>
+  <data name="Proof_NoLocation" xml:space="preserve"><value>لم يرسل الهاتف موقعاً</value></data>
+  <data name="Proof_Signature" xml:space="preserve"><value>توقيع مستلم الطرد</value></data>
   <data name="Courier_MarkFailed" xml:space="preserve"><value>لم يُسلَّم</value></data>
   <data name="Courier_Near" xml:space="preserve"><value>قرب</value></data>
   <data name="Courier_NotLinkedText" xml:space="preserve"><value>اطلب من المدير ربط حسابك بملفك كمندوب من صفحة الفريق.</value></data>
@@ -644,6 +663,36 @@
   <data name="AuditEntity_IdentityUserClaim" xml:space="preserve"><value>ربط الحساب</value></data>
   <data name="Nav_Track" xml:space="preserve"><value>تتبع شحنة</value></data>
   <data name="Nav_Transfers" xml:space="preserve"><value>الشاحنات بين المراكز</value></data>
+  <data name="Nav_ShelfChecks" xml:space="preserve"><value>جرد الرفوف</value></data>
+  <data name="Shelf_Subtitle" xml:space="preserve"><value>عُدّ ما هو موجود فعلاً على رف أو في المركز كله، واعرف أين يخطئ النظام: طرود مفقودة أو على رف آخر أو غير متوقعة هنا.</value></data>
+  <data name="Shelf_New" xml:space="preserve"><value>بدء جرد</value></data>
+  <data name="Shelf_NewHint" xml:space="preserve"><value>اترك الرف فارغاً لجرد المركز كله. إذا كان أحدهم يجرد الرف نفسه تنضم إليه بدل التكرار.</value></data>
+  <data name="Shelf_BinPlaceholder" xml:space="preserve"><value>الرف، مثل A-01-1</value></data>
+  <data name="Shelf_StartHub" xml:space="preserve"><value>جرد المركز كله</value></data>
+  <data name="Shelf_StartShelf" xml:space="preserve"><value>جرد هذا الرف</value></data>
+  <data name="Shelf_None" xml:space="preserve"><value>لا يوجد جرد بعد</value></data>
+  <data name="Shelf_Check" xml:space="preserve"><value>الجرد</value></data>
+  <data name="Shelf_FoundOfExpected" xml:space="preserve"><value>الموجود / المتوقع</value></data>
+  <data name="Shelf_Problems" xml:space="preserve"><value>ما وجده</value></data>
+  <data name="Shelf_WholeHub" xml:space="preserve"><value>المركز كله</value></data>
+  <data name="Shelf_Finished" xml:space="preserve"><value>منتهٍ</value></data>
+  <data name="Shelf_Counting" xml:space="preserve"><value>قيد العد</value></data>
+  <data name="Shelf_AllThere" xml:space="preserve"><value>كلها موجودة</value></data>
+  <data name="Shelf_NotFound" xml:space="preserve"><value>هذا الجرد غير موجود</value></data>
+  <data name="Shelf_TitleN" xml:space="preserve"><value>جرد {0}</value></data>
+  <data name="Shelf_Finish" xml:space="preserve"><value>إنهاء الجرد</value></data>
+  <data name="Shelf_Expected" xml:space="preserve"><value>المتوقع هنا</value></data>
+  <data name="Shelf_ScanPlaceholder" xml:space="preserve"><value>امسح رقم التتبع أو اكتبه</value></data>
+  <data name="Shelf_Scan" xml:space="preserve"><value>مسح</value></data>
+  <data name="Shelf_MissingHint" xml:space="preserve"><value>متوقعة هنا ولم يُعثر عليها. ابحث عنها أو راجع الطلب: ربما نُقلت دون مسح.</value></data>
+  <data name="Shelf_Attention" xml:space="preserve"><value>موجودة هنا وليست حيث يضعها النظام</value></data>
+  <data name="Shelf_AttentionHint" xml:space="preserve"><value>ضع كل طرد على هذا الرف بنقرة واحدة ليتطابق النظام مع الرف.</value></data>
+  <data name="Shelf_PendingHint" xml:space="preserve"><value>متوقعة هنا ولم تُمسح بعد.</value></data>
+  <data name="Shelf_ReceiveHere" xml:space="preserve"><value>استلام هنا</value></data>
+  <data name="Shelf_PutOnN" xml:space="preserve"><value>ضعه على {0}</value></data>
+  <data name="Shelf_FinishConfirmN" xml:space="preserve"><value>لم يُمسح {0} من الطرود المتوقعة بعد؛ إنهاء الجرد يعدّها مفقودة.</value></data>
+  <data name="Shelf_SystemSaysShelfN" xml:space="preserve"><value>النظام يضعه على {0}</value></data>
+  <data name="Shelf_UnknownLabel" xml:space="preserve"><value>لا يوجد طلب بهذا الرقم</value></data>
   <data name="Nav_Warehouse" xml:space="preserve"><value>محطة المركز</value></data>
   <data name="Nav_Warehouses" xml:space="preserve"><value>المخازن والفروع</value></data>
   <data name="NeedChange" xml:space="preserve"><value>هل تحتاج إلى تغيير شيء؟</value></data>

@@ -223,6 +223,25 @@
   <data name="Courier_FailedToast" xml:space="preserve"><value>{0}: attempt recorded.</value></data>
   <data name="Courier_Hello" xml:space="preserve"><value>Hello, {0}</value></data>
   <data name="Courier_MarkDelivered" xml:space="preserve"><value>Delivered</value></data>
+  <data name="Courier_WhoReceived" xml:space="preserve"><value>Who took the parcel?</value></data>
+  <data name="Courier_ReceiverName" xml:space="preserve"><value>Their name</value></data>
+  <data name="Courier_Signature" xml:space="preserve"><value>Signature</value></data>
+  <data name="Courier_ClearSignature" xml:space="preserve"><value>Clear</value></data>
+  <data name="Courier_Locating" xml:space="preserve"><value>Finding where you are…</value></data>
+  <data name="Courier_LocatedN" xml:space="preserve"><value>Your place is recorded (within {0} m).</value></data>
+  <data name="Courier_Located" xml:space="preserve"><value>Your place is recorded.</value></data>
+  <data name="Courier_NoLocation" xml:space="preserve"><value>Your place could not be found; the delivery still counts.</value></data>
+  <data name="Proof_Title" xml:space="preserve"><value>Proof of delivery</value></data>
+  <data name="Comments_Title" xml:space="preserve"><value>Comments</value></data>
+  <data name="Comments_None" xml:space="preserve"><value>No comments yet</value></data>
+  <data name="Comments_Hint" xml:space="preserve"><value>Notes for colleagues: what the customer said, what to check at the hub. Everyone in the office sees them; customers and sellers do not.</value></data>
+  <data name="Comments_Placeholder" xml:space="preserve"><value>Write a note for your colleagues…</value></data>
+  <data name="Comments_Add" xml:space="preserve"><value>Add comment</value></data>
+  <data name="Proof_Delivered" xml:space="preserve"><value>Delivered</value></data>
+  <data name="Proof_Failed" xml:space="preserve"><value>Not delivered</value></data>
+  <data name="Proof_AccuracyN" xml:space="preserve"><value>within {0} m</value></data>
+  <data name="Proof_NoLocation" xml:space="preserve"><value>No location from the phone</value></data>
+  <data name="Proof_Signature" xml:space="preserve"><value>Signature of the person who took the parcel</value></data>
   <data name="Courier_MarkFailed" xml:space="preserve"><value>Not delivered</value></data>
   <data name="Courier_Near" xml:space="preserve"><value>Near</value></data>
   <data name="Courier_NotLinkedText" xml:space="preserve"><value>Ask an administrator to link your account to your courier profile on the Team page.</value></data>
@@ -610,6 +629,36 @@
   <data name="AuditEntity_IdentityUserClaim" xml:space="preserve"><value>Account link</value></data>
   <data name="Nav_Track" xml:space="preserve"><value>Track a shipment</value></data>
   <data name="Nav_Transfers" xml:space="preserve"><value>Trucks between hubs</value></data>
+  <data name="Nav_ShelfChecks" xml:space="preserve"><value>Shelf checks</value></data>
+  <data name="Shelf_Subtitle" xml:space="preserve"><value>Count what is really on a shelf, or in the whole hub, and see what the system has wrong: parcels missing, on the wrong shelf, or not expected here.</value></data>
+  <data name="Shelf_New" xml:space="preserve"><value>Start a count</value></data>
+  <data name="Shelf_NewHint" xml:space="preserve"><value>Leave the shelf empty to count the whole hub. Someone already counting the same shelf is joined, not repeated.</value></data>
+  <data name="Shelf_BinPlaceholder" xml:space="preserve"><value>Shelf, e.g. A-01-1</value></data>
+  <data name="Shelf_StartHub" xml:space="preserve"><value>Count the whole hub</value></data>
+  <data name="Shelf_StartShelf" xml:space="preserve"><value>Count this shelf</value></data>
+  <data name="Shelf_None" xml:space="preserve"><value>No shelf checks yet</value></data>
+  <data name="Shelf_Check" xml:space="preserve"><value>Count</value></data>
+  <data name="Shelf_FoundOfExpected" xml:space="preserve"><value>Found / expected</value></data>
+  <data name="Shelf_Problems" xml:space="preserve"><value>What it found</value></data>
+  <data name="Shelf_WholeHub" xml:space="preserve"><value>Whole hub</value></data>
+  <data name="Shelf_Finished" xml:space="preserve"><value>Finished</value></data>
+  <data name="Shelf_Counting" xml:space="preserve"><value>Counting</value></data>
+  <data name="Shelf_AllThere" xml:space="preserve"><value>All there</value></data>
+  <data name="Shelf_NotFound" xml:space="preserve"><value>This shelf check does not exist</value></data>
+  <data name="Shelf_TitleN" xml:space="preserve"><value>Count of {0}</value></data>
+  <data name="Shelf_Finish" xml:space="preserve"><value>Finish the count</value></data>
+  <data name="Shelf_Expected" xml:space="preserve"><value>Expected here</value></data>
+  <data name="Shelf_ScanPlaceholder" xml:space="preserve"><value>Scan or type a tracking number</value></data>
+  <data name="Shelf_Scan" xml:space="preserve"><value>Scan</value></data>
+  <data name="Shelf_MissingHint" xml:space="preserve"><value>Expected here but not found. Look for them, or check the order: someone may have moved them without a scan.</value></data>
+  <data name="Shelf_Attention" xml:space="preserve"><value>Found here, not where the system has them</value></data>
+  <data name="Shelf_AttentionHint" xml:space="preserve"><value>Put each one on this shelf in one tap, so the system matches the shelf.</value></data>
+  <data name="Shelf_PendingHint" xml:space="preserve"><value>Expected here and not scanned yet.</value></data>
+  <data name="Shelf_ReceiveHere" xml:space="preserve"><value>Receive here</value></data>
+  <data name="Shelf_PutOnN" xml:space="preserve"><value>Put on {0}</value></data>
+  <data name="Shelf_FinishConfirmN" xml:space="preserve"><value>{0} expected parcels are not scanned yet; finishing marks them missing.</value></data>
+  <data name="Shelf_SystemSaysShelfN" xml:space="preserve"><value>the system has it on {0}</value></data>
+  <data name="Shelf_UnknownLabel" xml:space="preserve"><value>no order with this number</value></data>
   <data name="Nav_Warehouse" xml:space="preserve"><value>Hub station</value></data>
   <data name="Nav_Warehouses" xml:space="preserve"><value>Warehouses &amp; branches</value></data>
   <data name="NeedChange" xml:space="preserve"><value>Need to change something?</value></data>

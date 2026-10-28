@@ -1,0 +1,26 @@
+@* What a shelf check found wrong, as small badges (nothing when all is in order). *@
+@if (Summary.Missing + Summary.WrongShelf + Summary.NotExpected == 0)
+{
+    <span class="bp6-text-muted">@(Summary.Finished ? L["Shelf_AllThere"] : "—")</span>
+}
+else
+{
+    <span class="lx-row" style="gap:4px;flex-wrap:wrap">
+        @if (Summary.Missing > 0)
+        {
+            <Tag Intent="Intent.Danger">@ShipmentTexts.Of(ShelfCheckState.Missing) · @Fmt.Number(Summary.Missing)</Tag>
+        }
+        @if (Summary.WrongShelf > 0)
+        {
+            <Tag Intent="Intent.Warning">@ShipmentTexts.Of(ShelfCheckState.WrongShelf) · @Fmt.Number(Summary.WrongShelf)</Tag>
+        }
+        @if (Summary.NotExpected > 0)
+        {
+            <Tag Intent="Intent.Warning">@ShipmentTexts.Of(ShelfCheckState.NotExpected) · @Fmt.Number(Summary.NotExpected)</Tag>
+        }
+    </span>
+}
+
+@code {
+    [Parameter, EditorRequired] public ShelfCheckSummary Summary { get; set; } = default!;
+}

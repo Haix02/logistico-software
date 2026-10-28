@@ -7,9 +7,9 @@ internal sealed class CourierApi(HttpClient http) : ApiClient(http)
 {
     public Task<CourierRun> GetRunAsync(CancellationToken ct = default) => GetAsync<CourierRun>(ShipmentsApiRoutes.CourierRun, ct);
 
-    public Task<ScanOutcome> DeliveredAsync(Guid shipmentId, CancellationToken ct = default) =>
-        SendAsync<ScanOutcome>(HttpMethod.Post, ShipmentsApiRoutes.CourierDelivered(shipmentId), null, null, ct);
+    public Task<ScanOutcome> DeliveredAsync(Guid shipmentId, CourierDeliveryRequest proof, CancellationToken ct = default) =>
+        SendAsync<ScanOutcome>(HttpMethod.Post, ShipmentsApiRoutes.CourierDelivered(shipmentId), proof, null, ct);
 
-    public Task<ScanOutcome> FailedAsync(Guid shipmentId, DeliveryFailureReason reason, CancellationToken ct = default) =>
-        SendAsync<ScanOutcome>(HttpMethod.Post, ShipmentsApiRoutes.CourierFailed(shipmentId), new CourierFailureRequest { Reason = reason }, null, ct);
+    public Task<ScanOutcome> FailedAsync(Guid shipmentId, DeliveryFailureReason reason, GeoPoint? location, CancellationToken ct = default) =>
+        SendAsync<ScanOutcome>(HttpMethod.Post, ShipmentsApiRoutes.CourierFailed(shipmentId), new CourierFailureRequest { Reason = reason, Location = location }, null, ct);
 }

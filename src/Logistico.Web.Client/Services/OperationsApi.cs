@@ -1,5 +1,6 @@
 using Logistico.Modules.Shipments.Contracts;
 using Logistico.Modules.Shipments.Contracts.Rules;
+using Logistico.SharedKernel;
 
 namespace Logistico.Web.Client.Services;
 
@@ -9,6 +10,21 @@ internal sealed class OperationsApi(HttpClient http) : ApiClient(http)
     // Hub stations
     public Task<ScanOutcome> ScanAsync(ScanRequest request, CancellationToken ct = default) =>
         SendAsync<ScanOutcome>(HttpMethod.Post, ShipmentsApiRoutes.WarehouseScan, request, null, ct);
+
+    public Task<PagedResult<ShelfCheckSummary>> ListShelfChecksAsync(string? hub, int page, CancellationToken ct = default) =>
+        GetAsync<PagedResult<ShelfCheckSummary>>(ShipmentsApiRoutes.ShelfChecks + Query(("hub", hub), ("page", page)), ct);
+
+    public Task<ShelfCheckDetails> StartShelfCheckAsync(StartShelfCheckRequest request, CancellationToken ct = default) =>
+        SendAsync<ShelfCheckDetails>(HttpMethod.Post, ShipmentsApiRoutes.ShelfChecks, request, null, ct);
+
+    public Task<ShelfCheckDetails?> GetShelfCheckAsync(Guid id, CancellationToken ct = default) =>
+        FindAsync<ShelfCheckDetails>(ShipmentsApiRoutes.ShelfCheck(id), ct);
+
+    public Task<ShelfCheckScanResult> ScanShelfAsync(Guid id, string trackingNumber, CancellationToken ct = default) =>
+        SendAsync<ShelfCheckScanResult>(HttpMethod.Post, ShipmentsApiRoutes.ShelfCheckScan(id), new ShelfCheckScanRequest { TrackingNumber = trackingNumber }, null, ct);
+
+    public Task<ShelfCheckDetails> FinishShelfCheckAsync(Guid id, CancellationToken ct = default) =>
+        SendAsync<ShelfCheckDetails>(HttpMethod.Post, ShipmentsApiRoutes.ShelfCheckFinish(id), null, null, ct);
 
     public Task<BulkScanResult> BulkScanAsync(BulkScanRequest request, CancellationToken ct = default) =>
         SendAsync<BulkScanResult>(HttpMethod.Post, ShipmentsApiRoutes.WarehouseBulk, request, null, ct);
