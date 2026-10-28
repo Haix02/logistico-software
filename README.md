@@ -2,15 +2,30 @@
 
 # Logistico · لوجستيكو
 
-**Open-source logistics and delivery management system: orders, warehouses, trucks, couriers, shipment tracking, returns and cash on delivery — built for Iraq, useful anywhere the address is a neighbourhood and a landmark.**
+**Open-source delivery and logistics management system — courier app with proof of delivery, cash on delivery (COD), hubs and shelves, trucks between cities, returns, shipment tracking and an audit log. Built for Iraq, useful anywhere the address is a neighbourhood and a landmark.**
 
-Version 3.0 · Arabic-first (RTL) · English · .NET 10 · Blazor WebAssembly · PostgreSQL · Apache-2.0
+[![CI](https://github.com/Haix02/logistico-software/actions/workflows/ci.yml/badge.svg)](https://github.com/Haix02/logistico-software/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+![.NET 10](https://img.shields.io/badge/.NET-10-512BD4)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16%2B-336791)
+![Arabic RTL](https://img.shields.io/badge/Arabic-RTL-0a7d5a)
+![Flutter app](https://img.shields.io/badge/mobile-Flutter-02569B)
 
-[Quick start](#quick-start) · [What it does](#what-it-does) · [Demand intelligence](#demand-intelligence-the-data-advantage) · [Docs](#documentation) · [Contributing](CONTRIBUTING.md)
+Version 3.0 · Arabic-first (RTL) · English · .NET 10 · Blazor WebAssembly · PostgreSQL · Flutter mobile app · Apache-2.0
+
+[Quick start](#quick-start) · [What it does](#what-it-does) · [Mobile app](#mobile-app) · [Demand intelligence](#demand-intelligence-the-data-advantage) · [Docs](#documentation) · [Contributing](CONTRIBUTING.md)
 
 A delivery company runs the whole day in one console: book a parcel, scan it through hubs, put it on a truck, hand it to a courier, collect the cash, and see why deliveries fail. The interface is **light by default** (a quiet grey frame and white work panels). Dark mode is one click in the top bar. Arabic is the default language and the layout is right-to-left.
 
 ![Operations overview: orders, delivery success, cash collected and daily volume](docs/images/dashboard-light.png)
+
+</div>
+
+<div dir="rtl">
+
+**لوجستيكو** نظام مفتوح المصدر ومجاني لإدارة شركات الشحن والتوصيل في العراق: الطلبات ومتاجر الإنستغرام، الدفع عند الاستلام،
+المخازن والرفوف، الشاحنات بين المحافظات، تطبيق المندوب مع إثبات التسليم، المرتجعات، تسوية مستحقات المتاجر، الجمارك (أسيكودا)،
+وصفحة تتبع للزبون. الواجهة عربية أولاً من اليمين إلى اليسار، مع الإنجليزية.
 
 </div>
 
@@ -42,6 +57,11 @@ do deliveries fail?** Companies can publish anonymised answers as open data, so 
 | **Demand intelligence** | What customers buy, where, when, basket sizes vs refusals, trade lanes, repeat customers, plain-language findings, open-data export ([below](#demand-intelligence-the-data-advantage)) |
 | **Money** | Delivery prices per company (own governorate, per destination, weight, seller discounts) quoted on the order form; cash held by couriers, seller COD balances, settlement batches (ZainCash, Qi Card, cash, bank) with CSV statements |
 | **Courier app** | Couriers sign in on their phone and see only their parcels: address and landmark, cash to collect, call or WhatsApp the customer, mark delivered or not delivered with the reason; installable on the home screen |
+| **Proof of delivery** | Who took the parcel (customer, family, neighbour… with a name), an optional finger signature, and the courier's location at every delivery and failed attempt, shown on the order |
+| **Cash control** | Couriers hand in their cash against the parcels it covers, shortages recorded; sellers are paid only from cash the company holds; optional return fee for parcels sent back |
+| **Shelf checks** | Count a hub shelf or a whole hub with a barcode scanner: missing, misplaced and unexpected parcels at once, misplaced ones fixed in one tap |
+| **Audit log** | Who changed what and when — orders, prices, rules, payouts, sellers, staff accounts — with every field before and after; append-only |
+| **Comments & saved views** | Staff notes on every order; each person's named list views and columns |
 | **Seller portal** | Shops book their own orders (paste the customer's message), at the company's prices; follow orders and returns, cancel before pickup, see what they are owed and every payout with its statement |
 | **Team & roles** | Administrators add colleagues and give them one of five office roles (Administrator, Operations, Customer support, Finance, Viewer), or Courier or Seller for the courier app and seller portal; lock, unlock and set new passwords; the API enforces every role and the screens follow it |
 | **International freight & customs** | Bookings by sea/air/road, 4×6" AWB labels with Code-128, ASYCUDA workbench (SAD XML, CoO/invoice e-verification, duty estimate) |
@@ -59,6 +79,19 @@ do deliveries fail?** Companies can publish anonymised answers as open data, so 
 </table>
 
 ![Warehouses and branches: coverage of the governorates and the live load of each hub](docs/images/warehouses.png)
+
+## Mobile app
+
+One **Flutter** app for Android and iOS whose screens follow the account that signs in, and whose content the company
+controls from the web console:
+
+- **Senders (shops)** — book orders at the company's prices, follow them and their returns, see what they are owed.
+- **Couriers** — the day's run, call or WhatsApp the customer, proof of delivery, cash to hand in; scanning with the
+  **built-in scanner of Android handhelds**, a **Bluetooth/USB scanner gun**, or the camera.
+- **Managers** — operations and delivery figures, alerts, hub scanning and shelf checks.
+
+It signs in with the same accounts and roles as the web console. The design is in
+[09 — Client applications](docs/09-client-applications.md).
 
 ## Demand intelligence: the data advantage
 
@@ -109,9 +142,9 @@ dotnet run --project src/Logistico.Web --launch-profile http
 ### Tests
 
 ```bash
-dotnet test tests/Logistico.Modules.Shipments.Tests     # domain rules, product catalogue, open data, formatting (207)
-dotnet test tests/Logistico.ArchitectureTests            # module boundaries, texts in both languages, RTL/CSS and icon guards (31)
-dotnet test tests/Logistico.Web.IntegrationTests         # REST API on real PostgreSQL: flows, roles, team safety, tenants (62)
+dotnet test tests/Logistico.Modules.Shipments.Tests     # domain rules, product catalogue, open data, formatting (246)
+dotnet test tests/Logistico.ArchitectureTests            # module boundaries, texts in both languages, RTL/CSS and icon guards (33)
+dotnet test tests/Logistico.Web.IntegrationTests         # REST API on real PostgreSQL: flows, roles, audit, tenants (85)
 ```
 
 Set `LOGISTICO_TEST_DB` to point the integration tests at another PostgreSQL server.
@@ -126,6 +159,7 @@ Set `LOGISTICO_TEST_DB` to point the integration tests at another PostgreSQL ser
 | Backend | ASP.NET Core modular monolith (strict module boundaries, contracts shared with the browser) |
 | Database | PostgreSQL with EF Core 10 (schema per module, snake_case, optimistic concurrency) |
 | Identity | ASP.NET Core Identity (cookies, roles, 2FA, passkeys), multi-company (tenant) data isolation |
+| Mobile | Flutter (Android and iOS), one app for senders, couriers and managers; Riverpod, go_router, dio |
 | CI | GitHub Actions: format → build → tests on PostgreSQL → Docker image check → container image + migration bundles |
 
 No paid licences, no map service, no CDN at run time: everything (Blueprint, fonts, the Iraq map) is vendored.
@@ -139,6 +173,7 @@ src/
   Logistico.SharedKernel/     Tenancy, paging, Iraqi governorates and phone numbers, cultures
   Modules/Shipments/          Orders, hubs and trucks, returns, requests, automation, insights, customs, fleet, COD
   Modules/Merchants/          Sellers (Instagram / online shops)
+  Modules/Audit/              Audit log: who changed what, recorded with every change
 tests/                        Domain, architecture and API integration tests
 docs/                         Architecture, decisions and guides (start with 00)
 Dockerfile, docker-compose.yml
@@ -166,6 +201,14 @@ Dockerfile, docker-compose.yml
 | 15 | [Production readiness](docs/15-production-readiness.md) | Configuration, go-live checklist, performance acceptance |
 | 16 | [Data & demand intelligence](docs/16-data-and-insights.md) | Insights, product recognition, open data and privacy |
 | 17 | [Release audits](docs/17-release-audits.md) | What each release checked and fixed |
+| 18 | [Ideas from open source](docs/18-ideas-from-open-source.md) | What we took from Fleetbase, OpenBoxes, Karrio, VROOM, Traccar |
+
+## Alternatives and how Logistico differs
+
+Logistico is an open-source alternative to closed delivery platforms (Onfleet, Shipday, Tookan) and to general systems
+adapted for delivery (Odoo, ERPNext). Compared with open-source projects such as [Fleetbase](https://github.com/fleetbase/fleetbase)
+or [OpenBoxes](https://openboxes.com), it is built around **cash on delivery**, **Arabic and right-to-left first**,
+**Iraqi addresses** (governorate, area, nearest landmark), **line-haul between governorate hubs**, and **ASYCUDA customs**.
 
 ## Contributing
 

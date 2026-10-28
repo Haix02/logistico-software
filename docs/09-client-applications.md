@@ -7,8 +7,7 @@
 | **Logistico Web** | Current Chrome, Edge, Firefox, Safari on Windows, macOS, Linux, tablets | All office roles, partners, managers | Blazor WebAssembly + Blueprint 6, Arabic + English | ✅ Running |
 | **Public tracking** | Any browser | Customers | Anonymous pages of the same app (`/track`) | ✅ Running |
 | **Desktop app** | Windows, macOS | Power users who need offline cache, multi-window or local hardware | See §4: three options | ⏳ Open for discussion |
-| **Driver app** | Android, iOS | Drivers | Proposed: .NET MAUI Blazor Hybrid (reuses the web components) | ⏳ Phase 2 |
-| **Warehouse app** | Android (Zebra/Honeywell rugged first) | Warehouse staff | Proposed: .NET MAUI Blazor Hybrid (reuses the web components) | ⏳ Phase 2 |
+| **Logistico mobile** | Android (phones and rugged handhelds), iOS | Senders (shops), couriers, managers and hub staff — one app, screens by role | **Flutter** (Riverpod, go_router, dio), decided 28 Oct 2026 ([ADR-031](14-architecture-decisions.md)) | 🔨 In progress (`mobile/`) |
 
 ## 2. Web app (as built)
 
@@ -48,34 +47,29 @@ Browsers cannot reliably reach USB/serial devices, and Safari has no WebUSB or W
 | **B. .NET MAUI Blazor Hybrid** | Native Windows/macOS app hosting the **same Blazor components** in a WebView, with direct .NET access to the machine | Identical to web | Full local SQLite cache | In-process | Low–medium: packaging, updates | Phase 2 if offline or multi-window needs grow |
 | **C. Native Avalonia UI app** | A separate native desktop UI with Avalonia (MIT, runs on Windows and macOS): docking and native grids possible | Different from web | Full | In-process | **Highest**: second UI codebase | Only for a dedicated power-user console. (DevExpress WPF is out while there is no licence.) |
 
-## 5. Mobile apps (proposed, Phase 2)
+## 5. Mobile app (Flutter, in progress)
 
-**Two apps, not one:**
-- **Driver**: phones, navigation, POD, COD.
-- **Warehouse**: rugged scanners, high scan volume, kiosk-like.
+**One app, not three.** The account that signs in decides what the app shows, and the company decides, from the web
+console, which parts each kind of account gets — a small CMS for the app ([ADR-031](14-architecture-decisions.md)).
 
-They need different permissions, distribution (stores versus MDM) and UX, but share the C# contracts, API client and validation with the web app.
-
-| Concern | Proposal |
+| Account (role) | What the app shows |
 |---|---|
-| Framework | **.NET MAUI Blazor Hybrid**: native app shell (camera, Bluetooth, background location) hosting the same Blueprint-styled Blazor components, with layouts made for small screens. Free; no extra UI licence. |
-| Offline data | Local SQLite + queued commands with idempotency keys. Sync engine options: CommunityToolkit.Datasync (MIT) or PowerSync (if its .NET SDK is mature); decide in Phase 2. |
-| Scanning | Zebra **DataWedge** intents and Honeywell intents (Android platform code); camera scanning on phones |
-| Printing | Zebra Link-OS (Bluetooth ZPL); ESC/POS over Bluetooth (raster for Arabic) |
-| Maps & navigation | Mapsui (MIT) with offline Iraq tiles; hand-off to Google Maps/Waze for turn-by-turn |
-| Driver location | Foreground service while **on duty** only |
-| POD | Photo (compressed < 300 KB), signature, OTP, receiver name/ID |
-| Distribution | Stores (driver app); Android Enterprise / Zebra StageNow kiosk (warehouse devices) |
+| **Sender** (Seller role: a shop the company created) | Home with what the shop is owed and what is on its way; orders and their tracking; booking at the company's prices; returns; payouts with statements |
+| **Courier** | Today's run (address, landmark, cash to collect), call/WhatsApp, delivered with proof (who took it, signature, location) or not delivered with the reason, cash to hand in; scan a label to open its stop |
+| **Manager** (Admin, Operations, Finance, Viewer…) | Today's figures and the period's trend, alerts, order search; for hub roles a scan station (receive, dispatch) and shelf checks |
 
-### Driver app flows
-1. **Start shift**: vehicle check (photos, odometer), accept trip.
-2. **Trip list**: ordered stops, map, one-tap call/WhatsApp to consignee, navigation hand-off.
-3. **Pickup**: scan pieces, photo, signature, print a receipt.
-4. **Delivery**: scan → collect COD → POD (signature/photo/OTP) → receipt → done. Failed attempt → reason code + photo + reschedule.
-5. **End shift**: COD cash handover (count, discrepancies), vehicle check-in.
+| Concern | Decision |
+|---|---|
+| Framework | **Flutter** stable, one codebase for Android and iOS; Material 3 styled with the Pajamas tokens of the web console; Almarai font; Arabic first (RTL) and English |
+| State, navigation, HTTP | **Riverpod**, **go_router** (routes rebuilt from the account's role and the company's app settings), **dio** |
+| Sign-in | **ASP.NET Core Identity bearer tokens**: `POST /api/v1/auth/token` (e-mail, password; lockout as on the web), short-lived access token and a refresh token kept in the platform keystore (`flutter_secure_storage`); a refresh is refused once an administrator locks the account or changes its role (security stamp) |
+| What each role sees | `GET /api/v1/app/config`: the account (name, role, courier or shop), the modules switched on for its role, scanner settings, branding, a message to show, and the minimum app version. Administrators edit it on the **Mobile app** page of the web console; changes reach phones at the next start or refresh, and the audit log records them |
+| Scanning | Three sources behind one stream of codes: **built-in scanners of Android handhelds** in intent mode (a configurable broadcast action and extra, e.g. Zebra DataWedge, Honeywell, Urovo, Sunmi, Chainway) through a small Android plugin; **keyboard mode** of handhelds and **Bluetooth/USB scanner guns** (fast key bursts ended by Enter, told apart from typing by speed); the **camera** (`mobile_scanner`) as a fallback |
+| Location for proof | The phone's position at each attempt (already accepted by the API), asked only while delivering |
+| Performance | Release builds with tree-shaking; lists are lazy and paged; images none by default; the run and the config are cached for a quick start; tokens refreshed once for concurrent requests |
+| Distribution | Android first (APK/AAB for handhelds and Play), iOS from the same code |
 
-### Warehouse app flows
-Receive (against ASN, container devanning) → Putaway (system-directed location) → Pick (wave/batch/zone, scan-confirm) → Pack (cartonise, print label) → Load (scan to trip/container, seal numbers) → Cycle count → Move/relabel → Lookup (scan anything → show what it is).
+Senders are shops the company creates (Team page, Seller role); the app has no public sign-up.
 
 ## 6. Offline & sync rules (all clients)
 
@@ -91,4 +85,4 @@ Receive (against ASN, container devanning) → Putaway (system-directed location
 ## 7. Version compatibility
 
 - The API keeps backward compatibility within `/api/v1`. Breaking changes go to `/api/v2`.
-- Native apps (when they exist) send their version; the API can require a minimum version. The API supports **at least the two latest released mobile versions** because store review takes time.
+- The mobile app sends its version (`X-App-Version`); the company's app settings can require a minimum version. The API supports **at least the two latest released mobile versions** because store review takes time.

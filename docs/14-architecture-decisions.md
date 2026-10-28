@@ -222,3 +222,20 @@ knowledge in SQL); an outbox to a separate store (the change and its entry could
 tracker and so the trail; none are used today, and new ones must record their own entry. Still planned: the per-tenant
 hash chain, monthly partitions and a retention job (§4.6), and read access logging (sensitive reads, exports).
 
+### ADR-031: One Flutter app, shaped by the account and controlled from the console — Accepted (28 Oct 2026)
+**Context.** Senders, couriers and managers need a phone app; couriers use the company's rugged Android handhelds with
+built-in scanners and Bluetooth/USB scanner guns. The earlier proposal was .NET MAUI Blazor Hybrid (two apps).
+**Decision.** One **Flutter** app for Android and iOS (decided by the maintainers). The signed-in account's role decides
+the screens, and the company decides from the web console which modules each role gets (`GET /api/v1/app/config`, a
+**Mobile app** settings page). Foundation: **Riverpod** (state), **go_router** (role-based routes), **dio** (API),
+`flutter_secure_storage` (tokens), `mobile_scanner` (camera); the hardware scanners come through a small Android plugin
+(broadcast intents) and keyboard bursts. Sign-in uses **ASP.NET Core Identity bearer tokens** (`/api/v1/auth/token`,
+`/api/v1/auth/refresh`); the API accepts the cookie or the bearer token on every endpoint, with the same policies.
+Senders are shops created by the company; there is no public sign-up.
+**Alternatives.** MAUI Blazor Hybrid (reuses web components, weaker on Android device integration and scrolling
+performance); JWT (a signing key to manage, no built-in refresh-with-revocation); separate apps per role (three
+releases to ship and review).
+**Consequences.** Mobile code lives in `mobile/` with its own CI job. The API is the only contract: any role change or
+lock on the Team page reaches the app at the next refresh. Native features beyond these (printing, background GPS) are
+added as plugins when decided.
+
