@@ -60,12 +60,16 @@ public static class StaffPolicies
     /// <summary>A person's own settings, such as saved list views: every office role, read-only ones included.</summary>
     public const string Personal = "personal";
 
-    public static readonly IReadOnlyList<string> All = [Staff, Operate, Care, Finance, Administer, Deliver, Sell, Personal];
+    /// <summary>Any account of the company with a role, couriers and sellers included (the mobile app's start-up).</summary>
+    public const string Member = "member";
+
+    public static readonly IReadOnlyList<string> All = [Staff, Operate, Care, Finance, Administer, Deliver, Sell, Personal, Member];
 
     /// <summary>The roles that satisfy a policy.</summary>
     public static IReadOnlyList<string> RolesFor(string policy) => policy switch
     {
         Staff or Personal => StaffRoles.All,
+        Member => [.. StaffRoles.All, StaffRoles.Courier, StaffRoles.Seller],
         Operate => [StaffRoles.Admin, StaffRoles.Operations],
         Care => [StaffRoles.Admin, StaffRoles.Operations, StaffRoles.CustomerSupport],
         Finance => [StaffRoles.Admin, StaffRoles.Finance],

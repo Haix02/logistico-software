@@ -1,0 +1,143 @@
+@page "/mobile-app"
+@attribute [Authorize(Policy = StaffPolicies.Administer)]
+@inject MobileAppApi MobileApp
+@inject Toaster Toaster
+
+<PageTitle>@L["Nav_MobileApp"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["Nav_MobileApp"]" Subtitle="@L["Mobile_Subtitle"]" Icon="mobile-phone">
+    <Actions>
+        <Button Intent="Intent.Primary" Icon="tick" Text="@L["Save"]" Loading="saving" Disabled="@(view is null)" OnClick="SaveAsync" />
+    </Actions>
+</PageHeader>
+
+@if (view is null)
+{
+    <Skeleton Block="true" Lines="6" />
+}
+else
+{
+    var s = view.Settings;
+    @if (view.UpdatedAt is { } at)
+    {
+        <p class="bp6-text-muted lx-small lx-mb">@string.Format(CultureInfo.CurrentCulture, L["Mobile_LastChanged"], Fmt.DateTime(at), view.UpdatedBy)</p>
+    }
+
+    <Section Title="@L["Mobile_Modules"]" Subtitle="@L["Mobile_ModulesHint"]" Icon="th" CssClass="lx-mb">
+        <div class="lx-mobile-roles">
+            @foreach (var (kind, modules, chosen) in Kinds(s))
+            {
+                <div class="lx-mobile-role">
+                    <h6 class="bp6-heading"><Icon Name="@KindIcon(kind)" /> @L[$"Mobile_Kind_{kind}"]</h6>
+                    <p class="bp6-text-muted lx-small">@L[$"Mobile_Kind_{kind}_Hint"]</p>
+                    @foreach (var module in modules)
+                    {
+                        <Switch Label="@L[$"Mobile_Module_{module.Replace('.', '_')}"]" Value="@chosen.Contains(module)"
+                                ValueChanged="@(on => Toggle(chosen, module, on))" />
+                    }
+                </div>
+            }
+        </div>
+    </Section>
+
+    <div class="lx-grid-2 lx-mb">
+        <Section Title="@L["Mobile_Scanning"]" Subtitle="@L["Mobile_ScanningHint"]" Icon="barcode">
+            <Switch Label="@L["Mobile_CameraScanning"]" @bind-Value="s.CameraScanning" />
+            <p class="bp6-text-muted lx-small"><Mixed Text="@L["Mobile_KnownScanners"]" /></p>
+            <div class="lx-form-grid">
+                <FormField TValue="string" Label="@L["Mobile_ScannerAction"]" Hint="@L["Optional"]">
+                    <input class="bp6-input bp6-fill lx-mono" dir="ltr" maxlength="100" placeholder="com.example.SCAN" @bind="s.ScannerAction" />
+                </FormField>
+                <FormField TValue="string" Label="@L["Mobile_ScannerExtra"]" Hint="@L["Optional"]">
+                    <input class="bp6-input bp6-fill lx-mono" dir="ltr" maxlength="100" placeholder="barcode_data" @bind="s.ScannerExtra" />
+                </FormField>
+            </div>
+        </Section>
+
+        <Section Title="@L["Proof_Title"]" Subtitle="@L["Mobile_ProofHint"]" Icon="endorsed">
+            <Switch Label="@L["Mobile_RequireSignature"]" @bind-Value="s.RequireSignature" />
+        </Section>
+    </div>
+
+    <Section Title="@L["Mobile_Branding"]" Subtitle="@L["Mobile_BrandingHint"]" Icon="style">
+        <div class="lx-form-grid">
+            <FormField TValue="string" Label="@L["Mobile_AppName"]" Hint="@L["Optional"]">
+                <input class="bp6-input bp6-fill" maxlength="40" placeholder="Logistico" @bind="s.AppName" />
+            </FormField>
+            <FormField TValue="string" Label="@L["Mobile_Color"]" Hint="@L["Optional"]">
+                <span class="lx-row" style="gap:8px">
+                    <input type="color" class="lx-color" value="@(s.PrimaryColor ?? "#1f75cb")" @onchange="@(e => s.PrimaryColor = e.Value?.ToString())" aria-label="@L["Mobile_Color"]" />
+                    <span class="lx-mono" dir="ltr">@(s.PrimaryColor ?? "—")</span>
+                </span>
+            </FormField>
+            <FormField TValue="string" Label="@L["Mobile_Announcement"]" Hint="@L["Optional"]" CssClass="lx-span-2">
+                <textarea class="bp6-input bp6-fill" rows="2" maxlength="300" dir="auto" placeholder="@L["Mobile_AnnouncementPlaceholder"]" @bind="s.Announcement"></textarea>
+            </FormField>
+            <FormField TValue="string" Label="@L["Mobile_SupportPhone"]" Hint="@L["Optional"]">
+                <input class="bp6-input bp6-fill" dir="ltr" maxlength="20" placeholder="0770 000 0000" @bind="s.SupportPhone" />
+            </FormField>
+            <FormField TValue="string" Label="@L["Mobile_MinimumVersion"]" Hint="@L["Optional"]">
+                <input class="bp6-input bp6-fill lx-mono" dir="ltr" maxlength="11" placeholder="1.0.0" @bind="s.MinimumVersion" />
+            </FormField>
+        </div>
+        @if (error is not null)
+        {
+            <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mt">@error</Callout>
+        }
+    </Section>
+}
+
+@code {
+    private MobileAppSettingsView? view;
+    private bool saving;
+    private string? error;
+
+    protected override async Task OnInitializedAsync() => view = await MobileApp.GetSettingsAsync();
+
+    private static IEnumerable<(string Kind, IReadOnlyList<string> Modules, List<string> Chosen)> Kinds(MobileAppSettings s) =>
+    [
+        (AppKinds.Sender, AppModules.Sender, s.SenderModules),
+        (AppKinds.Courier, AppModules.Courier, s.CourierModules),
+        (AppKinds.Manager, AppModules.Manager, s.ManagerModules),
+    ];
+
+    private static string KindIcon(string kind) => kind switch
+    {
+        AppKinds.Sender => "shop",
+        AppKinds.Courier => "drive-time",
+        _ => "dashboard",
+    };
+
+    private static void Toggle(List<string> chosen, string module, bool on)
+    {
+        chosen.Remove(module);
+        if (on)
+        {
+            chosen.Add(module);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (view is null)
+        {
+            return;
+        }
+
+        saving = true;
+        error = null;
+        try
+        {
+            view = await MobileApp.SaveSettingsAsync(view.Settings, view.Version);
+            Toaster.Success(L["Mobile_Saved"]);
+        }
+        catch (ApiException ex)
+        {
+            error = ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

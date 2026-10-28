@@ -226,6 +226,7 @@
   <data name="Courier_WhoReceived" xml:space="preserve"><value>Who took the parcel?</value></data>
   <data name="Courier_ReceiverName" xml:space="preserve"><value>Their name</value></data>
   <data name="Courier_Signature" xml:space="preserve"><value>Signature</value></data>
+  <data name="Courier_SignatureNeeded" xml:space="preserve"><value>Ask the person who took the parcel to sign above.</value></data>
   <data name="Courier_ClearSignature" xml:space="preserve"><value>Clear</value></data>
   <data name="Courier_Locating" xml:space="preserve"><value>Finding where you are…</value></data>
   <data name="Courier_LocatedN" xml:space="preserve"><value>Your place is recorded (within {0} m).</value></data>
@@ -595,6 +596,47 @@
   <data name="Nav_Shipments" xml:space="preserve"><value>Shipments</value></data>
   <data name="Nav_Team" xml:space="preserve"><value>Team &amp; access</value></data>
   <data name="Nav_Audit" xml:space="preserve"><value>Audit log</value></data>
+  <data name="Nav_MobileApp" xml:space="preserve"><value>Mobile app</value></data>
+  <data name="Mobile_Subtitle" xml:space="preserve"><value>What the Logistico app shows to each kind of account. Changes reach phones the next time the app starts or refreshes.</value></data>
+  <data name="Mobile_LastChanged" xml:space="preserve"><value>Last changed {0} by {1}</value></data>
+  <data name="Mobile_Saved" xml:space="preserve"><value>Mobile app settings saved</value></data>
+  <data name="Mobile_Modules" xml:space="preserve"><value>What each account sees</value></data>
+  <data name="Mobile_ModulesHint" xml:space="preserve"><value>Switch parts of the app on or off. Managers only get the parts their role may use (hub scanning needs Operations, finance needs Finance).</value></data>
+  <data name="Mobile_Kind_sender" xml:space="preserve"><value>Senders (shops)</value></data>
+  <data name="Mobile_Kind_sender_Hint" xml:space="preserve"><value>Seller accounts linked to a shop on the Team page.</value></data>
+  <data name="Mobile_Kind_courier" xml:space="preserve"><value>Couriers</value></data>
+  <data name="Mobile_Kind_courier_Hint" xml:space="preserve"><value>Courier accounts linked to a courier on the Team page.</value></data>
+  <data name="Mobile_Kind_manager" xml:space="preserve"><value>Managers and office staff</value></data>
+  <data name="Mobile_Kind_manager_Hint" xml:space="preserve"><value>Administrators, operations, customer support, finance and viewers.</value></data>
+  <data name="Mobile_Module_sender_home" xml:space="preserve"><value>Home: what the shop is owed</value></data>
+  <data name="Mobile_Module_sender_orders" xml:space="preserve"><value>Orders and tracking</value></data>
+  <data name="Mobile_Module_sender_book" xml:space="preserve"><value>Book an order</value></data>
+  <data name="Mobile_Module_sender_payouts" xml:space="preserve"><value>Payouts and statements</value></data>
+  <data name="Mobile_Module_courier_run" xml:space="preserve"><value>Today's run</value></data>
+  <data name="Mobile_Module_courier_scan" xml:space="preserve"><value>Scan a label to open its stop</value></data>
+  <data name="Mobile_Module_courier_cash" xml:space="preserve"><value>Cash to hand in</value></data>
+  <data name="Mobile_Module_manager_dashboard" xml:space="preserve"><value>Figures of the day and the period</value></data>
+  <data name="Mobile_Module_manager_alerts" xml:space="preserve"><value>Alerts</value></data>
+  <data name="Mobile_Module_manager_orders" xml:space="preserve"><value>Order search</value></data>
+  <data name="Mobile_Module_manager_hub_scan" xml:space="preserve"><value>Hub scanning (receive, dispatch)</value></data>
+  <data name="Mobile_Module_manager_shelf_check" xml:space="preserve"><value>Shelf checks</value></data>
+  <data name="Mobile_Module_manager_finance" xml:space="preserve"><value>Cash and payouts</value></data>
+  <data name="Mobile_Scanning" xml:space="preserve"><value>Scanning</value></data>
+  <data name="Mobile_ScanningHint" xml:space="preserve"><value>Built-in scanners of Android handhelds and Bluetooth/USB scanner guns always work; the camera is for ordinary phones.</value></data>
+  <data name="Mobile_CameraScanning" xml:space="preserve"><value>Allow scanning with the phone camera</value></data>
+  <data name="Mobile_KnownScanners" xml:space="preserve"><value>The app already listens to Zebra (DataWedge set to com.logistico.SCAN), Urovo, Sunmi, Newland, iData and Chainway scanners, and to any scanner gun. For another handheld, enter the broadcast its scanner sends:</value></data>
+  <data name="Mobile_ScannerAction" xml:space="preserve"><value>Broadcast action</value></data>
+  <data name="Mobile_ScannerExtra" xml:space="preserve"><value>Extra with the code</value></data>
+  <data name="Mobile_ProofHint" xml:space="preserve"><value>What a courier must collect before a parcel counts as delivered. The server enforces it.</value></data>
+  <data name="Mobile_RequireSignature" xml:space="preserve"><value>Require the receiver's signature</value></data>
+  <data name="Mobile_Branding" xml:space="preserve"><value>Name, colour and messages</value></data>
+  <data name="Mobile_BrandingHint" xml:space="preserve"><value>How the app introduces your company.</value></data>
+  <data name="Mobile_AppName" xml:space="preserve"><value>App name</value></data>
+  <data name="Mobile_Color" xml:space="preserve"><value>Main colour</value></data>
+  <data name="Mobile_Announcement" xml:space="preserve"><value>Message at the top of the app</value></data>
+  <data name="Mobile_AnnouncementPlaceholder" xml:space="preserve"><value>e.g. No deliveries on Friday for the holiday.</value></data>
+  <data name="Mobile_SupportPhone" xml:space="preserve"><value>Support phone</value></data>
+  <data name="Mobile_MinimumVersion" xml:space="preserve"><value>Oldest app version allowed</value></data>
   <data name="Audit_Subtitle" xml:space="preserve"><value>Who changed what, and when: orders, prices, rules, customs, payouts, sellers and staff accounts. Entries cannot be edited or deleted.</value></data>
   <data name="Audit_SearchPlaceholder" xml:space="preserve"><value>Person, tracking number, e-mail or name…</value></data>
   <data name="Audit_Record" xml:space="preserve"><value>Record</value></data>
@@ -726,6 +768,7 @@
   <data name="OpenStation" xml:space="preserve"><value>Scan station</value></data>
   <data name="OpenTruck" xml:space="preserve"><value>Open the truck</value></data>
   <data name="Optional" xml:space="preserve"><value>(optional)</value></data>
+  <data name="Required" xml:space="preserve"><value>(required)</value></data>
   <data name="OrderCancelled" xml:space="preserve"><value>Order cancelled</value></data>
   <data name="OrderCreated" xml:space="preserve"><value>Order created — tracking number {0}</value></data>
   <data name="OrderUpdated" xml:space="preserve"><value>Order updated</value></data>

@@ -27,6 +27,7 @@ builder.Services.AddScoped<MerchantsApi>();
 builder.Services.AddScoped<AccountApi>();
 builder.Services.AddScoped<TeamApi>();
 builder.Services.AddScoped<AuditApi>();
+builder.Services.AddScoped<MobileAppApi>();
 builder.Services.AddScoped<CourierApi>();
 builder.Services.AddScoped<SellerApi>();
 builder.Services.AddScoped<Toaster>();

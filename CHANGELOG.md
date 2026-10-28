@@ -6,6 +6,16 @@ versions follow [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **Mobile app support in the API** (ADR-031): the app signs in with ASP.NET Identity bearer tokens
+  (`/api/v1/auth/token`, `/api/v1/auth/refresh`) under the web's rules (confirmed account, lockout, two-factor, its own
+  rate limit); a refresh is refused once an administrator locks the account or changes it. Every endpoint accepts the
+  cookie or the token with the same policies. `/api/v1/app/config` tells the app what to show for the signed-in
+  account: sender, courier or manager, the modules the company switched on (only those the role may use), scanner
+  intents for Zebra, Urovo, Sunmi, Newland, iData and Chainway handhelds plus the company's own, branding, a message
+  and the minimum app version.
+- **Mobile app settings page** (Administration → Mobile app): what senders, couriers and managers see in the app,
+  camera scanning, the broadcast of another handheld's scanner, "require the receiver's signature" (enforced by the
+  server and shown in the courier app), app name, colour, a message for everyone, support phone and minimum version.
 - **Comments on orders** (idea from Fleetbase): a *Comments* tab on each order where staff leave notes for each other —
   what the customer said, what to check at the hub — with who and when. Notes are never edited, only added; the call
   desk, operations and administrators write them, every office role reads them, customers and sellers never see them.

@@ -2016,3 +2016,10 @@ body.bp6-dark { color: var(--lx-text); background: var(--lx-bg); color-scheme: d
 .lx-comment-form { display: flex; gap: 8px; align-items: flex-end; padding: 12px 16px; border-block-start: 1px solid var(--lx-border); }
 .lx-comment-form textarea { resize: vertical; min-height: 40px; }
 .lx-comment-form .bp6-button { flex: none; white-space: nowrap; }
+
+/* Mobile app settings: the three kinds of account side by side, one column on phones. */
+.lx-mobile-roles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.lx-mobile-role .bp6-heading { display: flex; align-items: center; gap: 8px; margin-block-end: 2px; }
+.lx-mobile-role .bp6-control { margin-block: 10px; }
+.lx-color { width: 40px; height: 32px; padding: 2px; border: 1px solid var(--lx-control-border); border-radius: var(--lx-radius-sm); background: var(--lx-surface); }
+@media (max-width: 900px) { .lx-mobile-roles { grid-template-columns: 1fr; } }

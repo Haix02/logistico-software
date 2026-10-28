@@ -21,6 +21,8 @@ public sealed class RoleAccessTests(LogisticoApiFactory factory)
         ShipmentsApiRoutes.PublicTracking + "/{trackingNumber}/rating",
         ShipmentsApiRoutes.PublicTracking + "/{trackingNumber}/confirm",
         "api/v1/account/me",
+        Logistico.SharedKernel.Mobile.MobileApiRoutes.Token, // the mobile app's sign-in (password, lockout and rate limit apply)
+        Logistico.SharedKernel.Mobile.MobileApiRoutes.Refresh,
     ];
 
     [Fact]
