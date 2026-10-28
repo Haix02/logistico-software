@@ -6,6 +6,10 @@ versions follow [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **Comments on orders** (idea from Fleetbase): a *Comments* tab on each order where staff leave notes for each other —
+  what the customer said, what to check at the hub — with who and when. Notes are never edited, only added; the call
+  desk, operations and administrators write them, every office role reads them, customers and sellers never see them.
+  English notes read left to right inside the Arabic page, and numbers keep their order inside Arabic notes.
 - **Shelf checks** (Hubs & trucks → Shelf checks; idea from OpenBoxes cycle counts): count what is really on a shelf, or
   in the whole hub, with a barcode scanner. Each scan says at once whether the parcel belongs there, is on the wrong
   shelf (with where the system has it) or is not expected here; finishing lists what is missing. Parcels on the wrong

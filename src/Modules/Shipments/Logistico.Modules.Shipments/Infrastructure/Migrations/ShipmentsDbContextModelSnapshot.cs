@@ -1829,6 +1829,53 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                     b.ToTable("shipments", "shipment");
                 });
 
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ShipmentComment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("author");
+
+                    b.Property<string>("AuthorName")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("author_name");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("ShipmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("shipment_id");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("text");
+
+                    b.HasKey("Id")
+                        .HasName("pk_shipment_comments");
+
+                    b.HasIndex("ShipmentId")
+                        .HasDatabaseName("ix_shipment_comments_shipment_id");
+
+                    b.HasIndex("TenantId", "ShipmentId", "CreatedAt")
+                        .HasDatabaseName("ix_shipment_comments_tenant_id_shipment_id_created_at");
+
+                    b.ToTable("shipment_comments", "shipment");
+                });
+
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ShipmentEvent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2112,6 +2159,16 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_shelf_check_lines_shelf_checks_shelf_check_id");
+                });
+
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ShipmentComment", b =>
+                {
+                    b.HasOne("Logistico.Modules.Shipments.Domain.Shipment", null)
+                        .WithMany()
+                        .HasForeignKey("ShipmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_shipment_comments_shipments_shipment_id");
                 });
 
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ShipmentEvent", b =>
