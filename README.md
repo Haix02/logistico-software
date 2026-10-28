@@ -90,8 +90,13 @@ controls from the web console:
   **built-in scanner of Android handhelds**, a **Bluetooth/USB scanner gun**, or the camera.
 - **Managers** — operations and delivery figures, alerts, hub scanning and shelf checks.
 
-It signs in with the same accounts and roles as the web console. The design is in
-[09 — Client applications](docs/09-client-applications.md).
+It signs in with the same accounts and roles as the web console. How to run and build it:
+[mobile/README.md](mobile/README.md); the design: [09 — Client applications](docs/09-client-applications.md).
+
+<p>
+<img src="docs/images/mobile-courier-run.png" width="240" alt="Courier app: today's run with the company's message and the cash to collect at each stop">
+<img src="docs/images/mobile-courier-stop.png" width="240" alt="Courier app: one stop with call, WhatsApp, delivered and not delivered">
+</p>
 
 ## Demand intelligence: the data advantage
 
@@ -174,6 +179,7 @@ src/
   Modules/Shipments/          Orders, hubs and trucks, returns, requests, automation, insights, customs, fleet, COD
   Modules/Merchants/          Sellers (Instagram / online shops)
   Modules/Audit/              Audit log: who changed what, recorded with every change
+mobile/                       Flutter app for senders, couriers and managers (Android, iOS)
 tests/                        Domain, architecture and API integration tests
 docs/                         Architecture, decisions and guides (start with 00)
 Dockerfile, docker-compose.yml
