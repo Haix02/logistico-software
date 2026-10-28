@@ -2005,3 +2005,7 @@ body.bp6-dark { color: var(--lx-text); background: var(--lx-bg); color-scheme: d
 }
 .lx-signature-view path { fill: none; stroke: var(--lx-text-strong); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .lx-proof { align-items: flex-start; }
+
+/* Shelf checks: a large scan box under the progress bar. */
+.lx-shelf-scan { display: flex; gap: 8px; margin-block-start: 14px; }
+.lx-shelf-scan .bp6-input-group { flex: 1; min-width: 0; }

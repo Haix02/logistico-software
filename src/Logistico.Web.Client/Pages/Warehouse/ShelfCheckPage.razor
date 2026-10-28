@@ -1,0 +1,247 @@
+@page "/warehouse/checks/{Id:guid}"
+@inject OperationsApi Operations
+@inject Toaster Toaster
+@inject Confirmer Confirm
+@inject IJSRuntime JS
+
+<PageTitle>@(check?.Summary.Number ?? L["Nav_ShelfChecks"]) · @L["AppName"]</PageTitle>
+
+@if (notFound)
+{
+    <NonIdealState Icon="clipboard" Title="@L["Shelf_NotFound"]" />
+}
+else if (check is null)
+{
+    <Skeleton Block="true" Lines="6" />
+}
+else
+{
+    var s = check.Summary;
+    <PageHeader Title="@string.Format(CultureInfo.CurrentCulture, L["Shelf_TitleN"], s.Bin ?? L["Shelf_WholeHub"].Value)" Subtitle="@($"{s.Number} · {Fmt.Hub(s.HubCode)}")" Icon="clipboard">
+        <Actions>
+            <LinkButton Href="warehouse/checks" Icon="@Bidi.Back" Text="@L["Nav_ShelfChecks"]" Minimal="true" />
+            @if (!s.Finished)
+            {
+                <Allowed Policy="@StaffPolicies.Operate">
+                    <Button Intent="Intent.Primary" Icon="tick" Text="@L["Shelf_Finish"]" Loading="finishing" OnClick="FinishAsync" />
+                </Allowed>
+            }
+        </Actions>
+    </PageHeader>
+
+    <div class="lx-kpis">
+        <KpiCard Icon="box" Label="@L["Shelf_Expected"]" Value="@Fmt.Number(s.Expected)" />
+        <KpiCard Icon="tick-circle" Label="@ShipmentTexts.Of(ShelfCheckState.Found)" Value="@Fmt.Number(s.Found)" Intent="Intent.Success" />
+        @if (s.Finished)
+        {
+            <KpiCard Icon="error" Label="@ShipmentTexts.Of(ShelfCheckState.Missing)" Value="@Fmt.Number(s.Missing)" Intent="@(s.Missing > 0 ? Intent.Danger : Intent.None)" />
+        }
+        else
+        {
+            <KpiCard Icon="time" Label="@ShipmentTexts.Of(ShelfCheckState.Expected)" Value="@Fmt.Number(s.Pending)" />
+        }
+        <KpiCard Icon="swap-horizontal" Label="@ShipmentTexts.Of(ShelfCheckState.WrongShelf)" Value="@Fmt.Number(s.WrongShelf)" Intent="@(s.WrongShelf > 0 ? Intent.Warning : Intent.None)" />
+        <KpiCard Icon="help" Label="@ShipmentTexts.Of(ShelfCheckState.NotExpected)" Value="@Fmt.Number(s.NotExpected)" Intent="@(s.NotExpected > 0 ? Intent.Warning : Intent.None)" />
+    </div>
+
+    @if (!s.Finished)
+    {
+        <Allowed Policy="@StaffPolicies.Operate">
+            <div class="lx-card lx-card-pad lx-mb">
+                <ProgressBar Value="@(s.Expected == 0 ? 1 : (double)s.Found / s.Expected)" Intent="Intent.Success" />
+                <form class="lx-shelf-scan" @onsubmit="ScanAsync" @onsubmit:preventDefault>
+                    <div class="bp6-input-group bp6-large bp6-fill">
+                        <span class="bp6-icon bp6-icon-standard bp6-icon-barcode"></span>
+                        <input id="lx-shelf-scan" class="bp6-input lx-mono" dir="ltr" autocomplete="off" placeholder="@L["Shelf_ScanPlaceholder"]" aria-label="@L["Shelf_ScanPlaceholder"]" @bind="code" />
+                    </div>
+                    <Button Type="submit" Large="true" Icon="key-enter" Text="@L["Shelf_Scan"]" Loading="scanning" />
+                </form>
+                @if (last is { } l)
+                {
+                    <Callout Intent="@IntentOf(l.State)" Icon="@IconOf(l.State)" CssClass="lx-mt">
+                        <b dir="ltr">@l.TrackingNumber</b> — @ShipmentTexts.Of(l.State)
+                        @if (Where(l) is { } where)
+                        {
+                            <span class="bp6-text-muted"> · @where</span>
+                        }
+                    </Callout>
+                }
+            </div>
+        </Allowed>
+    }
+
+    <div class="lx-stack" style="gap:18px">
+        @if (Lines(ShelfCheckState.Missing).Any())
+        {
+            <Section Title="@ShipmentTexts.Of(ShelfCheckState.Missing)" Subtitle="@L["Shelf_MissingHint"]" Icon="error" Padded="false">
+                <ShelfLines Items="Lines(ShelfCheckState.Missing)" />
+            </Section>
+        }
+        @if (Lines(ShelfCheckState.WrongShelf, ShelfCheckState.NotExpected).Any())
+        {
+            <Section Title="@L["Shelf_Attention"]" Subtitle="@L["Shelf_AttentionHint"]" Icon="warning-sign" Padded="false">
+                <ShelfLines Items="Lines(ShelfCheckState.WrongShelf, ShelfCheckState.NotExpected)">
+                    <Action Context="line">
+                        @if (line.ShipmentId is not null && (!s.Finished || line.State == ShelfCheckState.WrongShelf))
+                        {
+                            <Allowed Policy="@StaffPolicies.Operate">
+                                <Button Small="true" Icon="import" Text="@(s.Bin is null ? L["Shelf_ReceiveHere"].Value : string.Format(CultureInfo.CurrentCulture, L["Shelf_PutOnN"], s.Bin))"
+                                        Loading="@(fixing == line.TrackingNumber)" OnClick="@(() => FixAsync(line))" />
+                            </Allowed>
+                        }
+                    </Action>
+                </ShelfLines>
+            </Section>
+        }
+        @if (!s.Finished && Lines(ShelfCheckState.Expected).Any())
+        {
+            <Section Title="@ShipmentTexts.Of(ShelfCheckState.Expected)" Subtitle="@L["Shelf_PendingHint"]" Icon="time" Padded="false" Collapsible="true">
+                <ShelfLines Items="Lines(ShelfCheckState.Expected)" />
+            </Section>
+        }
+        @if (Lines(ShelfCheckState.Found).Any())
+        {
+            <Section Title="@ShipmentTexts.Of(ShelfCheckState.Found)" Icon="tick-circle" Padded="false" Collapsible="true" StartCollapsed="@s.Finished">
+                <ShelfLines Items="Lines(ShelfCheckState.Found)" />
+            </Section>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private ShelfCheckDetails? check;
+    private ShelfCheckLineItem? last;
+    private string? code;
+    private string? fixing;
+    private bool scanning;
+    private bool finishing;
+    private bool notFound;
+    private bool focused;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        check = await Operations.GetShelfCheckAsync(Id);
+        notFound = check is null;
+    }
+
+    /// <summary>Ready to scan as soon as the count opens.</summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!focused && check is { Summary.Finished: false })
+        {
+            focused = true;
+            await JS.InvokeVoidAsync("lx.focus", "lx-shelf-scan");
+        }
+    }
+
+    private IEnumerable<ShelfCheckLineItem> Lines(params ShelfCheckState[] states) => check?.Lines.Where(l => states.Contains(l.State)) ?? [];
+
+    /// <summary>One label scanned (a barcode scanner types it and presses Enter): beep, show the answer, ready for the next.</summary>
+    private async Task ScanAsync()
+    {
+        var text = code?.Trim();
+        if (string.IsNullOrEmpty(text) || check is null || scanning)
+        {
+            return;
+        }
+
+        scanning = true;
+        code = null;
+        try
+        {
+            var result = await Operations.ScanShelfAsync(Id, text);
+            last = result.Line;
+            check = check with
+            {
+                Summary = result.Summary,
+                Lines = [result.Line, .. check.Lines.Where(l => l.TrackingNumber != result.Line.TrackingNumber)],
+            };
+            await JS.InvokeVoidAsync("lx.beep", result.Line.State == ShelfCheckState.Found);
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+            await JS.InvokeVoidAsync("lx.beep", false);
+        }
+        finally
+        {
+            scanning = false;
+            await JS.InvokeVoidAsync("lx.focus", "lx-shelf-scan");
+        }
+    }
+
+    /// <summary>Puts a parcel found here on this shelf (or receives it at this hub): an ordinary receive scan.</summary>
+    private async Task FixAsync(ShelfCheckLineItem line)
+    {
+        if (check is null)
+        {
+            return;
+        }
+
+        fixing = line.TrackingNumber;
+        try
+        {
+            var outcome = await Operations.ScanAsync(new ScanRequest { Operation = ScanOperation.Receive, TrackingNumber = line.TrackingNumber, HubCode = check.Summary.HubCode, WarehouseBin = check.Summary.Bin });
+            Toaster.Success(outcome.Message);
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            fixing = null;
+        }
+    }
+
+    private async Task FinishAsync()
+    {
+        if (check is not { } c || !await Confirm.AskAsync(L["Shelf_Finish"], string.Format(CultureInfo.CurrentCulture, L["Shelf_FinishConfirmN"], Fmt.Number(c.Summary.Pending)), L["Shelf_Finish"], Intent.Primary, "tick"))
+        {
+            return;
+        }
+
+        finishing = true;
+        try
+        {
+            check = await Operations.FinishShelfCheckAsync(Id);
+            last = null;
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            finishing = false;
+        }
+    }
+
+    /// <summary>Where the system has a parcel that should not be here.</summary>
+    private string? Where(ShelfCheckLineItem l) => l.State switch
+    {
+        ShelfCheckState.WrongShelf => string.Format(CultureInfo.CurrentCulture, L["Shelf_SystemSaysShelfN"], l.SystemBin ?? "—"),
+        ShelfCheckState.NotExpected when l.SystemStatus is { } status => $"{ShipmentTexts.Of(status)}{(l.SystemHubCode is { } hub ? " · " + Fmt.Hub(hub) : "")}",
+        ShelfCheckState.NotExpected => L["Shelf_UnknownLabel"],
+        _ => null,
+    };
+
+    private static Intent IntentOf(ShelfCheckState state) => state switch
+    {
+        ShelfCheckState.Found => Intent.Success,
+        ShelfCheckState.Missing => Intent.Danger,
+        ShelfCheckState.WrongShelf or ShelfCheckState.NotExpected => Intent.Warning,
+        _ => Intent.None,
+    };
+
+    private static string IconOf(ShelfCheckState state) => state switch
+    {
+        ShelfCheckState.Found => "tick-circle",
+        ShelfCheckState.Missing => "error",
+        ShelfCheckState.WrongShelf => "swap-horizontal",
+        ShelfCheckState.NotExpected => "help",
+        _ => "time",
+    };
+}

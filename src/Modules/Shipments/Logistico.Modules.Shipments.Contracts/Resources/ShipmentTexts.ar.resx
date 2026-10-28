@@ -47,6 +47,13 @@
   <data name="Receiver_Neighbour" xml:space="preserve"><value>الجار</value></data>
   <data name="Receiver_Workplace" xml:space="preserve"><value>زميل أو استقبال</value></data>
   <data name="Receiver_Other" xml:space="preserve"><value>شخص آخر</value></data>
+  <data name="ShelfState_Expected" xml:space="preserve"><value>لم يُمسح بعد</value></data>
+  <data name="ShelfState_Found" xml:space="preserve"><value>على الرف</value></data>
+  <data name="ShelfState_Missing" xml:space="preserve"><value>مفقود</value></data>
+  <data name="ShelfState_WrongShelf" xml:space="preserve"><value>على رف آخر</value></data>
+  <data name="ShelfState_NotExpected" xml:space="preserve"><value>غير متوقع هنا</value></data>
+  <data name="Problem_shelf_check.finished" xml:space="preserve"><value>انتهى هذا الجرد؛ ابدأ جرداً جديداً.</value></data>
+  <data name="Problem_shelf_check.not_found" xml:space="preserve"><value>لا يوجد جرد بهذا الرقم.</value></data>
   <data name="Failure_Unreachable" xml:space="preserve"><value>الهاتف مغلق أو خارج التغطية</value></data>
   <data name="Failure_WrongAddress" xml:space="preserve"><value>العنوان خاطئ أو غير مكتمل</value></data>
   <data name="HubKind_Branch" xml:space="preserve"><value>فرع</value></data>

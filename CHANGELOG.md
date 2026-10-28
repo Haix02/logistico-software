@@ -6,6 +6,11 @@ versions follow [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **Shelf checks** (Hubs & trucks → Shelf checks; idea from OpenBoxes cycle counts): count what is really on a shelf, or
+  in the whole hub, with a barcode scanner. Each scan says at once whether the parcel belongs there, is on the wrong
+  shelf (with where the system has it) or is not expected here; finishing lists what is missing. Parcels on the wrong
+  shelf are put right in one tap, a second person starting the same shelf joins the count, and every count is kept
+  (SC-… numbers) with who did it.
 - **Proof of delivery** (courier app; idea from Fleetbase): marking a parcel delivered asks who took it (the customer, a
   family member, a neighbour, a colleague or someone else, with their name) and offers a finger signature; the phone's
   location is recorded with every delivery and failed attempt, so "the courier never came" can be checked. The order
