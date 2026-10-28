@@ -65,6 +65,24 @@ public enum DeliveryFailureReason
     Other,
 }
 
+/// <summary>A parcel's place in a shelf check.</summary>
+[JsonConverter(typeof(JsonStringEnumConverter<ShelfCheckState>))]
+public enum ShelfCheckState
+{
+    /// <summary>Should be on the shelf; not scanned yet.</summary>
+    Expected,
+    Found,
+
+    /// <summary>Should have been on the shelf but was not scanned when the check finished.</summary>
+    Missing,
+
+    /// <summary>At this hub as far as the system knows, but on another shelf.</summary>
+    WrongShelf,
+
+    /// <summary>The system has it elsewhere (another hub, with a courier, delivered) or does not know it.</summary>
+    NotExpected,
+}
+
 /// <summary>Who took the parcel at the door (proof of delivery).</summary>
 [JsonConverter(typeof(JsonStringEnumConverter<DeliveryReceiver>))]
 public enum DeliveryReceiver

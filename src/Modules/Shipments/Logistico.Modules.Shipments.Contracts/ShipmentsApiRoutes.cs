@@ -53,6 +53,7 @@ public static class ShipmentsApiRoutes
     public const string SellerQuote = Seller + "/quote";
     public const string Finance = "api/v1/finance";
     public const string FinanceSummary = Finance + "/summary";
+    public const string ShelfChecks = "api/v1/shelf-checks";
     public const string Views = "api/v1/views";
     public const string FinanceSettlements = Finance + "/settlements";
 
@@ -69,6 +70,7 @@ public static class ShipmentsApiRoutes
     public static string TrackRating(string trackingNumber) => $"{PublicTracking}/{Uri.EscapeDataString(trackingNumber)}/rating";
     public static string Events(Guid id) => $"{Shipments}/{id}/events";
     public static string Proofs(Guid id) => $"{Shipments}/{id}/proofs";
+    public static string Comments(Guid id) => $"{Shipments}/{id}/comments";
     public static string StartReturn(Guid id) => $"{Shipments}/{id}/return";
     public static string Track(string trackingNumber) => $"{PublicTracking}/{Uri.EscapeDataString(trackingNumber)}";
     public static string TrackRequests(string trackingNumber) => $"{Track(trackingNumber)}/requests";
@@ -93,6 +95,9 @@ public static class ShipmentsApiRoutes
     public static string SellerCancel(Guid shipmentId) => $"{SellerOrders}/{shipmentId}/cancel";
 
     public static string SellerStatement(Guid settlementId) => $"{Seller}/payouts/{settlementId}/statement.csv";
+    public static string ShelfCheck(Guid id) => $"{ShelfChecks}/{id}";
+    public static string ShelfCheckScan(Guid id) => $"{ShelfChecks}/{id}/scan";
+    public static string ShelfCheckFinish(Guid id) => $"{ShelfChecks}/{id}/finish";
     public static string ViewById(Guid id) => $"{Views}/{id}";
     public static string SettlementExport(Guid id) => $"{FinanceSettlements}/{id}/export.csv";
 }

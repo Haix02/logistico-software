@@ -6,6 +6,15 @@ versions follow [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **Comments on orders** (idea from Fleetbase): a *Comments* tab on each order where staff leave notes for each other —
+  what the customer said, what to check at the hub — with who and when. Notes are never edited, only added; the call
+  desk, operations and administrators write them, every office role reads them, customers and sellers never see them.
+  English notes read left to right inside the Arabic page, and numbers keep their order inside Arabic notes.
+- **Shelf checks** (Hubs & trucks → Shelf checks; idea from OpenBoxes cycle counts): count what is really on a shelf, or
+  in the whole hub, with a barcode scanner. Each scan says at once whether the parcel belongs there, is on the wrong
+  shelf (with where the system has it) or is not expected here; finishing lists what is missing. Parcels on the wrong
+  shelf are put right in one tap, a second person starting the same shelf joins the count, and every count is kept
+  (SC-… numbers) with who did it.
 - **Proof of delivery** (courier app; idea from Fleetbase): marking a parcel delivered asks who took it (the customer, a
   family member, a neighbour, a colleague or someone else, with their name) and offers a finger signature; the phone's
   location is recorded with every delivery and failed attempt, so "the courier never came" can be checked. The order

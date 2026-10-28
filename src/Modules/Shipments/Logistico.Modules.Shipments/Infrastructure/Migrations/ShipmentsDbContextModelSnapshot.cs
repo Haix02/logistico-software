@@ -33,6 +33,8 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
 
             modelBuilder.HasSequence("settlement_number_seq");
 
+            modelBuilder.HasSequence("shelf_check_seq");
+
             modelBuilder.HasSequence("tracking_number_seq");
 
             modelBuilder.HasSequence("transfer_number_seq");
@@ -1294,6 +1296,132 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                     b.ToTable("service_requests", "shipment");
                 });
 
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ShelfCheck", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Bin")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("bin");
+
+                    b.Property<bool>("Finished")
+                        .HasColumnType("boolean")
+                        .HasColumnName("finished");
+
+                    b.Property<DateTimeOffset?>("FinishedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("finished_at");
+
+                    b.Property<string>("FinishedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("finished_by");
+
+                    b.Property<string>("HubCode")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("hub_code");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("number");
+
+                    b.Property<DateTimeOffset>("StartedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("started_at");
+
+                    b.Property<string>("StartedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("started_by");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
+                        .HasName("pk_shelf_checks");
+
+                    b.HasIndex("TenantId", "Number")
+                        .IsUnique()
+                        .HasDatabaseName("ix_shelf_checks_tenant_id_number");
+
+                    b.HasIndex("TenantId", "HubCode", "StartedAt")
+                        .HasDatabaseName("ix_shelf_checks_tenant_id_hub_code_started_at");
+
+                    b.ToTable("shelf_checks", "shipment");
+                });
+
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ShelfCheckLine", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset?>("ScannedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("scanned_at");
+
+                    b.Property<Guid>("ShelfCheckId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("shelf_check_id");
+
+                    b.Property<Guid?>("ShipmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("shipment_id");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("state");
+
+                    b.Property<string>("SystemBin")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("system_bin");
+
+                    b.Property<string>("SystemHubCode")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("system_hub_code");
+
+                    b.Property<string>("SystemStatus")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("system_status");
+
+                    b.Property<string>("TrackingNumber")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("tracking_number");
+
+                    b.HasKey("Id")
+                        .HasName("pk_shelf_check_lines");
+
+                    b.HasIndex("ShelfCheckId", "State")
+                        .HasDatabaseName("ix_shelf_check_lines_shelf_check_id_state");
+
+                    b.HasIndex("ShelfCheckId", "TrackingNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_shelf_check_lines_shelf_check_id_tracking_number");
+
+                    b.ToTable("shelf_check_lines", "shipment");
+                });
+
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.Shipment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1701,6 +1829,53 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                     b.ToTable("shipments", "shipment");
                 });
 
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ShipmentComment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("author");
+
+                    b.Property<string>("AuthorName")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("author_name");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("ShipmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("shipment_id");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("text");
+
+                    b.HasKey("Id")
+                        .HasName("pk_shipment_comments");
+
+                    b.HasIndex("ShipmentId")
+                        .HasDatabaseName("ix_shipment_comments_shipment_id");
+
+                    b.HasIndex("TenantId", "ShipmentId", "CreatedAt")
+                        .HasDatabaseName("ix_shipment_comments_tenant_id_shipment_id_created_at");
+
+                    b.ToTable("shipment_comments", "shipment");
+                });
+
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ShipmentEvent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1976,6 +2151,26 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                         .HasConstraintName("fk_delivery_proofs_shipments_shipment_id");
                 });
 
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ShelfCheckLine", b =>
+                {
+                    b.HasOne("Logistico.Modules.Shipments.Domain.ShelfCheck", null)
+                        .WithMany("Lines")
+                        .HasForeignKey("ShelfCheckId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_shelf_check_lines_shelf_checks_shelf_check_id");
+                });
+
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ShipmentComment", b =>
+                {
+                    b.HasOne("Logistico.Modules.Shipments.Domain.Shipment", null)
+                        .WithMany()
+                        .HasForeignKey("ShipmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_shipment_comments_shipments_shipment_id");
+                });
+
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ShipmentEvent", b =>
                 {
                     b.HasOne("Logistico.Modules.Shipments.Domain.Shipment", null)
@@ -1999,6 +2194,11 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.HubTransfer", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ShelfCheck", b =>
+                {
+                    b.Navigation("Lines");
                 });
 
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.Shipment", b =>

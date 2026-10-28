@@ -1,0 +1,102 @@
+@page "/warehouse/checks"
+@inject OperationsApi Operations
+@inject NavigationManager Navigation
+@inject Toaster Toaster
+@inject IJSRuntime JS
+
+<PageTitle>@L["Nav_ShelfChecks"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["Nav_ShelfChecks"]" Subtitle="@L["Shelf_Subtitle"]" Icon="clipboard" />
+
+<Allowed Policy="@StaffPolicies.Operate">
+    <Section Title="@L["Shelf_New"]" Subtitle="@L["Shelf_NewHint"]" Icon="add" CssClass="lx-mb">
+        <form class="lx-toolbar" @onsubmit="StartAsync" @onsubmit:preventDefault>
+            <HtmlSelect Value="@hub" ValueChanged="@(v => hub = v ?? HubCatalog.Primary.Code)" Label="@L["Col_Hub"]">
+                @foreach (var h in HubCatalog.All)
+                {
+                    <option value="@h.Code">@h.RoutingTag · @h.Name</option>
+                }
+            </HtmlSelect>
+            <input class="bp6-input lx-mono" dir="ltr" maxlength="20" placeholder="@L["Shelf_BinPlaceholder"]" aria-label="@L["Field_Shelf"]" @bind="bin" />
+            <Button Type="submit" Intent="Intent.Primary" Icon="clipboard" Text="@(string.IsNullOrWhiteSpace(bin) ? L["Shelf_StartHub"].Value : L["Shelf_StartShelf"].Value)" Loading="starting" />
+        </form>
+    </Section>
+</Allowed>
+
+<div class="bp6-card lx-table-card">
+    <DataTable TItem="ShelfCheckSummary" Items="result?.Items" Loading="result is null" ColumnCount="6" OnRowClick="Open" EmptyIcon="clipboard" EmptyTitle="@L["Shelf_None"]">
+        <Header>
+            <th>@L["Shelf_Check"]</th>
+            <th>@L["Col_Hub"]</th>
+            <th>@L["Field_Shelf"]</th>
+            <th class="lx-num">@L["Shelf_FoundOfExpected"]</th>
+            <th>@L["Shelf_Problems"]</th>
+            <th>@L["Col_Status"]</th>
+        </Header>
+        <Row Context="c">
+            <td>
+                <span class="lx-code" dir="ltr">@c.Number</span>
+                <div class="bp6-text-muted lx-small">@Fmt.DateTime(c.StartedAt) · <Mixed Text="@c.StartedBy" /></div>
+            </td>
+            <td>@Fmt.Hub(c.HubCode)</td>
+            <td><span class="lx-mono" dir="ltr">@(c.Bin ?? L["Shelf_WholeHub"].Value)</span></td>
+            <td class="lx-num">@Fmt.Number(c.Found) / @Fmt.Number(c.Expected)</td>
+            <td><ShelfProblems Summary="c" /></td>
+            <td><Tag Intent="@(c.Finished ? Intent.None : Intent.Primary)">@(c.Finished ? L["Shelf_Finished"] : L["Shelf_Counting"])</Tag></td>
+        </Row>
+    </DataTable>
+    @if (result is not null)
+    {
+        <Pager Page="result.Page" PageSize="result.PageSize" Total="result.TotalCount" OnPage="PageAsync" />
+    }
+</div>
+
+@code {
+    private PagedResult<ShelfCheckSummary>? result;
+    private string hub = HubCatalog.Primary.Code;
+    private string? bin;
+    private bool starting;
+    private int page = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            hub = HubCatalog.Find(await JS.InvokeAsync<string?>("lx.getPref", "hub"))?.Code ?? hub; // the hub the station was last used at
+        }
+        catch (JSException)
+        {
+            // no stored hub
+        }
+
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync() => result = await Operations.ListShelfChecksAsync(null, page);
+
+    private Task PageAsync(int p)
+    {
+        page = p;
+        return LoadAsync();
+    }
+
+    private async Task StartAsync()
+    {
+        starting = true;
+        try
+        {
+            var check = await Operations.StartShelfCheckAsync(new StartShelfCheckRequest { HubCode = hub, Bin = bin });
+            Navigation.NavigateTo($"warehouse/checks/{check.Summary.Id}");
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            starting = false;
+        }
+    }
+
+    private void Open(ShelfCheckSummary c) => Navigation.NavigateTo($"warehouse/checks/{c.Id}");
+}

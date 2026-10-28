@@ -23,6 +23,8 @@ Shipments (international and domestic), hub network and trucks, hub station with
 
 ### Unreleased
 
+- **Comments on orders:** staff notes for each other on every order, with who and when ([18](18-ideas-from-open-source.md)).
+- **Shelf checks:** count a shelf or a whole hub against the system; missing, misplaced and unexpected parcels, fixed in one tap ([18](18-ideas-from-open-source.md)).
 - **Proof of delivery:** who took the parcel, an optional signature and the courier's location at every attempt ([18](18-ideas-from-open-source.md)).
 - **Courier app:** couriers deliver from their phones (their own parcels only), with call and WhatsApp, cash to collect and failure reasons; the app can be installed on the home screen.
 - **Seller portal:** shops book their own orders at the company's prices, follow them and their returns, cancel before pickup, and see what they are owed and every payout with its statement (their own shop only).

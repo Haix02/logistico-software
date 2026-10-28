@@ -2005,3 +2005,14 @@ body.bp6-dark { color: var(--lx-text); background: var(--lx-bg); color-scheme: d
 }
 .lx-signature-view path { fill: none; stroke: var(--lx-text-strong); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .lx-proof { align-items: flex-start; }
+
+/* Shelf checks: a large scan box under the progress bar. */
+.lx-shelf-scan { display: flex; gap: 8px; margin-block-start: 14px; }
+.lx-shelf-scan .bp6-input-group { flex: 1; min-width: 0; }
+
+/* Comments on an order: who and when above the note, the form under the list. */
+.lx-comment { align-items: flex-start; }
+.lx-comment-text { white-space: pre-wrap; overflow-wrap: anywhere; color: var(--lx-text-strong); margin-block-start: 2px; }
+.lx-comment-form { display: flex; gap: 8px; align-items: flex-end; padding: 12px 16px; border-block-start: 1px solid var(--lx-border); }
+.lx-comment-form textarea { resize: vertical; min-height: 40px; }
+.lx-comment-form .bp6-button { flex: none; white-space: nowrap; }
