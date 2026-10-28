@@ -1990,3 +1990,18 @@ body.bp6-dark { color: var(--lx-text); background: var(--lx-bg); color-scheme: d
 .lx-chip-active .lx-chip-remove:hover { background: rgba(255, 255, 255, .18); }
 .lx-column-chooser { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 12px 6px; }
 .lx-column-chooser .bp6-control { margin-block-end: 6px; }
+
+/* Proof of delivery: the courier's dialog (who took it, a finger signature) and the office's view of it. */
+.lx-courier-confirm { font-size: var(--lx-font-size-lg, 16px); margin-block-end: 14px; }
+.lx-courier-receivers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.lx-courier-receivers .bp6-button { justify-content: center; }
+.lx-signature-pad {
+    display: block; width: 100%; height: 150px; margin-block-start: 6px; touch-action: none;
+    border: 1px dashed var(--lx-control-border); border-radius: var(--lx-radius); background: var(--lx-surface); color: var(--lx-text-strong);
+}
+.lx-signature-view {
+    display: block; width: 220px; max-width: 100%; height: auto; margin-block-start: 8px;
+    border: 1px solid var(--lx-border); border-radius: var(--lx-radius-sm); background: var(--lx-surface);
+}
+.lx-signature-view path { fill: none; stroke: var(--lx-text-strong); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.lx-proof { align-items: flex-start; }

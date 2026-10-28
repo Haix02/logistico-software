@@ -4,8 +4,8 @@
 @implements IDisposable
 @inject CourierApi Courier
 @inject Toaster Toaster
-@inject Confirmer Confirm
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <PageTitle>@L["Courier_Title"] · @L["AppName"]</PageTitle>
 
@@ -98,8 +98,8 @@
                                 <a class="bp6-button bp6-large" href="tel:@phone"><Icon Name="phone" /><span class="bp6-button-text">@L["Courier_Call"]</span></a>
                                 <a class="bp6-button bp6-large" href="@WhatsApp(s, phone)" target="_blank" rel="noopener"><Icon Name="send-message" /><span class="bp6-button-text">WhatsApp</span></a>
                             }
-                            <Button Large="true" Intent="Intent.Success" Icon="tick" Text="@L["Courier_MarkDelivered"]" Loading="@(busy == s.Id)" OnClick="@(() => DeliveredAsync(s))" />
-                            <Button Large="true" Minimal="true" Intent="Intent.Danger" Icon="cross" Text="@L["Courier_MarkFailed"]" Disabled="@(busy == s.Id)" OnClick="@(() => failing = s)" />
+                            <Button Large="true" Intent="Intent.Success" Icon="tick" Text="@L["Courier_MarkDelivered"]" Loading="@(busy == s.Id)" OnClick="@(() => StartDelivering(s))" />
+                            <Button Large="true" Minimal="true" Intent="Intent.Danger" Icon="cross" Text="@L["Courier_MarkFailed"]" Disabled="@(busy == s.Id)" OnClick="@(() => StartFailing(s))" />
                         </div>
                     </li>
                 }
@@ -107,6 +107,39 @@
         }
     }
 </div>
+
+<Dialog IsOpen="delivering is not null" IsOpenChanged="@(open => { if (!open) delivering = null; })" Title="@L["Courier_MarkDelivered"]" Icon="tick" Width="460px">
+    <ChildContent>
+        @if (delivering is { } d)
+        {
+            <p class="lx-courier-confirm">@DeliveryQuestion(d)</p>
+            <label class="bp6-label">@L["Courier_WhoReceived"]</label>
+            <div class="lx-courier-receivers">
+                @foreach (var receiver in Enum.GetValues<DeliveryReceiver>())
+                {
+                    <Button Text="@ShipmentTexts.Of(receiver)" Active="@(proof.ReceivedBy == receiver)" Intent="@(proof.ReceivedBy == receiver ? Intent.Primary : Intent.None)"
+                            OnClick="@(() => proof.ReceivedBy = receiver)" />
+                }
+            </div>
+            @if (proof.ReceivedBy != DeliveryReceiver.Customer)
+            {
+                <label class="bp6-label lx-mt" for="receiver-name">@L["Courier_ReceiverName"]</label>
+                <input id="receiver-name" class="bp6-input bp6-fill bp6-large" maxlength="120" autocomplete="off" @bind="proof.ReceiverName" @bind:event="oninput" />
+            }
+            <div class="lx-row lx-mt" style="justify-content:space-between">
+                <label class="bp6-label" style="margin:0">@L["Courier_Signature"] <span class="bp6-text-muted">@L["Optional"]</span></label>
+                <Button Minimal="true" Small="true" Icon="eraser" Text="@L["Courier_ClearSignature"]" OnClick="ClearSignatureAsync" />
+            </div>
+            <canvas @ref="signaturePad" class="lx-signature-pad" aria-label="@L["Courier_Signature"]"></canvas>
+            <p class="bp6-text-muted lx-small lx-mt-sm"><Icon Name="map-marker" /> @LocationText</p>
+        }
+    </ChildContent>
+    <Footer>
+        <Button Large="true" Text="@L["Cancel"]" OnClick="@(() => delivering = null)" />
+        <Button Large="true" Intent="Intent.Success" Icon="tick" Text="@L["Courier_MarkDelivered"]"
+                Disabled="@(proof.ReceivedBy != DeliveryReceiver.Customer && string.IsNullOrWhiteSpace(proof.ReceiverName))" OnClick="ConfirmDeliveredAsync" />
+    </Footer>
+</Dialog>
 
 <Dialog IsOpen="failing is not null" IsOpenChanged="@(open => { if (!open) failing = null; })" Title="@L["Courier_WhyFailed"]" Icon="issue" Width="460px">
     <div class="lx-courier-reasons">
@@ -123,6 +156,13 @@
     private bool notLinked;
     private Guid? busy;
     private CourierStop? failing;
+    private CourierStop? delivering;
+    private CourierDeliveryRequest proof = new();
+    private ElementReference signaturePad;
+    private bool padStarted;
+    private Task<GeoPoint?>? locating;
+    private GeoPoint? location;
+    private bool located;
     private CancellationTokenSource? refresh;
 
     protected override async Task OnInitializedAsync()
@@ -162,7 +202,7 @@
             using var timer = new PeriodicTimer(TimeSpan.FromSeconds(60));
             while (await timer.WaitForNextTickAsync(token))
             {
-                if (busy is null && failing is null)
+                if (busy is null && failing is null && delivering is null)
                 {
                     await InvokeAsync(async () => { await LoadAsync(); StateHasChanged(); });
                 }
@@ -174,17 +214,44 @@
         }
     }
 
-    private async Task DeliveredAsync(CourierStop s)
+    /// <summary>Proof of delivery: who took the parcel, an optional signature, and where the phone is (asked for now, used at the end).</summary>
+    private void StartDelivering(CourierStop s)
     {
-        var message = s.CodAmount is > 0
-            ? string.Format(CultureInfo.CurrentCulture, L["Courier_ConfirmCash"], Isolate(Fmt.Money(s.CodAmount, s.CodCurrency)), Isolate(s.ConsigneeName))
-            : string.Format(CultureInfo.CurrentCulture, L["Courier_ConfirmDelivered"], Isolate(s.ConsigneeName));
-        if (!await Confirm.AskAsync(L["Courier_MarkDelivered"], message, L["Courier_MarkDelivered"], Intent.Success, "tick"))
+        proof = new CourierDeliveryRequest();
+        padStarted = false;
+        delivering = s;
+        Locate();
+    }
+
+    private void StartFailing(CourierStop s)
+    {
+        failing = s;
+        Locate();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (delivering is not null && !padStarted)
+        {
+            padStarted = true;
+            await JS.InvokeVoidAsync("lx.signature.start", signaturePad);
+        }
+    }
+
+    private async Task ClearSignatureAsync() => await JS.InvokeVoidAsync("lx.signature.clear", signaturePad);
+
+    private async Task ConfirmDeliveredAsync()
+    {
+        if (delivering is not { } s)
         {
             return;
         }
 
-        await CompleteAsync(s, () => Courier.DeliveredAsync(s.Id), L["Courier_DeliveredToast"]);
+        proof.Signature = await JS.InvokeAsync<string?>("lx.signature.path", signaturePad);
+        proof.Location = await PlaceAsync();
+        var sent = proof;
+        delivering = null;
+        await CompleteAsync(s, () => Courier.DeliveredAsync(s.Id, sent), L["Courier_DeliveredToast"]);
     }
 
     private async Task FailedAsync(DeliveryFailureReason reason)
@@ -195,8 +262,54 @@
         }
 
         failing = null;
-        await CompleteAsync(s, () => Courier.FailedAsync(s.Id, reason), L["Courier_FailedToast"]);
+        var place = await PlaceAsync();
+        await CompleteAsync(s, () => Courier.FailedAsync(s.Id, reason, place), L["Courier_FailedToast"]);
     }
+
+    /// <summary>Asks the phone where it is while the courier fills in the dialog.</summary>
+    private void Locate()
+    {
+        located = false;
+        location = null;
+        locating = LocateAsync();
+    }
+
+    private async Task<GeoPoint?> LocateAsync()
+    {
+        try
+        {
+            location = await JS.InvokeAsync<GeoPoint?>("lx.locate");
+        }
+        catch (JSException)
+        {
+            location = null;
+        }
+
+        located = true;
+        StateHasChanged();
+        return location;
+    }
+
+    /// <summary>The position if the phone has found it, waiting at most a few more seconds; the attempt never waits on GPS.</summary>
+    private async Task<GeoPoint?> PlaceAsync()
+    {
+        if (locating is null)
+        {
+            return null;
+        }
+
+        await Task.WhenAny(locating, Task.Delay(TimeSpan.FromSeconds(3)));
+        return locating.IsCompletedSuccessfully ? locating.Result : null;
+    }
+
+    private string LocationText => !located ? L["Courier_Locating"]
+        : location is { AccuracyMeters: { } accuracy } ? string.Format(CultureInfo.CurrentCulture, L["Courier_LocatedN"], Fmt.Number((int)Math.Round(accuracy)))
+        : location is not null ? L["Courier_Located"]
+        : L["Courier_NoLocation"];
+
+    private string DeliveryQuestion(CourierStop s) => s.CodAmount is > 0
+        ? string.Format(CultureInfo.CurrentCulture, L["Courier_ConfirmCash"], Isolate(Fmt.Money(s.CodAmount, s.CodCurrency)), Isolate(s.ConsigneeName))
+        : string.Format(CultureInfo.CurrentCulture, L["Courier_ConfirmDelivered"], Isolate(s.ConsigneeName));
 
     private async Task CompleteAsync(CourierStop s, Func<Task<ScanOutcome>> action, string done)
     {

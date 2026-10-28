@@ -38,6 +38,8 @@ internal static class ShipmentEndpoints
             .RequireAuthorization(StaffPolicies.Operate); // customers' names, phones and addresses in bulk
         shipments.MapPost("/exact", GetExactAsync)
             .WithSummary("Returns up to 200 shipments by exact IDs or tracking numbers, preserving the requested order (label printing).");
+        shipments.MapGet("/{id:guid}/proofs", ProofsAsync)
+            .WithSummary("Proof of delivery from the courier app for each attempt: who took the parcel, the signature, where the courier was.");
         shipments.MapGet("/{id:guid}", GetByIdAsync)
             .WithSummary("Shipment with its milestone history. Returns an ETag for optimistic concurrency.");
         shipments.MapPost("/", CreateAsync)
@@ -385,6 +387,14 @@ internal static class ShipmentEndpoints
         response.Headers.ETag = Api.ETag(shipment.Version);
         return TypedResults.Ok(ShipmentProjections.ToDetails(shipment));
     }
+
+    private static async Task<Ok<List<DeliveryProofItem>>> ProofsAsync(Guid id, ShipmentsDbContext db, CancellationToken ct) =>
+        TypedResults.Ok(await db.DeliveryProofs.AsNoTracking()
+            .Where(p => p.ShipmentId == id)
+            .OrderBy(p => p.RecordedAt)
+            .Select(p => new DeliveryProofItem(p.Id, p.Delivered, p.FailureReason, p.RecordedAt, p.CourierLabel, p.ReceivedBy, p.ReceiverName, p.Signature,
+                p.Latitude, p.Longitude, p.AccuracyMeters))
+            .ToListAsync(ct));
 
     private static async Task<IResult> StartReturnAsync(
         Guid id,

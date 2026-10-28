@@ -31,6 +31,7 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
     public DbSet<Warehouse> Warehouses => Set<Warehouse>();
     public DbSet<RateCardSettings> RateCards => Set<RateCardSettings>();
     public DbSet<SavedView> SavedViews => Set<SavedView>();
+    public DbSet<DeliveryProof> DeliveryProofs => Set<DeliveryProof>();
 
     // Referenced by the query filters so EF Core parameterises the tenant per context instance.
     private Guid CurrentTenantId => tenant.TenantId;
@@ -212,6 +213,21 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
             e.HasIndex(x => new { x.TenantId, x.Code }).IsUnique();
             e.HasIndex(x => new { x.TenantId, x.IsActive, x.Governorate });
 
+            e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
+        });
+
+        modelBuilder.Entity<DeliveryProof>(e =>
+        {
+            e.ToTable("delivery_proofs");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).ValueGeneratedNever();
+            e.Property(x => x.FailureReason).HasConversion<string>().HasMaxLength(32);
+            e.Property(x => x.ReceivedBy).HasConversion<string>().HasMaxLength(16);
+            e.Property(x => x.CourierLabel).HasMaxLength(160);
+            e.Property(x => x.ReceiverName).HasMaxLength(120);
+            e.Property(x => x.Signature).HasMaxLength(Contracts.CourierDeliveryRequest.MaxSignatureLength);
+            e.HasOne<Shipment>().WithMany().HasForeignKey(x => x.ShipmentId).OnDelete(DeleteBehavior.Cascade);
+            e.HasIndex(x => new { x.TenantId, x.ShipmentId, x.RecordedAt });
             e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
         });
 

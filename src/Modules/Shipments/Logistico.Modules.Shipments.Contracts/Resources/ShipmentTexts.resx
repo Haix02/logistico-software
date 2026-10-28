@@ -42,6 +42,11 @@
   <data name="Failure_CustomerRescheduled" xml:space="preserve"><value>Customer asked for another day</value></data>
   <data name="Failure_NoAnswer" xml:space="preserve"><value>Customer did not answer</value></data>
   <data name="Failure_Other" xml:space="preserve"><value>Other reason</value></data>
+  <data name="Receiver_Customer" xml:space="preserve"><value>The customer</value></data>
+  <data name="Receiver_Family" xml:space="preserve"><value>Family member</value></data>
+  <data name="Receiver_Neighbour" xml:space="preserve"><value>Neighbour</value></data>
+  <data name="Receiver_Workplace" xml:space="preserve"><value>Colleague or reception</value></data>
+  <data name="Receiver_Other" xml:space="preserve"><value>Someone else</value></data>
   <data name="Failure_Unreachable" xml:space="preserve"><value>Phone switched off / unreachable</value></data>
   <data name="Failure_WrongAddress" xml:space="preserve"><value>Wrong or incomplete address</value></data>
   <data name="HubKind_Branch" xml:space="preserve"><value>Branch</value></data>

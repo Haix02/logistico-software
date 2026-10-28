@@ -237,6 +237,20 @@
   <data name="Courier_FailedToast" xml:space="preserve"><value>{0}: سُجّلت المحاولة.</value></data>
   <data name="Courier_Hello" xml:space="preserve"><value>أهلاً {0}</value></data>
   <data name="Courier_MarkDelivered" xml:space="preserve"><value>تم التسليم</value></data>
+  <data name="Courier_WhoReceived" xml:space="preserve"><value>من استلم الطرد؟</value></data>
+  <data name="Courier_ReceiverName" xml:space="preserve"><value>اسمه</value></data>
+  <data name="Courier_Signature" xml:space="preserve"><value>التوقيع</value></data>
+  <data name="Courier_ClearSignature" xml:space="preserve"><value>مسح</value></data>
+  <data name="Courier_Locating" xml:space="preserve"><value>جارٍ تحديد موقعك…</value></data>
+  <data name="Courier_LocatedN" xml:space="preserve"><value>سُجّل موقعك (بدقة {0} م).</value></data>
+  <data name="Courier_Located" xml:space="preserve"><value>سُجّل موقعك.</value></data>
+  <data name="Courier_NoLocation" xml:space="preserve"><value>تعذّر تحديد موقعك؛ يُحتسب التسليم مع ذلك.</value></data>
+  <data name="Proof_Title" xml:space="preserve"><value>إثبات التسليم</value></data>
+  <data name="Proof_Delivered" xml:space="preserve"><value>سُلّم</value></data>
+  <data name="Proof_Failed" xml:space="preserve"><value>لم يُسلَّم</value></data>
+  <data name="Proof_AccuracyN" xml:space="preserve"><value>بدقة {0} م</value></data>
+  <data name="Proof_NoLocation" xml:space="preserve"><value>لم يرسل الهاتف موقعاً</value></data>
+  <data name="Proof_Signature" xml:space="preserve"><value>توقيع مستلم الطرد</value></data>
   <data name="Courier_MarkFailed" xml:space="preserve"><value>لم يُسلَّم</value></data>
   <data name="Courier_Near" xml:space="preserve"><value>قرب</value></data>
   <data name="Courier_NotLinkedText" xml:space="preserve"><value>اطلب من المدير ربط حسابك بملفك كمندوب من صفحة الفريق.</value></data>

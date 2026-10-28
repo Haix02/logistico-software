@@ -42,6 +42,11 @@
   <data name="Failure_CustomerRescheduled" xml:space="preserve"><value>الزبون طلب موعداً آخر</value></data>
   <data name="Failure_NoAnswer" xml:space="preserve"><value>الزبون لم يرد</value></data>
   <data name="Failure_Other" xml:space="preserve"><value>سبب آخر</value></data>
+  <data name="Receiver_Customer" xml:space="preserve"><value>الزبون نفسه</value></data>
+  <data name="Receiver_Family" xml:space="preserve"><value>أحد أفراد العائلة</value></data>
+  <data name="Receiver_Neighbour" xml:space="preserve"><value>الجار</value></data>
+  <data name="Receiver_Workplace" xml:space="preserve"><value>زميل أو استقبال</value></data>
+  <data name="Receiver_Other" xml:space="preserve"><value>شخص آخر</value></data>
   <data name="Failure_Unreachable" xml:space="preserve"><value>الهاتف مغلق أو خارج التغطية</value></data>
   <data name="Failure_WrongAddress" xml:space="preserve"><value>العنوان خاطئ أو غير مكتمل</value></data>
   <data name="HubKind_Branch" xml:space="preserve"><value>فرع</value></data>

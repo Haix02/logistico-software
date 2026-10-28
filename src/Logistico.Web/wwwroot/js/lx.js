@@ -259,6 +259,66 @@ window.lx = {
             window.lx._camStream = null;
         }
     },
+    // Where the phone is, for proof of delivery: null when refused, unavailable or not found within a few seconds.
+    locate: () => new Promise((resolve) => {
+        if (!navigator.geolocation) { resolve(null); return; }
+        navigator.geolocation.getCurrentPosition(
+            (p) => resolve({ latitude: p.coords.latitude, longitude: p.coords.longitude, accuracyMeters: Math.round(p.coords.accuracy) }),
+            () => resolve(null),
+            { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 });
+    }),
+    // A finger signature on a canvas, kept as strokes and returned as SVG path data in a 300 × 150 box.
+    signature: {
+        start: (canvas) => {
+            if (!canvas || canvas._lxStrokes) return;
+            const ratio = window.devicePixelRatio || 1;
+            const box = canvas.getBoundingClientRect();
+            canvas.width = Math.round(box.width * ratio);
+            canvas.height = Math.round(box.height * ratio);
+            const pen = canvas.getContext("2d");
+            pen.scale(ratio, ratio);
+            pen.lineWidth = 2.2;
+            pen.lineCap = "round";
+            pen.lineJoin = "round";
+            pen.strokeStyle = getComputedStyle(canvas).color || "#18171d";
+            canvas._lxStrokes = [];
+            let stroke = null;
+            const at = (e) => { const r = canvas.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+            canvas.addEventListener("pointerdown", (e) => {
+                canvas.setPointerCapture(e.pointerId);
+                stroke = [at(e)];
+                canvas._lxStrokes.push(stroke);
+                pen.beginPath();
+                pen.moveTo(...stroke[0]);
+                pen.lineTo(...stroke[0]);
+                pen.stroke();
+            });
+            canvas.addEventListener("pointermove", (e) => {
+                if (!stroke) return;
+                const point = at(e);
+                pen.lineTo(...point);
+                pen.stroke();
+                stroke.push(point);
+            });
+            const end = () => { stroke = null; };
+            canvas.addEventListener("pointerup", end);
+            canvas.addEventListener("pointercancel", end);
+        },
+        clear: (canvas) => {
+            if (!canvas || !canvas._lxStrokes) return;
+            canvas._lxStrokes = [];
+            canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+        },
+        path: (canvas) => {
+            if (!canvas || !canvas._lxStrokes || canvas._lxStrokes.length === 0) return null;
+            const box = canvas.getBoundingClientRect();
+            const x = (v) => Math.round(v * 3000 / box.width) / 10;
+            const y = (v) => Math.round(v * 1500 / box.height) / 10;
+            return canvas._lxStrokes
+                .map((s) => "M" + x(s[0][0]) + " " + y(s[0][1]) + " L" + (s.length > 1 ? s.slice(1) : s).map((p) => x(p[0]) + " " + y(p[1])).join(" L"))
+                .join(" ");
+        }
+    },
     // Map units under the pointer for an SVG element (placing a warehouse by clicking the map).
     svgPoint: (svg, clientX, clientY) => {
         if (!svg || !svg.getScreenCTM) return null;

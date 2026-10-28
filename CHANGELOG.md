@@ -6,6 +6,11 @@ versions follow [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **Proof of delivery** (courier app; idea from Fleetbase): marking a parcel delivered asks who took it (the customer, a
+  family member, a neighbour, a colleague or someone else, with their name) and offers a finger signature; the phone's
+  location is recorded with every delivery and failed attempt, so "the courier never came" can be checked. The order
+  page shows it under *Proof of delivery* with a map link. Couriers can always finish a delivery: the signature is
+  optional and a missing location never blocks it; an app still open from before keeps working.
 - **Saved views and columns** (Shipments): choose which columns the list shows (courier, created, shelf, time in status…)
   and save the current filters, sort and columns under a name; your views appear as chips beside the quick views, open
   with one click and are removed with ×. Views are personal (on your account, so they follow you to another computer)

@@ -223,6 +223,20 @@
   <data name="Courier_FailedToast" xml:space="preserve"><value>{0}: attempt recorded.</value></data>
   <data name="Courier_Hello" xml:space="preserve"><value>Hello, {0}</value></data>
   <data name="Courier_MarkDelivered" xml:space="preserve"><value>Delivered</value></data>
+  <data name="Courier_WhoReceived" xml:space="preserve"><value>Who took the parcel?</value></data>
+  <data name="Courier_ReceiverName" xml:space="preserve"><value>Their name</value></data>
+  <data name="Courier_Signature" xml:space="preserve"><value>Signature</value></data>
+  <data name="Courier_ClearSignature" xml:space="preserve"><value>Clear</value></data>
+  <data name="Courier_Locating" xml:space="preserve"><value>Finding where you are…</value></data>
+  <data name="Courier_LocatedN" xml:space="preserve"><value>Your place is recorded (within {0} m).</value></data>
+  <data name="Courier_Located" xml:space="preserve"><value>Your place is recorded.</value></data>
+  <data name="Courier_NoLocation" xml:space="preserve"><value>Your place could not be found; the delivery still counts.</value></data>
+  <data name="Proof_Title" xml:space="preserve"><value>Proof of delivery</value></data>
+  <data name="Proof_Delivered" xml:space="preserve"><value>Delivered</value></data>
+  <data name="Proof_Failed" xml:space="preserve"><value>Not delivered</value></data>
+  <data name="Proof_AccuracyN" xml:space="preserve"><value>within {0} m</value></data>
+  <data name="Proof_NoLocation" xml:space="preserve"><value>No location from the phone</value></data>
+  <data name="Proof_Signature" xml:space="preserve"><value>Signature of the person who took the parcel</value></data>
   <data name="Courier_MarkFailed" xml:space="preserve"><value>Not delivered</value></data>
   <data name="Courier_Near" xml:space="preserve"><value>Near</value></data>
   <data name="Courier_NotLinkedText" xml:space="preserve"><value>Ask an administrator to link your account to your courier profile on the Team page.</value></data>

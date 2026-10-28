@@ -8,6 +8,8 @@ using Logistico.SharedKernel.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,8 +30,10 @@ internal static class CourierAppEndpoints
             .RequireAuthorization(StaffPolicies.Deliver)
             .WithValidation();
         run.MapGet("/", RunAsync).WithSummary("The signed-in courier's parcels out for delivery and today's totals.");
-        run.MapPost("/{id:guid}/delivered", DeliveredAsync).WithSummary("Marks one of the courier's parcels delivered (cash on delivery collected).");
-        run.MapPost("/{id:guid}/failed", FailedAsync).WithSummary("Records a failed attempt with its reason; the company's rules decide what happens next.");
+        run.MapPost("/{id:guid}/delivered", DeliveredAsync)
+            .WithSummary("Marks one of the courier's parcels delivered (cash on delivery collected), with proof: who took it, a signature, where.");
+        run.MapPost("/{id:guid}/failed", FailedAsync)
+            .WithSummary("Records a failed attempt with its reason and where the courier was; the company's rules decide what happens next.");
         return app;
     }
 
@@ -68,12 +72,19 @@ internal static class CourierAppEndpoints
             toHandIn?.Cash ?? 0, toHandIn?.Count ?? 0));
     }
 
-    private static Task<IResult> DeliveredAsync(Guid id, ClaimsPrincipal user, ShipmentsDbContext db, WarehouseScanner scanner, CancellationToken ct) =>
-        CompleteAsync(id, ScanOperation.Deliver, null, user, db, scanner, ct);
+    // An app opened before proof of delivery existed sends no body; the delivery still counts, without proof.
+    private static Task<IResult> DeliveredAsync(
+        Guid id, [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] CourierDeliveryRequest? request, ClaimsPrincipal user, ShipmentsDbContext db,
+        WarehouseScanner scanner, TimeProvider clock, CancellationToken ct) =>
+        CompleteAsync(id, ScanOperation.Deliver, null, user, db, scanner, ct,
+            (tenant, courier) => DeliveryProof.ForDelivery(tenant, id, courier, request ?? new CourierDeliveryRequest(), clock.GetUtcNow()));
 
-    private static Task<IResult> FailedAsync(Guid id, CourierFailureRequest request, ClaimsPrincipal user, ShipmentsDbContext db, WarehouseScanner scanner, CancellationToken ct) =>
-        CompleteAsync(id, ScanOperation.Fail, request.Reason, user, db, scanner, ct);
+    private static Task<IResult> FailedAsync(
+        Guid id, CourierFailureRequest request, ClaimsPrincipal user, ShipmentsDbContext db, WarehouseScanner scanner, TimeProvider clock, CancellationToken ct) =>
+        CompleteAsync(id, ScanOperation.Fail, request.Reason, user, db, scanner, ct,
+            (tenant, courier) => DeliveryProof.ForFailure(tenant, id, courier, request.Reason!.Value, request.Location, clock.GetUtcNow()));
 
+    /// <summary>Records the attempt through the hub scan logic and keeps its proof, both in one transaction.</summary>
     private static async Task<IResult> CompleteAsync(
         Guid id,
         ScanOperation operation,
@@ -81,7 +92,8 @@ internal static class CourierAppEndpoints
         ClaimsPrincipal user,
         ShipmentsDbContext db,
         WarehouseScanner scanner,
-        CancellationToken ct)
+        CancellationToken ct,
+        Func<Guid, string, DeliveryProof> proof)
     {
         if (await CourierOfAsync(user, db, ct) is not { } courier)
         {
@@ -91,14 +103,22 @@ internal static class CourierAppEndpoints
         // Only parcels out for delivery with this courier; anything else looks like it does not exist.
         var parcel = await db.Shipments.AsNoTracking()
             .Where(s => s.Id == id && s.CourierName == courier.DisplayLabel && s.Status == ShipmentStatus.OutForDelivery)
-            .Select(s => new { s.TrackingNumber, Hub = s.CurrentHubCode ?? s.DestinationHubCode })
+            .Select(s => new { s.TenantId, s.TrackingNumber, Hub = s.CurrentHubCode ?? s.DestinationHubCode })
             .FirstOrDefaultAsync(ct);
         if (parcel is null)
         {
             return Api.NotFound("courier.not_on_run");
         }
 
+        await using var transaction = await db.Database.BeginTransactionAsync(ct);
         var outcome = (await scanner.ScanAsync(operation, [parcel.TrackingNumber], parcel.Hub, null, courier.DisplayLabel, null, reason, user.UserName(), ct)).Single();
+        if (outcome.Ok)
+        {
+            db.DeliveryProofs.Add(proof(parcel.TenantId, courier.DisplayLabel));
+            await db.SaveChangesAsync(ct);
+        }
+
+        await transaction.CommitAsync(ct); // a refused scan stays in the hub's scan log, as before
         return outcome.Ok
             ? TypedResults.Ok(outcome)
             : Api.Conflict(outcome.ProblemCode ?? "courier.not_on_run", parcel.TrackingNumber);

@@ -65,6 +65,17 @@ public enum DeliveryFailureReason
     Other,
 }
 
+/// <summary>Who took the parcel at the door (proof of delivery).</summary>
+[JsonConverter(typeof(JsonStringEnumConverter<DeliveryReceiver>))]
+public enum DeliveryReceiver
+{
+    Customer,
+    Family,
+    Neighbour,
+    Workplace,
+    Other,
+}
+
 /// <summary>Customer-facing progress stages shown on tracking pages.</summary>
 [JsonConverter(typeof(JsonStringEnumConverter<TrackingStage>))]
 public enum TrackingStage

@@ -659,6 +659,78 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                     b.ToTable("customs_declarations", "shipment");
                 });
 
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.DeliveryProof", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<double?>("AccuracyMeters")
+                        .HasColumnType("double precision")
+                        .HasColumnName("accuracy_meters");
+
+                    b.Property<string>("CourierLabel")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)")
+                        .HasColumnName("courier_label");
+
+                    b.Property<bool>("Delivered")
+                        .HasColumnType("boolean")
+                        .HasColumnName("delivered");
+
+                    b.Property<string>("FailureReason")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("failure_reason");
+
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("latitude");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("longitude");
+
+                    b.Property<string>("ReceivedBy")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("received_by");
+
+                    b.Property<string>("ReceiverName")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("receiver_name");
+
+                    b.Property<DateTimeOffset>("RecordedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("recorded_at");
+
+                    b.Property<Guid>("ShipmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("shipment_id");
+
+                    b.Property<string>("Signature")
+                        .HasMaxLength(20000)
+                        .HasColumnType("character varying(20000)")
+                        .HasColumnName("signature");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_delivery_proofs");
+
+                    b.HasIndex("ShipmentId")
+                        .HasDatabaseName("ix_delivery_proofs_shipment_id");
+
+                    b.HasIndex("TenantId", "ShipmentId", "RecordedAt")
+                        .HasDatabaseName("ix_delivery_proofs_tenant_id_shipment_id_recorded_at");
+
+                    b.ToTable("delivery_proofs", "shipment");
+                });
+
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.HubScan", b =>
                 {
                     b.Property<long>("Id")
@@ -1892,6 +1964,16 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                         .HasFilter("is_primary");
 
                     b.ToTable("warehouses", "shipment");
+                });
+
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.DeliveryProof", b =>
+                {
+                    b.HasOne("Logistico.Modules.Shipments.Domain.Shipment", null)
+                        .WithMany()
+                        .HasForeignKey("ShipmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_delivery_proofs_shipments_shipment_id");
                 });
 
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ShipmentEvent", b =>

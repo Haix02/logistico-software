@@ -23,6 +23,7 @@ Shipments (international and domestic), hub network and trucks, hub station with
 
 ### Unreleased
 
+- **Proof of delivery:** who took the parcel, an optional signature and the courier's location at every attempt ([18](18-ideas-from-open-source.md)).
 - **Courier app:** couriers deliver from their phones (their own parcels only), with call and WhatsApp, cash to collect and failure reasons; the app can be installed on the home screen.
 - **Seller portal:** shops book their own orders at the company's prices, follow them and their returns, cancel before pickup, and see what they are owed and every payout with its statement (their own shop only).
 - **Courier cash hand-in:** the office receives each courier's collected cash against the parcels it covers, shortages are recorded, and sellers are paid only from cash the company holds.

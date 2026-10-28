@@ -189,6 +189,59 @@ else
                         </ul>
                     </div>
                 </Tab>
+                @if (proofs is { Count: > 0 })
+                {
+                    <Tab Id="proof" Title="@L["Proof_Title"]" Icon="endorsed" Count="@proofs.Count">
+                        <div class="lx-card">
+                            <ul class="lx-list">
+                                @foreach (var p in proofs.Reverse())
+                                {
+                                    <li class="lx-list-item lx-proof">
+                                        <span class="@($"lx-list-icon {(p.Delivered ? "lx-list-icon-success" : "lx-list-icon-danger")}")"><Icon Name="@(p.Delivered ? "tick" : "cross")" /></span>
+                                        <div class="lx-list-body">
+                                            <span class="lx-list-title">
+                                                @if (p.Delivered)
+                                                {
+                                                    @L["Proof_Delivered"] <text> · </text> @ShipmentTexts.Of(p.ReceivedBy ?? DeliveryReceiver.Customer)
+                                                    @if (p.ReceiverName is not null)
+                                                    {
+                                                        <text> · </text><Mixed Text="@p.ReceiverName" />
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    @L["Proof_Failed"] <text> · </text> @(p.FailureReason is { } why ? ShipmentTexts.Of(why) : "—")
+                                                }
+                                            </span>
+                                            <span class="lx-list-sub">@Fmt.DateTime(p.RecordedAt) · <Mixed Text="@p.CourierLabel" /></span>
+                                            @if (p.Latitude is { } lat && p.Longitude is { } lng)
+                                            {
+                                                <span class="lx-list-sub">
+                                                    <Icon Name="map-marker" />
+                                                    <a href="@MapLink(lat, lng)" target="_blank" rel="noopener noreferrer" dir="ltr">@lat.ToString("0.00000", CultureInfo.InvariantCulture), @lng.ToString("0.00000", CultureInfo.InvariantCulture)</a>
+                                                    @if (p.AccuracyMeters is { } accuracy)
+                                                    {
+                                                        <span> · @string.Format(CultureInfo.CurrentCulture, L["Proof_AccuracyN"], Fmt.Number((int)Math.Round(accuracy)))</span>
+                                                    }
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="lx-list-sub">@L["Proof_NoLocation"]</span>
+                                            }
+                                            @if (p.Signature is { } signature)
+                                            {
+                                                <svg class="lx-signature-view" viewBox="0 0 300 150" role="img" aria-label="@L["Proof_Signature"]">
+                                                    <path d="@signature" />
+                                                </svg>
+                                            }
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </Tab>
+                }
             </Tabs>
         </div>
 
@@ -414,6 +467,7 @@ else
 
     private ShipmentDetails? shipment;
     private ServiceRequestList? requests;
+    private IReadOnlyList<DeliveryProofItem>? proofs;
     private IReadOnlyList<CourierLookupItem> couriers = [];
     private IReadOnlyList<ShipmentStatus> allowedNext = [];
     private IReadOnlyList<TimelineEntry> timeline = [];
@@ -543,8 +597,10 @@ else
     {
         var detailsTask = Shipments.GetAsync(Id);
         var requestsTask = Operations.ListRequestsAsync(new ServiceRequestQuery { ShipmentId = Id, PageSize = 50 });
+        var proofsTask = Shipments.GetProofsAsync(Id);
         Apply(await detailsTask);
         requests = await requestsTask;
+        proofs = await proofsTask;
     }
 
     private void Apply(ShipmentDetails? details)
@@ -561,6 +617,13 @@ else
             Location = details?.CurrentHubCode ?? details?.DestinationHubCode,
         };
         serverError = null;
+    }
+
+    /// <summary>Where the phone was, on OpenStreetMap (a plain link: nothing is sent until someone opens it).</summary>
+    private static string MapLink(double lat, double lng)
+    {
+        var at = string.Create(CultureInfo.InvariantCulture, $"{lat:0.000000}/{lng:0.000000}");
+        return string.Create(CultureInfo.InvariantCulture, $"https://www.openstreetmap.org/?mlat={lat:0.000000}&mlon={lng:0.000000}#map=18/{at}");
     }
 
     private void Choose(ShipmentStatus next)
