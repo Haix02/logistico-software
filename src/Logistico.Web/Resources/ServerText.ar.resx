@@ -24,6 +24,11 @@
   <data name="Language" xml:space="preserve"><value>English</value></data>
   <data name="Or" xml:space="preserve"><value>أو</value></data>
   <data name="Password" xml:space="preserve"><value>كلمة المرور</value></data>
+  <data name="Problem_auth.invalid" xml:space="preserve"><value>البريد الإلكتروني أو كلمة المرور غير صحيحة.</value></data>
+  <data name="Problem_auth.locked_out" xml:space="preserve"><value>الحساب مقفل بعد محاولات خاطئة كثيرة. حاول لاحقاً أو اطلب من المدير.</value></data>
+  <data name="Problem_auth.not_allowed" xml:space="preserve"><value>لا يمكن لهذا الحساب الدخول بعد (البريد غير مؤكَّد).</value></data>
+  <data name="Problem_auth.two_factor_required" xml:space="preserve"><value>أدخل الرمز من تطبيق المصادقة.</value></data>
+  <data name="Problem_auth.expired" xml:space="preserve"><value>انتهت جلستك. سجّل الدخول من جديد.</value></data>
   <data name="Problem_team.email_taken" xml:space="preserve"><value>هذا البريد الإلكتروني مستخدم لحساب آخر.</value></data>
   <data name="Problem_team.last_admin" xml:space="preserve"><value>يجب أن يبقى للشركة مدير نظام فعّال واحد على الأقل.</value></data>
   <data name="Problem_team.not_found" xml:space="preserve"><value>عضو الفريق غير موجود.</value></data>

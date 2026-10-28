@@ -1,0 +1,237 @@
+{
+  "@@locale": "en",
+  "appTitle": "Logistico",
+  "retry": "Try again",
+  "cancel": "Cancel",
+  "save": "Save",
+  "close": "Close",
+  "refresh": "Refresh",
+  "search": "Search",
+  "optional": "optional",
+  "required": "required",
+  "errorNetwork": "Cannot reach the server. Check the connection.",
+  "errorUnexpected": "Something went wrong. Try again.",
+  "nothingHere": "Nothing here yet",
+  "serverTitle": "Your company's Logistico",
+  "serverHint": "Enter the address your company gave you, for example https://ship.example.iq",
+  "serverAddress": "Server address",
+  "serverContinue": "Continue",
+  "serverInvalid": "This address does not answer as Logistico.",
+  "signInTitle": "Sign in",
+  "email": "E-mail",
+  "password": "Password",
+  "twoFactorCode": "Code from your authenticator app",
+  "signIn": "Sign in",
+  "changeServer": "Change server",
+  "signOut": "Sign out",
+  "account": "Account",
+  "language": "Language",
+  "theme": "Appearance",
+  "themeSystem": "As the phone",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "support": "Call support",
+  "updateTitle": "Update the app",
+  "updateBody": "Your company needs version {version} or newer. Install the update to continue.",
+  "@updateBody": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "tabHome": "Home",
+  "tabOrders": "Orders",
+  "tabNewOrder": "New order",
+  "tabPayouts": "Payouts",
+  "tabRun": "My run",
+  "tabCash": "Cash",
+  "tabToday": "Today",
+  "tabAlerts": "Alerts",
+  "tabHub": "Hub",
+  "tabMoney": "Money",
+  "owed": "Owed to you",
+  "onTheWay": "On its way to you",
+  "paid": "Paid so far",
+  "activeOrders": "Active orders",
+  "delivered30": "Delivered in 30 days",
+  "returned30": "Returned in 30 days",
+  "recentPayouts": "Recent payouts",
+  "noPayouts": "No payouts yet",
+  "viewAll": "All",
+  "viewActive": "Active",
+  "viewDelivered": "Delivered",
+  "viewReturns": "Returns",
+  "searchOrders": "Tracking number, customer or phone",
+  "noOrders": "No orders",
+  "cod": "Cash on delivery",
+  "deliveryFee": "Delivery fee",
+  "returnFee": "Return fee",
+  "attempts": "Attempts",
+  "paidOut": "Paid out",
+  "loadMore": "Show more",
+  "customerName": "Customer name",
+  "customerPhone": "Customer mobile",
+  "governorate": "Governorate",
+  "area": "Area",
+  "address": "Address",
+  "landmark": "Nearest landmark",
+  "items": "What is inside",
+  "notes": "Notes",
+  "deliveryPrice": "Delivery price",
+  "book": "Book the order",
+  "booked": "Booked: {tracking}",
+  "@booked": {
+    "placeholders": {
+      "tracking": {
+        "type": "String"
+      }
+    }
+  },
+  "fieldRequired": "Required",
+  "invalidPhone": "An Iraqi mobile number, e.g. 0770 123 4567",
+  "payoutNet": "Net paid",
+  "payoutOrders": "{count, plural, =1{1 order} other{{count} orders}}",
+  "@payoutOrders": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hello": "Hello {name}",
+  "@hello": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deliveredToday": "Delivered today",
+  "failedToday": "Not delivered today",
+  "cashToday": "Cash collected today",
+  "noStops": "No parcels on your run. New ones appear here by themselves.",
+  "call": "Call",
+  "whatsapp": "WhatsApp",
+  "markDelivered": "Delivered",
+  "markFailed": "Not delivered",
+  "whyFailed": "Why was it not delivered?",
+  "whoReceived": "Who took the parcel?",
+  "receiverName": "Their name",
+  "signature": "Signature",
+  "clearSignature": "Clear",
+  "signatureNeeded": "Ask the person who took the parcel to sign.",
+  "locating": "Finding where you are…",
+  "located": "Your place is recorded (within {meters} m).",
+  "@located": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "noLocation": "Your place could not be found; the delivery still counts.",
+  "collectCash": "Collect {amount} from {name}",
+  "@collectCash": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmDelivered": "Delivered to {name}",
+  "@confirmDelivered": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deliveredToast": "{tracking} delivered",
+  "@deliveredToast": {
+    "placeholders": {
+      "tracking": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToast": "{tracking} recorded as not delivered",
+  "@failedToast": {
+    "placeholders": {
+      "tracking": {
+        "type": "String"
+      }
+    }
+  },
+  "cashToHandIn": "Cash to hand in at the office",
+  "parcelsN": "{count, plural, =1{1 parcel} other{{count} parcels}}",
+  "@parcelsN": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "handInHint": "Hand this in at the office: they count it against your parcels.",
+  "scan": "Scan",
+  "scanCamera": "Scan with the camera",
+  "scanHint": "Press the scanner's button, or scan with the camera.",
+  "notOnRun": "{tracking} is not on your run.",
+  "@notOnRun": {
+    "placeholders": {
+      "tracking": {
+        "type": "String"
+      }
+    }
+  },
+  "booked1": "Booked",
+  "successRate": "Delivery success",
+  "codCollected": "Cash collected",
+  "returnRate": "Returns",
+  "vsBefore": "{change}% vs the same time before",
+  "@vsBefore": {
+    "placeholders": {
+      "change": {
+        "type": "String"
+      }
+    }
+  },
+  "period": "Period",
+  "periodToday": "Today",
+  "period7": "7 days",
+  "period30": "30 days",
+  "noAlerts": "No open alerts",
+  "critical": "{count} critical",
+  "@critical": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hubOperation": "What are you doing?",
+  "opReceive": "Receive",
+  "opDispatch": "Give to courier",
+  "opVerify": "Check route",
+  "hub": "Hub",
+  "shelf": "Shelf",
+  "courier": "Courier",
+  "chooseCourier": "Choose the courier",
+  "shelfCheck": "Shelf check",
+  "startCheck": "Start counting",
+  "wholeHub": "Whole hub",
+  "finishCheck": "Finish the count",
+  "expected": "Expected",
+  "found": "Found",
+  "missing": "Missing",
+  "wrongShelf": "Wrong shelf",
+  "notExpected": "Not expected",
+  "withCouriers": "With couriers",
+  "collectedUnsettled": "Collected, not paid out",
+  "netPayable": "Owed to sellers",
+  "settled": "Paid to sellers",
+  "sellerBalances": "Sellers to pay"
+}

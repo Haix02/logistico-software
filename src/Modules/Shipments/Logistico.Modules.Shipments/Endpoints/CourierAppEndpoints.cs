@@ -5,6 +5,7 @@ using Logistico.Modules.Shipments.Domain;
 using Logistico.Modules.Shipments.Infrastructure;
 using Logistico.SharedKernel;
 using Logistico.SharedKernel.Identity;
+using Logistico.SharedKernel.Mobile;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -72,12 +73,20 @@ internal static class CourierAppEndpoints
             toHandIn?.Cash ?? 0, toHandIn?.Count ?? 0));
     }
 
-    // An app opened before proof of delivery existed sends no body; the delivery still counts, without proof.
-    private static Task<IResult> DeliveredAsync(
+    // An app opened before proof of delivery existed sends no body; the delivery still counts, without proof — unless
+    // the company requires a signature (Mobile app settings).
+    private static async Task<IResult> DeliveredAsync(
         Guid id, [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] CourierDeliveryRequest? request, ClaimsPrincipal user, ShipmentsDbContext db,
-        WarehouseScanner scanner, TimeProvider clock, CancellationToken ct) =>
-        CompleteAsync(id, ScanOperation.Deliver, null, user, db, scanner, ct,
+        WarehouseScanner scanner, IDeliveryRules rules, TimeProvider clock, CancellationToken ct)
+    {
+        if (string.IsNullOrEmpty(request?.Signature) && await rules.SignatureRequiredAsync(ct))
+        {
+            return Api.Rule(new DomainException("courier.signature_required", "This company asks for the receiver's signature before a parcel counts as delivered."));
+        }
+
+        return await CompleteAsync(id, ScanOperation.Deliver, null, user, db, scanner, ct,
             (tenant, courier) => DeliveryProof.ForDelivery(tenant, id, courier, request ?? new CourierDeliveryRequest(), clock.GetUtcNow()));
+    }
 
     private static Task<IResult> FailedAsync(
         Guid id, CourierFailureRequest request, ClaimsPrincipal user, ShipmentsDbContext db, WarehouseScanner scanner, TimeProvider clock, CancellationToken ct) =>

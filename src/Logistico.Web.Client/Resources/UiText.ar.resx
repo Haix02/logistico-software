@@ -240,6 +240,7 @@
   <data name="Courier_WhoReceived" xml:space="preserve"><value>من استلم الطرد؟</value></data>
   <data name="Courier_ReceiverName" xml:space="preserve"><value>اسمه</value></data>
   <data name="Courier_Signature" xml:space="preserve"><value>التوقيع</value></data>
+  <data name="Courier_SignatureNeeded" xml:space="preserve"><value>اطلب من مستلم الطرد التوقيع في المربع أعلاه.</value></data>
   <data name="Courier_ClearSignature" xml:space="preserve"><value>مسح</value></data>
   <data name="Courier_Locating" xml:space="preserve"><value>جارٍ تحديد موقعك…</value></data>
   <data name="Courier_LocatedN" xml:space="preserve"><value>سُجّل موقعك (بدقة {0} م).</value></data>
@@ -629,6 +630,47 @@
   <data name="Nav_Shipments" xml:space="preserve"><value>الشحنات</value></data>
   <data name="Nav_Team" xml:space="preserve"><value>الفريق والصلاحيات</value></data>
   <data name="Nav_Audit" xml:space="preserve"><value>سجل التغييرات</value></data>
+  <data name="Nav_MobileApp" xml:space="preserve"><value>تطبيق الهاتف</value></data>
+  <data name="Mobile_Subtitle" xml:space="preserve"><value>ما يعرضه تطبيق لوجستيكو لكل نوع من الحسابات. تصل التغييرات إلى الهواتف عند فتح التطبيق أو تحديثه.</value></data>
+  <data name="Mobile_LastChanged" xml:space="preserve"><value>آخر تغيير {0} بواسطة {1}</value></data>
+  <data name="Mobile_Saved" xml:space="preserve"><value>حُفظت إعدادات تطبيق الهاتف</value></data>
+  <data name="Mobile_Modules" xml:space="preserve"><value>ما يراه كل حساب</value></data>
+  <data name="Mobile_ModulesHint" xml:space="preserve"><value>شغّل أجزاء التطبيق أو أوقفها. لا يحصل المدراء إلا على ما يسمح به دورهم (مسح المركز يحتاج دور العمليات، والمالية تحتاج دور المالية).</value></data>
+  <data name="Mobile_Kind_sender" xml:space="preserve"><value>المرسلون (المتاجر)</value></data>
+  <data name="Mobile_Kind_sender_Hint" xml:space="preserve"><value>حسابات المتاجر المربوطة بمتجر في صفحة الفريق.</value></data>
+  <data name="Mobile_Kind_courier" xml:space="preserve"><value>المندوبون</value></data>
+  <data name="Mobile_Kind_courier_Hint" xml:space="preserve"><value>حسابات المندوبين المربوطة بمندوب في صفحة الفريق.</value></data>
+  <data name="Mobile_Kind_manager" xml:space="preserve"><value>المدراء وموظفو المكتب</value></data>
+  <data name="Mobile_Kind_manager_Hint" xml:space="preserve"><value>المدراء والعمليات وخدمة العملاء والمالية والمشاهدون.</value></data>
+  <data name="Mobile_Module_sender_home" xml:space="preserve"><value>الرئيسية: مستحقات المتجر</value></data>
+  <data name="Mobile_Module_sender_orders" xml:space="preserve"><value>الطلبات والتتبع</value></data>
+  <data name="Mobile_Module_sender_book" xml:space="preserve"><value>إنشاء طلب</value></data>
+  <data name="Mobile_Module_sender_payouts" xml:space="preserve"><value>التسويات وكشوفها</value></data>
+  <data name="Mobile_Module_courier_run" xml:space="preserve"><value>جولة اليوم</value></data>
+  <data name="Mobile_Module_courier_scan" xml:space="preserve"><value>مسح الملصق لفتح محطته</value></data>
+  <data name="Mobile_Module_courier_cash" xml:space="preserve"><value>النقد المطلوب تسليمه</value></data>
+  <data name="Mobile_Module_manager_dashboard" xml:space="preserve"><value>أرقام اليوم والفترة</value></data>
+  <data name="Mobile_Module_manager_alerts" xml:space="preserve"><value>التنبيهات</value></data>
+  <data name="Mobile_Module_manager_orders" xml:space="preserve"><value>البحث عن الطلبات</value></data>
+  <data name="Mobile_Module_manager_hub_scan" xml:space="preserve"><value>مسح المركز (استلام، تسليم للمندوب)</value></data>
+  <data name="Mobile_Module_manager_shelf_check" xml:space="preserve"><value>جرد الرفوف</value></data>
+  <data name="Mobile_Module_manager_finance" xml:space="preserve"><value>النقد والتسويات</value></data>
+  <data name="Mobile_Scanning" xml:space="preserve"><value>المسح</value></data>
+  <data name="Mobile_ScanningHint" xml:space="preserve"><value>الماسحات المدمجة في أجهزة أندرويد اليدوية ومسدسات المسح بالبلوتوث أو USB تعمل دائماً؛ الكاميرا للهواتف العادية.</value></data>
+  <data name="Mobile_CameraScanning" xml:space="preserve"><value>السماح بالمسح بكاميرا الهاتف</value></data>
+  <data name="Mobile_KnownScanners" xml:space="preserve"><value>يستمع التطبيق مسبقاً لهذه الماسحات: Zebra (عند ضبط DataWedge على com.logistico.SCAN)، Urovo، Sunmi، Newland، iData، Chainway، ولأي مسدس مسح. لجهاز آخر أدخل البث الذي يرسله ماسحه:</value></data>
+  <data name="Mobile_ScannerAction" xml:space="preserve"><value>اسم البث (Action)</value></data>
+  <data name="Mobile_ScannerExtra" xml:space="preserve"><value>الحقل الذي يحمل الرمز (Extra)</value></data>
+  <data name="Mobile_ProofHint" xml:space="preserve"><value>ما يجب أن يجمعه المندوب قبل احتساب الطرد مُسلَّماً. يفرضه الخادم.</value></data>
+  <data name="Mobile_RequireSignature" xml:space="preserve"><value>اشتراط توقيع المستلم</value></data>
+  <data name="Mobile_Branding" xml:space="preserve"><value>الاسم واللون والرسائل</value></data>
+  <data name="Mobile_BrandingHint" xml:space="preserve"><value>كيف يقدّم التطبيق شركتك.</value></data>
+  <data name="Mobile_AppName" xml:space="preserve"><value>اسم التطبيق</value></data>
+  <data name="Mobile_Color" xml:space="preserve"><value>اللون الرئيسي</value></data>
+  <data name="Mobile_Announcement" xml:space="preserve"><value>رسالة أعلى التطبيق</value></data>
+  <data name="Mobile_AnnouncementPlaceholder" xml:space="preserve"><value>مثلاً: لا توصيل يوم الجمعة بسبب العطلة.</value></data>
+  <data name="Mobile_SupportPhone" xml:space="preserve"><value>هاتف الدعم</value></data>
+  <data name="Mobile_MinimumVersion" xml:space="preserve"><value>أقدم إصدار مسموح للتطبيق</value></data>
   <data name="Audit_Subtitle" xml:space="preserve"><value>من غيّر ماذا ومتى: الطلبات والأسعار والقواعد والجمارك والتسويات والمتاجر وحسابات الموظفين. لا يمكن تعديل السجل أو حذفه.</value></data>
   <data name="Audit_SearchPlaceholder" xml:space="preserve"><value>الشخص أو رقم التتبع أو البريد أو الاسم…</value></data>
   <data name="Audit_Record" xml:space="preserve"><value>السجل</value></data>
@@ -766,6 +808,7 @@
   <data name="OpenStation" xml:space="preserve"><value>محطة المسح</value></data>
   <data name="OpenTruck" xml:space="preserve"><value>فتح الشاحنة</value></data>
   <data name="Optional" xml:space="preserve"><value>(اختياري)</value></data>
+  <data name="Required" xml:space="preserve"><value>(مطلوب)</value></data>
   <data name="OrderCancelled" xml:space="preserve"><value>تم إلغاء الطلب</value></data>
   <data name="OrderCreated" xml:space="preserve"><value>تم إنشاء الطلب — رقم التتبع {0}</value></data>
   <data name="OrderUpdated" xml:space="preserve"><value>تم تعديل الطلب</value></data>

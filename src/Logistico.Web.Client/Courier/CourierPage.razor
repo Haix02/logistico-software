@@ -6,6 +6,7 @@
 @inject Toaster Toaster
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
+@inject MobileAppApi MobileApp
 
 <PageTitle>@L["Courier_Title"] · @L["AppName"]</PageTitle>
 
@@ -127,10 +128,14 @@
                 <input id="receiver-name" class="bp6-input bp6-fill bp6-large" maxlength="120" autocomplete="off" @bind="proof.ReceiverName" @bind:event="oninput" />
             }
             <div class="lx-row lx-mt" style="justify-content:space-between">
-                <label class="bp6-label" style="margin:0">@L["Courier_Signature"] <span class="bp6-text-muted">@L["Optional"]</span></label>
+                <label class="bp6-label" style="margin:0">@L["Courier_Signature"] <span class="@(requireSignature ? "lx-intent-warning" : "bp6-text-muted")">@(requireSignature ? L["Required"] : L["Optional"])</span></label>
                 <Button Minimal="true" Small="true" Icon="eraser" Text="@L["Courier_ClearSignature"]" OnClick="ClearSignatureAsync" />
             </div>
             <canvas @ref="signaturePad" class="lx-signature-pad" aria-label="@L["Courier_Signature"]"></canvas>
+            @if (signatureMissing)
+            {
+                <p class="lx-intent-danger lx-small lx-mt-sm">@L["Courier_SignatureNeeded"]</p>
+            }
             <p class="bp6-text-muted lx-small lx-mt-sm"><Icon Name="map-marker" /> @LocationText</p>
         }
     </ChildContent>
@@ -163,11 +168,22 @@
     private Task<GeoPoint?>? locating;
     private GeoPoint? location;
     private bool located;
+    private bool requireSignature;
+    private bool signatureMissing;
     private CancellationTokenSource? refresh;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadAsync();
+        try
+        {
+            requireSignature = (await MobileApp.GetConfigAsync()).RequireSignature; // the company's rule (Mobile app settings)
+        }
+        catch (ApiException)
+        {
+            // the server still enforces it
+        }
+
         refresh = new CancellationTokenSource();
         _ = RefreshLoopAsync(refresh.Token);
     }
@@ -219,6 +235,7 @@
     {
         proof = new CourierDeliveryRequest();
         padStarted = false;
+        signatureMissing = false;
         delivering = s;
         Locate();
     }
@@ -248,6 +265,12 @@
         }
 
         proof.Signature = await JS.InvokeAsync<string?>("lx.signature.path", signaturePad);
+        if (requireSignature && proof.Signature is null)
+        {
+            signatureMissing = true;
+            return;
+        }
+
         proof.Location = await PlaceAsync();
         var sent = proof;
         delivering = null;

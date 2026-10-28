@@ -54,13 +54,25 @@ else if (!builder.Environment.IsDevelopment() && !builder.Environment.IsEnvironm
         "DataProtection:KeyRingPath must point to a durable shared volume outside Development so authentication survives restarts and scale-out.");
 }
 
-// Identity (cookie authentication for the browser)
-builder.Services.AddAuthentication(options =>
+// Identity: cookies for the browser, bearer tokens for the mobile app (ADR-031). Every request goes to the one it
+// carries, so all endpoints and policies accept both.
+const string CookieOrToken = "CookieOrToken";
+var authentication = builder.Services.AddAuthentication(options =>
     {
-        options.DefaultScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultScheme = CookieOrToken;
         options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-    })
-    .AddIdentityCookies();
+    });
+authentication.AddPolicyScheme(CookieOrToken, CookieOrToken, options => options.ForwardDefaultSelector = context =>
+    context.Request.Headers.Authorization.ToString().StartsWith("Bearer ", StringComparison.Ordinal)
+        ? IdentityConstants.BearerScheme
+        : IdentityConstants.ApplicationScheme);
+authentication.AddBearerToken(IdentityConstants.BearerScheme, options =>
+{
+    // Short-lived: a locked account or a changed role stops working within minutes (refresh re-checks the account).
+    options.BearerTokenExpiration = TimeSpan.FromMinutes(15);
+    options.RefreshTokenExpiration = TimeSpan.FromDays(14);
+});
+authentication.AddIdentityCookies();
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.Name = "logistico.auth";
@@ -107,6 +119,7 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 // Platform services
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ITenantContext, HttpTenantContext>();
+builder.Services.AddScoped<Logistico.SharedKernel.Mobile.IDeliveryRules, DeliveryRules>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
@@ -138,9 +151,11 @@ builder.Services.AddRateLimiter(options =>
     // Sign-in, registration and password forms: 30 submissions a minute per client address slows password spraying
     // across accounts (each account also locks after 5 wrong passwords) while an office behind one address still works.
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
-        HttpMethods.IsPost(context.Request.Method) && context.Request.Path.StartsWithSegments("/Account")
+        HttpMethods.IsPost(context.Request.Method)
+        && (context.Request.Path.StartsWithSegments("/Account") || context.Request.Path.StartsWithSegments("/api/v1/auth"))
             ? RateLimitPartition.GetFixedWindowLimiter(
-                "account:" + (context.Connection.RemoteIpAddress?.ToString() ?? "unknown"),
+                // The web forms and the app's sign-in each have their own budget per address.
+                (context.Request.Path.StartsWithSegments("/Account") ? "account:" : "app-sign-in:") + (context.Connection.RemoteIpAddress?.ToString() ?? "unknown"),
                 _ => new FixedWindowRateLimiterOptions { PermitLimit = 30, Window = TimeSpan.FromMinutes(1) })
             : RateLimitPartition.GetNoLimiter(""));
     // Public tracking is anonymous: 60 lookups per minute per client address.
@@ -239,6 +254,8 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
 
 app.MapCultureSwitch();
 app.MapAccountEndpoints();
+app.MapAuthTokenEndpoints();
+app.MapMobileAppEndpoints();
 app.MapTeamEndpoints();
 
 // Module APIs: reading needs a staff role, changing data needs Operations or Admin unless an endpoint asks for more.

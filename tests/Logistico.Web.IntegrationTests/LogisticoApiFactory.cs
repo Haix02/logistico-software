@@ -105,17 +105,17 @@ public sealed class LogisticoApiFactory : WebApplicationFactory<Program>, IAsync
             services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
             services.PostConfigure<AuthorizationOptions>(options =>
             {
-                options.DefaultPolicy = new AuthorizationPolicyBuilder(TestAuthHandler.SchemeName, IdentityConstants.ApplicationScheme)
+                options.DefaultPolicy = new AuthorizationPolicyBuilder(TestAuthHandler.SchemeName, IdentityConstants.BearerScheme, IdentityConstants.ApplicationScheme)
                     .RequireAuthenticatedUser()
                     .Build();
 
-                // The real policies (roles, tenant claim), also accepting the test scheme.
+                // The real policies (roles, tenant claim), also accepting the test scheme (and the app's bearer tokens).
                 foreach (var policyName in StaffPolicies.All)
                 {
                     var policy = options.GetPolicy(policyName)
                         ?? throw new InvalidOperationException($"Missing authorization policy {policyName}.");
                     options.AddPolicy(policyName, new AuthorizationPolicyBuilder(policy)
-                        .AddAuthenticationSchemes(TestAuthHandler.SchemeName, IdentityConstants.ApplicationScheme)
+                        .AddAuthenticationSchemes(TestAuthHandler.SchemeName, IdentityConstants.BearerScheme, IdentityConstants.ApplicationScheme)
                         .Build());
                 }
             });
