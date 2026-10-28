@@ -83,6 +83,37 @@ jobs:
           name: test-results
           path: TestResults
 
+  mobile:
+    # The Flutter app (mobile/): its texts match the server's, it analyzes clean and its tests pass.
+    name: Mobile app (Flutter)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Install Flutter (official repository, pinned version)
+        run: |
+          git clone --depth 1 --branch 3.47.2 https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+
+      - name: Packages and generated strings
+        run: |
+          flutter --disable-analytics
+          flutter pub get
+          flutter gen-l10n
+
+      - name: Domain texts match the server's resources
+        run: python3 tool/generate_domain_texts.py --check
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
   docker:
     name: Docker image (docker compose)
     runs-on: ubuntu-latest

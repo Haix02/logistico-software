@@ -6,6 +6,14 @@ versions follow [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **Logistico mobile app** (`mobile/`, Flutter, Android and iOS; ADR-031): one app whose screens follow the account —
+  senders (home with what the shop is owed, orders, booking at the company's price, payouts), couriers (the run, scan
+  a label to open its stop, delivered with receiver, signature and location or not delivered with the reason, cash to
+  hand in) and managers (like-for-like figures, alerts, order search, hub scanning and shelf checks, money). What each
+  kind of account sees, the company's colour, name and message come from the console. Barcodes from the built-in
+  scanners of Android handhelds (Zebra, Urovo, Sunmi, Newland, iData, Chainway and any configured broadcast), scanner
+  guns and the camera. Arabic first (RTL) and English, light and dark, the console's look and Almarai. CI analyzes and
+  tests it; an on-device test delivers a parcel against a real server.
 - **Mobile app support in the API** (ADR-031): the app signs in with ASP.NET Identity bearer tokens
   (`/api/v1/auth/token`, `/api/v1/auth/refresh`) under the web's rules (confirmed account, lockout, two-factor, its own
   rate limit); a refresh is refused once an administrator locks the account or changes it. Every endpoint accepts the
