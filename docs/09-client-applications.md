@@ -7,7 +7,7 @@
 | **Logistico Web** | Current Chrome, Edge, Firefox, Safari on Windows, macOS, Linux, tablets | All office roles, partners, managers | Blazor WebAssembly + Blueprint 6, Arabic + English | ✅ Running |
 | **Public tracking** | Any browser | Customers | Anonymous pages of the same app (`/track`) | ✅ Running |
 | **Desktop app** | Windows, macOS | Power users who need offline cache, multi-window or local hardware | See §4: three options | ⏳ Open for discussion |
-| **Logistico mobile** | Android (phones and rugged handhelds), iOS | Senders (shops), couriers, managers and hub staff — one app, screens by role | **Flutter** (Riverpod, go_router, dio), decided 28 Oct 2026 ([ADR-031](14-architecture-decisions.md)) | 🔨 In progress (`mobile/`) |
+| **Logistico mobile** | Android (phones and rugged handhelds), iOS | Senders (shops), couriers, managers and hub staff — one app, screens by role | **Flutter** (Riverpod, go_router, dio), decided 28 Oct 2026 ([ADR-031](14-architecture-decisions.md)) | ✅ First version ([`mobile/`](../mobile/README.md)) |
 
 ## 2. Web app (as built)
 
@@ -47,7 +47,10 @@ Browsers cannot reliably reach USB/serial devices, and Safari has no WebUSB or W
 | **B. .NET MAUI Blazor Hybrid** | Native Windows/macOS app hosting the **same Blazor components** in a WebView, with direct .NET access to the machine | Identical to web | Full local SQLite cache | In-process | Low–medium: packaging, updates | Phase 2 if offline or multi-window needs grow |
 | **C. Native Avalonia UI app** | A separate native desktop UI with Avalonia (MIT, runs on Windows and macOS): docking and native grids possible | Different from web | Full | In-process | **Highest**: second UI codebase | Only for a dedicated power-user console. (DevExpress WPF is out while there is no licence.) |
 
-## 5. Mobile app (Flutter, in progress)
+## 5. Mobile app (Flutter)
+
+How to run, build and test it, and how to set up the handheld scanners: [mobile/README.md](../mobile/README.md).
+
 
 **One app, not three.** The account that signs in decides what the app shows, and the company decides, from the web
 console, which parts each kind of account gets — a small CMS for the app ([ADR-031](14-architecture-decisions.md)).
