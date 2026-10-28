@@ -33,6 +33,7 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
     public DbSet<RateCardSettings> RateCards => Set<RateCardSettings>();
     public DbSet<SavedView> SavedViews => Set<SavedView>();
     public DbSet<DeliveryProof> DeliveryProofs => Set<DeliveryProof>();
+    public DbSet<ShipmentComment> Comments => Set<ShipmentComment>();
     public DbSet<ShelfCheck> ShelfChecks => Set<ShelfCheck>();
     public DbSet<ShelfCheckLine> ShelfCheckLines => Set<ShelfCheckLine>();
 
@@ -252,6 +253,19 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
             // A parcel appears once per check, even when two people scan it at the same moment.
             e.HasIndex(x => new { x.ShelfCheckId, x.TrackingNumber }).IsUnique();
             e.HasIndex(x => new { x.ShelfCheckId, x.State });
+        });
+
+        modelBuilder.Entity<ShipmentComment>(e =>
+        {
+            e.ToTable("shipment_comments");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).ValueGeneratedNever();
+            e.Property(x => x.Author).HasMaxLength(256);
+            e.Property(x => x.AuthorName).HasMaxLength(120);
+            e.Property(x => x.Text).HasMaxLength(ShipmentComment.MaxLength);
+            e.HasOne<Shipment>().WithMany().HasForeignKey(x => x.ShipmentId).OnDelete(DeleteBehavior.Cascade);
+            e.HasIndex(x => new { x.TenantId, x.ShipmentId, x.CreatedAt });
+            e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
         });
 
         modelBuilder.Entity<DeliveryProof>(e =>

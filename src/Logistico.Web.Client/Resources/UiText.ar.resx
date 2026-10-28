@@ -246,6 +246,11 @@
   <data name="Courier_Located" xml:space="preserve"><value>سُجّل موقعك.</value></data>
   <data name="Courier_NoLocation" xml:space="preserve"><value>تعذّر تحديد موقعك؛ يُحتسب التسليم مع ذلك.</value></data>
   <data name="Proof_Title" xml:space="preserve"><value>إثبات التسليم</value></data>
+  <data name="Comments_Title" xml:space="preserve"><value>التعليقات</value></data>
+  <data name="Comments_None" xml:space="preserve"><value>لا توجد تعليقات بعد</value></data>
+  <data name="Comments_Hint" xml:space="preserve"><value>ملاحظات للزملاء: ما قاله الزبون، وما يجب التحقق منه في المركز. يراها كل من في المكتب، ولا يراها الزبائن ولا المتاجر.</value></data>
+  <data name="Comments_Placeholder" xml:space="preserve"><value>اكتب ملاحظة لزملائك…</value></data>
+  <data name="Comments_Add" xml:space="preserve"><value>إضافة تعليق</value></data>
   <data name="Proof_Delivered" xml:space="preserve"><value>سُلّم</value></data>
   <data name="Proof_Failed" xml:space="preserve"><value>لم يُسلَّم</value></data>
   <data name="Proof_AccuracyN" xml:space="preserve"><value>بدقة {0} م</value></data>

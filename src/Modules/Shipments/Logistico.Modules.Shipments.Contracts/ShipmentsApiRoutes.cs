@@ -70,6 +70,7 @@ public static class ShipmentsApiRoutes
     public static string TrackRating(string trackingNumber) => $"{PublicTracking}/{Uri.EscapeDataString(trackingNumber)}/rating";
     public static string Events(Guid id) => $"{Shipments}/{id}/events";
     public static string Proofs(Guid id) => $"{Shipments}/{id}/proofs";
+    public static string Comments(Guid id) => $"{Shipments}/{id}/comments";
     public static string StartReturn(Guid id) => $"{Shipments}/{id}/return";
     public static string Track(string trackingNumber) => $"{PublicTracking}/{Uri.EscapeDataString(trackingNumber)}";
     public static string TrackRequests(string trackingNumber) => $"{Track(trackingNumber)}/requests";

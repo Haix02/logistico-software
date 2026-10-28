@@ -100,6 +100,12 @@ internal sealed class ShipmentsApi(HttpClient http) : ApiClient(http)
     public Task<PagedResult<CashHandoverItem>> ListCashHandoversAsync(Guid? courierId = null, int page = 1, int pageSize = 10, CancellationToken ct = default) =>
         GetAsync<PagedResult<CashHandoverItem>>(ShipmentsApiRoutes.CashHandovers + Query(("courierId", courierId), ("page", page), ("pageSize", pageSize)), ct);
 
+    public async Task<IReadOnlyList<ShipmentCommentItem>> GetCommentsAsync(Guid shipmentId, CancellationToken ct = default) =>
+        await GetAsync<List<ShipmentCommentItem>>(ShipmentsApiRoutes.Comments(shipmentId), ct);
+
+    public Task<ShipmentCommentItem> AddCommentAsync(Guid shipmentId, string text, CancellationToken ct = default) =>
+        SendAsync<ShipmentCommentItem>(HttpMethod.Post, ShipmentsApiRoutes.Comments(shipmentId), new AddCommentRequest { Text = text }, null, ct);
+
     /// <summary>What the courier app recorded at each attempt (who took it, signature, place).</summary>
     public async Task<IReadOnlyList<DeliveryProofItem>> GetProofsAsync(Guid shipmentId, CancellationToken ct = default) =>
         await GetAsync<List<DeliveryProofItem>>(ShipmentsApiRoutes.Proofs(shipmentId), ct);
