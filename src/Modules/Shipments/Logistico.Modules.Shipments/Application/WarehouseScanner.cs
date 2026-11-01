@@ -15,6 +15,7 @@ internal sealed class WarehouseScanner(
     ShipmentsDbContext db,
     AutomationPolicies policies,
     TransferPlanner planner,
+    SortPlanner sortPlanner,
     HubDirectory hubs,
     Activity activity,
     ITenantContext tenant,
@@ -38,9 +39,11 @@ internal sealed class WarehouseScanner(
             ? await db.Transfers.Include(t => t.Items).FirstOrDefaultAsync(t => t.Id == id, ct) ?? throw new DomainException("transfer.not_found", "Truck manifest not found.")
             : null;
         var policy = await policies.GetAsync(tenant.TenantId, ct);
+        var sortPlan = operation is ScanOperation.Receive or ScanOperation.Unload ? await sortPlanner.ForHubAsync(hub.Code, ct) : null;
         var now = clock.GetUtcNow();
         var actor = Actor.Scan(user);
         var scans = new List<HubScan>(numbers.Count);
+        var placements = new Dictionary<Guid, ShelfPlacement>();
 
         foreach (var number in numbers)
         {
@@ -54,7 +57,12 @@ internal sealed class WarehouseScanner(
             var misrouted = IsMisrouted(hub, shipment, operation);
             try
             {
-                var (message, transferNumber) = await ApplyAsync(operation, shipment, hub, bin, courierName, transfer, failureReason, policy, actor, now, ct);
+                var (message, transferNumber, placement) = await ApplyAsync(operation, shipment, hub, bin, courierName, transfer, failureReason, policy, sortPlan, actor, now, ct);
+                if (placement is not null)
+                {
+                    placements[shipment.Id] = placement;
+                }
+
                 if (misrouted)
                 {
                     RaiseMisrouted(shipment, hub, now);
@@ -71,10 +79,16 @@ internal sealed class WarehouseScanner(
 
         db.HubScans.AddRange(scans);
         await db.SaveChangesAsync(ct);
-        return scans.Select(scan => ToOutcome(scan, scan.ShipmentId is { } sid ? shipments.Values.FirstOrDefault(s => s.Id == sid) : null)).ToList();
+        return scans.Select(scan =>
+        {
+            var outcome = ToOutcome(scan, scan.ShipmentId is { } sid ? shipments.Values.FirstOrDefault(s => s.Id == sid) : null);
+            return scan.Ok && scan.ShipmentId is { } id && placements.TryGetValue(id, out var placed)
+                ? outcome with { ShelfFromPlan = true, ShelfFull = placed.Full }
+                : outcome;
+        }).ToList();
     }
 
-    private async Task<(string Message, string? TransferNumber)> ApplyAsync(
+    private async Task<(string Message, string? TransferNumber, ShelfPlacement? Placement)> ApplyAsync(
         ScanOperation operation,
         Shipment shipment,
         HubInfo hub,
@@ -83,6 +97,7 @@ internal sealed class WarehouseScanner(
         HubTransfer? transfer,
         DeliveryFailureReason? failureReason,
         AutomationPolicy policy,
+        HubSortPlan? sortPlan,
         Actor actor,
         DateTimeOffset now,
         CancellationToken ct)
@@ -113,18 +128,25 @@ internal sealed class WarehouseScanner(
                         }
                     }
 
-                    shipment.ReceiveAtHub(hub, bin, actor, now);
+                    // A shelf typed or scanned at the station wins; otherwise the hub's sort plan chooses one.
+                    var typed = SortPlanRules.Shelf(bin);
+                    var before = sortPlan?.ShelfAtThisHub(shipment);
+                    var placement = typed is null ? sortPlan?.Place(shipment) : null;
+                    shipment.ReceiveAtHub(hub, typed ?? placement?.Shelf, actor, now);
+                    sortPlan?.Moved(before, sortPlan.ShelfAtThisHub(shipment));
                     var planned = policy.AutoPlanTransfers ? await planner.PlanAsync(shipment, ct) : null;
-                    var text = $"{hub.RoutingTag} · {ShipmentTexts.Of(shipment.Status)}" + (shipment.WarehouseBin is { } shelf ? $" · {shelf}" : "");
+                    var text = $"{hub.RoutingTag} · {ShipmentTexts.Of(shipment.Status)}"
+                        + (shipment.WarehouseBin is { } shelf ? $" · {shelf}" : "")
+                        + (placement is { Full: true } ? $" ({ShipmentTexts.Get("SortPlan_ShelfFull")})" : "");
                     return planned is null
-                        ? (text, arriving?.Number)
-                        : ($"{text} → {IraqHubs.TagOf(planned.ToHubCode)} ({planned.Number})", planned.Number);
+                        ? (text, arriving?.Number, placement)
+                        : ($"{text} → {IraqHubs.TagOf(planned.ToHubCode)} ({planned.Number})", planned.Number, placement);
                 }
 
             case ScanOperation.Dispatch:
                 shipment.DispatchToCourier(hub, courierName, actor, now);
                 activity.Notify(shipment, NotificationTemplate.OutForDelivery, policy);
-                return ($"{hub.RoutingTag} → {shipment.CourierName}", null);
+                return ($"{hub.RoutingTag} → {shipment.CourierName}", null, null);
 
             case ScanOperation.Load:
                 {
@@ -162,26 +184,26 @@ internal sealed class WarehouseScanner(
                     }
 
                     truck.Load(shipment, now);
-                    return ($"{truck.Number} · {IraqHubs.TagOf(truck.FromHubCode)} → {IraqHubs.TagOf(truck.ToHubCode)}", truck.Number);
+                    return ($"{truck.Number} · {IraqHubs.TagOf(truck.FromHubCode)} → {IraqHubs.TagOf(truck.ToHubCode)}", truck.Number, null);
                 }
 
             case ScanOperation.Deliver:
                 shipment.AdvanceTo(ShipmentStatus.Delivered, now, new MilestoneDetails(Location: hub.Code, CourierName: courierName ?? shipment.CourierName), actor.Source, actor.Name, now);
                 activity.Notify(shipment, NotificationTemplate.Delivered, policy);
-                return (ShipmentTexts.Of(shipment.Status), null);
+                return (ShipmentTexts.Of(shipment.Status), null, null);
 
             case ScanOperation.Fail:
                 {
                     var decision = shipment.RecordFailedAttempt(failureReason ?? DeliveryFailureReason.NoAnswer, courierName, null, policy, actor, now);
                     activity.AfterFailure(shipment, decision, policy);
-                    return (ShipmentTexts.Of(shipment.Status), null);
+                    return (ShipmentTexts.Of(shipment.Status), null, null);
                 }
 
             case ScanOperation.Verify:
                 {
                     return (hub.Code == shipment.TargetHubCode
                         ? $"{hub.RoutingTag} ✓ · {ShipmentTexts.Of(shipment.Status)}"
-                        : $"{hub.RoutingTag} → {IraqHubs.TagOf(shipment.TargetHubCode)} · {ShipmentTexts.Of(shipment.Status)}", null);
+                        : $"{hub.RoutingTag} → {IraqHubs.TagOf(shipment.TargetHubCode)} · {ShipmentTexts.Of(shipment.Status)}", null, null);
                 }
 
             default:

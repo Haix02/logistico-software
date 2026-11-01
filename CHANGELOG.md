@@ -6,6 +6,28 @@ versions follow [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **First run: a setup page instead of settings** (ADR-033, docs/19). A new installation writes a one-time setup code
+  to its log and every page leads to `/setup`: the code, the company's name and phone, and the first administrator,
+  with sample data to learn with if wanted. It runs once, under a database lock, so two people submitting together get
+  one administrator; then it closes. Unlike Fleetbase and Traccar, reaching a fresh server is not enough to own it;
+  unlike Karrio, there is no default password. `Seed:AdminEmail` still works for unattended installs.
+- **Getting started**: a guide on the dashboard and its own page that walks each role through setting up the company
+  (profile, warehouses, prices, team, couriers, sellers, sort plan, first order and scan, automation, the mobile app,
+  installation health). Each step links to the page that does it and is done when the data says so, not when someone
+  ticks it; operations and administrators can mark a step "not for us".
+- **Company profile** (Administration → Company): name, phone, head office and address; the name shows in the top bar.
+- **Installation health** (Administration): PostgreSQL version, pending migrations, the shelf-order collation, HTTPS,
+  the reverse proxy, sign-in keys, email, leftover bootstrap settings, demo data, administrators, two-step sign-in and
+  automation, each with what to do about it.
+- **Hub sort plans** (Warehouse → Sort plan; ADR-032; ideas from Odoo's putaway rules and parcel sort plans): each
+  hub says which parcels go on which shelves — for its couriers by governorate or area, waiting for the truck to a
+  given hub, returns for the seller, one seller's own shelf — and how many fit on each. A receive scan without a shelf
+  (station, bulk scan, the app, or a milestone recorded by hand) follows the plan: the most specific matching rule
+  wins, its shelves fill in order, a full shelf overflows to the next and then to the next matching rule, and when all
+  are full the parcel goes on the emptiest and the scan says so. A typed or scanned shelf always wins; a parcel scanned
+  again on an allowed shelf stays put. The station and the app show the chosen shelf large. The plan page lists every
+  shelf in walking order with its load and capacity, and shows where a parcel would go without scanning it. The demo
+  company starts with a plan at every hub.
 - **Logistico mobile app** (`mobile/`, Flutter, Android and iOS; ADR-031): one app whose screens follow the account —
   senders (home with what the shop is owed, orders, booking at the company's price, payouts), couriers (the run, scan
   a label to open its stop, delivered with receiver, signature and location or not delivered with the reason, cash to
@@ -86,6 +108,20 @@ versions follow [Semantic Versioning](https://semver.org/).
   now shows all collected cash not handed in, whatever the day.
 
 ### Changed
+- **Tests reach the whole system.** Every read endpoint is called as every role on the demo company and must never
+  fail; the setup page, the guide, the company profile and the health checks have end-to-end tests; a new test project
+  renders the console's components with bUnit (the guide card, the health page, role-gated actions, tables, paging,
+  mixed Arabic/Latin text) and checks that every menu entry and guide step leads to a page and has its texts in both
+  languages. CI reports the console's coverage on its own line.
+- **Orderly lists.** Shelves sort the way people walk a hub (A-2 before A-10, B-01-9 before B-01-10) in the order list,
+  the station and shelf checks; sorting by status follows the order a parcel lives through them instead of the
+  alphabet; every sort has a tiebreaker, so paging never shows an order twice or skips one. The hub station no longer
+  pre-fills shelf A-01-1: an empty shelf field means "use the sort plan".
+- **Tests cover the demo company and customer ratings; CI shows coverage.** A test company seeded with the 150-order
+  demo (staff, couriers, seller, fleet, settlements) must open every screen, sort the order list by every column both
+  ways, add up its money and open each demo account's app; seeding twice adds nothing. Customer ratings are tested end
+  to end (only after delivery, only once, only with the phone digits; two stars or fewer open a complaint). Each CI run
+  lists line coverage per module on its page (86.6 % of the server code) and fails below 85 %.
 - **README and docs match the light console.** New screenshots of the dashboard (light and dark), the shipments list, the Iraq map and demand intelligence. Dark-mode borders are documented as hairlines.
 - **New look: GitLab's Pajamas design system on Blueprint.** Navigation sits on a quiet grey frame and each page is a
   white panel; buttons, inputs, badges, alerts, tabs, tables, dialogs, drawers and toasts follow Pajamas (32 px

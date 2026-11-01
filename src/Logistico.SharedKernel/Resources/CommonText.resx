@@ -6,6 +6,8 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="Validation_Choice" xml:space="preserve"><value>Choose one of the listed options.</value></data>
   <data name="Validation_Format" xml:space="preserve"><value>This value is not in the expected format.</value></data>
+  <data name="Validation_Shelves" xml:space="preserve"><value>List one to 12 shelves, such as B-07 B-08 (letters, digits, - . /), each once.</value></data>
+  <data name="Validation_PasswordsDiffer" xml:space="preserve"><value>The two passwords are not the same.</value></data>
   <data name="Validation_CourierCode" xml:space="preserve"><value>Choose the courier this account delivers for.</value></data>
   <data name="Validation_Currency" xml:space="preserve"><value>Use a currency code such as IQD or USD.</value></data>
   <data name="Validation_DateWindow" xml:space="preserve"><value>Choose a date from today up to 14 days ahead.</value></data>

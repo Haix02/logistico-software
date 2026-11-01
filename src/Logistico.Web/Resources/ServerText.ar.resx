@@ -53,4 +53,28 @@
   <data name="OpenSourceLine" xml:space="preserve"><value>مفتوح المصدر · Apache-2.0</value></data>
   <data name="SeoTitle" xml:space="preserve"><value>لوجستيكو — نظام توصيل مفتوح المصدر للعراق</value></data>
   <data name="SeoDescription" xml:space="preserve"><value>نظام لوجستي مفتوح المصدر لشركات التوصيل في العراق: الطلبات والمخازن والشاحنات والمندوبون والمرتجعات والدفع عند الاستلام. العربية أولاً والإنجليزية.</value></data>
+  <data name="SetupTitle" xml:space="preserve"><value>إعداد لوجستيكو</value></data>
+  <data name="SetupSubtitle" xml:space="preserve"><value>أنشئ شركتك وأول مدير لها. تعمل هذه الصفحة مرة واحدة.</value></data>
+  <data name="SetupHeroTitle" xml:space="preserve"><value>شركة التوصيل الخاصة بك جاهزة خلال دقيقة</value></data>
+  <data name="SetupHeroText" xml:space="preserve"><value>لا يوجد مدير في لوجستيكو بعد. املأ هذه الصفحة وسيرشدك الدليل إلى الباقي: المخازن والأسعار والفريق والمندوبين وأول طلب.</value></data>
+  <data name="SetupStep1" xml:space="preserve"><value>شركتك</value></data>
+  <data name="SetupStep2" xml:space="preserve"><value>أول مدير</value></data>
+  <data name="SetupStep3" xml:space="preserve"><value>دليل لما تبقى</value></data>
+  <data name="SetupCode" xml:space="preserve"><value>رمز الإعداد</value></data>
+  <data name="SetupCodeHelp" xml:space="preserve"><value>كتبه الخادم في سجله عند التشغيل. لعرضه مع Docker:</value></data>
+  <data name="SetupCompany" xml:space="preserve"><value>الشركة</value></data>
+  <data name="SetupCompanyName" xml:space="preserve"><value>اسم الشركة</value></data>
+  <data name="SetupCompanyNamePlaceholder" xml:space="preserve"><value>الرافدين للتوصيل</value></data>
+  <data name="SetupCompanyPhone" xml:space="preserve"><value>هاتف الشركة</value></data>
+  <data name="SetupGovernorate" xml:space="preserve"><value>محافظة المكتب الرئيسي</value></data>
+  <data name="Optional" xml:space="preserve"><value>اختياري</value></data>
+  <data name="SetupAdmin" xml:space="preserve"><value>أول مدير</value></data>
+  <data name="SetupAdminName" xml:space="preserve"><value>الاسم الكامل</value></data>
+  <data name="ConfirmPassword" xml:space="preserve"><value>تأكيد كلمة المرور</value></data>
+  <data name="SetupSampleData" xml:space="preserve"><value>إضافة بيانات تجريبية للتعلّم</value></data>
+  <data name="SetupSampleDataHelp" xml:space="preserve"><value>متاجر وطلبات وشاحنات ومرتجعات تجريبية لتجربة كل الشاشات. اتركها مطفأة إذا كانت الشركة ستبدأ العمل مباشرة.</value></data>
+  <data name="SetupButton" xml:space="preserve"><value>إنشاء الشركة</value></data>
+  <data name="SetupWrongCode" xml:space="preserve"><value>رمز الإعداد غير صحيح. انسخه مرة أخرى من سجل الخادم؛ فهو يتغير في كل تشغيل.</value></data>
+  <data name="SetupDoneTitle" xml:space="preserve"><value>تم إعداد لوجستيكو</value></data>
+  <data name="SetupDoneText" xml:space="preserve"><value>لهذا التثبيت مدير بالفعل. سجّل الدخول، أو اطلب من المدير إضافتك من صفحة الفريق.</value></data>
 </root>

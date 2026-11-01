@@ -52,7 +52,7 @@
                 <FormField TValue="string" Label="@L["Field_Shelf"]" Hint="@L["StickyHint"]" For="lx-bin">
                     <div class="bp6-input-group bp6-large">
                         <span class="bp6-icon bp6-icon-standard bp6-icon-box"></span>
-                        <input id="lx-bin" class="bp6-input lx-upper" dir="ltr" placeholder="A-01-2" @bind="bin" autocomplete="off" />
+                        <input id="lx-bin" class="bp6-input lx-upper" dir="ltr" placeholder="@L["Station_ShelfAuto"]" @bind="bin" autocomplete="off" />
                     </div>
                 </FormField>
             }
@@ -110,6 +110,10 @@
                             <div class="lx-semibold"><Mixed Text="@last.Hint" /></div>
                         }
                     </div>
+                    @if (last.Shelf is { } planned)
+                    {
+                        <span class="lx-scan-shelf" dir="ltr" title="@string.Format(CultureInfo.CurrentCulture, L["Station_PutOnShelf"], planned)">@planned</span>
+                    }
                     @if (last.ShipmentId is { } sid)
                     {
                         <LinkButton Href="@($"shipments/{sid}")" Icon="@Bidi.Forward" Minimal="true" Tip="@L["OpenShipment"]" />
@@ -216,6 +220,10 @@
                         <div class="lx-scan-title"><span class="lx-code">@last.TrackingNumber</span></div>
                         <div><Mixed Text="@last.Message" /></div>
                     </div>
+                    @if (last.Shelf is { } planned)
+                    {
+                        <span class="lx-scan-shelf" dir="ltr" title="@string.Format(CultureInfo.CurrentCulture, L["Station_PutOnShelf"], planned)">@planned</span>
+                    }
                 </div>
             }
         </div>
@@ -226,7 +234,8 @@
 </Dialog>
 
 @code {
-    private sealed record SessionScan(DateTimeOffset At, string TrackingNumber, bool Ok, bool Warning, string Message, string? Hint, Guid? ShipmentId);
+    /// <summary>One scan of this session; <paramref name="Shelf"/> is the shelf the sort plan chose, shown large.</summary>
+    private sealed record SessionScan(DateTimeOffset At, string TrackingNumber, bool Ok, bool Warning, string Message, string? Hint, Guid? ShipmentId, string? Shelf = null);
 
     private static readonly (ScanOperation Op, string Icon, string Key)[] Modes =
     [
@@ -240,7 +249,7 @@
 
     private ScanOperation mode = ScanOperation.Receive;
     private string hubCode = HubCatalog.Primary.Code;
-    private string? bin = "A-01-1";
+    private string? bin; // empty: the hub's sort plan chooses the shelf
     private string? courier;
     private string? truckId;
     private string? scan;
@@ -381,7 +390,8 @@
                 TransferId = Guid.TryParse(truckId, out var id) ? id : null,
             });
             Ops.LastLocalScanSeq = Math.Max(Ops.LastLocalScanSeq, outcome.Seq);
-            await RecordAsync(new SessionScan(outcome.ScannedAt, number, true, outcome.IsMisrouted || outcome.NextHubCode is not null, outcome.Message, HintFor(outcome), outcome.ShipmentId));
+            await RecordAsync(new SessionScan(outcome.ScannedAt, number, true, outcome.IsMisrouted || outcome.NextHubCode is not null || outcome.ShelfFull,
+                outcome.Message, HintFor(outcome), outcome.ShipmentId, outcome.ShelfFromPlan ? outcome.WarehouseBin : null));
         }
         catch (ApiException ex)
         {
@@ -402,6 +412,11 @@
         if (o.IsMisrouted && o.ExpectedHubCode is { } expected)
         {
             return string.Format(CultureInfo.CurrentCulture, L["MisrouteHint"], Fmt.Hub(expected));
+        }
+
+        if (o.ShelfFull && o.WarehouseBin is { } full)
+        {
+            return string.Format(CultureInfo.CurrentCulture, L["Station_PutOnShelfFull"], full);
         }
 
         if (o.NextHubCode is { } next)

@@ -1,0 +1,247 @@
+@page "/warehouse/sort-plan"
+@inject OperationsApi Operations
+@inject NavigationManager Navigation
+@inject Confirmer Confirm
+@inject Toaster Toaster
+@inject IJSRuntime JS
+
+<PageTitle>@L["Nav_SortPlan"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["Nav_SortPlan"]" Subtitle="@L["SortPlan_Subtitle"]" Icon="sort">
+    <Actions>
+        <HtmlSelect Value="@hub" ValueChanged="SelectHubAsync" Label="@L["Col_Hub"]">
+            @foreach (var h in HubCatalog.All)
+            {
+                <option value="@h.Code">@h.RoutingTag · @h.Name</option>
+            }
+        </HtmlSelect>
+        <Allowed Policy="@StaffPolicies.Operate">
+            <Button Intent="Intent.Primary" Icon="add" Text="@L["SortPlan_AddRule"]" OnClick="@(() => Edit(null))" />
+        </Allowed>
+    </Actions>
+</PageHeader>
+
+<Callout Icon="sort" CssClass="lx-mb">@L["SortPlan_HowItWorks"]</Callout>
+
+<Section Title="@L["SortPlan_Rules"]" Subtitle="@L["SortPlan_RulesHint"]" Icon="th-list" Padded="false" CssClass="lx-mb">
+    <DataTable TItem="ShelfRuleItem" Items="plan?.Rules" Loading="plan is null" ColumnCount="6" OnRowClick="Edit" EmptyIcon="sort" EmptyTitle="@L["SortPlan_NoRules"]" EmptyDescription="@L["SortPlan_NoRulesHint"]">
+        <Header>
+            <th class="lx-num">#</th>
+            <th>@L["SortPlan_WhichParcels"]</th>
+            <th>@L["SortPlan_Shelves"]</th>
+            <th class="lx-num">@L["SortPlan_Capacity"]</th>
+            <th>@L["Field_Notes"]</th>
+            <th></th>
+        </Header>
+        <Row Context="r">
+            <td class="lx-num">@Fmt.Number(Position(r))</td>
+            <td>
+                <span class="lx-row" style="gap:4px;flex-wrap:wrap">
+                    <Tag Icon="@PurposeIcon(r.Purpose)" Intent="@(r.Purpose == ShelfPurpose.Any ? Intent.None : Intent.Primary)">@ShipmentTexts.Of(r.Purpose)</Tag>
+                    @if (r.ToHubCode is { } to)
+                    {
+                        <Tag Icon="arrow-right">@Fmt.Hub(to)</Tag>
+                    }
+                    @if (r.Governorate is { } g)
+                    {
+                        <Tag Icon="map">@IraqGovernorates.NameOrCode(g)</Tag>
+                    }
+                    @if (r.Area is { } area)
+                    {
+                        <Tag Icon="map-marker"><Mixed Text="@area" /></Tag>
+                    }
+                    @if (r.MerchantName is { } seller)
+                    {
+                        <Tag Icon="shop"><Mixed Text="@seller" /></Tag>
+                    }
+                </span>
+            </td>
+            <td>
+                <span class="lx-shelf-list" dir="ltr">
+                    @for (var i = 0; i < r.Shelves.Count; i++)
+                    {
+                        @if (i > 0)
+                        {
+                            <span class="bp6-text-muted" aria-hidden="true">→</span>
+                        }
+                        <span class="lx-mono">@r.Shelves[i]</span>
+                    }
+                </span>
+            </td>
+            <td class="lx-num">@(r.CapacityPerShelf is { } c ? Fmt.Number(c) : "∞")</td>
+            <td class="bp6-text-muted"><Mixed Text="@r.Note" /></td>
+            <td class="lx-col-actions" @onclick:stopPropagation="true">
+                <Allowed Policy="@StaffPolicies.Operate">
+                    <Button Minimal="true" Small="true" Icon="trash" Intent="Intent.Danger" Tip="@L["SortPlan_Remove"]" OnClick="@(() => RemoveAsync(r))" />
+                </Allowed>
+            </td>
+        </Row>
+    </DataTable>
+</Section>
+
+<div class="lx-grid-2 lx-mb">
+    <Section Title="@L["SortPlan_ShelvesNow"]" Subtitle="@L["SortPlan_ShelvesNowHint"]" Icon="box" Padded="false">
+        <DataTable TItem="ShelfLoad" Items="plan?.Shelves" Loading="plan is null" ColumnCount="3" EmptyIcon="box" EmptyTitle="@L["SortPlan_NoShelves"]">
+            <Header>
+                <th>@L["Field_Shelf"]</th>
+                <th class="lx-num">@L["SortPlan_Parcels"]</th>
+                <th style="width:40%">@L["SortPlan_Fill"]</th>
+            </Header>
+            <Row Context="s">
+                <td><span class="lx-code" dir="ltr">@s.Shelf</span></td>
+                <td class="lx-num">@Fmt.Number(s.Parcels)@(s.Capacity is { } c ? $" / {Fmt.Number(c)}" : "")</td>
+                <td>
+                    @if (s.Capacity is { } capacity)
+                    {
+                        <ProgressBar Value="@((double)s.Parcels / capacity)" Intent="@(s.IsFull ? Intent.Danger : s.Parcels * 5 >= capacity * 4 ? Intent.Warning : Intent.Success)" />
+                    }
+                    else
+                    {
+                        <span class="bp6-text-muted lx-small">@(s.RuleId is null ? L["SortPlan_NotInPlan"] : L["SortPlan_NoLimit"])</span>
+                    }
+                </td>
+            </Row>
+        </DataTable>
+        @if (plan is { WithoutShelf: > 0 })
+        {
+            <p class="bp6-text-muted lx-small" style="padding:8px 12px;margin:0">@L.Count("SortPlan_WithoutShelfN", plan.WithoutShelf)</p>
+        }
+    </Section>
+
+    <Section Title="@L["SortPlan_Try"]" Subtitle="@L["SortPlan_TryHint"]" Icon="search-template">
+        <form class="bp6-control-group bp6-fill" @onsubmit="TryAsync" @onsubmit:preventDefault>
+            <div class="bp6-input-group bp6-fill">
+                <span class="bp6-icon bp6-icon-standard bp6-icon-barcode"></span>
+                <input class="bp6-input lx-upper" dir="ltr" placeholder="LX26…" aria-label="@L["Col_Tracking"]" @bind="tryNumber" autocomplete="off" />
+            </div>
+            <Button Type="submit" Icon="arrow-right" Text="@L["SortPlan_TryButton"]" Loading="trying" />
+        </form>
+        @if (tryError is not null)
+        {
+            <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mt">@tryError</Callout>
+        }
+        else if (suggestion is not null)
+        {
+            <div class="@Bp.Cls("lx-scan-result", "lx-mt", suggestion.Shelf is null ? "lx-scan-warn" : suggestion.Full ? "lx-scan-warn" : "lx-scan-ok")">
+                <Icon Name="@(suggestion.Shelf is null ? "help" : "box")" Large="true" />
+                <div class="lx-stack">
+                    <div class="lx-scan-title"><span class="lx-code">@suggestion.TrackingNumber</span> · @ShipmentTexts.Of(suggestion.Purpose)</div>
+                    @if (suggestion.Shelf is { } shelf)
+                    {
+                        <div>@string.Format(CultureInfo.CurrentCulture, L[suggestion.AlreadyThere ? "SortPlan_StaysOn" : "SortPlan_GoesOn"], shelf)</div>
+                        @if (suggestion.Full)
+                        {
+                            <div class="lx-semibold">@L["SortPlan_AllFull"]</div>
+                        }
+                    }
+                    else
+                    {
+                        <div>@L["SortPlan_NoMatch"]</div>
+                    }
+                </div>
+            </div>
+        }
+    </Section>
+</div>
+
+<ShelfRuleEditor IsOpen="editing" IsOpenChanged="@(v => editing = v)" HubCode="@hub" Existing="selected" OnSaved="LoadAsync" />
+
+@code {
+    private string hub = HubCatalog.Primary.Code;
+    private SortPlanView? plan;
+    private ShelfRuleItem? selected;
+    private bool editing;
+    private string? tryNumber;
+    private bool trying;
+    private string? tryError;
+    private ShelfSuggestion? suggestion;
+
+    [SupplyParameterFromQuery(Name = "hub")] public string? HubParam { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        hub = HubCatalog.Find(HubParam)?.Code
+            ?? HubCatalog.Find(await JS.InvokeAsync<string?>("lx.getPref", "hub"))?.Code
+            ?? HubCatalog.Primary.Code;
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        plan = null;
+        plan = await Operations.GetSortPlanAsync(hub);
+    }
+
+    private async Task SelectHubAsync(string? next)
+    {
+        hub = HubCatalog.Find(next)?.Code ?? HubCatalog.Primary.Code;
+        suggestion = null;
+        tryError = null;
+        await JS.InvokeVoidAsync("lx.setPref", "hub", hub);
+        Navigation.NavigateTo($"warehouse/sort-plan?hub={Uri.EscapeDataString(hub)}", replace: true);
+        await LoadAsync();
+    }
+
+    /// <summary>Rules are tried in this order (the list is sorted by the server).</summary>
+    private int Position(ShelfRuleItem rule) => (plan?.Rules.ToList().IndexOf(rule) ?? 0) + 1;
+
+    private static string PurposeIcon(ShelfPurpose purpose) => purpose switch
+    {
+        ShelfPurpose.Deliver => "drive-time",
+        ShelfPurpose.Forward => "truck",
+        ShelfPurpose.Return => "undo",
+        _ => "box",
+    };
+
+    private void Edit(ShelfRuleItem? rule)
+    {
+        selected = rule;
+        editing = true;
+    }
+
+    private async Task RemoveAsync(ShelfRuleItem rule)
+    {
+        if (!await Confirm.AskAsync(L["SortPlan_RemoveTitle"], L["SortPlan_RemoveMessage"], L["SortPlan_Remove"], Intent.Danger, "trash"))
+        {
+            return;
+        }
+
+        try
+        {
+            await Operations.DeleteShelfRuleAsync(rule.Id);
+            Toaster.Success(L["SortPlan_Removed"]);
+            await LoadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+    }
+
+    private async Task TryAsync()
+    {
+        var number = TrackingNumber.Normalize(tryNumber);
+        tryError = null;
+        suggestion = null;
+        if (!TrackingNumber.IsValid(number))
+        {
+            tryError = L["InvalidTrackingNumber"].Value;
+            return;
+        }
+
+        trying = true;
+        try
+        {
+            suggestion = await Operations.SuggestShelfAsync(hub, number);
+            tryError = suggestion is null ? L["SortPlan_UnknownParcel"].Value : null;
+        }
+        catch (ApiException ex)
+        {
+            tryError = ex.UserMessage;
+        }
+        finally
+        {
+            trying = false;
+        }
+    }
+}

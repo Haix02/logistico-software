@@ -11,6 +11,8 @@ in October 2026. We take ideas and behaviour, not code: the projects below use o
 | [VROOM](https://github.com/VROOM-Project/vroom) + [OSRM](https://github.com/Project-OSRM/osrm-backend) | BSD-2 / BSD-2 | Route optimisation: time windows, capacities, pickups and deliveries, on OpenStreetMap roads | Planned courier runs (needs a decision, below) |
 | [Traccar](https://github.com/traccar/traccar) | Apache-2.0 | GPS tracking server: devices, geofences, trips | Already proposed for live fleet tracking ([13](13-roadmap.md)) |
 | ERPNext Delivery Trip | GPL-3.0 | A trip with ordered stops and a driver | Our courier run sheet already covers it; optimisation is the gap (VROOM) |
+| [Odoo Inventory](https://www.odoo.com/documentation/15.0/applications/inventory_and_mrp/inventory/routes/strategies/putaway.html) (Community) | LGPL-3.0 | Putaway rules (where received goods go, by product or category), [storage categories](https://www.odoo.com/documentation/15.0/applications/inventory_and_mrp/inventory/routes/strategies/storage_category.html) with capacity, [wave picking](https://www.odoo.com/documentation/19.0/applications/inventory_and_mrp/inventory/shipping_receiving/picking_methods/wave.html) | Hub sort plans with capacity and overflow (below) |
+| Parcel sort plans ([Georgia Tech, sort plan design](https://www2.isye.gatech.edu/~atoriello3/Sort_plan_design_v2.pdf)) | Research | Assigning destinations to sort positions so each position fills evenly and loads in route order | Shelves per area, truck lane and returns, filled in order |
 
 ## Built from these ideas
 
@@ -22,6 +24,19 @@ in October 2026. We take ideas and behaviour, not code: the projects below use o
   parcels on the wrong shelf, and fixes the shelf in one step. Each check is kept with who did it.
 - **Comments on orders** (Fleetbase): staff leave notes on an order for each other (call desk, hub, finance), with who
   and when, instead of overwriting one notes field.
+
+- **Hub sort plans** (Odoo putaway rules and storage categories; parcel sort plans): each hub lists which parcels go on
+  which shelves — for its couriers by governorate or area, waiting for the truck to a given hub, returns for the
+  seller, one big seller's own shelf — with how many parcels fit on each. A receive scan without a shelf follows the
+  plan. As in Odoo, the most specific matching rule wins and full places are skipped. For parcels the conditions are
+  what a parcel waits for, where it goes and whose it is; a rule lists several shelves that fill in order; when every
+  shelf a parcel may use is full it still gets the emptiest one and the scan says so, instead of none; and the station
+  shows the chosen shelf large, so it can be read with the parcel in hand. The plan page shows every shelf in walking
+  order (A-2 before A-10) with its load, and answers "where would this parcel go?" without scanning it.
+  ![Sort plan of the Baghdad hub](images/sort-plan.png)
+- **Orderly lists**: shelves sort the way people walk a hub everywhere (a natural, numeric collation in PostgreSQL),
+  statuses sort by the order a parcel lives through them, and every sort has a tiebreaker so a page never repeats or
+  skips an order.
 
 ## Needs a decision first
 

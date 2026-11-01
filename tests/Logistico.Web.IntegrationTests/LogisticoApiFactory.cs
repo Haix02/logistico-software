@@ -1,9 +1,11 @@
-﻿using System.Security.Claims;
+﻿using System.Net;
+using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Logistico.SharedKernel;
 using Logistico.SharedKernel.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -23,12 +25,15 @@ public sealed class ApiCollection : ICollectionFixture<LogisticoApiFactory>;
 /// without migrating the same database at the same time. Server: LOGISTICO_TEST_DB, else the local development server.
 /// The database name gets a unique suffix per factory and is dropped when the test class finishes.
 /// </summary>
-public sealed class LogisticoApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
+public class LogisticoApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     public static readonly Guid OtherTenant = new("01990000-0000-7000-8000-0000000000ff");
 
     private readonly string _connectionString;
     private readonly string _database;
+
+    /// <summary>Settings a derived factory adds on top of the test defaults (for example demo data).</summary>
+    protected virtual IEnumerable<(string Key, string Value)> ExtraSettings => [];
 
     /// <summary>The server's clock; tests move it forward to make parcels late or stuck.</summary>
     public TestClock Clock { get; } = new();
@@ -90,18 +95,38 @@ public sealed class LogisticoApiFactory : WebApplicationFactory<Program>, IAsync
         return client;
     }
 
+    /// <summary>
+    /// An anonymous client with an address of its own, as each customer has: the public limits count per address, so
+    /// tests that act as different customers do not use up each other's budget.
+    /// </summary>
+    public HttpClient CreateCustomerClient()
+    {
+        var client = CreateClient();
+        var n = Interlocked.Increment(ref _customers);
+        client.DefaultRequestHeaders.Add(ClientAddress.Header, $"10.{(n >> 16) & 255}.{(n >> 8) & 255}.{n & 255}");
+        return client;
+    }
+
+    private static int _customers;
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
         builder.UseSetting("ConnectionStrings:Logistico", _connectionString);
         builder.UseSetting("Database:MigrateOnStartup", "true");
         builder.UseSetting("Seed:DemoShipments", "0");
+        foreach (var (key, value) in ExtraSettings)
+        {
+            builder.UseSetting(key, value);
+        }
+
         builder.UseSetting("Automation:Enabled", "false"); // tests run the automation sweep through the API
 
         builder.ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Warning));
         builder.ConfigureTestServices(services =>
         {
             services.AddSingleton<TimeProvider>(Clock);
+            services.AddTransient<IStartupFilter, ClientAddress>();
             services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
             services.PostConfigure<AuthorizationOptions>(options =>
             {
@@ -121,6 +146,26 @@ public sealed class LogisticoApiFactory : WebApplicationFactory<Program>, IAsync
             });
         });
     }
+}
+
+/// <summary>The test server has no client address; a test header sets one before anything else (rate limits) runs.</summary>
+internal sealed class ClientAddress : IStartupFilter
+{
+    public const string Header = "X-Test-Client-Address";
+
+    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
+    {
+        app.Use((context, nextMiddleware) =>
+        {
+            if (IPAddress.TryParse(context.Request.Headers[Header].ToString(), out var address))
+            {
+                context.Connection.RemoteIpAddress = address;
+            }
+
+            return nextMiddleware(context);
+        });
+        next(app);
+    };
 }
 
 /// <summary>Authenticates requests that carry the test headers; anonymous otherwise.</summary>

@@ -53,6 +53,13 @@ dotnet test Logistico.slnx -c Release           # integration tests need Postgre
 The integration tests create and drop a throw-away database per test class on the local PostgreSQL server; set
 `LOGISTICO_TEST_DB` (a full connection string) to use another server.
 
+Coverage as CI measures it (a table per module; CI fails below 85 %):
+
+```bash
+dotnet test Logistico.slnx -c Release --collect:"XPlat Code Coverage" --results-directory TestResults
+python3 scripts/coverage-summary.py TestResults --min 85
+```
+
 If you changed an EF Core model, add a migration for that module's context and check it:
 
 ```bash

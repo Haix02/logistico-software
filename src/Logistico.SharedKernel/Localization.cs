@@ -80,6 +80,8 @@ public static class ValidationText
     public static string PasswordLength => Get("Validation_PasswordLength");
     public static string Choice => Get("Validation_Choice");
     public static string Format => Get("Validation_Format");
+    public static string Shelves => Get("Validation_Shelves");
+    public static string PasswordsDiffer => Get("Validation_PasswordsDiffer");
 
     private static string Get(string key) => Resources.GetString(key, CultureInfo.CurrentUICulture) ?? key;
 }

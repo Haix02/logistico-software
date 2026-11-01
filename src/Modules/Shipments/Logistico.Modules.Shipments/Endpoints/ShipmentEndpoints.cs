@@ -307,6 +307,7 @@ internal static class ShipmentEndpoints
         ShipmentsDbContext db,
         AutomationPolicies policies,
         TransferPlanner planner,
+        SortPlanner sortPlanner,
         HubDirectory hubs,
         Activity activity,
         TimeProvider clock,
@@ -349,7 +350,13 @@ internal static class ShipmentEndpoints
                     activity.AfterFailure(shipment, shipment.RecordFailedAttempt(request.FailureReason!.Value, request.CourierName, request.Notes, policy, actor, now), policy);
                     break;
                 case ShipmentStatus.AtWarehouse or ShipmentStatus.AtDestinationWarehouse:
-                    shipment.ReceiveAtHub(hub ?? network.FindOrDefault(shipment.CurrentHubCode ?? DefaultHub(shipment)), request.WarehouseBin, actor, now);
+                    {
+                        // As at the station: the shelf given wins, otherwise the hub's sort plan chooses one.
+                        var receiving = hub ?? network.FindOrDefault(shipment.CurrentHubCode ?? DefaultHub(shipment));
+                        var shelf = SortPlanRules.Shelf(request.WarehouseBin) ?? (await sortPlanner.ForHubAsync(receiving.Code, ct)).Place(shipment)?.Shelf;
+                        shipment.ReceiveAtHub(receiving, shelf, actor, now);
+                    }
+
                     if (policy.AutoPlanTransfers)
                     {
                         await planner.PlanAsync(shipment, ct);

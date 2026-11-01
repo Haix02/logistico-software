@@ -5,6 +5,7 @@
 @inject ShipmentsApi Shipments
 @inject OperationsApi Operations
 @inject OpsState Ops
+@inject CompanyApi Company
 @inject Toaster Toaster
 @inject IJSRuntime JS
 @using System.Security.Claims
@@ -19,6 +20,10 @@
             <a class="lx-brand" href="">
                 <span class="lx-logo" aria-hidden="true"></span>
                 <span class="lx-brand-name">@L["AppName"]</span>
+                @if (Company.Name is { } companyName)
+                {
+                    <span class="lx-brand-company lx-hide-sm"><bdi>@companyName</bdi></span>
+                }
             </a>
             @if (staff)
             {
@@ -214,6 +219,7 @@
     protected override async Task OnInitializedAsync()
     {
         Ops.Changed += OnOpsChanged;
+        Company.Changed += OnCompanyChanged;
         HubCatalog.Changed += OnNetworkChanged;
         user = AuthState is null ? new() : (await AuthState).User;
         staff = user.IsStaff();
@@ -236,9 +242,23 @@
             networkUnavailable = true; // fall back to the standard network rather than blocking the app
         }
 
-        await Task.WhenAll(RefreshRadarAsync(notify: false), Ops.RefreshAsync());
+        await Task.WhenAll(RefreshRadarAsync(notify: false), Ops.RefreshAsync(), LoadCompanyAsync());
         StartBackgroundRefresh();
     }
+
+    /// <summary>The company's name for the top bar; the app works without it.</summary>
+    private async Task LoadCompanyAsync()
+    {
+        try
+        {
+            await Company.GetCompanyAsync();
+        }
+        catch (Exception ex) when (ex is ApiException or HttpRequestException)
+        {
+        }
+    }
+
+    private void OnCompanyChanged() => InvokeAsync(StateHasChanged);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -421,6 +441,7 @@
     public void Dispose()
     {
         Ops.Changed -= OnOpsChanged;
+        Company.Changed -= OnCompanyChanged;
         HubCatalog.Changed -= OnNetworkChanged;
         loopCts?.Cancel();
         loopCts?.Dispose();

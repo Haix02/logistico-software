@@ -89,6 +89,7 @@ internal sealed class ShipmentsDemoSeeder(
 
         var random = new Random(2026);
         await SeedCouriersAsync(ct);
+        await SeedSortPlansAsync(ct);
 
         if (!await db.Shipments.AnyAsync(s => s.ServiceType == ServiceType.International, ct))
         {
@@ -128,6 +129,50 @@ internal sealed class ShipmentsDemoSeeder(
         await SeedCodSettlementsAsync(ct);
         await SeedRatingsAsync(random, ct);
         await automation.SweepAsync(tenant.TenantId, ct);
+    }
+
+    /// <summary>
+    /// Every hub starts with a sort plan on the demo shelves: parcels for its couriers, parcels waiting for a truck,
+    /// returns, and a catch-all; Baghdad keeps Karrada (its busiest area) on a shelf of its own.
+    /// </summary>
+    private async Task SeedSortPlansAsync(CancellationToken ct)
+    {
+        if (await db.ShelfRules.AnyAsync(ct))
+        {
+            return;
+        }
+
+        var now = clock.GetUtcNow();
+        foreach (var hub in (await hubs.NetworkAsync(tenant.TenantId, ct)).All)
+        {
+            ShelfRuleRequest[] plan =
+            [
+                new() { Purpose = ShelfPurpose.Deliver, Shelves = ["A-01-1", "A-01-2", "A-02-1", "A-03-2"], CapacityPerShelf = 40, Note = "للمندوبين" },
+                new() { Purpose = ShelfPurpose.Forward, Shelves = ["B-01-1", "B-02-3"], CapacityPerShelf = 60, Note = "بانتظار الشاحنة" },
+                new() { Purpose = ShelfPurpose.Return, Shelves = ["R-01"], Note = "مرتجعات البائعين" },
+                new() { Shelves = ["C-01-1", "C-04-2"] },
+            ];
+            foreach (var rule in plan)
+            {
+                rule.HubCode = hub.Code;
+                db.ShelfRules.Add(ShelfRule.Create(tenant.TenantId, rule, null, "seed", now));
+            }
+
+            if (hub.Code == IraqHubs.Baghdad)
+            {
+                db.ShelfRules.Add(ShelfRule.Create(tenant.TenantId, new ShelfRuleRequest
+                {
+                    HubCode = hub.Code,
+                    Purpose = ShelfPurpose.Deliver,
+                    Governorate = "IQ-BG",
+                    Area = "الكرادة",
+                    Shelves = ["K-01", "K-02"],
+                    CapacityPerShelf = 25,
+                }, null, "seed", now));
+            }
+        }
+
+        await db.SaveChangesAsync(ct);
     }
 
     /// <summary>Customers rate about half of last fortnight's deliveries from the tracking page: mostly happy, a few not.</summary>

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logistico_app/core/config.dart';
 import 'package:logistico_app/core/format.dart';
+import 'package:logistico_app/core/models.dart';
 import 'package:logistico_app/core/scanner/keyboard_wedge.dart';
 import 'package:logistico_app/core/version.dart';
 import 'package:logistico_app/features/courier/signature_pad.dart';
@@ -101,6 +102,16 @@ void main() {
       for (final bad in ['0770123', '06701234567', 'abc']) {
         expect(isIraqiMobile(bad), isFalse, reason: bad);
       }
+    });
+  });
+  group('hub scans', () {
+    test('show the shelf the sort plan chose, and only that one', () {
+      final planned = ScanResult({'ok': true, 'trackingNumber': 'LX26000000017', 'message': 'BGW', 'warehouseBin': 'K-2', 'shelfFromPlan': true, 'shelfFull': true});
+      expect((planned.plannedShelf, planned.shelfFull), ('K-2', true));
+      final typed = ScanResult({'ok': true, 'trackingNumber': 'LX26000000017', 'message': 'BGW', 'warehouseBin': 'A-10', 'shelfFromPlan': false});
+      expect((typed.plannedShelf, typed.shelfFull), (null, false));
+      final refused = ScanResult({'ok': false, 'trackingNumber': 'LX26000000017', 'message': 'no'});
+      expect(refused.plannedShelf, isNull);
     });
   });
 }

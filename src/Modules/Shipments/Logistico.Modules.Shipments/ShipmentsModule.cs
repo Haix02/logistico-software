@@ -1,6 +1,7 @@
 using Logistico.Modules.Shipments.Application;
 using Logistico.Modules.Shipments.Endpoints;
 using Logistico.Modules.Shipments.Infrastructure;
+using Logistico.SharedKernel.Setup;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -35,6 +36,10 @@ public static class ShipmentsModule
         services.AddScoped<ConfirmationDesk>();
         services.AddScoped<Pricing>();
         services.AddScoped<TransferPlanner>();
+        services.AddScoped<SortPlanner>();
+        services.AddScoped<ShipmentsSetupFacts>();
+        services.AddScoped<IGettingStartedFacts>(sp => sp.GetRequiredService<ShipmentsSetupFacts>());
+        services.AddScoped<IDatabaseHealth>(sp => sp.GetRequiredService<ShipmentsSetupFacts>());
         services.AddScoped<WarehouseScanner>();
         services.AddScoped<RequestDesk>();
         services.AddScoped<ReturnDesk>();
@@ -65,7 +70,8 @@ public static class ShipmentsModule
         .MapSellerPortalEndpoints()
         .MapFinanceEndpoints()
         .MapViewEndpoints()
-        .MapShelfCheckEndpoints();
+        .MapShelfCheckEndpoints()
+        .MapSortPlanEndpoints();
 
     public static async Task MigrateShipmentsDatabaseAsync(this IServiceProvider services, CancellationToken ct = default)
     {

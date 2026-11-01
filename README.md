@@ -50,6 +50,8 @@ do deliveries fail?** Companies can publish anonymised answers as open data, so 
 | **Dashboard** | Period-over-period KPIs (booked, delivered, success, first attempt, on time, delivery time, returns, COD, customer rating), daily volume, pipeline, failure reasons, sellers, governorates, couriers |
 | **Hubs and trucks** | Map of the 18 governorates, each hub's shelves and trucks, scan station, and line-haul manifests between hubs |
 | **Hub station** | Barcode-scanner-first receive / load truck / dispatch / route check, shelves, scan log and live radar, printable command barcodes |
+| **First run & getting started** | A setup page that creates the company and its first administrator with a one-time code from the server log; a guide that walks each role through setting the company up, done when the data says so; installation health that says what to fix before going live |
+| **Sort plans** | Per hub: which parcels go on which shelves (couriers' areas, truck lanes, returns, a seller's own shelf) and how many fit; receive scans pick the shelf, overflow when one is full and show it large; shelves listed in walking order with their load |
 | **Trucks between hubs** | Parcels planned onto the right truck automatically; load, depart and unload by scan; manifests; missing parcels flagged |
 | **Returns** | Start automatically after the last failed attempt or a refusal, travel back by truck, handed over against a manifest |
 | **Customers** | Public tracking without personal data; self-service requests (new day, address, phone, cancel, return, complaint) protected by the phone's last four digits with lockout; ratings that open complaints |
@@ -79,6 +81,17 @@ do deliveries fail?** Companies can publish anonymised answers as open data, so 
 </table>
 
 ![Warehouses and branches: coverage of the governorates and the live load of each hub](docs/images/warehouses.png)
+
+<table>
+<tr>
+<td width="50%"><img src="docs/images/sort-plan.png" alt="Sort plan of the Baghdad hub: rules tried most specific first, every shelf in walking order with its load, and where a parcel would go"></td>
+<td width="50%"><img src="docs/images/hub-station.png" alt="Hub station: a parcel received without a shelf goes on K-01, shown large, chosen by the sort plan"></td>
+</tr>
+<tr>
+<td align="center">Each hub's sort plan: rules, shelf loads, "where would this parcel go?"</td>
+<td align="center">The station shows the shelf the plan chose</td>
+</tr>
+</table>
 
 ## Mobile app
 
@@ -142,17 +155,42 @@ dotnet run --project src/Logistico.Web --launch-profile http
 ```
 
 - App: http://localhost:5210 · Public tracking: http://localhost:5210/track · OpenAPI: http://localhost:5210/openapi/v1.json
+- Development signs in as `admin@logistico.local` / `Logistico#2026` with demo data (from `appsettings.Development.json`).
 - The UI is in Arabic by default; switch to English from the top bar. Light theme by default; dark from the top bar.
+
+### A new installation
+
+Started without `Seed:AdminEmail`, Logistico has nobody to sign in yet. It writes a one-time **setup code** to its
+log and every page leads to **`/setup`**: enter the code, your company's name and phone, and the first administrator
+(with Docker: `docker compose logs app` shows the code). The page works once. You land on **Getting started**, a guide
+that walks each role through what to set up (warehouses, prices, team, couriers, sellers, sort plan, the first order
+and scan, automation, the mobile app) and is done when the data says so; **Installation health** lists what to fix
+before real customers' data goes in. See [First run & getting started](docs/19-first-run-and-getting-started.md).
+
+<table>
+<tr>
+<td width="50%"><img src="docs/images/setup.png" alt="Setup page: the code from the server log, the company and the first administrator"></td>
+<td width="50%"><img src="docs/images/getting-started.png" alt="Getting started: twelve steps, each done when the company's data says so"></td>
+</tr>
+<tr>
+<td align="center">The setup page (once, with the code from the log)</td>
+<td align="center">Getting started, step by step</td>
+</tr>
+</table>
 
 ### Tests
 
 ```bash
-dotnet test tests/Logistico.Modules.Shipments.Tests     # domain rules, product catalogue, open data, formatting (246)
+dotnet test tests/Logistico.Modules.Shipments.Tests     # domain rules, product catalogue, open data, formatting, sort plans (260)
 dotnet test tests/Logistico.ArchitectureTests            # module boundaries, texts in both languages, RTL/CSS and icon guards (33)
-dotnet test tests/Logistico.Web.IntegrationTests         # REST API on real PostgreSQL: flows, roles, audit, tenants (85)
+dotnet test tests/Logistico.Web.IntegrationTests         # REST API on real PostgreSQL: flows, roles, setup, every endpoint × every role (150)
+dotnet test tests/Logistico.Web.Client.Tests             # the console: components (bUnit), navigation, plurals, texts (46)
 ```
 
 Set `LOGISTICO_TEST_DB` to point the integration tests at another PostgreSQL server.
+
+CI also measures line coverage of the server code and fails below 85 % (87.7 % today); see
+[CONTRIBUTING](CONTRIBUTING.md) to measure it locally.
 
 ## Stack
 
@@ -207,7 +245,8 @@ Dockerfile, docker-compose.yml
 | 15 | [Production readiness](docs/15-production-readiness.md) | Configuration, go-live checklist, performance acceptance |
 | 16 | [Data & demand intelligence](docs/16-data-and-insights.md) | Insights, product recognition, open data and privacy |
 | 17 | [Release audits](docs/17-release-audits.md) | What each release checked and fixed |
-| 18 | [Ideas from open source](docs/18-ideas-from-open-source.md) | What we took from Fleetbase, OpenBoxes, Karrio, VROOM, Traccar |
+| 18 | [Ideas from open source](docs/18-ideas-from-open-source.md) | What we took from Fleetbase, OpenBoxes, Karrio, Odoo, VROOM, Traccar |
+| 19 | [First run & getting started](docs/19-first-run-and-getting-started.md) | The setup page, the getting-started guide, installation health |
 
 ## Alternatives and how Logistico differs
 

@@ -1417,4 +1417,158 @@
   <data name="Track_HelpChangeText" xml:space="preserve"><value>اختر يوماً آخر أو عنواناً جديداً أو رقماً آخر، وتأكّد بآخر 4 أرقام من هاتفك.</value></data>
   <data name="Track_HelpConfirmTitle" xml:space="preserve"><value>أكّد وقيّم</value></data>
   <data name="Track_HelpConfirmText" xml:space="preserve"><value>أكّد طلبك قبل الشحن، وأخبرنا كيف كان التوصيل.</value></data>
+  <data name="Nav_SortPlan" xml:space="preserve"><value>خطة الفرز</value></data>
+  <data name="SortPlan_Subtitle" xml:space="preserve"><value>على أي رف يوضع كل طرد في المركز، ويُختار عند مسحه</value></data>
+  <data name="SortPlan_HowItWorks" xml:space="preserve"><value>عند مسح طرد دون رف، تختار له الرفَّ القاعدةُ الأكثر تحديداً من بين القواعد المطابقة: البائع قبل المنطقة، والمنطقة قبل المحافظة أو مركز الشاحنة، وأي شرط قبل القاعدة العامة لكل الطرود. تمتلئ رفوف القاعدة بالترتيب؛ وإذا امتلأ رف يُستخدم الذي يليه، ثم القاعدة المطابقة التالية. الرف الذي يُكتب أو يُمسح في المحطة له الأولوية دائماً.</value></data>
+  <data name="SortPlan_Rules" xml:space="preserve"><value>القواعد</value></data>
+  <data name="SortPlan_RulesHint" xml:space="preserve"><value>تُجرَّب بهذا الترتيب</value></data>
+  <data name="SortPlan_NoRules" xml:space="preserve"><value>لا توجد قواعد في هذا المركز بعد</value></data>
+  <data name="SortPlan_NoRulesHint" xml:space="preserve"><value>بدون قواعد يكتب الموظف الرف أو يمسحه لكل طرد.</value></data>
+  <data name="SortPlan_AddRule" xml:space="preserve"><value>إضافة قاعدة</value></data>
+  <data name="SortPlan_EditRule" xml:space="preserve"><value>تعديل القاعدة</value></data>
+  <data name="SortPlan_RuleAt" xml:space="preserve"><value>خطة الفرز في {0}</value></data>
+  <data name="SortPlan_WhichParcels" xml:space="preserve"><value>أي طرود</value></data>
+  <data name="SortPlan_WhichShelves" xml:space="preserve"><value>أي رفوف</value></data>
+  <data name="SortPlan_Purpose" xml:space="preserve"><value>ما ينتظره الطرد</value></data>
+  <data name="SortPlan_ToHub" xml:space="preserve"><value>شاحنة إلى</value></data>
+  <data name="SortPlan_AnyHub" xml:space="preserve"><value>أي مركز</value></data>
+  <data name="SortPlan_Governorate" xml:space="preserve"><value>محافظة الزبون</value></data>
+  <data name="SortPlan_AnyGovernorate" xml:space="preserve"><value>أي محافظة</value></data>
+  <data name="SortPlan_Area" xml:space="preserve"><value>المنطقة</value></data>
+  <data name="SortPlan_AreaHint" xml:space="preserve"><value>تطابق عندما تحتويها منطقة الطلب، مهما اختلفت كتابتها (ة أو ه، أ أو ا).</value></data>
+  <data name="SortPlan_AreaPlaceholder" xml:space="preserve"><value>الكرادة</value></data>
+  <data name="SortPlan_Seller" xml:space="preserve"><value>البائع</value></data>
+  <data name="SortPlan_AnySeller" xml:space="preserve"><value>أي بائع</value></data>
+  <data name="SortPlan_Shelves" xml:space="preserve"><value>الرفوف</value></data>
+  <data name="SortPlan_ShelvesHint" xml:space="preserve"><value>بترتيب امتلائها، مفصولة بمسافات: B-07 B-08 B-09</value></data>
+  <data name="SortPlan_Capacity" xml:space="preserve"><value>طرود لكل رف</value></data>
+  <data name="SortPlan_CapacityHint" xml:space="preserve"><value>اتركه فارغاً بلا حد. الرف الممتلئ ينتقل إلى الذي يليه.</value></data>
+  <data name="SortPlan_OrderHint" xml:space="preserve"><value>لا حاجة لترتيب القواعد: تُجرَّب الأكثر تحديداً أولاً، والأقدم أولاً عند التساوي.</value></data>
+  <data name="SortPlan_Saved" xml:space="preserve"><value>حُفظت القاعدة</value></data>
+  <data name="SortPlan_Remove" xml:space="preserve"><value>حذف القاعدة</value></data>
+  <data name="SortPlan_RemoveTitle" xml:space="preserve"><value>حذف هذه القاعدة؟</value></data>
+  <data name="SortPlan_RemoveMessage" xml:space="preserve"><value>الطرود الموجودة على رفوفها تبقى مكانها، والطرود الجديدة تتبع القواعد الأخرى.</value></data>
+  <data name="SortPlan_Removed" xml:space="preserve"><value>حُذفت القاعدة</value></data>
+  <data name="SortPlan_ShelvesNow" xml:space="preserve"><value>الرفوف الآن</value></data>
+  <data name="SortPlan_ShelvesNowHint" xml:space="preserve"><value>كل رف مستخدم أو في الخطة، بترتيب المرور</value></data>
+  <data name="SortPlan_NoShelves" xml:space="preserve"><value>لا شيء على الرفوف</value></data>
+  <data name="SortPlan_Parcels" xml:space="preserve"><value>الطرود</value></data>
+  <data name="SortPlan_Fill" xml:space="preserve"><value>الامتلاء</value></data>
+  <data name="SortPlan_NotInPlan" xml:space="preserve"><value>ليس في الخطة</value></data>
+  <data name="SortPlan_NoLimit" xml:space="preserve"><value>بلا حد</value></data>
+  <data name="SortPlan_WithoutShelfN" xml:space="preserve"><value>{0} طرد في المركز بلا رف</value></data>
+  <data name="SortPlan_WithoutShelfN_One" xml:space="preserve"><value>طرد واحد في المركز بلا رف</value></data>
+  <data name="SortPlan_WithoutShelfN_Two" xml:space="preserve"><value>طردان في المركز بلا رف</value></data>
+  <data name="SortPlan_WithoutShelfN_Few" xml:space="preserve"><value>{0} طرود في المركز بلا رف</value></data>
+  <data name="SortPlan_Try" xml:space="preserve"><value>جرّب طرداً</value></data>
+  <data name="SortPlan_TryHint" xml:space="preserve"><value>أين ستضعه الخطة لو مُسح الآن</value></data>
+  <data name="SortPlan_TryButton" xml:space="preserve"><value>تحقق</value></data>
+  <data name="SortPlan_GoesOn" xml:space="preserve"><value>يوضع على الرف {0}</value></data>
+  <data name="SortPlan_StaysOn" xml:space="preserve"><value>يبقى على الرف {0} حيث هو الآن</value></data>
+  <data name="SortPlan_AllFull" xml:space="preserve"><value>كل رفوفه ممتلئة، لذا يوضع على أقلها امتلاءً. أضف رفوفاً أو ارفع السعة.</value></data>
+  <data name="SortPlan_NoMatch" xml:space="preserve"><value>لا تطابقه أي قاعدة: يُكتب الرف أو يُمسح في المحطة.</value></data>
+  <data name="SortPlan_UnknownParcel" xml:space="preserve"><value>لا يوجد طلب بهذا الرقم.</value></data>
+  <data name="Station_ShelfAuto" xml:space="preserve"><value>تلقائي (خطة الفرز)</value></data>
+  <data name="Station_PutOnShelf" xml:space="preserve"><value>ضعه على الرف {0}</value></data>
+  <data name="Station_PutOnShelfFull" xml:space="preserve"><value>ضعه على الرف {0}: كل رفوفه ممتلئة</value></data>
+  <data name="Nav_GettingStarted" xml:space="preserve"><value>البدء</value></data>
+  <data name="Nav_Company" xml:space="preserve"><value>الشركة</value></data>
+  <data name="Nav_System" xml:space="preserve"><value>صحة التثبيت</value></data>
+  <data name="Guide_Subtitle" xml:space="preserve"><value>ما يجب إعداده لتبدأ الشركة التوصيل، بالترتيب. تكتمل كل خطوة عندما تدل البيانات على ذلك.</value></data>
+  <data name="Guide_Welcome" xml:space="preserve"><value>أهلاً بك في {0}</value></data>
+  <data name="Guide_ShowOnDashboard" xml:space="preserve"><value>إظهاره في لوحة التحكم</value></data>
+  <data name="Guide_NothingForRole" xml:space="preserve"><value>لا شيء لإعداده في دورك</value></data>
+  <data name="Guide_NothingForRoleHint" xml:space="preserve"><value>يتولى زملاؤك في الإدارة والعمليات إعداد الشركة؛ كل ما تحتاجه موجود في القائمة.</value></data>
+  <data name="Guide_ProgressN" xml:space="preserve"><value>اكتملت {0} من {1} خطوة</value></data>
+  <data name="Guide_AllDone" xml:space="preserve"><value>كل شيء جاهز</value></data>
+  <data name="Guide_Done" xml:space="preserve"><value>مكتملة</value></data>
+  <data name="Guide_Skipped" xml:space="preserve"><value>لا نحتاجها</value></data>
+  <data name="Guide_Review" xml:space="preserve"><value>مراجعة</value></data>
+  <data name="Guide_Open" xml:space="preserve"><value>ابدأ</value></data>
+  <data name="Guide_Skip" xml:space="preserve"><value>لا نحتاجها</value></data>
+  <data name="Guide_Unskip" xml:space="preserve"><value>إعادتها</value></data>
+  <data name="Guide_CardTitle" xml:space="preserve"><value>البدء</value></data>
+  <data name="Guide_Hide" xml:space="preserve"><value>إخفاء من لوحة التحكم (يمكن إظهاره من صفحة البدء)</value></data>
+  <data name="Guide_Next" xml:space="preserve"><value>التالي</value></data>
+  <data name="Guide_SeeAll" xml:space="preserve"><value>كل الخطوات</value></data>
+  <data name="Step_company_Title" xml:space="preserve"><value>ملف الشركة</value></data>
+  <data name="Step_company_Why" xml:space="preserve"><value>اسم شركتك وهاتفها: يظهران في لوحة التحكم والتطبيق وللزبائن.</value></data>
+  <data name="Step_warehouses_Title" xml:space="preserve"><value>المخازن والتغطية</value></data>
+  <data name="Step_warehouses_Why" xml:space="preserve"><value>تبدأ بخمسة مراكز قياسية. غيّر أسماءها وأضف فروعك واختر المحافظات التي يوصل إليها كل منها.</value></data>
+  <data name="Step_prices_Title" xml:space="preserve"><value>أسعار التوصيل</value></data>
+  <data name="Step_prices_Why" xml:space="preserve"><value>ما يدفعه البائع عن كل طلب: داخل محافظتك وإلى كل محافظة، والوزن الإضافي والمرتجعات. تُسعَّر الطلبات منها.</value></data>
+  <data name="Step_team_Title" xml:space="preserve"><value>فريقك</value></data>
+  <data name="Step_team_Why" xml:space="preserve"><value>أعطِ كل زميل حساباً بأضيق دور يناسبه: العمليات أو خدمة الزبائن أو المالية أو المشاهدة.</value></data>
+  <data name="Step_couriers_Title" xml:space="preserve"><value>المندوبون</value></data>
+  <data name="Step_couriers_Why" xml:space="preserve"><value>أضف المندوبين الذين يوصلون مع محافظاتهم ومركباتهم، ثم أعطِ كل واحد حساب مندوب للتطبيق.</value></data>
+  <data name="Step_sellers_Title" xml:space="preserve"><value>البائعون</value></data>
+  <data name="Step_sellers_Why" xml:space="preserve"><value>المتاجر التي توصل لها. لكل منها سعر وطريقة دفع، وحساب بائع إن أرادت حجز طلباتها بنفسها.</value></data>
+  <data name="Step_sort_plan_Title" xml:space="preserve"><value>خطة الفرز</value></data>
+  <data name="Step_sort_plan_Why" xml:space="preserve"><value>حدد لكل مركز أي طرود توضع على أي رفوف، فيختار المسح الرف ولا يحتاج أحد إلى التذكر.</value></data>
+  <data name="Step_first_order_Title" xml:space="preserve"><value>أول طلب</value></data>
+  <data name="Step_first_order_Why" xml:space="preserve"><value>احجز طلباً واحداً لبائع: يُحسب السعر وموعد التوصيل والملصق تلقائياً.</value></data>
+  <data name="Step_first_scan_Title" xml:space="preserve"><value>أول مسح في المركز</value></data>
+  <data name="Step_first_scan_Why" xml:space="preserve"><value>استلم ذلك الطلب في محطة المركز بماسح يدوي أو جهاز محمول أو الكاميرا. يوضع على رفه، وعلى الشاحنة التالية إن لزم.</value></data>
+  <data name="Step_automation_Title" xml:space="preserve"><value>قواعد الأتمتة</value></data>
+  <data name="Step_automation_Why" xml:space="preserve"><value>عدد محاولات التوصيل، ومتى يُرجَع الطرد أو يُؤجَّل، وأي تأخير يرفع تنبيهاً. تأكد أن القيم الافتراضية تناسبك.</value></data>
+  <data name="Step_mobile_app_Title" xml:space="preserve"><value>تطبيق الهاتف</value></data>
+  <data name="Step_mobile_app_Why" xml:space="preserve"><value>اختر ما يراه المندوبون والبائعون والمدراء في التطبيق، واسمه ولونه، وطريقة المسح في أجهزتك.</value></data>
+  <data name="Step_health_Title" xml:space="preserve"><value>صحة التثبيت</value></data>
+  <data name="Step_health_Why" xml:space="preserve"><value>HTTPS ومفاتيح تسجيل الدخول والبريد والنسخ الاحتياطي: ما يحتاجه التثبيت قبل إدخال بيانات زبائن حقيقيين.</value></data>
+  <data name="Company_Subtitle" xml:space="preserve"><value>كيف تظهر الشركة في لوحة التحكم والتطبيق وللزبائن</value></data>
+  <data name="Company_Profile" xml:space="preserve"><value>الملف</value></data>
+  <data name="Company_ProfileHint" xml:space="preserve"><value>يظهر الاسم في الشريط العلوي، وهو اسم التطبيق ما لم تحدد إعدادات التطبيق اسماً آخر.</value></data>
+  <data name="Company_Name" xml:space="preserve"><value>اسم الشركة</value></data>
+  <data name="Company_Governorate" xml:space="preserve"><value>محافظة المكتب الرئيسي</value></data>
+  <data name="Company_Saved" xml:space="preserve"><value>حُفظ ملف الشركة</value></data>
+  <data name="System_Subtitle" xml:space="preserve"><value>ما يحتاجه هذا التثبيت قبل إدخال بيانات زبائن حقيقيين</value></data>
+  <data name="System_HasProblems" xml:space="preserve"><value>هناك أمور يجب إصلاحها قبل التشغيل الفعلي.</value></data>
+  <data name="System_HasWarnings" xml:space="preserve"><value>جاهز، مع بعض الأمور التي تستحق الإصلاح.</value></data>
+  <data name="System_AllGood" xml:space="preserve"><value>كل ما فُحص سليم.</value></data>
+  <data name="System_CheckedAt" xml:space="preserve"><value>فُحص {0}</value></data>
+  <data name="System_MoreHint" xml:space="preserve"><value>لا يمكن فحص النسخ الاحتياطي من هنا: تأكد أن PostgreSQL يُنسخ احتياطياً وأن الاستعادة جُرّبت فعلاً (docs/15).</value></data>
+  <data name="System_Ok" xml:space="preserve"><value>سليم</value></data>
+  <data name="System_Info" xml:space="preserve"><value>ملاحظة</value></data>
+  <data name="System_Warning" xml:space="preserve"><value>يستحق الإصلاح</value></data>
+  <data name="System_Problem" xml:space="preserve"><value>أصلحه قبل التشغيل</value></data>
+  <data name="Check_database_Title" xml:space="preserve"><value>PostgreSQL</value></data>
+  <data name="Check_database_Ok" xml:space="preserve"><value>الإصدار {0}.</value></data>
+  <data name="Check_database_Warning" xml:space="preserve"><value>الإصدار {0}. جُرّب لوجستيكو على PostgreSQL 16 وما بعده؛ حدّث قبل التشغيل الفعلي.</value></data>
+  <data name="Check_migrations_Title" xml:space="preserve"><value>ترحيلات قاعدة البيانات</value></data>
+  <data name="Check_migrations_Ok" xml:space="preserve"><value>قاعدة بيانات كل وحدة محدّثة.</value></data>
+  <data name="Check_migrations_Problem" xml:space="preserve"><value>{0} ترحيل غير مطبّق. شغّل حزم الترحيل المرفقة بالإصدار، أو فعّل Database:MigrateOnStartup في نسخة واحدة.</value></data>
+  <data name="Check_collation_Title" xml:space="preserve"><value>الترتيب الطبيعي للرفوف</value></data>
+  <data name="Check_collation_Ok" xml:space="preserve"><value>تُرتَّب الرفوف كما يمر بها الناس في المركز (A-2 قبل A-10).</value></data>
+  <data name="Check_collation_Problem" xml:space="preserve"><value>ترتيب "natural" غير موجود: يحتاج PostgreSQL إلى ICU. استخدم الصورة الرسمية أو نسخة فيها ICU، ثم طبّق الترحيلات.</value></data>
+  <data name="Check_https_Title" xml:space="preserve"><value>HTTPS</value></data>
+  <data name="Check_https_Ok" xml:space="preserve"><value>وصلت هذه الصفحة عبر HTTPS.</value></data>
+  <data name="Check_https_Info" xml:space="preserve"><value>HTTP العادي مقبول على حاسوب التطوير.</value></data>
+  <data name="Check_https_Problem" xml:space="preserve"><value>وصلت هذه الصفحة عبر HTTP عادي. شغّل لوجستيكو عبر HTTPS قبل أن يسجّل أحد الدخول من حاسوب آخر.</value></data>
+  <data name="Check_proxy_Title" xml:space="preserve"><value>الوكيل العكسي</value></data>
+  <data name="Check_proxy_Ok" xml:space="preserve"><value>شبكات الوكيل الموثوقة محددة، فترى حدود الطلبات عنوان كل زائر.</value></data>
+  <data name="Check_proxy_Info" xml:space="preserve"><value>لا يوجد وكيل أمام التطبيق، أو لم يُحدَّد.</value></data>
+  <data name="Check_proxy_Warning" xml:space="preserve"><value>تصل الطلبات عبر وكيل غير موثوق: حدد ReverseProxy:KnownNetworks لترى حدود الطلبات عنوان كل زائر.</value></data>
+  <data name="Check_keys_Title" xml:space="preserve"><value>مفاتيح تسجيل الدخول</value></data>
+  <data name="Check_keys_Ok" xml:space="preserve"><value>محفوظة في مجلد دائم (DataProtection:KeyRingPath).</value></data>
+  <data name="Check_keys_Info" xml:space="preserve"><value>يحفظها التطوير في ملف المستخدم.</value></data>
+  <data name="Check_keys_Problem" xml:space="preserve"><value>حدد DataProtection:KeyRingPath لمجلد دائم تشترك فيه كل النسخ، وإلا خرج الجميع من حساباتهم عند كل إعادة تشغيل.</value></data>
+  <data name="Check_email_Title" xml:space="preserve"><value>البريد الإلكتروني</value></data>
+  <data name="Check_email_Ok" xml:space="preserve"><value>مُرسِل البريد مُعدّ.</value></data>
+  <data name="Check_email_Warning" xml:space="preserve"><value>لا يوجد مُرسِل بريد: لا تُرسل رسائل استعادة كلمة المرور والتأكيد. إلى أن يُعدّ، يضع المدراء كلمات المرور الجديدة من صفحة الفريق.</value></data>
+  <data name="Check_bootstrap_Title" xml:space="preserve"><value>كلمة مرور الإعداد الأولي</value></data>
+  <data name="Check_bootstrap_Ok" xml:space="preserve"><value>لا توجد كلمة مرور للمدير في الإعدادات.</value></data>
+  <data name="Check_bootstrap_Info" xml:space="preserve"><value>يأتي مدير التطوير من الإعدادات.</value></data>
+  <data name="Check_bootstrap_Warning" xml:space="preserve"><value>لا يزال Seed:AdminPassword في الإعدادات. احذفه بعد أن اكتمل الإعداد.</value></data>
+  <data name="Check_demo_Title" xml:space="preserve"><value>البيانات التجريبية</value></data>
+  <data name="Check_demo_Ok" xml:space="preserve"><value>لا تُضاف بيانات تجريبية عند التشغيل.</value></data>
+  <data name="Check_demo_Warning" xml:space="preserve"><value>يضيف Seed:DemoShipments طلبات تجريبية خارج التطوير. اجعله 0.</value></data>
+  <data name="Check_admins_Title" xml:space="preserve"><value>المدراء</value></data>
+  <data name="Check_admins_Ok" xml:space="preserve"><value>عدد المدراء: {0}.</value></data>
+  <data name="Check_admins_Warning" xml:space="preserve"><value>عدد المدراء: {0}. أضف مديراً ثانياً من صفحة الفريق حتى لا تُغلق الشركة على نفسها.</value></data>
+  <data name="Check_two_step_Title" xml:space="preserve"><value>التحقق بخطوتين</value></data>
+  <data name="Check_two_step_Ok" xml:space="preserve"><value>الجميع يستخدم التحقق بخطوتين.</value></data>
+  <data name="Check_two_step_Info" xml:space="preserve"><value>يستخدم التحقق بخطوتين {0} من {1}. اطلب من البقية تفعيله من "حسابي".</value></data>
+  <data name="Check_automation_Title" xml:space="preserve"><value>الأتمتة</value></data>
+  <data name="Check_automation_Ok" xml:space="preserve"><value>التنبيهات وتخطيط الشاحنات والإلغاء التلقائي تعمل كل دقيقة.</value></data>
+  <data name="Check_automation_Warning" xml:space="preserve"><value>Automation:Enabled مطفأ: لا تعمل التنبيهات وتخطيط الشاحنات.</value></data>
 </root>
