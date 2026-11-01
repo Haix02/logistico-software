@@ -33,6 +33,7 @@ in October 2026. We take ideas and behaviour, not code: the projects below use o
   shelf a parcel may use is full it still gets the emptiest one and the scan says so, instead of none; and the station
   shows the chosen shelf large, so it can be read with the parcel in hand. The plan page shows every shelf in walking
   order (A-2 before A-10) with its load, and answers "where would this parcel go?" without scanning it.
+  ![Sort plan of the Baghdad hub](images/sort-plan.png)
 - **Orderly lists**: shelves sort the way people walk a hub everywhere (a natural, numeric collation in PostgreSQL),
   statuses sort by the order a parcel lives through them, and every sort has a tiebreaker so a page never repeats or
   skips an order.

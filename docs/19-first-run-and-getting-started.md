@@ -30,6 +30,8 @@ Until an installation has an administrator, every page leads to **`/setup`** (`/
    new code to the log and opens the setup page again. That is the way back in for whoever runs the server; a person
    who only reaches the web page cannot use it. (A temporary lock-out after wrong passwords does not count.)
 
+![The setup page: the code from the server log, the company and the first administrator](images/setup.png)
+
 Unattended installations (CI, the evaluation Docker stack) can still create the first administrator from
 `Seed:AdminEmail` / `Seed:AdminPassword`; the setup page is then closed.
 
@@ -59,6 +61,8 @@ links to the page that does it, and is done when the data says so, not when some
 | Mobile app | Admin | the app settings were saved |
 | Installation health | Admin | no check fails |
 
+![Getting started on a company that has done ten of twelve steps; the next one is highlighted](images/getting-started.png)
+
 Each person sees the steps their role can do (administrators see all). Operations and administrators can mark a step
 "not for us" and bring it back (kept per company). Each person can hide the dashboard card and show it again from the
 **Getting started** page (kept in their browser).
@@ -75,6 +79,8 @@ and says what to do when something is off:
 - the bootstrap `Seed:AdminPassword` setting removed after setup, and no demo seeding outside Development;
 - at least two administrators, and how many staff use two-step sign-in;
 - the automation sweep enabled.
+
+![Installation health on a development computer: what is fine, worth fixing, or noted](images/installation-health.png)
 
 ## 5. Tests
 

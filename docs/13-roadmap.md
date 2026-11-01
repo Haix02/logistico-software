@@ -33,6 +33,9 @@ Shipments (international and domestic), hub network and trucks, hub station with
 - **Saved views:** each person keeps named views of the shipments list (filters, sort and columns) and their usual columns.
 - **Audit log:** who changed what and when, for every order, price, rule, payout, seller and staff account, with each field before and after; append-only, recorded in the same transaction as the change.
 - **Return fee:** an optional share of the delivery fee charged to the seller for parcels sent back to them (not for damage in our care), deducted from their next payout.
+- **Hub sort plans:** each hub's rules choose the shelf at the scan, with capacity and overflow; shelves sort naturally, statuses by lifecycle, and pages never repeat an order ([18](18-ideas-from-open-source.md), ADR-032).
+- **First run and getting started:** a setup page with a one-time code from the server log, a getting-started guide for each role computed from the company's data, a company profile, and installation health ([19](19-first-run-and-getting-started.md), ADR-033).
+- **Tests across the system:** every read endpoint as every role on the demo data, the console's components (bUnit), coverage per module in CI with a minimum for the server code.
 
 ## Next
 
