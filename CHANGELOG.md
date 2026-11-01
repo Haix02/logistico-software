@@ -86,6 +86,11 @@ versions follow [Semantic Versioning](https://semver.org/).
   now shows all collected cash not handed in, whatever the day.
 
 ### Changed
+- **Tests cover the demo company and customer ratings; CI shows coverage.** A test company seeded with the 150-order
+  demo (staff, couriers, seller, fleet, settlements) must open every screen, sort the order list by every column both
+  ways, add up its money and open each demo account's app; seeding twice adds nothing. Customer ratings are tested end
+  to end (only after delivery, only once, only with the phone digits; two stars or fewer open a complaint). Each CI run
+  lists line coverage per module on its page (86.6 % of the server code) and fails below 85 %.
 - **README and docs match the light console.** New screenshots of the dashboard (light and dark), the shipments list, the Iraq map and demand intelligence. Dark-mode borders are documented as hairlines.
 - **New look: GitLab's Pajamas design system on Blueprint.** Navigation sits on a quiet grey frame and each page is a
   white panel; buttons, inputs, badges, alerts, tabs, tables, dialogs, drawers and toasts follow Pajamas (32 px

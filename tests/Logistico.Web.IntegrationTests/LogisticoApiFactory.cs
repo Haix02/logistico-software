@@ -23,12 +23,15 @@ public sealed class ApiCollection : ICollectionFixture<LogisticoApiFactory>;
 /// without migrating the same database at the same time. Server: LOGISTICO_TEST_DB, else the local development server.
 /// The database name gets a unique suffix per factory and is dropped when the test class finishes.
 /// </summary>
-public sealed class LogisticoApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
+public class LogisticoApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     public static readonly Guid OtherTenant = new("01990000-0000-7000-8000-0000000000ff");
 
     private readonly string _connectionString;
     private readonly string _database;
+
+    /// <summary>Settings a derived factory adds on top of the test defaults (for example demo data).</summary>
+    protected virtual IEnumerable<(string Key, string Value)> ExtraSettings => [];
 
     /// <summary>The server's clock; tests move it forward to make parcels late or stuck.</summary>
     public TestClock Clock { get; } = new();
@@ -96,6 +99,11 @@ public sealed class LogisticoApiFactory : WebApplicationFactory<Program>, IAsync
         builder.UseSetting("ConnectionStrings:Logistico", _connectionString);
         builder.UseSetting("Database:MigrateOnStartup", "true");
         builder.UseSetting("Seed:DemoShipments", "0");
+        foreach (var (key, value) in ExtraSettings)
+        {
+            builder.UseSetting(key, value);
+        }
+
         builder.UseSetting("Automation:Enabled", "false"); // tests run the automation sweep through the API
 
         builder.ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Warning));

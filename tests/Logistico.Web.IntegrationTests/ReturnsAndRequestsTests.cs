@@ -130,6 +130,53 @@ public sealed class ReturnsAndRequestsTests(LogisticoApiFactory factory)
         Assert.Equal(HttpStatusCode.Created, complaint.StatusCode);
     }
 
+    [Fact]
+    public async Task Customers_rate_a_delivery_once_and_a_low_rating_becomes_a_complaint()
+    {
+        var staff = factory.CreateUserClient();
+        var shop = await staff.CreateMerchantAsync("متجر التقييم", "rating.flow.test");
+        var order = ApiTestHelpers.DomesticOrder(shop, "زبون التقييم");
+        order.DestinationCode = "IQ-BG";
+        order.DestinationCity = "الكرادة";
+        var created = await staff.BookAsync(order);
+        var anonymous = factory.CreateClient();
+        var route = "/" + ShipmentsApiRoutes.TrackRating(created.TrackingNumber);
+
+        // Not delivered yet: nothing to rate.
+        var early = await anonymous.PostAsJsonAsync(route, new CustomerRating { Stars = 5, PhoneLast4 = "3344" });
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, early.StatusCode);
+
+        await staff.ScanAsync(ScanOperation.Receive, created.TrackingNumber, IraqHubs.Baghdad, "A-01-1");
+        await staff.ScanAsync(ScanOperation.Dispatch, created.TrackingNumber, IraqHubs.Baghdad, courier: "حيدر (Baghdad-02)");
+        await staff.ScanAsync(ScanOperation.Deliver, created.TrackingNumber, IraqHubs.Baghdad, courier: "حيدر (Baghdad-02)");
+        Assert.True((await anonymous.GetFromJsonAsync<PublicTrackingView>("/" + ShipmentsApiRoutes.Track(created.TrackingNumber)))!.CanRate);
+
+        // Only the customer can rate: the phone digits must match; unknown numbers reveal nothing.
+        var stranger = await anonymous.PostAsJsonAsync(route, new CustomerRating { Stars = 1, PhoneLast4 = "0000" });
+        Assert.Equal(HttpStatusCode.Forbidden, stranger.StatusCode);
+        foreach (var number in new[] { TrackingNumber.Create(99, TrackingNumber.MaxSequence - 1), "LX-NOT-A-NUMBER" })
+        {
+            var unknown = await anonymous.PostAsJsonAsync("/" + ShipmentsApiRoutes.TrackRating(number), new CustomerRating { Stars = 1, PhoneLast4 = "3344" });
+            Assert.Equal(HttpStatusCode.NotFound, unknown.StatusCode);
+        }
+
+        var rated = await anonymous.PostAsJsonAsync(route, new CustomerRating { Stars = 2, Comment = "تأخر المندوب ساعتين", PhoneLast4 = "3344" });
+        Assert.True(rated.IsSuccessStatusCode, await rated.Content.ReadAsStringAsync());
+        var view = (await anonymous.GetFromJsonAsync<PublicTrackingView>("/" + ShipmentsApiRoutes.Track(created.TrackingNumber)))!;
+        Assert.Equal((2, false), (view.Rating, view.CanRate));
+
+        // Two stars open a complaint for customer care, with the stars and the customer's words.
+        var inbox = (await staff.GetFromJsonAsync<ServiceRequestList>("/" + ShipmentsApiRoutes.Requests + $"?shipmentId={created.Id}"))!;
+        var complaint = Assert.Single(inbox.Items);
+        Assert.Equal((RequestType.Complaint, RequestSource.Customer), (complaint.Type, complaint.Source));
+        Assert.Contains("★★☆☆☆", complaint.Details, StringComparison.Ordinal);
+        Assert.Contains("تأخر المندوب", complaint.Details, StringComparison.Ordinal);
+
+        // A delivery is rated once.
+        var twice = await anonymous.PostAsJsonAsync(route, new CustomerRating { Stars = 5, PhoneLast4 = "3344" });
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, twice.StatusCode);
+    }
+
     private static DateTimeOffset NextWorkingDay(DateTimeOffset from) =>
         from.ToOffset(TimeSpan.FromHours(3)).DayOfWeek == DayOfWeek.Friday ? from.AddDays(1) : from;
 

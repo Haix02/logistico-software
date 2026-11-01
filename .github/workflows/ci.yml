@@ -65,7 +65,10 @@ jobs:
         run: dotnet build Logistico.slnx -c Release --no-restore
 
       - name: Test (unit, architecture, API integration on PostgreSQL)
-        run: dotnet test Logistico.slnx -c Release --no-build --logger trx --results-directory TestResults
+        run: dotnet test Logistico.slnx -c Release --no-build --logger trx --results-directory TestResults --collect:"XPlat Code Coverage"
+
+      - name: Coverage of the server code (summary on the run's page; fails below the minimum)
+        run: python3 scripts/coverage-summary.py TestResults --min 85
 
       - name: Check that EF Core migrations match the model
         run: |

@@ -149,10 +149,13 @@ dotnet run --project src/Logistico.Web --launch-profile http
 ```bash
 dotnet test tests/Logistico.Modules.Shipments.Tests     # domain rules, product catalogue, open data, formatting (246)
 dotnet test tests/Logistico.ArchitectureTests            # module boundaries, texts in both languages, RTL/CSS and icon guards (33)
-dotnet test tests/Logistico.Web.IntegrationTests         # REST API on real PostgreSQL: flows, roles, audit, tenants (85)
+dotnet test tests/Logistico.Web.IntegrationTests         # REST API on real PostgreSQL: flows, roles, audit, tenants, demo data (130)
 ```
 
 Set `LOGISTICO_TEST_DB` to point the integration tests at another PostgreSQL server.
+
+CI also measures line coverage of the server code and fails below 85 % (86.6 % today); see
+[CONTRIBUTING](CONTRIBUTING.md) to measure it locally.
 
 ## Stack
 
