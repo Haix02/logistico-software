@@ -55,6 +55,15 @@
   <data name="ShelfState_NotExpected" xml:space="preserve"><value>غير متوقع هنا</value></data>
   <data name="Problem_shelf_check.finished" xml:space="preserve"><value>انتهى هذا الجرد؛ ابدأ جرداً جديداً.</value></data>
   <data name="Problem_shelf_check.not_found" xml:space="preserve"><value>لا يوجد جرد بهذا الرقم.</value></data>
+  <data name="ShelfPurpose_Any" xml:space="preserve"><value>أي طرد</value></data>
+  <data name="ShelfPurpose_Deliver" xml:space="preserve"><value>للتوصيل</value></data>
+  <data name="ShelfPurpose_Forward" xml:space="preserve"><value>للشاحنة</value></data>
+  <data name="ShelfPurpose_Return" xml:space="preserve"><value>مرتجعات</value></data>
+  <data name="SortPlan_ShelfFull" xml:space="preserve"><value>كل رفوفه ممتلئة</value></data>
+  <data name="Problem_sort_plan.not_found" xml:space="preserve"><value>قاعدة الفرز هذه لم تعد موجودة.</value></data>
+  <data name="Problem_sort_plan.hub_locked" xml:space="preserve"><value>القاعدة تبقى في مركزها؛ أضف قاعدة جديدة في المركز الآخر.</value></data>
+  <data name="Problem_sort_plan.too_many_rules" xml:space="preserve"><value>يمكن أن يكون للمركز {0} قاعدة فرز كحد أقصى.</value></data>
+  <data name="Problem_sort_plan.same_hub" xml:space="preserve"><value>الطرود بانتظار شاحنة تذهب إلى مركز آخر: اختر مركزاً غير هذا المركز.</value></data>
   <data name="Failure_Unreachable" xml:space="preserve"><value>الهاتف مغلق أو خارج التغطية</value></data>
   <data name="Failure_WrongAddress" xml:space="preserve"><value>العنوان خاطئ أو غير مكتمل</value></data>
   <data name="HubKind_Branch" xml:space="preserve"><value>فرع</value></data>

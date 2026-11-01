@@ -55,6 +55,7 @@ public static class ShipmentsApiRoutes
     public const string FinanceSummary = Finance + "/summary";
     public const string ShelfChecks = "api/v1/shelf-checks";
     public const string Views = "api/v1/views";
+    public const string SortPlan = "api/v1/sort-plan";
     public const string FinanceSettlements = Finance + "/settlements";
 
     public static string ById(Guid id) => $"{Shipments}/{id}";
@@ -99,5 +100,9 @@ public static class ShipmentsApiRoutes
     public static string ShelfCheckScan(Guid id) => $"{ShelfChecks}/{id}/scan";
     public static string ShelfCheckFinish(Guid id) => $"{ShelfChecks}/{id}/finish";
     public static string ViewById(Guid id) => $"{Views}/{id}";
+    public static string SortPlanFor(string hubCode) => $"{SortPlan}/{Uri.EscapeDataString(hubCode)}";
+    public static string SortPlanRule(Guid id) => $"{SortPlan}/rules/{id}";
+    public static string SortPlanSuggest(string hubCode, string trackingNumber) =>
+        $"{SortPlanFor(hubCode)}/suggest/{Uri.EscapeDataString(trackingNumber)}";
     public static string SettlementExport(Guid id) => $"{FinanceSettlements}/{id}/export.csv";
 }

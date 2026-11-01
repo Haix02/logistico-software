@@ -1,0 +1,88 @@
+@page "/system"
+@attribute [Authorize(Policy = StaffPolicies.Administer)]
+@inject CompanyApi Company
+
+<PageTitle>@L["Nav_System"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@L["Nav_System"]" Subtitle="@L["System_Subtitle"]" Icon="pulse">
+    <Actions>
+        <Button Icon="refresh" Text="@L["Refresh"]" Loading="loading" OnClick="LoadAsync" />
+    </Actions>
+</PageHeader>
+
+@if (checks is null)
+{
+    <Skeleton Block="true" Lines="8" />
+}
+else
+{
+    <Callout Intent="@(checks.HasProblems ? Intent.Danger : Problems(SystemCheckState.Warning) > 0 ? Intent.Warning : Intent.Success)"
+             Icon="@(checks.HasProblems ? "error" : Problems(SystemCheckState.Warning) > 0 ? "warning-sign" : "tick-circle")" CssClass="lx-mb">
+        @(checks.HasProblems ? L["System_HasProblems"] : Problems(SystemCheckState.Warning) > 0 ? L["System_HasWarnings"] : L["System_AllGood"])
+        <span class="bp6-text-muted lx-small"> · @string.Format(CultureInfo.CurrentCulture, L["System_CheckedAt"], Fmt.DateTime(checks.CheckedAt))</span>
+    </Callout>
+
+    <div class="bp6-card lx-table-card">
+        <ul class="lx-list lx-health-list">
+            @foreach (var check in checks.Checks.OrderByDescending(c => c.State))
+            {
+                var key = $"Check_{check.Id.Replace('-', '_')}";
+                <li class="lx-list-item">
+                    <span class="@Bp.Cls("lx-list-icon", IconClass(check.State))"><Icon Name="@StateIcon(check.State)" /></span>
+                    <span class="lx-list-body">
+                        <span class="lx-list-title">@L[$"{key}_Title"]</span>
+                        <span class="lx-list-sub"><Mixed Text="@string.Format(CultureInfo.CurrentCulture, L[$"{key}_{check.State}"], [.. check.Values])" /></span>
+                    </span>
+                    <span class="lx-list-meta"><Tag Intent="@StateIntent(check.State)">@L[$"System_{check.State}"]</Tag></span>
+                </li>
+            }
+        </ul>
+    </div>
+    <p class="bp6-text-muted lx-small lx-mt">@L["System_MoreHint"]</p>
+}
+
+@code {
+    private SystemChecksView? checks;
+    private bool loading;
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        loading = true;
+        try
+        {
+            checks = await Company.GetChecksAsync();
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private int Problems(SystemCheckState state) => checks?.Checks.Count(c => c.State == state) ?? 0;
+
+    private static string StateIcon(SystemCheckState state) => state switch
+    {
+        SystemCheckState.Ok => "tick",
+        SystemCheckState.Info => "info-sign",
+        SystemCheckState.Warning => "warning-sign",
+        _ => "error",
+    };
+
+    private static string IconClass(SystemCheckState state) => state switch
+    {
+        SystemCheckState.Ok => "lx-list-icon-success",
+        SystemCheckState.Warning => "lx-list-icon-warning",
+        SystemCheckState.Problem => "lx-list-icon-danger",
+        _ => "",
+    };
+
+    private static Intent StateIntent(SystemCheckState state) => state switch
+    {
+        SystemCheckState.Ok => Intent.Success,
+        SystemCheckState.Warning => Intent.Warning,
+        SystemCheckState.Problem => Intent.Danger,
+        _ => Intent.None,
+    };
+}

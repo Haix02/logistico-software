@@ -76,7 +76,9 @@ public sealed record ScanOutcome(
     string Message,
     string? ProblemCode,
     string? ScannedBy,
-    DateTimeOffset ScannedAt);
+    DateTimeOffset ScannedAt,
+    bool ShelfFromPlan = false,
+    bool ShelfFull = false);
 
 public sealed record BulkScanResult(int Succeeded, int Failed, IReadOnlyList<ScanOutcome> Items);
 

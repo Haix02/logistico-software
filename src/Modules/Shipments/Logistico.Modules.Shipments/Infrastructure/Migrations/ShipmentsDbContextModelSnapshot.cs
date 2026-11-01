@@ -19,6 +19,7 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("shipment")
+                .HasAnnotation("Npgsql:CollationDefinition:public.natural", "und-u-kn-true,und-u-kn-true,icu,True")
                 .HasAnnotation("ProductVersion", "10.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -1391,7 +1392,8 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                     b.Property<string>("SystemBin")
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
-                        .HasColumnName("system_bin");
+                        .HasColumnName("system_bin")
+                        .UseCollation("natural");
 
                     b.Property<string>("SystemHubCode")
                         .HasMaxLength(16)
@@ -1420,6 +1422,103 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                         .HasDatabaseName("ix_shelf_check_lines_shelf_check_id_tracking_number");
 
                     b.ToTable("shelf_check_lines", "shipment");
+                });
+
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ShelfRule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Area")
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)")
+                        .HasColumnName("area");
+
+                    b.Property<string>("AreaFolded")
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)")
+                        .HasColumnName("area_folded");
+
+                    b.Property<int?>("CapacityPerShelf")
+                        .HasColumnType("integer")
+                        .HasColumnName("capacity_per_shelf");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Governorate")
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)")
+                        .HasColumnName("governorate");
+
+                    b.Property<string>("HubCode")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("hub_code");
+
+                    b.Property<Guid?>("MerchantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("merchant_id");
+
+                    b.Property<string>("MerchantName")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("merchant_name");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("note");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("purpose");
+
+                    b.PrimitiveCollection<List<string>>("Shelves")
+                        .IsRequired()
+                        .HasColumnType("text[]")
+                        .HasColumnName("shelves");
+
+                    b.Property<int>("Specificity")
+                        .HasColumnType("integer")
+                        .HasColumnName("specificity");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("ToHubCode")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("to_hub_code");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("updated_by");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
+                        .HasName("pk_shelf_rules");
+
+                    b.HasIndex("TenantId", "HubCode")
+                        .HasDatabaseName("ix_shelf_rules_tenant_id_hub_code");
+
+                    b.ToTable("shelf_rules", "shipment");
                 });
 
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.Shipment", b =>
@@ -1749,7 +1848,8 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                     b.Property<string>("WarehouseBin")
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
-                        .HasColumnName("warehouse_bin");
+                        .HasColumnName("warehouse_bin")
+                        .UseCollation("natural");
 
                     b.HasKey("Id")
                         .HasName("pk_shipments");

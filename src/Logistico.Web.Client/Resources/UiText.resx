@@ -1359,4 +1359,156 @@
   <data name="Track_HelpChangeText" xml:space="preserve"><value>Pick another day, a new address or another phone. You confirm with the last 4 digits of your phone number.</value></data>
   <data name="Track_HelpConfirmTitle" xml:space="preserve"><value>Confirm and rate</value></data>
   <data name="Track_HelpConfirmText" xml:space="preserve"><value>Confirm your order before it ships, and tell us how the delivery went.</value></data>
+  <data name="Nav_SortPlan" xml:space="preserve"><value>Sort plan</value></data>
+  <data name="SortPlan_Subtitle" xml:space="preserve"><value>Which shelf each parcel goes on at a hub, chosen when it is scanned in</value></data>
+  <data name="SortPlan_HowItWorks" xml:space="preserve"><value>When a parcel is scanned in without a shelf, the most specific rule that matches it chooses one: a seller beats an area, an area beats a governorate or a truck's hub, and any condition beats a rule for every parcel. A rule's shelves fill in order; a full shelf overflows to the next one, then to the next matching rule. A shelf typed or scanned at the station always wins.</value></data>
+  <data name="SortPlan_Rules" xml:space="preserve"><value>Rules</value></data>
+  <data name="SortPlan_RulesHint" xml:space="preserve"><value>Tried in this order</value></data>
+  <data name="SortPlan_NoRules" xml:space="preserve"><value>No rules at this hub yet</value></data>
+  <data name="SortPlan_NoRulesHint" xml:space="preserve"><value>Without rules, staff type or scan the shelf for each parcel.</value></data>
+  <data name="SortPlan_AddRule" xml:space="preserve"><value>Add rule</value></data>
+  <data name="SortPlan_EditRule" xml:space="preserve"><value>Change rule</value></data>
+  <data name="SortPlan_RuleAt" xml:space="preserve"><value>Sort plan of {0}</value></data>
+  <data name="SortPlan_WhichParcels" xml:space="preserve"><value>Which parcels</value></data>
+  <data name="SortPlan_WhichShelves" xml:space="preserve"><value>Which shelves</value></data>
+  <data name="SortPlan_Purpose" xml:space="preserve"><value>What the parcel is waiting for</value></data>
+  <data name="SortPlan_ToHub" xml:space="preserve"><value>Truck to</value></data>
+  <data name="SortPlan_AnyHub" xml:space="preserve"><value>Any hub</value></data>
+  <data name="SortPlan_Governorate" xml:space="preserve"><value>Customer's governorate</value></data>
+  <data name="SortPlan_AnyGovernorate" xml:space="preserve"><value>Any governorate</value></data>
+  <data name="SortPlan_Area" xml:space="preserve"><value>Area</value></data>
+  <data name="SortPlan_AreaHint" xml:space="preserve"><value>Matches when the order's area contains it, however it is spelled.</value></data>
+  <data name="SortPlan_AreaPlaceholder" xml:space="preserve"><value>Karrada</value></data>
+  <data name="SortPlan_Seller" xml:space="preserve"><value>Seller</value></data>
+  <data name="SortPlan_AnySeller" xml:space="preserve"><value>Any seller</value></data>
+  <data name="SortPlan_Shelves" xml:space="preserve"><value>Shelves</value></data>
+  <data name="SortPlan_ShelvesHint" xml:space="preserve"><value>In the order they fill, separated by spaces: B-07 B-08 B-09.</value></data>
+  <data name="SortPlan_Capacity" xml:space="preserve"><value>Parcels per shelf</value></data>
+  <data name="SortPlan_CapacityHint" xml:space="preserve"><value>Empty for no limit. A full shelf overflows to the next.</value></data>
+  <data name="SortPlan_OrderHint" xml:space="preserve"><value>Rules need no ordering: the most specific rule that matches is tried first, the older one first among equals.</value></data>
+  <data name="SortPlan_Saved" xml:space="preserve"><value>Rule saved</value></data>
+  <data name="SortPlan_Remove" xml:space="preserve"><value>Remove rule</value></data>
+  <data name="SortPlan_RemoveTitle" xml:space="preserve"><value>Remove this rule?</value></data>
+  <data name="SortPlan_RemoveMessage" xml:space="preserve"><value>Parcels already on its shelves stay there; new parcels follow the other rules.</value></data>
+  <data name="SortPlan_Removed" xml:space="preserve"><value>Rule removed</value></data>
+  <data name="SortPlan_ShelvesNow" xml:space="preserve"><value>Shelves now</value></data>
+  <data name="SortPlan_ShelvesNowHint" xml:space="preserve"><value>Every shelf in use or in the plan, in walking order</value></data>
+  <data name="SortPlan_NoShelves" xml:space="preserve"><value>Nothing on the shelves</value></data>
+  <data name="SortPlan_Parcels" xml:space="preserve"><value>Parcels</value></data>
+  <data name="SortPlan_Fill" xml:space="preserve"><value>Fill</value></data>
+  <data name="SortPlan_NotInPlan" xml:space="preserve"><value>Not in the plan</value></data>
+  <data name="SortPlan_NoLimit" xml:space="preserve"><value>No limit</value></data>
+  <data name="SortPlan_WithoutShelfN" xml:space="preserve"><value>{0} parcels at the hub have no shelf</value></data>
+  <data name="SortPlan_WithoutShelfN_One" xml:space="preserve"><value>1 parcel at the hub has no shelf</value></data>
+  <data name="SortPlan_Try" xml:space="preserve"><value>Try a parcel</value></data>
+  <data name="SortPlan_TryHint" xml:space="preserve"><value>Where the plan would put it if it were scanned in now</value></data>
+  <data name="SortPlan_TryButton" xml:space="preserve"><value>Check</value></data>
+  <data name="SortPlan_GoesOn" xml:space="preserve"><value>Goes on shelf {0}</value></data>
+  <data name="SortPlan_StaysOn" xml:space="preserve"><value>Stays on shelf {0}, where it is now</value></data>
+  <data name="SortPlan_AllFull" xml:space="preserve"><value>Every shelf for it is full, so it goes on the emptiest. Add shelves or raise the capacity.</value></data>
+  <data name="SortPlan_NoMatch" xml:space="preserve"><value>No rule matches: the shelf is typed or scanned at the station.</value></data>
+  <data name="SortPlan_UnknownParcel" xml:space="preserve"><value>No order has this tracking number.</value></data>
+  <data name="Station_ShelfAuto" xml:space="preserve"><value>Automatic (sort plan)</value></data>
+  <data name="Station_PutOnShelf" xml:space="preserve"><value>Put it on shelf {0}</value></data>
+  <data name="Station_PutOnShelfFull" xml:space="preserve"><value>Put it on shelf {0}: every shelf for it is full</value></data>
+  <data name="Nav_GettingStarted" xml:space="preserve"><value>Getting started</value></data>
+  <data name="Nav_Company" xml:space="preserve"><value>Company</value></data>
+  <data name="Nav_System" xml:space="preserve"><value>Installation health</value></data>
+  <data name="Guide_Subtitle" xml:space="preserve"><value>What to set up so the company can deliver, in order. Each step is done when the data says so.</value></data>
+  <data name="Guide_Welcome" xml:space="preserve"><value>Welcome to {0}</value></data>
+  <data name="Guide_ShowOnDashboard" xml:space="preserve"><value>Show on the dashboard</value></data>
+  <data name="Guide_NothingForRole" xml:space="preserve"><value>Nothing to set up for your role</value></data>
+  <data name="Guide_NothingForRoleHint" xml:space="preserve"><value>Your colleagues in administration and operations set the company up; everything you need is in the menu.</value></data>
+  <data name="Guide_ProgressN" xml:space="preserve"><value>{0} of {1} steps done</value></data>
+  <data name="Guide_AllDone" xml:space="preserve"><value>All set</value></data>
+  <data name="Guide_Done" xml:space="preserve"><value>Done</value></data>
+  <data name="Guide_Skipped" xml:space="preserve"><value>Not for us</value></data>
+  <data name="Guide_Review" xml:space="preserve"><value>Review</value></data>
+  <data name="Guide_Open" xml:space="preserve"><value>Start</value></data>
+  <data name="Guide_Skip" xml:space="preserve"><value>Not for us</value></data>
+  <data name="Guide_Unskip" xml:space="preserve"><value>Bring back</value></data>
+  <data name="Guide_CardTitle" xml:space="preserve"><value>Getting started</value></data>
+  <data name="Guide_Hide" xml:space="preserve"><value>Hide from the dashboard (show it again from Getting started)</value></data>
+  <data name="Guide_Next" xml:space="preserve"><value>Next</value></data>
+  <data name="Guide_SeeAll" xml:space="preserve"><value>All steps</value></data>
+  <data name="Step_company_Title" xml:space="preserve"><value>Company profile</value></data>
+  <data name="Step_company_Why" xml:space="preserve"><value>Your company name and phone: shown in the console, the mobile app and to customers.</value></data>
+  <data name="Step_warehouses_Title" xml:space="preserve"><value>Warehouses and coverage</value></data>
+  <data name="Step_warehouses_Why" xml:space="preserve"><value>You start with five standard hubs. Rename them, add your branches, and choose which governorates each one delivers to.</value></data>
+  <data name="Step_prices_Title" xml:space="preserve"><value>Delivery prices</value></data>
+  <data name="Step_prices_Why" xml:space="preserve"><value>What sellers pay per order: inside your governorate, to each other one, extra weight and returns. Orders are priced from it.</value></data>
+  <data name="Step_team_Title" xml:space="preserve"><value>Your team</value></data>
+  <data name="Step_team_Why" xml:space="preserve"><value>Give each colleague an account with the narrowest role that fits: operations, customer support, finance or viewer.</value></data>
+  <data name="Step_couriers_Title" xml:space="preserve"><value>Couriers</value></data>
+  <data name="Step_couriers_Why" xml:space="preserve"><value>Add the couriers who deliver, with their governorate and vehicle; then give each one a courier account for the app.</value></data>
+  <data name="Step_sellers_Title" xml:space="preserve"><value>Sellers</value></data>
+  <data name="Step_sellers_Why" xml:space="preserve"><value>The shops you deliver for. Each gets a price, a payout method and, if they want, a seller account to book their own orders.</value></data>
+  <data name="Step_sort_plan_Title" xml:space="preserve"><value>Sort plan</value></data>
+  <data name="Step_sort_plan_Why" xml:space="preserve"><value>Tell each hub which parcels go on which shelves, so scans choose the shelf and nobody has to remember.</value></data>
+  <data name="Step_first_order_Title" xml:space="preserve"><value>First order</value></data>
+  <data name="Step_first_order_Why" xml:space="preserve"><value>Book one order for a seller: the price, the delivery promise and the label are worked out for you.</value></data>
+  <data name="Step_first_scan_Title" xml:space="preserve"><value>First scan at a hub</value></data>
+  <data name="Step_first_scan_Why" xml:space="preserve"><value>Receive that order at the hub station with a scanner gun, a handheld or the camera. It goes on its shelf and, if needed, on the next truck.</value></data>
+  <data name="Step_automation_Title" xml:space="preserve"><value>Automation rules</value></data>
+  <data name="Step_automation_Why" xml:space="preserve"><value>How many delivery attempts, when to return or reschedule, and which delays raise an alert. Check the defaults suit you.</value></data>
+  <data name="Step_mobile_app_Title" xml:space="preserve"><value>Mobile app</value></data>
+  <data name="Step_mobile_app_Why" xml:space="preserve"><value>Choose what couriers, sellers and managers see in the app, its name and colour, and how your handhelds scan.</value></data>
+  <data name="Step_health_Title" xml:space="preserve"><value>Installation health</value></data>
+  <data name="Step_health_Why" xml:space="preserve"><value>HTTPS, sign-in keys, email and backups: what the installation needs before real customers' data goes in.</value></data>
+  <data name="Company_Subtitle" xml:space="preserve"><value>How the company presents itself in the console, the app and to customers</value></data>
+  <data name="Company_Profile" xml:space="preserve"><value>Profile</value></data>
+  <data name="Company_ProfileHint" xml:space="preserve"><value>The name appears in the top bar and is the mobile app's name unless the app settings give another.</value></data>
+  <data name="Company_Name" xml:space="preserve"><value>Company name</value></data>
+  <data name="Company_Governorate" xml:space="preserve"><value>Head office governorate</value></data>
+  <data name="Company_Saved" xml:space="preserve"><value>Company profile saved</value></data>
+  <data name="System_Subtitle" xml:space="preserve"><value>What this installation needs before real customers' data goes in</value></data>
+  <data name="System_HasProblems" xml:space="preserve"><value>Some things must be fixed before going live.</value></data>
+  <data name="System_HasWarnings" xml:space="preserve"><value>Ready, with a few things worth doing.</value></data>
+  <data name="System_AllGood" xml:space="preserve"><value>Everything checked is in order.</value></data>
+  <data name="System_CheckedAt" xml:space="preserve"><value>checked {0}</value></data>
+  <data name="System_MoreHint" xml:space="preserve"><value>Backups and restores cannot be checked from here: make sure PostgreSQL is backed up and that a restore has been tried (docs/15).</value></data>
+  <data name="System_Ok" xml:space="preserve"><value>OK</value></data>
+  <data name="System_Info" xml:space="preserve"><value>Note</value></data>
+  <data name="System_Warning" xml:space="preserve"><value>Worth fixing</value></data>
+  <data name="System_Problem" xml:space="preserve"><value>Fix before going live</value></data>
+  <data name="Check_database_Title" xml:space="preserve"><value>PostgreSQL</value></data>
+  <data name="Check_database_Ok" xml:space="preserve"><value>Version {0}.</value></data>
+  <data name="Check_database_Warning" xml:space="preserve"><value>Version {0}. Logistico is tested on PostgreSQL 16 and later; upgrade before going live.</value></data>
+  <data name="Check_migrations_Title" xml:space="preserve"><value>Database migrations</value></data>
+  <data name="Check_migrations_Ok" xml:space="preserve"><value>Every module's database is up to date.</value></data>
+  <data name="Check_migrations_Problem" xml:space="preserve"><value>{0} migrations are not applied. Run the release's migration bundles, or set Database:MigrateOnStartup on a single instance.</value></data>
+  <data name="Check_collation_Title" xml:space="preserve"><value>Natural shelf order</value></data>
+  <data name="Check_collation_Ok" xml:space="preserve"><value>Shelves sort the way people walk the hub (A-2 before A-10).</value></data>
+  <data name="Check_collation_Problem" xml:space="preserve"><value>The "natural" collation is missing: PostgreSQL needs ICU. Use the official image or a build with ICU, then apply the migrations.</value></data>
+  <data name="Check_https_Title" xml:space="preserve"><value>HTTPS</value></data>
+  <data name="Check_https_Ok" xml:space="preserve"><value>This page arrived over HTTPS.</value></data>
+  <data name="Check_https_Info" xml:space="preserve"><value>Plain HTTP is fine on a development computer.</value></data>
+  <data name="Check_https_Problem" xml:space="preserve"><value>This page arrived over plain HTTP. Serve Logistico over HTTPS before anyone signs in from another computer.</value></data>
+  <data name="Check_proxy_Title" xml:space="preserve"><value>Reverse proxy</value></data>
+  <data name="Check_proxy_Ok" xml:space="preserve"><value>Trusted proxy networks are set, so rate limits see each visitor's own address.</value></data>
+  <data name="Check_proxy_Info" xml:space="preserve"><value>No proxy in front of the app, or none configured.</value></data>
+  <data name="Check_proxy_Warning" xml:space="preserve"><value>Requests come through a proxy that is not trusted: set ReverseProxy:KnownNetworks so rate limits see each visitor's own address.</value></data>
+  <data name="Check_keys_Title" xml:space="preserve"><value>Sign-in keys</value></data>
+  <data name="Check_keys_Ok" xml:space="preserve"><value>Kept in a durable folder (DataProtection:KeyRingPath).</value></data>
+  <data name="Check_keys_Info" xml:space="preserve"><value>Development keeps them in your user profile.</value></data>
+  <data name="Check_keys_Problem" xml:space="preserve"><value>Set DataProtection:KeyRingPath to a durable folder shared by every instance, or everyone is signed out at each restart.</value></data>
+  <data name="Check_email_Title" xml:space="preserve"><value>Email</value></data>
+  <data name="Check_email_Ok" xml:space="preserve"><value>An email sender is configured.</value></data>
+  <data name="Check_email_Warning" xml:space="preserve"><value>No email sender: password resets and confirmations are not sent. Until one is set up, administrators set new passwords on the Team page.</value></data>
+  <data name="Check_bootstrap_Title" xml:space="preserve"><value>Bootstrap password</value></data>
+  <data name="Check_bootstrap_Ok" xml:space="preserve"><value>No administrator password in the settings.</value></data>
+  <data name="Check_bootstrap_Info" xml:space="preserve"><value>The development administrator comes from the settings.</value></data>
+  <data name="Check_bootstrap_Warning" xml:space="preserve"><value>Seed:AdminPassword is still in the settings. Remove it now that the installation is set up.</value></data>
+  <data name="Check_demo_Title" xml:space="preserve"><value>Demo data</value></data>
+  <data name="Check_demo_Ok" xml:space="preserve"><value>No demo data is added at start-up.</value></data>
+  <data name="Check_demo_Warning" xml:space="preserve"><value>Seed:DemoShipments adds demo orders outside development. Set it to 0.</value></data>
+  <data name="Check_admins_Title" xml:space="preserve"><value>Administrators</value></data>
+  <data name="Check_admins_Ok" xml:space="preserve"><value>{0} administrators.</value></data>
+  <data name="Check_admins_Warning" xml:space="preserve"><value>{0} administrator. Add a second on the Team page so the company is never locked out.</value></data>
+  <data name="Check_two_step_Title" xml:space="preserve"><value>Two-step sign-in</value></data>
+  <data name="Check_two_step_Ok" xml:space="preserve"><value>Everyone uses two-step sign-in.</value></data>
+  <data name="Check_two_step_Info" xml:space="preserve"><value>{0} of {1} people use two-step sign-in. Ask the others to turn it on under My account.</value></data>
+  <data name="Check_automation_Title" xml:space="preserve"><value>Automation</value></data>
+  <data name="Check_automation_Ok" xml:space="preserve"><value>Alerts, truck planning and auto-cancel run every minute.</value></data>
+  <data name="Check_automation_Warning" xml:space="preserve"><value>Automation:Enabled is off: alerts and truck planning do not run.</value></data>
 </root>

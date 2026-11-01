@@ -53,4 +53,28 @@
   <data name="OpenSourceLine" xml:space="preserve"><value>Open source · Apache-2.0</value></data>
   <data name="SeoTitle" xml:space="preserve"><value>Logistico — open-source delivery software for Iraq</value></data>
   <data name="SeoDescription" xml:space="preserve"><value>Open-source logistics for Iraqi delivery companies: orders, hubs, trucks, couriers, returns and cash on delivery. Arabic-first and English. Apache-2.0.</value></data>
+  <data name="SetupTitle" xml:space="preserve"><value>Set up Logistico</value></data>
+  <data name="SetupSubtitle" xml:space="preserve"><value>Create your company and its first administrator. This page works once.</value></data>
+  <data name="SetupHeroTitle" xml:space="preserve"><value>Your delivery company, ready in a minute</value></data>
+  <data name="SetupHeroText" xml:space="preserve"><value>Logistico has no administrator yet. Fill in this page and the guide takes you through the rest: warehouses, prices, team, couriers and your first order.</value></data>
+  <data name="SetupStep1" xml:space="preserve"><value>Your company</value></data>
+  <data name="SetupStep2" xml:space="preserve"><value>The first administrator</value></data>
+  <data name="SetupStep3" xml:space="preserve"><value>A guide to the rest</value></data>
+  <data name="SetupCode" xml:space="preserve"><value>Setup code</value></data>
+  <data name="SetupCodeHelp" xml:space="preserve"><value>The server wrote it to its log when it started. To see it with Docker:</value></data>
+  <data name="SetupCompany" xml:space="preserve"><value>Company</value></data>
+  <data name="SetupCompanyName" xml:space="preserve"><value>Company name</value></data>
+  <data name="SetupCompanyNamePlaceholder" xml:space="preserve"><value>Al-Rafidain Express</value></data>
+  <data name="SetupCompanyPhone" xml:space="preserve"><value>Company phone</value></data>
+  <data name="SetupGovernorate" xml:space="preserve"><value>Head office governorate</value></data>
+  <data name="Optional" xml:space="preserve"><value>optional</value></data>
+  <data name="SetupAdmin" xml:space="preserve"><value>First administrator</value></data>
+  <data name="SetupAdminName" xml:space="preserve"><value>Full name</value></data>
+  <data name="ConfirmPassword" xml:space="preserve"><value>Confirm password</value></data>
+  <data name="SetupSampleData" xml:space="preserve"><value>Add sample data to learn with</value></data>
+  <data name="SetupSampleDataHelp" xml:space="preserve"><value>Sample shops, orders, trucks and returns, to try every screen. Leave it off for a company that starts working right away.</value></data>
+  <data name="SetupButton" xml:space="preserve"><value>Create the company</value></data>
+  <data name="SetupWrongCode" xml:space="preserve"><value>That setup code is not right. Copy it again from the server log; it changes every time the server starts.</value></data>
+  <data name="SetupDoneTitle" xml:space="preserve"><value>Logistico is set up</value></data>
+  <data name="SetupDoneText" xml:space="preserve"><value>This installation already has an administrator. Sign in, or ask an administrator to add you on the Team page.</value></data>
 </root>

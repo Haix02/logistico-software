@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Logistico.Modules.Shipments.Contracts;
 using Logistico.Modules.Shipments.Contracts.Rules;
 using Logistico.Modules.Shipments.Domain;
@@ -115,13 +116,20 @@ internal static class ShipmentSearch
         return source;
     }
 
+    /// <summary>A status's place in <see cref="ShipmentLifecycle.Order"/>, as SQL (CASE … WHEN … THEN n).</summary>
+    private static readonly Expression<Func<Shipment, int>> LifecycleStep = BuildLifecycleStep();
+
+    /// <summary>
+    /// Sorts by a whitelisted column. Status sorts follow the lifecycle, shelves sort naturally (the column's collation),
+    /// and every sort ends with the id so pages never repeat or skip a row when many share a value.
+    /// </summary>
     public static IQueryable<Shipment> Sort(IQueryable<Shipment> source, ShipmentQuery query)
     {
         var desc = query.Desc ?? query.Sort is null;
-        return (query.Sort?.ToLowerInvariant()) switch
+        IOrderedQueryable<Shipment> sorted = (query.Sort?.ToLowerInvariant()) switch
         {
             "trackingnumber" => desc ? source.OrderByDescending(s => s.TrackingNumber) : source.OrderBy(s => s.TrackingNumber),
-            "status" => desc ? source.OrderByDescending(s => s.Status).ThenByDescending(s => s.CreatedAt) : source.OrderBy(s => s.Status).ThenByDescending(s => s.CreatedAt),
+            "status" => desc ? source.OrderByDescending(LifecycleStep).ThenByDescending(s => s.CreatedAt) : source.OrderBy(LifecycleStep).ThenByDescending(s => s.CreatedAt),
             "consignee" => desc ? source.OrderByDescending(s => s.ConsigneeName) : source.OrderBy(s => s.ConsigneeName),
             "merchant" => desc ? source.OrderByDescending(s => s.MerchantName) : source.OrderBy(s => s.MerchantName),
             "cod" => desc ? source.OrderByDescending(s => s.CodAmount) : source.OrderBy(s => s.CodAmount),
@@ -132,5 +140,19 @@ internal static class ShipmentSearch
             "bin" => desc ? source.OrderByDescending(s => s.WarehouseBin).ThenBy(s => s.TrackingNumber) : source.OrderBy(s => s.WarehouseBin).ThenBy(s => s.TrackingNumber),
             _ => desc ? source.OrderByDescending(s => s.CreatedAt) : source.OrderBy(s => s.CreatedAt),
         };
+        return sorted.ThenBy(s => s.Id);
+    }
+
+    private static Expression<Func<Shipment, int>> BuildLifecycleStep()
+    {
+        var shipment = Expression.Parameter(typeof(Shipment), "s");
+        var status = Expression.Property(shipment, nameof(Shipment.Status));
+        Expression step = Expression.Constant(ShipmentLifecycle.Order.Length);
+        for (var i = ShipmentLifecycle.Order.Length - 1; i >= 0; i--)
+        {
+            step = Expression.Condition(Expression.Equal(status, Expression.Constant(ShipmentLifecycle.Order[i])), Expression.Constant(i), step);
+        }
+
+        return Expression.Lambda<Func<Shipment, int>>(step, shipment);
     }
 }

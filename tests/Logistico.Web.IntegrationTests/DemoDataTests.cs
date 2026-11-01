@@ -2,10 +2,15 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Logistico.Modules.Shipments;
 using Logistico.Modules.Shipments.Contracts;
+using Logistico.Modules.Shipments.Contracts.Rules;
 using Logistico.SharedKernel;
+using Logistico.SharedKernel.Identity;
 using Logistico.SharedKernel.Mobile;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Logistico.Web.IntegrationTests;
 
@@ -28,7 +33,7 @@ public sealed class DemoDataFactory : LogisticoApiFactory
 /// The demo data people first see (docker compose, development) must load, be consistent, and work on every screen:
 /// it is the product's first impression and the realistic data the other tests do not build.
 /// </summary>
-public sealed class DemoDataTests(DemoDataFactory factory) : IClassFixture<DemoDataFactory>
+public sealed partial class DemoDataTests(DemoDataFactory factory) : IClassFixture<DemoDataFactory>
 {
     private HttpClient Admin => factory.CreateUserClient(tenant: Tenants.Default);
 
@@ -76,6 +81,7 @@ public sealed class DemoDataTests(DemoDataFactory factory) : IClassFixture<DemoD
     [InlineData(ShipmentsApiRoutes.NetworkHubs)]
     [InlineData(ShipmentsApiRoutes.Warehouses)]
     [InlineData(ShipmentsApiRoutes.WarehouseRadar)]
+    [InlineData(ShipmentsApiRoutes.SortPlan + "/" + IraqHubs.Baghdad)]
     [InlineData(ShipmentsApiRoutes.Transfers)]
     [InlineData(ShipmentsApiRoutes.Returns)]
     [InlineData(ShipmentsApiRoutes.Requests)]
@@ -117,6 +123,94 @@ public sealed class DemoDataTests(DemoDataFactory factory) : IClassFixture<DemoD
             var page = (await Admin.GetFromJsonAsync<ShipmentListResult>($"/{ShipmentsApiRoutes.Shipments}?sort={key}&desc={desc}&pageSize=50"))!;
             Assert.Equal(50, page.Items.Count);
         }
+    }
+
+    /// <summary>
+    /// Every read endpoint of the API, for every role, on the demo company: answers, refuses or does not find, but never
+    /// fails. Route values come from the demo data where one exists (an order, a hub), otherwise a value that matches
+    /// nothing, so "not found" paths are exercised too.
+    /// </summary>
+    [Theory]
+    [InlineData(StaffRoles.Admin)]
+    [InlineData(StaffRoles.Operations)]
+    [InlineData(StaffRoles.CustomerSupport)]
+    [InlineData(StaffRoles.Finance)]
+    [InlineData(StaffRoles.Viewer)]
+    [InlineData(StaffRoles.Courier)]
+    [InlineData(StaffRoles.Seller)]
+    public async Task Every_read_endpoint_answers_every_role_without_a_server_error(string role)
+    {
+        var order = (await Admin.GetFromJsonAsync<ShipmentListResult>($"/{ShipmentsApiRoutes.Shipments}?pageSize=1"))!.Items[0];
+        var shop = (await Admin.GetShipmentAsync(order.Id)).MerchantId;
+        var client = factory.CreateUserClient($"{role.ToLowerInvariant()}@sweep.test", Tenants.Default, role,
+            courierCode: role == StaffRoles.Courier ? "Baghdad-01" : null, merchantId: role == StaffRoles.Seller ? shop : null);
+        var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["id"] = order.Id.ToString(),
+            ["shipmentId"] = order.Id.ToString(),
+            ["trackingNumber"] = order.TrackingNumber,
+            ["hub"] = IraqHubs.Baghdad,
+        };
+
+        var routes = factory.Services.GetRequiredService<EndpointDataSource>().Endpoints.OfType<RouteEndpoint>()
+            .Where(e => e.RoutePattern.RawText?.TrimStart('/').StartsWith("api/", StringComparison.Ordinal) == true)
+            .Where(e => e.Metadata.GetMetadata<HttpMethodMetadata>()?.HttpMethods.Contains("GET") == true)
+            .Select(e => RouteValue().Replace(e.RoutePattern.RawText!.TrimStart('/'), m => values.GetValueOrDefault(m.Groups[1].Value, "unknown")))
+            .Distinct()
+            .ToList();
+        Assert.True(routes.Count >= 50, $"only {routes.Count} read endpoints found");
+
+        var failures = new List<string>();
+        foreach (var route in routes)
+        {
+            var response = await client.GetAsync("/" + route);
+            if ((int)response.StatusCode >= 500)
+            {
+                failures.Add($"GET {route} → {(int)response.StatusCode} {await response.Content.ReadAsStringAsync()}");
+            }
+        }
+
+        Assert.Empty(failures);
+    }
+
+    [GeneratedRegex(@"\{([A-Za-z]+)(?::[^}]*)?\}")]
+    private static partial Regex RouteValue();
+
+    [Fact]
+    public async Task Every_hub_has_a_sort_plan_that_places_its_parcels()
+    {
+        foreach (var hub in IraqHubs.Standard)
+        {
+            var plan = (await Admin.GetFromJsonAsync<SortPlanView>("/" + ShipmentsApiRoutes.SortPlanFor(hub.Code)))!;
+            Assert.True(plan.Rules.Count >= 4, hub.Code);
+            Assert.Equal(plan.Shelves.Select(s => s.Shelf).Order(ShelfOrder.Instance), plan.Shelves.Select(s => s.Shelf));
+        }
+
+        var waiting = (await Admin.GetFromJsonAsync<ShipmentListResult>($"/{ShipmentsApiRoutes.Shipments}?hub={IraqHubs.Baghdad}&inWarehouse=true&pageSize=1"))!;
+        var parcel = Assert.Single(waiting.Items);
+        var suggestion = (await Admin.GetFromJsonAsync<ShelfSuggestion>("/" + ShipmentsApiRoutes.SortPlanSuggest(IraqHubs.Baghdad, parcel.TrackingNumber)))!;
+        Assert.NotNull(suggestion.Shelf);
+    }
+
+    [Fact]
+    public async Task Status_sorts_follow_the_lifecycle_and_pages_never_repeat_an_order()
+    {
+        var steps = new List<int>();
+        var seen = new HashSet<Guid>();
+        var total = 0;
+        for (var number = 1; number <= 4; number++)
+        {
+            // Destination has many equal values: without a tiebreaker, rows could move between pages.
+            var byStatus = (await Admin.GetFromJsonAsync<ShipmentListResult>($"/{ShipmentsApiRoutes.Shipments}?sort=status&desc=false&pageSize=50&page={number}"))!;
+            steps.AddRange(byStatus.Items.Select(s => Array.IndexOf(ShipmentLifecycle.Order, s.Status)));
+            var byPlace = (await Admin.GetFromJsonAsync<ShipmentListResult>($"/{ShipmentsApiRoutes.Shipments}?sort=destination&desc=false&pageSize=50&page={number}"))!;
+            Assert.All(byPlace.Items, s => Assert.True(seen.Add(s.Id), $"{s.TrackingNumber} is on two pages"));
+            total = byPlace.TotalCount;
+        }
+
+        Assert.Equal(steps.Order(), steps);
+        Assert.True(steps.Distinct().Count() >= 8);
+        Assert.Equal(Math.Min(total, 200), seen.Count);
     }
 
     [Theory]

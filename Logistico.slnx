@@ -19,6 +19,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/Logistico.ArchitectureTests/Logistico.ArchitectureTests.csproj" />
     <Project Path="tests/Logistico.Modules.Shipments.Tests/Logistico.Modules.Shipments.Tests.csproj" />
+    <Project Path="tests/Logistico.Web.Client.Tests/Logistico.Web.Client.Tests.csproj" />
     <Project Path="tests/Logistico.Web.IntegrationTests/Logistico.Web.IntegrationTests.csproj" />
   </Folder>
 </Solution>

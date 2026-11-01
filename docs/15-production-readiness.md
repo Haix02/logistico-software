@@ -12,12 +12,15 @@ Settings come from `appsettings.json`, environment variables (`Section__Key`, fo
 | `DataProtection:KeyRingPath` | *(required outside Development)* | A durable folder shared by all instances. Sign-in cookies are encrypted with these keys; losing them signs everyone out. |
 | `Database:MigrateOnStartup` | `false` | `true` applies migrations when the app starts (fine for one instance). For several instances, run the migration bundles from CI before starting the new version. |
 | `Identity:AllowSelfRegistration` | `false` | Leave off. Self-registered accounts get no role, but there is no reason to let strangers create accounts. |
-| `Seed:AdminEmail`, `Seed:AdminPassword` | *(empty)* | Creates the first administrator at start-up. Use once, then remove (see §2). |
+| `Setup:Code` | *(generated)* | The code the setup page asks for while there is no administrator. Generated at each start and written to the log unless set (useful with several instances). |
+| `Seed:AdminEmail`, `Seed:AdminPassword` | *(empty)* | Creates the first administrator at start-up instead of the setup page (unattended installs). Use once, then remove (see §2). |
 | `Seed:DemoShipments` | `0` | Demo data. Keep `0` in production. |
 | `Automation:Enabled` | `true` | The background sweep (alerts, truck planning, auto-cancel). One instance at a time runs it (PostgreSQL advisory lock). |
 | `ReverseProxy:KnownNetworks` | *(empty)* | CIDR ranges of your reverse proxies (`10.0.0.5/32` for one address, `10.0.0.0/8` inside a cluster). Only then are `X-Forwarded-For` and `X-Forwarded-Proto` trusted. |
 | `Seed:DemoTeam` | `false` | Development only: adds one demo account per role, with the administrator's password. |
 | `Insights:OpenDataMinimumOrders` | `10` | Groups with fewer orders are left out of the anonymised open-data export. |
+
+Administrators see most of §2 checked live on **Administration → Installation health** (HTTPS, sign-in keys, email, migrations, the ICU collation, bootstrap settings, administrators, two-step sign-in, automation).
 
 Health endpoints for the orchestrator: `/health/live` (process) and `/health/ready` (PostgreSQL reachable). Both are anonymous and uncached.
 
@@ -32,7 +35,7 @@ Health endpoints for the orchestrator: `/health/live` (process) and `/health/rea
 
 **Accounts**
 
-5. Bootstrap the first administrator with `Seed:AdminEmail` / `Seed:AdminPassword`, sign in, add the real administrators on the **Team** page, then **remove the seed settings** and deactivate or re-password the bootstrap account.
+5. Create the first administrator on the **setup page** (`/setup`) with the one-time code the app writes to its log ([19](19-first-run-and-getting-started.md)), then add the other administrators on the **Team** page. For unattended installs, `Seed:AdminEmail` / `Seed:AdminPassword` still work; **remove them** afterwards (Installation health warns while they are set).
 6. Give every colleague the narrowest role that fits ([10](10-security-and-compliance.md#roles)). Keep at least two administrators.
 7. Ask staff to turn on two-step sign-in under *My account* (the Team page shows who has). Enforcement is not built yet.
 8. Replace the no-op email sender (`IdentityNoOpEmailSender`) with a real one before relying on password reset or email confirmation by email. Until then, administrators set new passwords on the Team page.
