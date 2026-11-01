@@ -35,6 +35,7 @@ public static class ShipmentsModule
         services.AddScoped<ConfirmationDesk>();
         services.AddScoped<Pricing>();
         services.AddScoped<TransferPlanner>();
+        services.AddScoped<SortPlanner>();
         services.AddScoped<WarehouseScanner>();
         services.AddScoped<RequestDesk>();
         services.AddScoped<ReturnDesk>();
@@ -65,7 +66,8 @@ public static class ShipmentsModule
         .MapSellerPortalEndpoints()
         .MapFinanceEndpoints()
         .MapViewEndpoints()
-        .MapShelfCheckEndpoints();
+        .MapShelfCheckEndpoints()
+        .MapSortPlanEndpoints();
 
     public static async Task MigrateShipmentsDatabaseAsync(this IServiceProvider services, CancellationToken ct = default)
     {

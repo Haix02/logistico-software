@@ -6,6 +6,15 @@ versions follow [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **Hub sort plans** (Warehouse → Sort plan; ADR-032; ideas from Odoo's putaway rules and parcel sort plans): each
+  hub says which parcels go on which shelves — for its couriers by governorate or area, waiting for the truck to a
+  given hub, returns for the seller, one seller's own shelf — and how many fit on each. A receive scan without a shelf
+  (station, bulk scan, the app, or a milestone recorded by hand) follows the plan: the most specific matching rule
+  wins, its shelves fill in order, a full shelf overflows to the next and then to the next matching rule, and when all
+  are full the parcel goes on the emptiest and the scan says so. A typed or scanned shelf always wins; a parcel scanned
+  again on an allowed shelf stays put. The station and the app show the chosen shelf large. The plan page lists every
+  shelf in walking order with its load and capacity, and shows where a parcel would go without scanning it. The demo
+  company starts with a plan at every hub.
 - **Logistico mobile app** (`mobile/`, Flutter, Android and iOS; ADR-031): one app whose screens follow the account —
   senders (home with what the shop is owed, orders, booking at the company's price, payouts), couriers (the run, scan
   a label to open its stop, delivered with receiver, signature and location or not delivered with the reason, cash to
@@ -86,6 +95,10 @@ versions follow [Semantic Versioning](https://semver.org/).
   now shows all collected cash not handed in, whatever the day.
 
 ### Changed
+- **Orderly lists.** Shelves sort the way people walk a hub (A-2 before A-10, B-01-9 before B-01-10) in the order list,
+  the station and shelf checks; sorting by status follows the order a parcel lives through them instead of the
+  alphabet; every sort has a tiebreaker, so paging never shows an order twice or skips one. The hub station no longer
+  pre-fills shelf A-01-1: an empty shelf field means "use the sort plan".
 - **Tests cover the demo company and customer ratings; CI shows coverage.** A test company seeded with the 150-order
   demo (staff, couriers, seller, fleet, settlements) must open every screen, sort the order list by every column both
   ways, add up its money and open each demo account's app; seeding twice adds nothing. Customer ratings are tested end

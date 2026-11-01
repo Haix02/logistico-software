@@ -1359,4 +1359,56 @@
   <data name="Track_HelpChangeText" xml:space="preserve"><value>Pick another day, a new address or another phone. You confirm with the last 4 digits of your phone number.</value></data>
   <data name="Track_HelpConfirmTitle" xml:space="preserve"><value>Confirm and rate</value></data>
   <data name="Track_HelpConfirmText" xml:space="preserve"><value>Confirm your order before it ships, and tell us how the delivery went.</value></data>
+  <data name="Nav_SortPlan" xml:space="preserve"><value>Sort plan</value></data>
+  <data name="SortPlan_Subtitle" xml:space="preserve"><value>Which shelf each parcel goes on at a hub, chosen when it is scanned in</value></data>
+  <data name="SortPlan_HowItWorks" xml:space="preserve"><value>When a parcel is scanned in without a shelf, the most specific rule that matches it chooses one: a seller beats an area, an area beats a governorate or a truck's hub, and any condition beats a rule for every parcel. A rule's shelves fill in order; a full shelf overflows to the next one, then to the next matching rule. A shelf typed or scanned at the station always wins.</value></data>
+  <data name="SortPlan_Rules" xml:space="preserve"><value>Rules</value></data>
+  <data name="SortPlan_RulesHint" xml:space="preserve"><value>Tried in this order</value></data>
+  <data name="SortPlan_NoRules" xml:space="preserve"><value>No rules at this hub yet</value></data>
+  <data name="SortPlan_NoRulesHint" xml:space="preserve"><value>Without rules, staff type or scan the shelf for each parcel.</value></data>
+  <data name="SortPlan_AddRule" xml:space="preserve"><value>Add rule</value></data>
+  <data name="SortPlan_EditRule" xml:space="preserve"><value>Change rule</value></data>
+  <data name="SortPlan_RuleAt" xml:space="preserve"><value>Sort plan of {0}</value></data>
+  <data name="SortPlan_WhichParcels" xml:space="preserve"><value>Which parcels</value></data>
+  <data name="SortPlan_WhichShelves" xml:space="preserve"><value>Which shelves</value></data>
+  <data name="SortPlan_Purpose" xml:space="preserve"><value>What the parcel is waiting for</value></data>
+  <data name="SortPlan_ToHub" xml:space="preserve"><value>Truck to</value></data>
+  <data name="SortPlan_AnyHub" xml:space="preserve"><value>Any hub</value></data>
+  <data name="SortPlan_Governorate" xml:space="preserve"><value>Customer's governorate</value></data>
+  <data name="SortPlan_AnyGovernorate" xml:space="preserve"><value>Any governorate</value></data>
+  <data name="SortPlan_Area" xml:space="preserve"><value>Area</value></data>
+  <data name="SortPlan_AreaHint" xml:space="preserve"><value>Matches when the order's area contains it, however it is spelled.</value></data>
+  <data name="SortPlan_AreaPlaceholder" xml:space="preserve"><value>Karrada</value></data>
+  <data name="SortPlan_Seller" xml:space="preserve"><value>Seller</value></data>
+  <data name="SortPlan_AnySeller" xml:space="preserve"><value>Any seller</value></data>
+  <data name="SortPlan_Shelves" xml:space="preserve"><value>Shelves</value></data>
+  <data name="SortPlan_ShelvesHint" xml:space="preserve"><value>In the order they fill, separated by spaces: B-07 B-08 B-09.</value></data>
+  <data name="SortPlan_Capacity" xml:space="preserve"><value>Parcels per shelf</value></data>
+  <data name="SortPlan_CapacityHint" xml:space="preserve"><value>Empty for no limit. A full shelf overflows to the next.</value></data>
+  <data name="SortPlan_OrderHint" xml:space="preserve"><value>Rules need no ordering: the most specific rule that matches is tried first, the older one first among equals.</value></data>
+  <data name="SortPlan_Saved" xml:space="preserve"><value>Rule saved</value></data>
+  <data name="SortPlan_Remove" xml:space="preserve"><value>Remove rule</value></data>
+  <data name="SortPlan_RemoveTitle" xml:space="preserve"><value>Remove this rule?</value></data>
+  <data name="SortPlan_RemoveMessage" xml:space="preserve"><value>Parcels already on its shelves stay there; new parcels follow the other rules.</value></data>
+  <data name="SortPlan_Removed" xml:space="preserve"><value>Rule removed</value></data>
+  <data name="SortPlan_ShelvesNow" xml:space="preserve"><value>Shelves now</value></data>
+  <data name="SortPlan_ShelvesNowHint" xml:space="preserve"><value>Every shelf in use or in the plan, in walking order</value></data>
+  <data name="SortPlan_NoShelves" xml:space="preserve"><value>Nothing on the shelves</value></data>
+  <data name="SortPlan_Parcels" xml:space="preserve"><value>Parcels</value></data>
+  <data name="SortPlan_Fill" xml:space="preserve"><value>Fill</value></data>
+  <data name="SortPlan_NotInPlan" xml:space="preserve"><value>Not in the plan</value></data>
+  <data name="SortPlan_NoLimit" xml:space="preserve"><value>No limit</value></data>
+  <data name="SortPlan_WithoutShelfN" xml:space="preserve"><value>{0} parcels at the hub have no shelf</value></data>
+  <data name="SortPlan_WithoutShelfN_One" xml:space="preserve"><value>1 parcel at the hub has no shelf</value></data>
+  <data name="SortPlan_Try" xml:space="preserve"><value>Try a parcel</value></data>
+  <data name="SortPlan_TryHint" xml:space="preserve"><value>Where the plan would put it if it were scanned in now</value></data>
+  <data name="SortPlan_TryButton" xml:space="preserve"><value>Check</value></data>
+  <data name="SortPlan_GoesOn" xml:space="preserve"><value>Goes on shelf {0}</value></data>
+  <data name="SortPlan_StaysOn" xml:space="preserve"><value>Stays on shelf {0}, where it is now</value></data>
+  <data name="SortPlan_AllFull" xml:space="preserve"><value>Every shelf for it is full, so it goes on the emptiest. Add shelves or raise the capacity.</value></data>
+  <data name="SortPlan_NoMatch" xml:space="preserve"><value>No rule matches: the shelf is typed or scanned at the station.</value></data>
+  <data name="SortPlan_UnknownParcel" xml:space="preserve"><value>No order has this tracking number.</value></data>
+  <data name="Station_ShelfAuto" xml:space="preserve"><value>Automatic (sort plan)</value></data>
+  <data name="Station_PutOnShelf" xml:space="preserve"><value>Put it on shelf {0}</value></data>
+  <data name="Station_PutOnShelfFull" xml:space="preserve"><value>Put it on shelf {0}: every shelf for it is full</value></data>
 </root>

@@ -239,3 +239,25 @@ releases to ship and review).
 lock on the Team page reaches the app at the next refresh. Native features beyond these (printing, background GPS) are
 added as plugins when decided.
 
+
+### ADR-032: Hub sort plans choose shelves; shelves sort naturally, statuses by lifecycle — Accepted (1 Nov 2026)
+**Context.** Hub staff typed or scanned a shelf for every parcel they received, so a parcel's shelf depended on who
+scanned it, and the station's default shelf meant many parcels went on one shelf. Lists sorted shelves as text (A-10
+before A-2) and statuses alphabetically, and sorts on columns with many equal values (destination, hub) could show a
+row on two pages.
+**Decision.** Each hub has a **sort plan** (`shipment.shelf_rules`): rules that match what a parcel is waiting for (a
+courier here, a truck to a given hub, the seller of a return), the customer's governorate, an area (folded like search,
+so spelling variants match) and a seller, and list shelves in fill order with an optional capacity. A receive scan
+without a shelf takes the **most specific** matching rule (a seller beats an area, an area beats a governorate or a
+truck's hub, any condition beats a catch-all; older first among equals), fills its shelves in order, overflows a full
+shelf to the next and a full rule to the next matching one, and when everything is full uses the emptiest shelf and
+says so. A typed or scanned shelf always wins; a parcel scanned again on an allowed shelf stays there. Loads are counted
+from the parcels at the hub and kept current across a bulk scan. Shelf columns use an ICU collation with numeric
+ordering (`natural`, `und-u-kn-true`, deterministic); status sorts follow `ShipmentLifecycle.Order`; every list sort
+ends with the id.
+**Alternatives.** Priority numbers set by hand (staff must keep them in order; specificity gives the expected answer
+without it); a shelf per area derived from the label only (no capacity, no trucks or
+returns); natural order in C# after loading (breaks paging); a stored sort key column (one more thing to keep right).
+**Consequences.** Rules are data per company and hub, edited on **Warehouse → Sort plan** (operations and
+administrators; every office role reads it). The planner is one query per scan batch. Parcels already on shelves are
+not moved when a rule changes. The collation needs PostgreSQL built with ICU (the official images and Homebrew are).

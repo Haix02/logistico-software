@@ -1417,4 +1417,58 @@
   <data name="Track_HelpChangeText" xml:space="preserve"><value>اختر يوماً آخر أو عنواناً جديداً أو رقماً آخر، وتأكّد بآخر 4 أرقام من هاتفك.</value></data>
   <data name="Track_HelpConfirmTitle" xml:space="preserve"><value>أكّد وقيّم</value></data>
   <data name="Track_HelpConfirmText" xml:space="preserve"><value>أكّد طلبك قبل الشحن، وأخبرنا كيف كان التوصيل.</value></data>
+  <data name="Nav_SortPlan" xml:space="preserve"><value>خطة الفرز</value></data>
+  <data name="SortPlan_Subtitle" xml:space="preserve"><value>على أي رف يوضع كل طرد في المركز، ويُختار عند مسحه</value></data>
+  <data name="SortPlan_HowItWorks" xml:space="preserve"><value>عند مسح طرد دون رف، تختار له الرفَّ القاعدةُ الأكثر تحديداً من بين القواعد المطابقة: البائع قبل المنطقة، والمنطقة قبل المحافظة أو مركز الشاحنة، وأي شرط قبل القاعدة العامة لكل الطرود. تمتلئ رفوف القاعدة بالترتيب؛ وإذا امتلأ رف يُستخدم الذي يليه، ثم القاعدة المطابقة التالية. الرف الذي يُكتب أو يُمسح في المحطة له الأولوية دائماً.</value></data>
+  <data name="SortPlan_Rules" xml:space="preserve"><value>القواعد</value></data>
+  <data name="SortPlan_RulesHint" xml:space="preserve"><value>تُجرَّب بهذا الترتيب</value></data>
+  <data name="SortPlan_NoRules" xml:space="preserve"><value>لا توجد قواعد في هذا المركز بعد</value></data>
+  <data name="SortPlan_NoRulesHint" xml:space="preserve"><value>بدون قواعد يكتب الموظف الرف أو يمسحه لكل طرد.</value></data>
+  <data name="SortPlan_AddRule" xml:space="preserve"><value>إضافة قاعدة</value></data>
+  <data name="SortPlan_EditRule" xml:space="preserve"><value>تعديل القاعدة</value></data>
+  <data name="SortPlan_RuleAt" xml:space="preserve"><value>خطة الفرز في {0}</value></data>
+  <data name="SortPlan_WhichParcels" xml:space="preserve"><value>أي طرود</value></data>
+  <data name="SortPlan_WhichShelves" xml:space="preserve"><value>أي رفوف</value></data>
+  <data name="SortPlan_Purpose" xml:space="preserve"><value>ما ينتظره الطرد</value></data>
+  <data name="SortPlan_ToHub" xml:space="preserve"><value>شاحنة إلى</value></data>
+  <data name="SortPlan_AnyHub" xml:space="preserve"><value>أي مركز</value></data>
+  <data name="SortPlan_Governorate" xml:space="preserve"><value>محافظة الزبون</value></data>
+  <data name="SortPlan_AnyGovernorate" xml:space="preserve"><value>أي محافظة</value></data>
+  <data name="SortPlan_Area" xml:space="preserve"><value>المنطقة</value></data>
+  <data name="SortPlan_AreaHint" xml:space="preserve"><value>تطابق عندما تحتويها منطقة الطلب، مهما اختلفت كتابتها (ة أو ه، أ أو ا).</value></data>
+  <data name="SortPlan_AreaPlaceholder" xml:space="preserve"><value>الكرادة</value></data>
+  <data name="SortPlan_Seller" xml:space="preserve"><value>البائع</value></data>
+  <data name="SortPlan_AnySeller" xml:space="preserve"><value>أي بائع</value></data>
+  <data name="SortPlan_Shelves" xml:space="preserve"><value>الرفوف</value></data>
+  <data name="SortPlan_ShelvesHint" xml:space="preserve"><value>بترتيب امتلائها، مفصولة بمسافات: B-07 B-08 B-09</value></data>
+  <data name="SortPlan_Capacity" xml:space="preserve"><value>طرود لكل رف</value></data>
+  <data name="SortPlan_CapacityHint" xml:space="preserve"><value>اتركه فارغاً بلا حد. الرف الممتلئ ينتقل إلى الذي يليه.</value></data>
+  <data name="SortPlan_OrderHint" xml:space="preserve"><value>لا حاجة لترتيب القواعد: تُجرَّب الأكثر تحديداً أولاً، والأقدم أولاً عند التساوي.</value></data>
+  <data name="SortPlan_Saved" xml:space="preserve"><value>حُفظت القاعدة</value></data>
+  <data name="SortPlan_Remove" xml:space="preserve"><value>حذف القاعدة</value></data>
+  <data name="SortPlan_RemoveTitle" xml:space="preserve"><value>حذف هذه القاعدة؟</value></data>
+  <data name="SortPlan_RemoveMessage" xml:space="preserve"><value>الطرود الموجودة على رفوفها تبقى مكانها، والطرود الجديدة تتبع القواعد الأخرى.</value></data>
+  <data name="SortPlan_Removed" xml:space="preserve"><value>حُذفت القاعدة</value></data>
+  <data name="SortPlan_ShelvesNow" xml:space="preserve"><value>الرفوف الآن</value></data>
+  <data name="SortPlan_ShelvesNowHint" xml:space="preserve"><value>كل رف مستخدم أو في الخطة، بترتيب المرور</value></data>
+  <data name="SortPlan_NoShelves" xml:space="preserve"><value>لا شيء على الرفوف</value></data>
+  <data name="SortPlan_Parcels" xml:space="preserve"><value>الطرود</value></data>
+  <data name="SortPlan_Fill" xml:space="preserve"><value>الامتلاء</value></data>
+  <data name="SortPlan_NotInPlan" xml:space="preserve"><value>ليس في الخطة</value></data>
+  <data name="SortPlan_NoLimit" xml:space="preserve"><value>بلا حد</value></data>
+  <data name="SortPlan_WithoutShelfN" xml:space="preserve"><value>{0} طرد في المركز بلا رف</value></data>
+  <data name="SortPlan_WithoutShelfN_One" xml:space="preserve"><value>طرد واحد في المركز بلا رف</value></data>
+  <data name="SortPlan_WithoutShelfN_Two" xml:space="preserve"><value>طردان في المركز بلا رف</value></data>
+  <data name="SortPlan_WithoutShelfN_Few" xml:space="preserve"><value>{0} طرود في المركز بلا رف</value></data>
+  <data name="SortPlan_Try" xml:space="preserve"><value>جرّب طرداً</value></data>
+  <data name="SortPlan_TryHint" xml:space="preserve"><value>أين ستضعه الخطة لو مُسح الآن</value></data>
+  <data name="SortPlan_TryButton" xml:space="preserve"><value>تحقق</value></data>
+  <data name="SortPlan_GoesOn" xml:space="preserve"><value>يوضع على الرف {0}</value></data>
+  <data name="SortPlan_StaysOn" xml:space="preserve"><value>يبقى على الرف {0} حيث هو الآن</value></data>
+  <data name="SortPlan_AllFull" xml:space="preserve"><value>كل رفوفه ممتلئة، لذا يوضع على أقلها امتلاءً. أضف رفوفاً أو ارفع السعة.</value></data>
+  <data name="SortPlan_NoMatch" xml:space="preserve"><value>لا تطابقه أي قاعدة: يُكتب الرف أو يُمسح في المحطة.</value></data>
+  <data name="SortPlan_UnknownParcel" xml:space="preserve"><value>لا يوجد طلب بهذا الرقم.</value></data>
+  <data name="Station_ShelfAuto" xml:space="preserve"><value>تلقائي (خطة الفرز)</value></data>
+  <data name="Station_PutOnShelf" xml:space="preserve"><value>ضعه على الرف {0}</value></data>
+  <data name="Station_PutOnShelfFull" xml:space="preserve"><value>ضعه على الرف {0}: كل رفوفه ممتلئة</value></data>
 </root>

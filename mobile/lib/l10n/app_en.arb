@@ -218,6 +218,16 @@
   "opVerify": "Check route",
   "hub": "Hub",
   "shelf": "Shelf",
+  "shelfAuto": "Automatic (sort plan)",
+  "putOnShelf": "Put it on shelf {shelf}",
+  "@putOnShelf": {
+    "placeholders": {
+      "shelf": {
+        "type": "String"
+      }
+    }
+  },
+  "shelvesFull": "Every shelf for it is full",
   "courier": "Courier",
   "chooseCourier": "Choose the courier",
   "shelfCheck": "Shelf check",

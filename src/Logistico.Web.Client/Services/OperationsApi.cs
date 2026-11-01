@@ -26,6 +26,22 @@ internal sealed class OperationsApi(HttpClient http) : ApiClient(http)
     public Task<ShelfCheckDetails> FinishShelfCheckAsync(Guid id, CancellationToken ct = default) =>
         SendAsync<ShelfCheckDetails>(HttpMethod.Post, ShipmentsApiRoutes.ShelfCheckFinish(id), null, null, ct);
 
+    // Sort plans
+    public Task<SortPlanView> GetSortPlanAsync(string hub, CancellationToken ct = default) =>
+        GetAsync<SortPlanView>(ShipmentsApiRoutes.SortPlanFor(hub), ct);
+
+    public Task<ShelfSuggestion?> SuggestShelfAsync(string hub, string trackingNumber, CancellationToken ct = default) =>
+        FindAsync<ShelfSuggestion>(ShipmentsApiRoutes.SortPlanSuggest(hub, trackingNumber), ct);
+
+    public Task<ShelfRuleItem> AddShelfRuleAsync(ShelfRuleRequest request, CancellationToken ct = default) =>
+        SendAsync<ShelfRuleItem>(HttpMethod.Post, ShipmentsApiRoutes.SortPlan + "/rules", request, null, ct);
+
+    public Task<ShelfRuleItem> UpdateShelfRuleAsync(Guid id, ShelfRuleRequest request, CancellationToken ct = default) =>
+        SendAsync<ShelfRuleItem>(HttpMethod.Put, ShipmentsApiRoutes.SortPlanRule(id), request, null, ct);
+
+    public Task DeleteShelfRuleAsync(Guid id, CancellationToken ct = default) =>
+        SendAsync(HttpMethod.Delete, ShipmentsApiRoutes.SortPlanRule(id), null, null, ct);
+
     public Task<BulkScanResult> BulkScanAsync(BulkScanRequest request, CancellationToken ct = default) =>
         SendAsync<BulkScanResult>(HttpMethod.Post, ShipmentsApiRoutes.WarehouseBulk, request, null, ct);
 

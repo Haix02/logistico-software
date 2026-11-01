@@ -1,0 +1,188 @@
+@* Side panel to add or change one rule of a hub's sort plan: which parcels, which shelves, how many fit. *@
+@inject OperationsApi Operations
+@inject MerchantsApi Merchants
+@inject Toaster Toaster
+
+<Drawer IsOpen="IsOpen" IsOpenChanged="IsOpenChanged" Title="@(Existing is null ? L["SortPlan_AddRule"] : L["SortPlan_EditRule"])" Icon="sort" Width="640px">
+    <ChildContent>
+        <EditForm Model="model" OnValidSubmit="SaveAsync" Context="form" id="shelf-rule-form">
+            <DataAnnotationsValidator />
+            <EditableBy Policy="@StaffPolicies.Operate">
+                <ServerErrors @ref="serverErrors" />
+                <p class="bp6-text-muted lx-small" style="margin-top:0">@string.Format(CultureInfo.CurrentCulture, L["SortPlan_RuleAt"], HubCatalog.FindOrDefault(model.HubCode).DisplayLabel)</p>
+
+                <h4 class="lx-form-section">@L["SortPlan_WhichParcels"]</h4>
+                <FormField TValue="string" Label="@L["SortPlan_Purpose"]">
+                    <SegmentedControl TValue="ShelfPurpose" Options="PurposeOptions" Value="model.Purpose" ValueChanged="PurposeChanged" Label="@L["SortPlan_Purpose"]" Fill="true" />
+                </FormField>
+                <div class="lx-form-grid">
+                    @if (model.Purpose is ShelfPurpose.Forward or ShelfPurpose.Any)
+                    {
+                        <FormField TValue="string" Label="@L["SortPlan_ToHub"]" Hint="@L["Optional"]" For="lx-rule-to">
+                            <HtmlSelect Id="lx-rule-to" Value="@model.ToHubCode" ValueChanged="@(v => model.ToHubCode = string.IsNullOrEmpty(v) ? null : v)" Fill="true" Label="@L["SortPlan_ToHub"]">
+                                <option value="">@L["SortPlan_AnyHub"]</option>
+                                @foreach (var h in HubCatalog.All.Where(h => h.Code != model.HubCode))
+                                {
+                                    <option value="@h.Code">@h.RoutingTag · @h.Name</option>
+                                }
+                            </HtmlSelect>
+                        </FormField>
+                    }
+                    <FormField TValue="string" Label="@L["SortPlan_Governorate"]" Hint="@L["Optional"]" For="lx-rule-gov">
+                        <HtmlSelect Id="lx-rule-gov" Value="@model.Governorate" ValueChanged="@(v => model.Governorate = string.IsNullOrEmpty(v) ? null : v)" Fill="true" Label="@L["SortPlan_Governorate"]">
+                            <option value="">@L["SortPlan_AnyGovernorate"]</option>
+                            @foreach (var g in IraqGovernorates.All.OrderBy(g => g.Name, StringComparer.CurrentCulture))
+                            {
+                                <option value="@g.Code">@g.Name</option>
+                            }
+                        </HtmlSelect>
+                    </FormField>
+                    <FormField Label="@L["SortPlan_Area"]" Hint="@L["Optional"]" Helper="@L["SortPlan_AreaHint"]" Field="() => model.Area">
+                        <InputText class="bp6-input bp6-fill" @bind-Value="model.Area" dir="auto" maxlength="80" placeholder="@L["SortPlan_AreaPlaceholder"]" />
+                    </FormField>
+                    <FormField TValue="string" Label="@L["SortPlan_Seller"]" Hint="@L["Optional"]" For="lx-rule-seller">
+                        <HtmlSelect Id="lx-rule-seller" Value="@model.MerchantId?.ToString()" ValueChanged="@(v => model.MerchantId = Guid.TryParse(v, out var id) ? id : null)" Fill="true" Label="@L["SortPlan_Seller"]">
+                            <option value="">@L["SortPlan_AnySeller"]</option>
+                            @foreach (var m in merchants)
+                            {
+                                <option value="@m.Id">@m.Name</option>
+                            }
+                        </HtmlSelect>
+                    </FormField>
+                </div>
+
+                <h4 class="lx-form-section">@L["SortPlan_WhichShelves"]</h4>
+                <div class="lx-form-grid">
+                    <FormField Label="@L["SortPlan_Shelves"]" Required="true" Helper="@L["SortPlan_ShelvesHint"]" Field="() => model.Shelves" CssClass="lx-span-2">
+                        <input class="bp6-input bp6-fill lx-mono lx-upper" dir="ltr" maxlength="260" placeholder="B-07 B-08" value="@shelvesText" @onchange="ShelvesChanged" autocomplete="off" />
+                    </FormField>
+                    <FormField Label="@L["SortPlan_Capacity"]" Hint="@L["Optional"]" Helper="@L["SortPlan_CapacityHint"]" Field="() => model.CapacityPerShelf">
+                        <InputNumber class="bp6-input bp6-fill" @bind-Value="model.CapacityPerShelf" min="1" max="10000" dir="ltr" />
+                    </FormField>
+                    <FormField Label="@L["Field_Notes"]" Hint="@L["Optional"]" Field="() => model.Note">
+                        <InputText class="bp6-input bp6-fill" @bind-Value="model.Note" dir="auto" maxlength="200" />
+                    </FormField>
+                </div>
+                <Callout Icon="info-sign">@L["SortPlan_OrderHint"]</Callout>
+
+                @if (error is not null)
+                {
+                    <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mt">@error</Callout>
+                }
+            </EditableBy>
+        </EditForm>
+    </ChildContent>
+    <Footer>
+        @if (Existing is not null)
+        {
+            <span class="bp6-text-muted lx-small">@string.Format(CultureInfo.CurrentCulture, L["UpdatedByAt"], Existing.UpdatedBy ?? "—", Fmt.DateTime(Existing.UpdatedAt))</span>
+        }
+        <span class="lx-spacer"></span>
+        <Button Text="@L["Cancel"]" OnClick="@(() => IsOpenChanged.InvokeAsync(false))" />
+        <Allowed Policy="@StaffPolicies.Operate">
+            <Button Type="submit" Intent="Intent.Primary" Icon="tick" Text="@L["Save"]" Loading="saving" Attributes="@(new Dictionary<string, object> { ["form"] = "shelf-rule-form" })" />
+        </Allowed>
+    </Footer>
+</Drawer>
+
+@code {
+    private ShelfRuleRequest model = new();
+    private string shelvesText = "";
+    private IReadOnlyList<MerchantLookupItem> merchants = [];
+    private ServerErrors? serverErrors;
+    private string? error;
+    private bool saving;
+    private (Guid?, string)? loadedFor;
+
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter, EditorRequired] public string HubCode { get; set; } = "";
+
+    /// <summary>The rule to change; null to add one.</summary>
+    [Parameter] public ShelfRuleItem? Existing { get; set; }
+
+    [Parameter] public EventCallback OnSaved { get; set; }
+
+    private static IReadOnlyList<SegmentOption<ShelfPurpose>> PurposeOptions =>
+    [
+        new(ShelfPurpose.Any, ShipmentTexts.Of(ShelfPurpose.Any), "box"),
+        new(ShelfPurpose.Deliver, ShipmentTexts.Of(ShelfPurpose.Deliver), "drive-time"),
+        new(ShelfPurpose.Forward, ShipmentTexts.Of(ShelfPurpose.Forward), "truck"),
+        new(ShelfPurpose.Return, ShipmentTexts.Of(ShelfPurpose.Return), "undo"),
+    ];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!IsOpen)
+        {
+            loadedFor = null;
+            return;
+        }
+
+        var key = (Existing?.Id, HubCode);
+        if (loadedFor == key)
+        {
+            return;
+        }
+
+        loadedFor = key;
+        error = null;
+        model = Existing is { } r
+            ? new ShelfRuleRequest
+            {
+                HubCode = r.HubCode, Purpose = r.Purpose, ToHubCode = r.ToHubCode, Governorate = r.Governorate, Area = r.Area,
+                MerchantId = r.MerchantId, Shelves = [.. r.Shelves], CapacityPerShelf = r.CapacityPerShelf, Note = r.Note,
+            }
+            : new ShelfRuleRequest { HubCode = HubCode };
+        shelvesText = string.Join(' ', model.Shelves);
+        if (merchants.Count == 0)
+        {
+            merchants = await Merchants.LookupAsync();
+        }
+    }
+
+    private void PurposeChanged(ShelfPurpose purpose)
+    {
+        model.Purpose = purpose;
+        if (purpose is not (ShelfPurpose.Forward or ShelfPurpose.Any))
+        {
+            model.ToHubCode = null;
+        }
+    }
+
+    /// <summary>Shelves are typed in one line, separated by spaces or commas.</summary>
+    private void ShelvesChanged(ChangeEventArgs e)
+    {
+        shelvesText = e.Value?.ToString() ?? "";
+        model.Shelves = [.. shelvesText.Split([' ', ',', '،', '\t'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(s => s.ToUpperInvariant())];
+    }
+
+    private async Task SaveAsync()
+    {
+        error = null;
+        saving = true;
+        try
+        {
+            if (Existing is null)
+            {
+                await Operations.AddShelfRuleAsync(model);
+            }
+            else
+            {
+                await Operations.UpdateShelfRuleAsync(Existing.Id, model);
+            }
+
+            Toaster.Success(L["SortPlan_Saved"]);
+            await OnSaved.InvokeAsync();
+            await IsOpenChanged.InvokeAsync(false);
+        }
+        catch (ApiException ex)
+        {
+            error = serverErrors?.Show(ex) ?? ex.UserMessage;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

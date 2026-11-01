@@ -16,6 +16,7 @@ public static class ShipmentTexts
     public static string Of(DeliveryFailureReason reason) => Get("Failure_" + reason);
     public static string Of(DeliveryReceiver receiver) => Get("Receiver_" + receiver);
     public static string Of(ShelfCheckState state) => Get("ShelfState_" + state);
+    public static string Of(ShelfPurpose purpose) => Get("ShelfPurpose_" + purpose);
     public static string Of(TrackingStage stage) => Get("Stage_" + stage);
     public static string Of(CustomsLane lane) => Get("Lane_" + lane);
     public static string Of(VehicleType vehicle) => Get("Vehicle_" + vehicle);

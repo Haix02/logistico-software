@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Logistico.Modules.Shipments;
 using Logistico.Modules.Shipments.Contracts;
+using Logistico.Modules.Shipments.Contracts.Rules;
 using Logistico.SharedKernel;
 using Logistico.SharedKernel.Mobile;
 
@@ -76,6 +77,7 @@ public sealed class DemoDataTests(DemoDataFactory factory) : IClassFixture<DemoD
     [InlineData(ShipmentsApiRoutes.NetworkHubs)]
     [InlineData(ShipmentsApiRoutes.Warehouses)]
     [InlineData(ShipmentsApiRoutes.WarehouseRadar)]
+    [InlineData(ShipmentsApiRoutes.SortPlan + "/" + IraqHubs.Baghdad)]
     [InlineData(ShipmentsApiRoutes.Transfers)]
     [InlineData(ShipmentsApiRoutes.Returns)]
     [InlineData(ShipmentsApiRoutes.Requests)]
@@ -117,6 +119,43 @@ public sealed class DemoDataTests(DemoDataFactory factory) : IClassFixture<DemoD
             var page = (await Admin.GetFromJsonAsync<ShipmentListResult>($"/{ShipmentsApiRoutes.Shipments}?sort={key}&desc={desc}&pageSize=50"))!;
             Assert.Equal(50, page.Items.Count);
         }
+    }
+
+    [Fact]
+    public async Task Every_hub_has_a_sort_plan_that_places_its_parcels()
+    {
+        foreach (var hub in IraqHubs.Standard)
+        {
+            var plan = (await Admin.GetFromJsonAsync<SortPlanView>("/" + ShipmentsApiRoutes.SortPlanFor(hub.Code)))!;
+            Assert.True(plan.Rules.Count >= 4, hub.Code);
+            Assert.Equal(plan.Shelves.Select(s => s.Shelf).Order(ShelfOrder.Instance), plan.Shelves.Select(s => s.Shelf));
+        }
+
+        var waiting = (await Admin.GetFromJsonAsync<ShipmentListResult>($"/{ShipmentsApiRoutes.Shipments}?hub={IraqHubs.Baghdad}&inWarehouse=true&pageSize=1"))!;
+        var parcel = Assert.Single(waiting.Items);
+        var suggestion = (await Admin.GetFromJsonAsync<ShelfSuggestion>("/" + ShipmentsApiRoutes.SortPlanSuggest(IraqHubs.Baghdad, parcel.TrackingNumber)))!;
+        Assert.NotNull(suggestion.Shelf);
+    }
+
+    [Fact]
+    public async Task Status_sorts_follow_the_lifecycle_and_pages_never_repeat_an_order()
+    {
+        var steps = new List<int>();
+        var seen = new HashSet<Guid>();
+        var total = 0;
+        for (var number = 1; number <= 4; number++)
+        {
+            // Destination has many equal values: without a tiebreaker, rows could move between pages.
+            var byStatus = (await Admin.GetFromJsonAsync<ShipmentListResult>($"/{ShipmentsApiRoutes.Shipments}?sort=status&desc=false&pageSize=50&page={number}"))!;
+            steps.AddRange(byStatus.Items.Select(s => Array.IndexOf(ShipmentLifecycle.Order, s.Status)));
+            var byPlace = (await Admin.GetFromJsonAsync<ShipmentListResult>($"/{ShipmentsApiRoutes.Shipments}?sort=destination&desc=false&pageSize=50&page={number}"))!;
+            Assert.All(byPlace.Items, s => Assert.True(seen.Add(s.Id), $"{s.TrackingNumber} is on two pages"));
+            total = byPlace.TotalCount;
+        }
+
+        Assert.Equal(steps.Order(), steps);
+        Assert.True(steps.Distinct().Count() >= 8);
+        Assert.Equal(Math.Min(total, 200), seen.Count);
     }
 
     [Theory]

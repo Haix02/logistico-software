@@ -66,6 +66,20 @@ public static class ShipmentLifecycle
     /// <summary>Statuses that mean the journey is over.</summary>
     public static readonly ShipmentStatus[] ClosedStatuses = [ShipmentStatus.Delivered, ShipmentStatus.Returned, ShipmentStatus.Cancelled];
 
+    /// <summary>
+    /// Every status in the order a parcel lives through them; lists sorted by status follow it (booked before on the
+    /// way before delivered) instead of the alphabet.
+    /// </summary>
+    public static readonly ShipmentStatus[] Order =
+    [
+        ShipmentStatus.Draft, ShipmentStatus.Booked, ShipmentStatus.PickedUp, ShipmentStatus.ReceivedAtOrigin, ShipmentStatus.AtWarehouse,
+        ShipmentStatus.Consolidated, ShipmentStatus.DepartedOrigin, ShipmentStatus.InTransit, ShipmentStatus.ArrivedPortOfEntry,
+        ShipmentStatus.CustomsPending, ShipmentStatus.CustomsHold, ShipmentStatus.Released, ShipmentStatus.InTransitToHub,
+        ShipmentStatus.AtDestinationWarehouse, ShipmentStatus.ReadyForDispatch, ShipmentStatus.OutForDelivery, ShipmentStatus.DeliveryFailed,
+        ShipmentStatus.Delivered, ShipmentStatus.ReturnInitiated, ShipmentStatus.ReturnInTransit, ShipmentStatus.ReturnAtHub,
+        ShipmentStatus.Returned, ShipmentStatus.Cancelled,
+    ];
+
     public static IReadOnlyDictionary<ShipmentStatus, ShipmentStatus[]> For(ServiceType service) =>
         service == ServiceType.Domestic ? Domestic : International;
 

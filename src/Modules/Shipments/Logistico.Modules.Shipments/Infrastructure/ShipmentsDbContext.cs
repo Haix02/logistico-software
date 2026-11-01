@@ -36,6 +36,7 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
     public DbSet<ShipmentComment> Comments => Set<ShipmentComment>();
     public DbSet<ShelfCheck> ShelfChecks => Set<ShelfCheck>();
     public DbSet<ShelfCheckLine> ShelfCheckLines => Set<ShelfCheckLine>();
+    public DbSet<ShelfRule> ShelfRules => Set<ShelfRule>();
 
     // Referenced by the query filters so EF Core parameterises the tenant per context instance.
     private Guid CurrentTenantId => tenant.TenantId;
@@ -50,6 +51,9 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
     {
         modelBuilder.HasDefaultSchema(Schema);
         modelBuilder.HasPostgresExtension("pg_trgm");
+        // Shelf names sort the way people walk a hub (A-2 before A-10): ICU with numeric ordering, still deterministic.
+        // In the public schema so the unqualified COLLATE "natural" of the columns finds it.
+        modelBuilder.HasCollation("public", Contracts.Rules.ShelfOrder.Collation, locale: "und-u-kn-true", provider: "icu", deterministic: true);
         SearchSql.Register(modelBuilder);
         modelBuilder.HasSequence<long>(TrackingSequence).StartsAt(1).IncrementsBy(1);
         modelBuilder.HasSequence<long>(TransferSequence).StartsAt(1).IncrementsBy(1);
@@ -90,7 +94,7 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
             e.Property(x => x.CodCurrency).HasMaxLength(3).IsFixedLength();
             e.Property(x => x.DeliveryFee).HasPrecision(19, 4);
             e.Property(x => x.ReturnFee).HasPrecision(19, 4);
-            e.Property(x => x.WarehouseBin).HasMaxLength(20);
+            e.Property(x => x.WarehouseBin).HasMaxLength(20).UseCollation(Contracts.Rules.ShelfOrder.Collation);
             e.Property(x => x.CourierName).HasMaxLength(100);
             e.Property(x => x.LastFailureReason).HasConversion<string>().HasMaxLength(32);
             e.Property(x => x.Notes).HasMaxLength(2000);
@@ -247,12 +251,32 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
             e.Property(x => x.TrackingNumber).HasMaxLength(40);
             e.Property(x => x.State).HasConversion<string>().HasMaxLength(16);
             e.Property(x => x.SystemHubCode).HasMaxLength(16);
-            e.Property(x => x.SystemBin).HasMaxLength(20);
+            e.Property(x => x.SystemBin).HasMaxLength(20).UseCollation(Contracts.Rules.ShelfOrder.Collation);
             e.Property(x => x.SystemStatus).HasConversion<string>().HasMaxLength(32);
 
             // A parcel appears once per check, even when two people scan it at the same moment.
             e.HasIndex(x => new { x.ShelfCheckId, x.TrackingNumber }).IsUnique();
             e.HasIndex(x => new { x.ShelfCheckId, x.State });
+        });
+
+        modelBuilder.Entity<ShelfRule>(e =>
+        {
+            e.ToTable("shelf_rules");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).ValueGeneratedNever();
+            e.Property(x => x.HubCode).HasMaxLength(16);
+            e.Property(x => x.Purpose).HasConversion<string>().HasMaxLength(16);
+            e.Property(x => x.ToHubCode).HasMaxLength(16);
+            e.Property(x => x.Governorate).HasMaxLength(5);
+            e.Property(x => x.Area).HasMaxLength(80);
+            e.Property(x => x.AreaFolded).HasMaxLength(80);
+            e.Property(x => x.MerchantName).HasMaxLength(150);
+            e.Property(x => x.Shelves).HasColumnType("text[]");
+            e.Property(x => x.Note).HasMaxLength(200);
+            e.Property(x => x.UpdatedBy).HasMaxLength(256);
+            e.Property(x => x.Version).IsRowVersion();
+            e.HasIndex(x => new { x.TenantId, x.HubCode });
+            e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
         });
 
         modelBuilder.Entity<ShipmentComment>(e =>

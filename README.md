@@ -50,6 +50,7 @@ do deliveries fail?** Companies can publish anonymised answers as open data, so 
 | **Dashboard** | Period-over-period KPIs (booked, delivered, success, first attempt, on time, delivery time, returns, COD, customer rating), daily volume, pipeline, failure reasons, sellers, governorates, couriers |
 | **Hubs and trucks** | Map of the 18 governorates, each hub's shelves and trucks, scan station, and line-haul manifests between hubs |
 | **Hub station** | Barcode-scanner-first receive / load truck / dispatch / route check, shelves, scan log and live radar, printable command barcodes |
+| **Sort plans** | Per hub: which parcels go on which shelves (couriers' areas, truck lanes, returns, a seller's own shelf) and how many fit; receive scans pick the shelf, overflow when one is full and show it large; shelves listed in walking order with their load |
 | **Trucks between hubs** | Parcels planned onto the right truck automatically; load, depart and unload by scan; manifests; missing parcels flagged |
 | **Returns** | Start automatically after the last failed attempt or a refusal, travel back by truck, handed over against a manifest |
 | **Customers** | Public tracking without personal data; self-service requests (new day, address, phone, cancel, return, complaint) protected by the phone's last four digits with lockout; ratings that open complaints |
@@ -147,14 +148,14 @@ dotnet run --project src/Logistico.Web --launch-profile http
 ### Tests
 
 ```bash
-dotnet test tests/Logistico.Modules.Shipments.Tests     # domain rules, product catalogue, open data, formatting (246)
+dotnet test tests/Logistico.Modules.Shipments.Tests     # domain rules, product catalogue, open data, formatting, sort plans (260)
 dotnet test tests/Logistico.ArchitectureTests            # module boundaries, texts in both languages, RTL/CSS and icon guards (33)
-dotnet test tests/Logistico.Web.IntegrationTests         # REST API on real PostgreSQL: flows, roles, audit, tenants, demo data (130)
+dotnet test tests/Logistico.Web.IntegrationTests         # REST API on real PostgreSQL: flows, roles, audit, tenants, demo data, sort plans (137)
 ```
 
 Set `LOGISTICO_TEST_DB` to point the integration tests at another PostgreSQL server.
 
-CI also measures line coverage of the server code and fails below 85 % (86.6 % today); see
+CI also measures line coverage of the server code and fails below 85 % (87.2 % today); see
 [CONTRIBUTING](CONTRIBUTING.md) to measure it locally.
 
 ## Stack

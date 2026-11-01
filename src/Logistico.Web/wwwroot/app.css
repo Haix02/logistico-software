@@ -1333,6 +1333,14 @@ a.lx-code, a .lx-code { color: var(--lx-link); }
 .lx-scan-warn { background: var(--lx-warning-soft); color: var(--lx-warning-text); box-shadow: inset 0 0 0 1px var(--lx-warning-border); }
 .lx-scan-error { background: var(--lx-danger-soft); color: var(--lx-danger-text); box-shadow: inset 0 0 0 1px var(--lx-danger-border); }
 .lx-scan-title { font-size: 17px; font-weight: 700; }
+/* A rule's shelves in fill order: wraps between shelves, never inside a shelf's name. */
+.lx-shelf-list { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }
+.lx-shelf-list > .lx-mono { white-space: nowrap; }
+/* The shelf the sort plan chose, readable from arm's length while holding the parcel. */
+.lx-scan-shelf {
+    flex: none; padding: 4px 14px; border: 2px solid currentColor; border-radius: var(--lx-radius); background: var(--lx-surface);
+    font-family: var(--lx-font-mono); font-size: 28px; font-weight: 700; line-height: 1.2; letter-spacing: 1px;
+}
 .lx-mode-switch { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 6px; }
 .lx-mode-btn {
     display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 6px 10px;

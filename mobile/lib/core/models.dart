@@ -243,11 +243,19 @@ class ScanResult {
       : ok = j['ok'] as bool,
         trackingNumber = j['trackingNumber'] as String,
         message = j['message'] as String,
-        status = j['status'] as String?;
+        status = j['status'] as String?,
+        plannedShelf = j['shelfFromPlan'] == true ? j['warehouseBin'] as String? : null,
+        shelfFull = j['shelfFull'] == true;
 
   final bool ok;
   final String trackingNumber, message;
   final String? status;
+
+  /// The shelf the hub's sort plan chose when none was typed; shown large so it can be read with the parcel in hand.
+  final String? plannedShelf;
+
+  /// Every shelf the plan allows for this parcel is full.
+  final bool shelfFull;
 }
 
 class ShelfSummary {

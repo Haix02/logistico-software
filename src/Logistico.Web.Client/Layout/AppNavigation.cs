@@ -33,6 +33,7 @@ public static class AppNavigation
             new("warehouses", "Nav_Warehouses", "office", "h", "warehouses branches hubs coverage provinces مخازن فروع تغطية محافظات"),
             new("transfers", "Nav_Transfers", "drive-time", "t", "line haul truck شاحنة نقل"),
             new("warehouse/checks", "Nav_ShelfChecks", "clipboard", null, "shelf check count inventory cycle missing جرد رفوف مفقود"),
+            new("warehouse/sort-plan", "Nav_SortPlan", "sort", null, "sort plan shelves putaway rules capacity overflow خطة الفرز رفوف قواعد سعة"),
             new("returns", "Nav_Returns", "undo", "r", "returns rto مرتجعات"),
             new("shipments/labels", "Nav_PrintLabels", "print", null, "labels awb print بوليصة طباعة", Policy: StaffPolicies.Operate),
         ]),

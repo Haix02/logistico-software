@@ -170,7 +170,7 @@ class _HubPageState extends ConsumerState<HubPage> {
             ),
             const SizedBox(height: 10),
             if (_operation == 'Receive')
-              TextField(controller: _shelf, textDirection: TextDirection.ltr, decoration: InputDecoration(labelText: '${s.shelf} (${s.optional})', hintText: 'A-01-1', prefixIcon: const Icon(Icons.shelves))),
+              TextField(controller: _shelf, textDirection: TextDirection.ltr, decoration: InputDecoration(labelText: '${s.shelf} (${s.optional})', hintText: s.shelfAuto, prefixIcon: const Icon(Icons.shelves))),
             if (_operation == 'Dispatch')
               DropdownButtonFormField<String>(
                 initialValue: _courier,
@@ -242,14 +242,26 @@ class _ResultTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final color = result.ok ? scheme.success : scheme.error;
+    final color = !result.ok ? scheme.error : result.shelfFull ? scheme.warning : scheme.success;
+    final s = S.of(context);
     return Card(
       color: color.withValues(alpha: 0.08),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide(color: color.withValues(alpha: 0.4))),
       child: ListTile(
-        leading: Icon(result.ok ? Icons.check_circle : Icons.error, color: color),
+        leading: Icon(!result.ok ? Icons.error : result.shelfFull ? Icons.warning_amber : Icons.check_circle, color: color),
         title: Text(result.trackingNumber, textDirection: TextDirection.ltr, style: const TextStyle(fontWeight: FontWeight.w800)),
-        subtitle: Text(result.message),
+        subtitle: Text(result.shelfFull ? '${result.message}\n${s.shelvesFull}' : result.message),
+        trailing: switch (result.plannedShelf) {
+          final shelf? => Semantics(
+              label: s.putOnShelf(shelf),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(border: Border.all(color: color, width: 2), borderRadius: BorderRadius.circular(8), color: scheme.surface),
+                child: Text(shelf, textDirection: TextDirection.ltr, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: scheme.onSurface)),
+              ),
+            ),
+          null => null,
+        },
       ),
     );
   }
