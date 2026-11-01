@@ -629,6 +629,8 @@ a.bp6-breadcrumb:hover { color: var(--lx-link); }
 .lx-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--lx-text-strong) !important; text-decoration: none !important; padding-inline: 6px 10px; flex: none; }
 .lx-brand-name { font-size: 16px; font-weight: 700; letter-spacing: 0; }
 html[lang^="en"] .lx-brand-name { letter-spacing: 0.01em; }
+/* The company's own name beside the product's, as a quiet second line of identity. */
+.lx-brand-company { padding-inline-start: 10px; border-inline-start: 1px solid var(--lx-border); color: var(--lx-muted); font-size: var(--lx-font-size-sm); font-weight: 600; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lx-search-trigger {
     flex: 1; max-width: 480px; min-width: 0; height: var(--lx-control-height);
     display: flex; align-items: center; gap: 8px; padding-inline: 10px 6px;
@@ -2031,3 +2033,26 @@ body.bp6-dark { color: var(--lx-text); background: var(--lx-bg); color-scheme: d
 .lx-mobile-role .bp6-control { margin-block: 10px; }
 .lx-color { width: 40px; height: 32px; padding: 2px; border: 1px solid var(--lx-control-border); border-radius: var(--lx-radius-sm); background: var(--lx-surface); }
 @media (max-width: 900px) { .lx-mobile-roles { grid-template-columns: 1fr; } }
+
+/* Getting started (docs/19): the dashboard card and the guide's numbered steps. */
+.lx-guide-card { display: grid; gap: 12px; padding: 16px; border-inline-start: 3px solid var(--lx-primary); }
+.lx-guide-card-head { display: flex; align-items: center; gap: 12px; }
+.lx-guide-card-icon { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--lx-primary-soft); color: var(--lx-primary); flex: none; }
+.lx-guide-card-title { margin: 0; font-size: 16px; }
+.lx-guide-card-next { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.lx-guide-progress { display: grid; gap: 10px; padding: 14px 16px; }
+.lx-guide-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.lx-guide-step { display: flex; gap: 14px; padding: 14px 16px; border: 1px solid var(--lx-border); border-radius: var(--lx-radius); background: var(--lx-surface); }
+.lx-guide-step-mark {
+    display: inline-grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 50%;
+    border: 1px solid var(--lx-border); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--lx-muted);
+}
+.lx-guide-step-body { flex: 1; min-width: 0; display: grid; gap: 6px; }
+.lx-guide-step-body p { margin: 0; }
+.lx-guide-step-title { display: flex; align-items: center; gap: 8px; font-weight: 700; flex-wrap: wrap; }
+.lx-guide-step-next { border-color: var(--lx-primary-border); border-inline-start: 3px solid var(--lx-primary); }
+.lx-guide-step-next .lx-guide-step-mark { background: var(--lx-primary); border-color: var(--lx-primary); color: var(--lx-surface); }
+.lx-guide-step-done .lx-guide-step-mark { background: var(--lx-success-soft); border-color: var(--lx-success-border); color: var(--lx-success-text); }
+.lx-guide-step-done, .lx-guide-step-skipped { background: var(--lx-neutral-soft); }
+.lx-guide-step-skipped .lx-guide-step-body { opacity: 0.7; }
+.lx-health-list .lx-list-item { padding: 12px 16px; }

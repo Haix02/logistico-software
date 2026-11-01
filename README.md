@@ -143,19 +143,30 @@ dotnet run --project src/Logistico.Web --launch-profile http
 ```
 
 - App: http://localhost:5210 · Public tracking: http://localhost:5210/track · OpenAPI: http://localhost:5210/openapi/v1.json
+- Development signs in as `admin@logistico.local` / `Logistico#2026` with demo data (from `appsettings.Development.json`).
 - The UI is in Arabic by default; switch to English from the top bar. Light theme by default; dark from the top bar.
+
+### A new installation
+
+Started without `Seed:AdminEmail`, Logistico has nobody to sign in yet. It writes a one-time **setup code** to its
+log and every page leads to **`/setup`**: enter the code, your company's name and phone, and the first administrator
+(with Docker: `docker compose logs app` shows the code). The page works once. You land on **Getting started**, a guide
+that walks each role through what to set up (warehouses, prices, team, couriers, sellers, sort plan, the first order
+and scan, automation, the mobile app) and is done when the data says so; **Installation health** lists what to fix
+before real customers' data goes in. See [First run & getting started](docs/19-first-run-and-getting-started.md).
 
 ### Tests
 
 ```bash
 dotnet test tests/Logistico.Modules.Shipments.Tests     # domain rules, product catalogue, open data, formatting, sort plans (260)
 dotnet test tests/Logistico.ArchitectureTests            # module boundaries, texts in both languages, RTL/CSS and icon guards (33)
-dotnet test tests/Logistico.Web.IntegrationTests         # REST API on real PostgreSQL: flows, roles, audit, tenants, demo data, sort plans (137)
+dotnet test tests/Logistico.Web.IntegrationTests         # REST API on real PostgreSQL: flows, roles, setup, every endpoint × every role (150)
+dotnet test tests/Logistico.Web.Client.Tests             # the console: components (bUnit), navigation, plurals, texts (46)
 ```
 
 Set `LOGISTICO_TEST_DB` to point the integration tests at another PostgreSQL server.
 
-CI also measures line coverage of the server code and fails below 85 % (87.2 % today); see
+CI also measures line coverage of the server code and fails below 85 % (87.7 % today); see
 [CONTRIBUTING](CONTRIBUTING.md) to measure it locally.
 
 ## Stack
@@ -211,7 +222,8 @@ Dockerfile, docker-compose.yml
 | 15 | [Production readiness](docs/15-production-readiness.md) | Configuration, go-live checklist, performance acceptance |
 | 16 | [Data & demand intelligence](docs/16-data-and-insights.md) | Insights, product recognition, open data and privacy |
 | 17 | [Release audits](docs/17-release-audits.md) | What each release checked and fixed |
-| 18 | [Ideas from open source](docs/18-ideas-from-open-source.md) | What we took from Fleetbase, OpenBoxes, Karrio, VROOM, Traccar |
+| 18 | [Ideas from open source](docs/18-ideas-from-open-source.md) | What we took from Fleetbase, OpenBoxes, Karrio, Odoo, VROOM, Traccar |
+| 19 | [First run & getting started](docs/19-first-run-and-getting-started.md) | The setup page, the getting-started guide, installation health |
 
 ## Alternatives and how Logistico differs
 

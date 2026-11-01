@@ -62,3 +62,10 @@ textarea.form-control { height: auto; min-height: 72px; padding-block: 6px; }
 .table th { background: var(--lx-surface-2); color: var(--lx-text-strong); }
 .recovery-code { font-family: var(--lx-font-mono); }
 .glyphicon { display: none; }
+
+/* The setup page: section headings and the command that shows the setup code, on its own line. */
+.lx-setup-section { display: flex; align-items: center; gap: 8px; margin: 20px 0 10px; font-size: 15px; }
+.lx-setup-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0 12px; }
+.lx-setup-command { display: block; width: fit-content; margin-top: 4px; padding: 2px 8px; border-radius: 4px; background: var(--lx-neutral-soft); text-align: start; unicode-bidi: isolate; }
+.lx-setup-sample { display: block; margin-top: 8px; line-height: 1.5; }
+.lx-setup-sample .bp6-text-muted { display: block; }

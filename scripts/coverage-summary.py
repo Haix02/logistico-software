@@ -2,8 +2,9 @@
 """Merges the test runs' Cobertura reports and checks the server code's line coverage.
 
 Usage: python3 scripts/coverage-summary.py <results-dir> [--min 85]
-A line counts as covered when any test project ran it. Generated migrations, the browser client and build output are
-left out. Prints a table per module (and to $GITHUB_STEP_SUMMARY in CI) and fails when coverage is below --min.
+A line counts as covered when any test project ran it. Generated migrations and build output are left out. Prints a
+table per module (and to $GITHUB_STEP_SUMMARY in CI) and fails when the server code's coverage is below --min; the
+browser console (Logistico.Web.Client) is listed on its own line and not part of the minimum yet.
 """
 import collections
 import glob
@@ -18,7 +19,7 @@ lines = collections.defaultdict(dict)
 for report in glob.glob(os.path.join(results, "**", "coverage.cobertura.xml"), recursive=True):
     for cls in ET.parse(report).getroot().iter("class"):
         name = cls.get("filename").replace("\\", "/")
-        if "/Migrations/" in name or "/obj/" in name or "Logistico.Web.Client" in name:
+        if "/Migrations/" in name or "/obj/" in name:
             continue
         for line in cls.iter("line"):
             number = int(line.get("number"))
@@ -29,7 +30,7 @@ if not lines:
 
 def module(path):
     for marker in ("Modules/Shipments/Logistico.Modules.Shipments.Contracts", "Modules/Shipments/Logistico.Modules.Shipments",
-                   "Modules/Merchants", "Modules/Audit", "Logistico.SharedKernel", "Logistico.Web"):
+                   "Modules/Merchants", "Modules/Audit", "Logistico.SharedKernel", "Logistico.Web.Client", "Logistico.Web"):
         if marker in path:
             return marker.split("/")[-1]
     return "other"
@@ -38,12 +39,17 @@ totals = collections.defaultdict(lambda: [0, 0])
 for path, hits in lines.items():
     totals[module(path)][0] += sum(hits.values())
     totals[module(path)][1] += len(hits)
-covered, total = sum(c for c, _ in totals.values()), sum(t for _, t in totals.values())
+CLIENT = "Logistico.Web.Client"
+server = {m: v for m, v in totals.items() if m != CLIENT}
+covered, total = sum(c for c, _ in server.values()), sum(t for _, t in server.values())
 rate = 100 * covered / total
 
 table = ["| Module | Lines covered | Coverage |", "|---|---:|---:|"]
-table += [f"| {m} | {c:,} / {t:,} | {100 * c / t:.1f}% |" for m, (c, t) in sorted(totals.items())]
+table += [f"| {m} | {c:,} / {t:,} | {100 * c / t:.1f}% |" for m, (c, t) in sorted(server.items())]
 table.append(f"| **All server code** | **{covered:,} / {total:,}** | **{rate:.1f}%** |")
+if CLIENT in totals:
+    c, t = totals[CLIENT]
+    table.append(f"| Browser console (not in the minimum yet) | {c:,} / {t:,} | {100 * c / t:.1f}% |")
 report = "\n".join(["### Test coverage", "", *table, "", f"Minimum: {minimum:.0f}%"])
 print(report)
 if os.environ.get("GITHUB_STEP_SUMMARY"):

@@ -1,0 +1,62 @@
+@* The dashboard's getting-started card: how far the company is, and the next step for this person. Hidden once every
+   step is done or skipped, or when the person hides it (they can show it again from the Getting started page). *@
+@inject CompanyApi Company
+@inject IJSRuntime JS
+
+@if (guide is { Finished: false, Next: { } next } && !hidden)
+{
+    <section class="bp6-card lx-guide-card lx-mb" aria-labelledby="lx-guide-card-title">
+        <div class="lx-guide-card-head">
+            <span class="lx-guide-card-icon" aria-hidden="true"><Icon Name="flag" /></span>
+            <div class="lx-stack" style="gap:2px;flex:1">
+                <h2 class="bp6-heading lx-guide-card-title" id="lx-guide-card-title">@L["Guide_CardTitle"]</h2>
+                <span class="bp6-text-muted lx-small">@string.Format(CultureInfo.CurrentCulture, L["Guide_ProgressN"], Fmt.Number(guide.Done), Fmt.Number(guide.Steps.Count))</span>
+            </div>
+            <Button Minimal="true" Small="true" Icon="cross" Tip="@L["Guide_Hide"]" OnClick="HideAsync" />
+        </div>
+        <ProgressBar Value="@((double)guide.Done / guide.Steps.Count)" />
+        <div class="lx-guide-card-next">
+            <Icon Name="@next.Icon" Large="true" />
+            <div class="lx-stack" style="gap:2px;flex:1">
+                <strong>@L["Guide_Next"]: @L[$"Step_{GettingStartedPage.Key(next.Id)}_Title"]</strong>
+                <span class="bp6-text-muted">@L[$"Step_{GettingStartedPage.Key(next.Id)}_Why"]</span>
+            </div>
+            <div class="lx-row" style="gap:8px">
+                <LinkButton Href="@next.Href" Intent="Intent.Primary" Icon="@Bidi.Forward" Text="@L["Guide_Open"]" />
+                <LinkButton Href="getting-started" Minimal="true" Text="@L["Guide_SeeAll"]" />
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    /// <summary>The browser preference that hides the card (per person and device).</summary>
+    public const string HiddenPref = "guide-hidden";
+
+    private GettingStartedView? guide;
+    private bool hidden = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hidden = await JS.InvokeAsync<string?>("lx.getPref", HiddenPref) == "1";
+        if (hidden)
+        {
+            return;
+        }
+
+        try
+        {
+            guide = await Company.GetGuideAsync();
+        }
+        catch (ApiException)
+        {
+            // The dashboard works without the guide.
+        }
+    }
+
+    private async Task HideAsync()
+    {
+        hidden = true;
+        await JS.InvokeVoidAsync("lx.setPref", HiddenPref, "1");
+    }
+}

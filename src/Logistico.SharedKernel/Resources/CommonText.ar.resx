@@ -7,6 +7,7 @@
   <data name="Validation_Choice" xml:space="preserve"><value>اختر أحد الخيارات المعروضة.</value></data>
   <data name="Validation_Format" xml:space="preserve"><value>القيمة ليست بالصيغة المتوقعة.</value></data>
   <data name="Validation_Shelves" xml:space="preserve"><value>اكتب من رف واحد إلى 12 رفاً، مثل B-07 B-08 (حروف إنجليزية وأرقام و - . /)، وكل رف مرة واحدة.</value></data>
+  <data name="Validation_PasswordsDiffer" xml:space="preserve"><value>كلمتا المرور غير متطابقتين.</value></data>
   <data name="Validation_CourierCode" xml:space="preserve"><value>اختر المندوب الذي يعود إليه هذا الحساب.</value></data>
   <data name="Validation_Currency" xml:space="preserve"><value>استخدم رمز عملة مثل IQD أو USD.</value></data>
   <data name="Validation_DateWindow" xml:space="preserve"><value>اختر تاريخاً من اليوم وحتى 14 يوماً قادمة.</value></data>

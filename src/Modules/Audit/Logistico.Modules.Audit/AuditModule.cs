@@ -1,5 +1,6 @@
 using Logistico.Modules.Audit.Endpoints;
 using Logistico.Modules.Audit.Infrastructure;
+using Logistico.SharedKernel.Setup;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -20,6 +21,7 @@ public static class AuditModule
             .UseNpgsql(connectionString, npgsql => npgsql.MigrationsHistoryTable("__ef_migrations_history", AuditDbContext.Schema))
             .UseSnakeCaseNamingConvention());
         services.AddScoped<ISaveChangesInterceptor, AuditInterceptor>();
+        services.AddScoped<IDatabaseHealth, AuditDatabaseHealth>();
         return services;
     }
 
