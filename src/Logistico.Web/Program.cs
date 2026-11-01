@@ -119,6 +119,8 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 // Platform services
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ITenantContext, HttpTenantContext>();
+builder.Services.AddSingleton<SetupGate>();
+builder.Services.AddScoped<SetupService>();
 builder.Services.AddScoped<Logistico.SharedKernel.Mobile.IDeliveryRules, DeliveryRules>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddProblemDetails();
@@ -212,6 +214,7 @@ else
 }
 
 await app.InitializeDatabaseAsync();
+await app.Services.GetRequiredService<SetupGate>().AnnounceAsync(); // the first run: a setup code in the log (docs/19)
 
 app.UseSecurityHeaders();
 app.UseWhen(context => context.Request.Path.StartsWithSegments("/api"), branch => branch.UseResponseCompression());
@@ -257,6 +260,8 @@ app.MapAccountEndpoints();
 app.MapAuthTokenEndpoints();
 app.MapMobileAppEndpoints();
 app.MapTeamEndpoints();
+app.MapSetupEndpoints();
+app.MapGet("/setup", () => Results.Redirect("/Account/Setup")).ExcludeFromDescription();
 
 // Module APIs: reading needs a staff role, changing data needs Operations or Admin unless an endpoint asks for more.
 var modules = app.MapGroup("").RequireStaffRoles();

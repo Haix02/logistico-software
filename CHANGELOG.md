@@ -6,6 +6,19 @@ versions follow [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **First run: a setup page instead of settings** (ADR-033, docs/19). A new installation writes a one-time setup code
+  to its log and every page leads to `/setup`: the code, the company's name and phone, and the first administrator,
+  with sample data to learn with if wanted. It runs once, under a database lock, so two people submitting together get
+  one administrator; then it closes. Unlike Fleetbase and Traccar, reaching a fresh server is not enough to own it;
+  unlike Karrio, there is no default password. `Seed:AdminEmail` still works for unattended installs.
+- **Getting started**: a guide on the dashboard and its own page that walks each role through setting up the company
+  (profile, warehouses, prices, team, couriers, sellers, sort plan, first order and scan, automation, the mobile app,
+  installation health). Each step links to the page that does it and is done when the data says so, not when someone
+  ticks it; operations and administrators can mark a step "not for us".
+- **Company profile** (Administration → Company): name, phone, head office and address; the name shows in the top bar.
+- **Installation health** (Administration): PostgreSQL version, pending migrations, the shelf-order collation, HTTPS,
+  the reverse proxy, sign-in keys, email, leftover bootstrap settings, demo data, administrators, two-step sign-in and
+  automation, each with what to do about it.
 - **Hub sort plans** (Warehouse → Sort plan; ADR-032; ideas from Odoo's putaway rules and parcel sort plans): each
   hub says which parcels go on which shelves — for its couriers by governorate or area, waiting for the truck to a
   given hub, returns for the seller, one seller's own shelf — and how many fit on each. A receive scan without a shelf
@@ -95,6 +108,11 @@ versions follow [Semantic Versioning](https://semver.org/).
   now shows all collected cash not handed in, whatever the day.
 
 ### Changed
+- **Tests reach the whole system.** Every read endpoint is called as every role on the demo company and must never
+  fail; the setup page, the guide, the company profile and the health checks have end-to-end tests; a new test project
+  renders the console's components with bUnit (the guide card, the health page, role-gated actions, tables, paging,
+  mixed Arabic/Latin text) and checks that every menu entry and guide step leads to a page and has its texts in both
+  languages. CI reports the console's coverage on its own line.
 - **Orderly lists.** Shelves sort the way people walk a hub (A-2 before A-10, B-01-9 before B-01-10) in the order list,
   the station and shelf checks; sorting by status follows the order a parcel lives through them instead of the
   alphabet; every sort has a tiebreaker, so paging never shows an order twice or skips one. The hub station no longer

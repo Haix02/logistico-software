@@ -1,0 +1,119 @@
+@page "/getting-started"
+@inject CompanyApi Company
+@inject Toaster Toaster
+@inject IJSRuntime JS
+
+<PageTitle>@L["Nav_GettingStarted"] · @L["AppName"]</PageTitle>
+
+<PageHeader Title="@Welcome" Subtitle="@L["Guide_Subtitle"]" Icon="flag">
+    <Actions>
+        @if (guide is { Steps.Count: > 0 })
+        {
+            <Switch Label="@L["Guide_ShowOnDashboard"]" Value="@(!hidden)" ValueChanged="ShowOnDashboardAsync" />
+        }
+    </Actions>
+</PageHeader>
+
+@if (guide is null)
+{
+    <Skeleton Block="true" Lines="6" />
+}
+else if (guide.Steps.Count == 0)
+{
+    <NonIdealState Icon="tick-circle" Title="@L["Guide_NothingForRole"]" Description="@L["Guide_NothingForRoleHint"]" />
+}
+else
+{
+    <div class="bp6-card lx-guide-progress lx-mb">
+        <div class="lx-row" style="justify-content:space-between">
+            <strong>@string.Format(CultureInfo.CurrentCulture, L["Guide_ProgressN"], Fmt.Number(guide.Done), Fmt.Number(guide.Steps.Count))</strong>
+            @if (guide.Finished)
+            {
+                <Tag Intent="Intent.Success" Icon="tick">@L["Guide_AllDone"]</Tag>
+            }
+        </div>
+        <ProgressBar Value="@((double)guide.Done / guide.Steps.Count)" Intent="@(guide.Finished ? Intent.Success : Intent.Primary)" />
+    </div>
+
+    <ol class="lx-guide-steps">
+        @foreach (var (step, n) in guide.Steps.Select((s, i) => (s, i + 1)))
+        {
+            var state = step.Done ? "done" : step.Skipped ? "skipped" : guide.Next?.Id == step.Id ? "next" : "todo";
+            <li class="@Bp.Cls("lx-guide-step", $"lx-guide-step-{state}")">
+                <span class="lx-guide-step-mark" aria-hidden="true">
+                    @if (step.Done)
+                    {
+                        <Icon Name="tick" />
+                    }
+                    else
+                    {
+                        @Fmt.Number(n)
+                    }
+                </span>
+                <div class="lx-guide-step-body">
+                    <div class="lx-guide-step-title">
+                        <Icon Name="@step.Icon" />
+                        <span>@L[$"Step_{Key(step.Id)}_Title"]</span>
+                        @if (step.Done)
+                        {
+                            <Tag Intent="Intent.Success">@L["Guide_Done"]</Tag>
+                        }
+                        else if (step.Skipped)
+                        {
+                            <Tag>@L["Guide_Skipped"]</Tag>
+                        }
+                    </div>
+                    <p class="bp6-text-muted">@L[$"Step_{Key(step.Id)}_Why"]</p>
+                    <div class="lx-row" style="gap:8px">
+                        <LinkButton Href="@step.Href" Icon="@Bidi.Forward" Text="@L[step.Done ? "Guide_Review" : "Guide_Open"]"
+                                    Intent="@(state == "next" ? Intent.Primary : Intent.None)" Small="true" />
+                        @if (!step.Done)
+                        {
+                            <Allowed Policy="@StaffPolicies.Operate">
+                                <Button Minimal="true" Small="true" Icon="@(step.Skipped ? "undo" : "disable")" Text="@L[step.Skipped ? "Guide_Unskip" : "Guide_Skip"]"
+                                        OnClick="@(() => SkipAsync(step, !step.Skipped))" />
+                            </Allowed>
+                        }
+                    </div>
+                </div>
+            </li>
+        }
+    </ol>
+}
+
+@code {
+    private GettingStartedView? guide;
+    private bool hidden;
+
+    private string Welcome => Company.Name is { } name ? string.Format(CultureInfo.CurrentCulture, L["Guide_Welcome"], name) : L["Nav_GettingStarted"].Value;
+
+    /// <summary>Step ids as text keys ("sort-plan" → "sort_plan").</summary>
+    internal static string Key(string id) => id.Replace('-', '_');
+
+    protected override async Task OnInitializedAsync()
+    {
+        hidden = await JS.InvokeAsync<string?>("lx.getPref", GettingStartedCard.HiddenPref) == "1";
+        var company = Company.GetCompanyAsync();
+        guide = await Company.GetGuideAsync();
+        await company;
+    }
+
+    private async Task SkipAsync(GettingStartedStep step, bool skip)
+    {
+        try
+        {
+            await Company.SkipAsync(step.Id, skip);
+            guide = await Company.GetGuideAsync();
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+    }
+
+    private async Task ShowOnDashboardAsync(bool show)
+    {
+        hidden = !show;
+        await JS.InvokeVoidAsync("lx.setPref", GettingStartedCard.HiddenPref, hidden ? "1" : "");
+    }
+}

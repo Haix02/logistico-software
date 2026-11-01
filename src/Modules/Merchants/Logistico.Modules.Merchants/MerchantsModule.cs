@@ -1,6 +1,7 @@
 using Logistico.Modules.Merchants.Contracts;
 using Logistico.Modules.Merchants.Endpoints;
 using Logistico.Modules.Merchants.Infrastructure;
+using Logistico.SharedKernel.Setup;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -20,6 +21,9 @@ public static class MerchantsModule
             .AddInterceptors(sp.GetServices<ISaveChangesInterceptor>()));
         services.AddScoped<IMerchantDirectory, MerchantDirectory>();
         services.AddScoped<MerchantsDemoSeeder>();
+        services.AddScoped<MerchantsSetupFacts>();
+        services.AddScoped<IGettingStartedFacts>(sp => sp.GetRequiredService<MerchantsSetupFacts>());
+        services.AddScoped<IDatabaseHealth>(sp => sp.GetRequiredService<MerchantsSetupFacts>());
         return services;
     }
 

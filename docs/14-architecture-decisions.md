@@ -261,3 +261,21 @@ returns); natural order in C# after loading (breaks paging); a stored sort key c
 **Consequences.** Rules are data per company and hub, edited on **Warehouse → Sort plan** (operations and
 administrators; every office role reads it). The planner is one query per scan batch. Parcels already on shelves are
 not moved when a rule changes. The collation needs PostgreSQL built with ICU (the official images and Homebrew are).
+
+### ADR-033: First run through a setup page with a code from the server log; a guide computed from data — Accepted (1 Nov 2026)
+**Context.** A new installation needed its first administrator from settings (`Seed:AdminEmail` / `Seed:AdminPassword`)
+that then had to be removed, and nothing told a new company what to set up next. Comparable projects either let the
+first person who reaches the server become its administrator (Fleetbase, Traccar) or ship a default password (Karrio);
+ERPNext's onboarding steps are flags that can drift from the data (docs/19 §6).
+**Decision.** While no active administrator exists, the app writes a one-time **setup code** to its log and `/setup`
+(server-rendered, like sign-in) asks for it with the company's name and phone and the first administrator. The
+account and the company profile are created in one transaction under a PostgreSQL advisory lock after checking again
+that no administrator exists; the page then closes. A **getting-started guide** lists the steps for the person's role,
+each done when the company's data says so (each module answers through `IGettingStartedFacts`), with "not for us"
+skips kept per company. **Installation health** checks the production-readiness items that can be checked live
+(modules report pending migrations through `IDatabaseHealth`).
+**Alternatives.** First account wins (anyone who finds a fresh server owns it); a wizard of several pages (more state
+to keep, no more information needed); stored completion flags (drift from the data); a setup token in a file on disk
+(containers make the log easier to reach than a file).
+**Consequences.** The setup code changes at each start unless `Setup:Code` is set. `Seed:AdminEmail` remains for
+unattended installs. New modules join the guide and the health page by registering the two interfaces.

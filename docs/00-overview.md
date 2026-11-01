@@ -14,6 +14,7 @@ It is **.NET end to end**, runs **in the browser**, and works in **Arabic (defau
 | Warehouses and branches | Each company manages its own sorting hubs, branches and fulfilment stores per governorate: coverage, map position, capacity, live load |
 | Hub network and trucks | Origin, destination, current and target hub on every parcel; trucks between hubs planned automatically, loaded and unloaded by scan, with manifests and missing-parcel detection |
 | Hub station | Barcode-scanner friendly receive, load, dispatch and route check; shelves; misroute alerts; live hub radar |
+| Sort plans | Per hub: which parcels go on which shelves and how many fit; the scan picks the shelf, overflows when one is full and shows it large ([18](18-ideas-from-open-source.md)) |
 | Order confirmation | COD orders from risky customers (or all orders) wait for the customer's confirmation by WhatsApp, the tracking page or a call |
 | Pricing | A rate card per company: own-governorate price, price per destination, weight allowance, per-seller discounts; the order form quotes from it |
 | Returns | Started automatically after the last failed attempt or a refusal; travel back by truck; handed to the seller against a return manifest |
@@ -25,6 +26,7 @@ It is **.NET end to end**, runs **in the browser**, and works in **Arabic (defau
 | Labels | 4×6" thermal labels with Code-128 barcodes and the hub routing code |
 | Customs (ASYCUDA) | Declaration workbench, selectivity lanes, CoO and invoice e-verification gate, duty estimate, SAD XML export |
 | Fleet and finance | Couriers and vehicles, run sheets, cash held by couriers, seller COD balances, settlement batches with statements |
+| First run | A setup page for a new installation (code from the server log), a getting-started guide per role worked out from the data, a company profile and installation health ([19](19-first-run-and-getting-started.md)) |
 | Team and roles | Administrators add colleagues and give each one role (Admin, Operations, Customer support, Finance, Viewer), lock, unlock and set new passwords; the API enforces every role and the screens follow it |
 
 ## 3. Who it is for

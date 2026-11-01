@@ -54,9 +54,12 @@ public static class AppNavigation
         ]),
         new("Nav_AdminSection",
         [
+            new("getting-started", "Nav_GettingStarted", "flag", null, "getting started guide setup first steps onboarding checklist البدء دليل الإعداد الخطوات الأولى"),
+            new("settings/company", "Nav_Company", "office", null, "company profile name phone address الشركة الملف الاسم الهاتف العنوان", Policy: StaffPolicies.Administer),
             new("team", "Nav_Team", "key", "x", "team users staff roles access permissions الفريق المستخدمين الصلاحيات الأدوار", Policy: StaffPolicies.Administer),
             new("mobile-app", "Nav_MobileApp", "mobile-phone", null, "mobile app phone flutter courier seller scanner تطبيق الهاتف الجوال المندوب الماسح", Policy: StaffPolicies.Administer),
             new("audit", "Nav_Audit", "history", "l", "audit log trail history changes who changed what سجل التغييرات تدقيق من غيّر", Policy: StaffPolicies.Administer),
+            new("system", "Nav_System", "pulse", null, "installation health system checks https email backups database صحة التثبيت فحص النظام", Policy: StaffPolicies.Administer),
         ]),
     ];
 

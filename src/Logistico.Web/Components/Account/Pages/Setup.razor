@@ -1,0 +1,230 @@
+@page "/Account/Setup"
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.Extensions.Localization
+@using Logistico.SharedKernel
+@using Logistico.SharedKernel.Iraq
+@using Logistico.SharedKernel.Setup
+@using Logistico.Web.Data
+@using Logistico.Web.Infrastructure
+
+@inject SetupGate Gate
+@inject SetupService Installer
+@inject SignInManager<ApplicationUser> SignInManager
+@inject IdentityRedirectManager RedirectManager
+@inject IStringLocalizer<ServerText> T
+
+<PageTitle>@T["SetupTitle"] · @T["AppName"]</PageTitle>
+
+<div class="lx-signin-split">
+<aside class="lx-signin-hero">
+    <div class="lx-signin-hero-brand">
+        <span class="lx-logo lx-logo-large" aria-hidden="true"></span>
+        <span class="lx-signin-app">@T["AppName"]</span>
+    </div>
+    <h1 class="lx-signin-hero-title">@T["SetupHeroTitle"]</h1>
+    <p class="lx-signin-hero-text">@T["SetupHeroText"]</p>
+    <ol class="lx-signin-points lx-setup-steps">
+        <li><span class="bp6-icon-standard bp6-icon-office" aria-hidden="true"></span>@T["SetupStep1"]</li>
+        <li><span class="bp6-icon-standard bp6-icon-person" aria-hidden="true"></span>@T["SetupStep2"]</li>
+        <li><span class="bp6-icon-standard bp6-icon-flag" aria-hidden="true"></span>@T["SetupStep3"]</li>
+    </ol>
+    <Logistico.Web.Client.Ui.Map.NetworkSilhouette CssClass="lx-signin-map" />
+    <div class="lx-signin-hero-foot">@T["OpenSourceLine"]</div>
+</aside>
+
+<div class="lx-signin">
+    <div class="bp6-card bp6-elevation-2 lx-signin-card lx-setup-card">
+        @if (closed)
+        {
+            <h2 class="bp6-heading">@T["SetupDoneTitle"]</h2>
+            <p class="bp6-text-muted">@T["SetupDoneText"]</p>
+            <a class="bp6-button bp6-intent-primary bp6-large bp6-fill" href="Account/Login">
+                <span class="bp6-button-text">@T["SignInButton"]</span>
+            </a>
+        }
+        else
+        {
+            <h2 class="bp6-heading">@T["SetupTitle"]</h2>
+            <p class="bp6-text-muted">@T["SetupSubtitle"]</p>
+
+            @if (errors.Count > 0)
+            {
+                <div class="bp6-callout bp6-intent-danger lx-mb" role="alert">
+                    <span class="bp6-icon-standard bp6-icon-error lx-callout-icon"></span>
+                    @foreach (var error in errors)
+                    {
+                        <div>@error</div>
+                    }
+                </div>
+            }
+
+            <EditForm EditContext="editContext" method="post" OnValidSubmit="RunAsync" FormName="setup">
+                <DataAnnotationsValidator />
+
+                <div class="bp6-form-group @Danger(nameof(InputModel.Code))">
+                    <label class="bp6-label" for="Input.Code">@T["SetupCode"]</label>
+                    <div class="bp6-form-content">
+                        <div class="bp6-input-group bp6-large">
+                            <span class="bp6-icon bp6-icon-standard bp6-icon-key"></span>
+                            <InputText @bind-Value="Input.Code" id="Input.Code" class="bp6-input lx-mono lx-upper" dir="ltr" autocomplete="off" placeholder="XXXX-XXXX" aria-describedby="code-help" />
+                        </div>
+                        <div class="bp6-form-helper-text" id="code-help">@T["SetupCodeHelp"]<code class="lx-setup-command" dir="ltr">docker compose logs app</code></div>
+                        <div class="bp6-form-helper-text"><ValidationMessage For="() => Input.Code" /></div>
+                    </div>
+                </div>
+
+                <h3 class="lx-setup-section"><span class="bp6-icon-standard bp6-icon-office" aria-hidden="true"></span> @T["SetupCompany"]</h3>
+                <div class="bp6-form-group @Danger(nameof(InputModel.CompanyName))">
+                    <label class="bp6-label" for="Input.CompanyName">@T["SetupCompanyName"]</label>
+                    <InputText @bind-Value="Input.CompanyName" id="Input.CompanyName" class="bp6-input bp6-fill" dir="auto" maxlength="100" placeholder="@T["SetupCompanyNamePlaceholder"]" />
+                    <div class="bp6-form-helper-text"><ValidationMessage For="() => Input.CompanyName" /></div>
+                </div>
+                <div class="lx-setup-row">
+                    <div class="bp6-form-group @Danger(nameof(InputModel.CompanyPhone))">
+                        <label class="bp6-label" for="Input.CompanyPhone">@T["SetupCompanyPhone"]</label>
+                        <InputText @bind-Value="Input.CompanyPhone" id="Input.CompanyPhone" class="bp6-input bp6-fill" type="tel" dir="ltr" maxlength="20" placeholder="0770 123 4567" />
+                        <div class="bp6-form-helper-text"><ValidationMessage For="() => Input.CompanyPhone" /></div>
+                    </div>
+                    <div class="bp6-form-group">
+                        <label class="bp6-label" for="Input.Governorate">@T["SetupGovernorate"] <span class="bp6-text-muted">(@T["Optional"])</span></label>
+                        <div class="bp6-html-select bp6-fill">
+                            <InputSelect @bind-Value="Input.Governorate" id="Input.Governorate">
+                                <option value="">—</option>
+                                @foreach (var g in IraqGovernorates.All.OrderBy(g => g.Name, StringComparer.CurrentCulture))
+                                {
+                                    <option value="@g.Code">@g.Name</option>
+                                }
+                            </InputSelect>
+                            <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="lx-setup-section"><span class="bp6-icon-standard bp6-icon-person" aria-hidden="true"></span> @T["SetupAdmin"]</h3>
+                <div class="bp6-form-group @Danger(nameof(InputModel.AdminName))">
+                    <label class="bp6-label" for="Input.AdminName">@T["SetupAdminName"]</label>
+                    <InputText @bind-Value="Input.AdminName" id="Input.AdminName" class="bp6-input bp6-fill" dir="auto" maxlength="200" autocomplete="name" />
+                    <div class="bp6-form-helper-text"><ValidationMessage For="() => Input.AdminName" /></div>
+                </div>
+                <div class="bp6-form-group @Danger(nameof(InputModel.Email))">
+                    <label class="bp6-label" for="Input.Email">@T["Email"]</label>
+                    <InputText @bind-Value="Input.Email" id="Input.Email" class="bp6-input bp6-fill" dir="ltr" autocomplete="username" placeholder="name@company.iq" />
+                    <div class="bp6-form-helper-text"><ValidationMessage For="() => Input.Email" /></div>
+                </div>
+                <div class="lx-setup-row">
+                    <div class="bp6-form-group @Danger(nameof(InputModel.Password))">
+                        <label class="bp6-label" for="Input.Password">@T["Password"]</label>
+                        <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="bp6-input bp6-fill" dir="ltr" autocomplete="new-password" />
+                        <div class="bp6-form-helper-text"><ValidationMessage For="() => Input.Password" /></div>
+                    </div>
+                    <div class="bp6-form-group @Danger(nameof(InputModel.ConfirmPassword))">
+                        <label class="bp6-label" for="Input.ConfirmPassword">@T["ConfirmPassword"]</label>
+                        <InputText type="password" @bind-Value="Input.ConfirmPassword" id="Input.ConfirmPassword" class="bp6-input bp6-fill" dir="ltr" autocomplete="new-password" />
+                        <div class="bp6-form-helper-text"><ValidationMessage For="() => Input.ConfirmPassword" /></div>
+                    </div>
+                </div>
+
+                <label class="bp6-control bp6-checkbox lx-setup-sample">
+                    <InputCheckbox class="bp6-control-input" @bind-Value="Input.SampleData" />
+                    <span class="bp6-control-indicator"></span>
+                    <strong>@T["SetupSampleData"]</strong>
+                    <span class="bp6-text-muted lx-small">@T["SetupSampleDataHelp"]</span>
+                </label>
+
+                <button type="submit" class="bp6-button bp6-intent-primary bp6-large bp6-fill lx-mt">
+                    <span class="bp6-icon-standard bp6-icon-tick"></span>
+                    <span class="bp6-button-text">@T["SetupButton"]</span>
+                </button>
+            </EditForm>
+        }
+    </div>
+</div>
+</div>
+
+@code {
+    private EditContext editContext = default!;
+    private List<string> errors = [];
+    private bool closed;
+
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Input ??= new();
+        editContext = new EditContext(Input);
+        closed = !await Gate.NeedsSetupAsync();
+    }
+
+    private string Danger(string field) =>
+        editContext.GetValidationMessages(new FieldIdentifier(Input, field)).Any() ? "bp6-intent-danger" : "";
+
+    private async Task RunAsync()
+    {
+        if (closed)
+        {
+            return;
+        }
+
+        if (!Gate.Accepts(Input.Code))
+        {
+            errors = [T["SetupWrongCode"]];
+            return;
+        }
+
+        var company = new CompanyProfile { Name = Input.CompanyName, Phone = Input.CompanyPhone, Governorate = Input.Governorate };
+        var outcome = await Installer.RunAsync(new SetupRequest(company, Input.AdminName, Input.Email, Input.Password, Input.SampleData), CancellationToken.None);
+        switch (outcome)
+        {
+            case SetupOutcome.AlreadySetUp:
+                closed = true;
+                return;
+            case SetupOutcome.Rejected:
+                errors = [.. Installer.Errors];
+                return;
+        }
+
+        await SignInManager.SignInAsync(Installer.Administrator!, isPersistent: false);
+        RedirectManager.RedirectTo("getting-started");
+    }
+
+    private sealed class InputModel : IValidatableObject
+    {
+        [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
+        public string Code { get; set; } = "";
+
+        [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
+        [StringLength(100, MinimumLength = 2, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.MaxLength))]
+        public string CompanyName { get; set; } = "";
+
+        [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
+        public string CompanyPhone { get; set; } = "";
+
+        public string? Governorate { get; set; }
+
+        [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
+        [StringLength(200, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.MaxLength))]
+        public string AdminName { get; set; } = "";
+
+        [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
+        [EmailAddress(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Email))]
+        public string Email { get; set; } = "";
+
+        [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
+        [StringLength(100, MinimumLength = 10, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.PasswordLength))]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = "";
+
+        [Compare(nameof(Password), ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.PasswordsDiffer))]
+        [DataType(DataType.Password)]
+        public string ConfirmPassword { get; set; } = "";
+
+        public bool SampleData { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) =>
+            new CompanyProfile { Name = CompanyName, Phone = CompanyPhone, Governorate = Governorate }.Validate(validationContext)
+                .Select(r => new ValidationResult(r.ErrorMessage, r.MemberNames.Select(m => m == nameof(CompanyProfile.Phone) ? nameof(CompanyPhone) : m)));
+    }
+}
