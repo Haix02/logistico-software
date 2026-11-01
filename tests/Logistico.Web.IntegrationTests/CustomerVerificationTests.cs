@@ -17,7 +17,7 @@ public sealed class CustomerVerificationTests(LogisticoApiFactory factory) : ICl
         var staff = factory.CreateUserClient(tenant: Guid.CreateVersion7());
         var shop = await staff.CreateMerchantAsync("متجر التحقق", "verify.flow.test");
         var created = await staff.BookAsync(ApiTestHelpers.DomesticOrder(shop, "زبون التحقق"));
-        var anonymous = factory.CreateClient();
+        var anonymous = factory.CreateCustomerClient();
         var route = "/" + ShipmentsApiRoutes.TrackRequests(created.TrackingNumber);
         static CustomerRequest NewPhone(string last4) => new() { Type = RequestType.ChangePhone, NewPhone = "0770 999 8877", PhoneLast4 = last4 };
 

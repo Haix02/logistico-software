@@ -1,9 +1,11 @@
-﻿using System.Security.Claims;
+﻿using System.Net;
+using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Logistico.SharedKernel;
 using Logistico.SharedKernel.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -93,6 +95,20 @@ public class LogisticoApiFactory : WebApplicationFactory<Program>, IAsyncLifetim
         return client;
     }
 
+    /// <summary>
+    /// An anonymous client with an address of its own, as each customer has: the public limits count per address, so
+    /// tests that act as different customers do not use up each other's budget.
+    /// </summary>
+    public HttpClient CreateCustomerClient()
+    {
+        var client = CreateClient();
+        var n = Interlocked.Increment(ref _customers);
+        client.DefaultRequestHeaders.Add(ClientAddress.Header, $"10.{(n >> 16) & 255}.{(n >> 8) & 255}.{n & 255}");
+        return client;
+    }
+
+    private static int _customers;
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
@@ -110,6 +126,7 @@ public class LogisticoApiFactory : WebApplicationFactory<Program>, IAsyncLifetim
         builder.ConfigureTestServices(services =>
         {
             services.AddSingleton<TimeProvider>(Clock);
+            services.AddTransient<IStartupFilter, ClientAddress>();
             services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
             services.PostConfigure<AuthorizationOptions>(options =>
             {
@@ -129,6 +146,26 @@ public class LogisticoApiFactory : WebApplicationFactory<Program>, IAsyncLifetim
             });
         });
     }
+}
+
+/// <summary>The test server has no client address; a test header sets one before anything else (rate limits) runs.</summary>
+internal sealed class ClientAddress : IStartupFilter
+{
+    public const string Header = "X-Test-Client-Address";
+
+    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
+    {
+        app.Use((context, nextMiddleware) =>
+        {
+            if (IPAddress.TryParse(context.Request.Headers[Header].ToString(), out var address))
+            {
+                context.Connection.RemoteIpAddress = address;
+            }
+
+            return nextMiddleware(context);
+        });
+        next(app);
+    };
 }
 
 /// <summary>Authenticates requests that carry the test headers; anonymous otherwise.</summary>

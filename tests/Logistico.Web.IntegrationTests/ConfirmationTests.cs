@@ -46,7 +46,7 @@ public sealed class ConfirmationTests(LogisticoApiFactory factory) : IClassFixtu
         Assert.True((await client.GetFromJsonAsync<OpsCounters>("/" + ShipmentsApiRoutes.Counters))!.PendingConfirmations >= 1);
 
         // The customer confirms on the tracking page (wrong digits are refused).
-        var anonymous = factory.CreateClient();
+        var anonymous = factory.CreateCustomerClient();
         var view = (await anonymous.GetFromJsonAsync<PublicTrackingView>("/" + ShipmentsApiRoutes.Track(first.TrackingNumber)))!;
         Assert.True(view.AwaitingConfirmation);
         var wrong = await anonymous.PostAsJsonAsync("/" + ShipmentsApiRoutes.TrackConfirm(first.TrackingNumber), new CustomerConfirmation { PhoneLast4 = "0000" });

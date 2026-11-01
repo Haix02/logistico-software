@@ -82,7 +82,7 @@ public sealed class ReturnsAndRequestsTests(LogisticoApiFactory factory)
         var staff = factory.CreateUserClient();
         var shop = await staff.CreateMerchantAsync("متجر الطلبات", "requests.flow.test");
         var created = await staff.BookAsync(ApiTestHelpers.DomesticOrder(shop, "زبون الطلبات"));
-        var anonymous = factory.CreateClient();
+        var anonymous = factory.CreateCustomerClient();
         var route = "/" + ShipmentsApiRoutes.TrackRequests(created.TrackingNumber);
         var day = NextWorkingDay(DateTimeOffset.UtcNow.AddDays(2));
 
@@ -139,7 +139,7 @@ public sealed class ReturnsAndRequestsTests(LogisticoApiFactory factory)
         order.DestinationCode = "IQ-BG";
         order.DestinationCity = "الكرادة";
         var created = await staff.BookAsync(order);
-        var anonymous = factory.CreateClient();
+        var anonymous = factory.CreateCustomerClient();
         var route = "/" + ShipmentsApiRoutes.TrackRating(created.TrackingNumber);
 
         // Not delivered yet: nothing to rate.
