@@ -19,11 +19,11 @@ This is where Logistico is heading. It is a direction, not a promise of dates: i
 
 ### 2.1 and earlier
 
-Shipments (international and domestic), hub network and trucks, hub station with scanners, returns, customer requests, automation engine, labels, customs workbench, fleet and COD settlements, public tracking, Arabic/English with RTL, security hardening. See [CHANGELOG.md](../CHANGELOG.md) and [17 — Release audits](17-release-audits.md).
+Shipments (international and domestic), hub network and trucks, hub station with scanners, returns, customer requests, automation engine, labels, customs workbench, fleet and COD settlements, public tracking, Arabic/English with RTL, security hardening. See [CHANGELOG.md](https://github.com/Haix02/logistico-software/blob/main/CHANGELOG.md) and [17 — Release audits](17-release-audits.md).
 
 ### Unreleased
 
-- **Mobile app (Flutter):** one app for senders, couriers and managers, shaped by the account and controlled from the console; handheld scanners, scanner guns and the camera ([mobile/](../mobile/README.md)).
+- **Mobile app (Flutter):** one app for senders, couriers and managers, shaped by the account and controlled from the console; handheld scanners, scanner guns and the camera ([mobile/](https://github.com/Haix02/logistico-software/blob/main/mobile/README.md)).
 - **Comments on orders:** staff notes for each other on every order, with who and when ([18](18-ideas-from-open-source.md)).
 - **Shelf checks:** count a shelf or a whole hub against the system; missing, misplaced and unexpected parcels, fixed in one tap ([18](18-ideas-from-open-source.md)).
 - **Proof of delivery:** who took the parcel, an optional signature and the courier's location at every attempt ([18](18-ideas-from-open-source.md)).

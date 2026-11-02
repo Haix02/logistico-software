@@ -1,5 +1,8 @@
 blank_issues_enabled: true
 contact_links:
+  - name: Ask a question or share an idea
+    url: https://github.com/Haix02/logistico-software/discussions
+    about: Questions about installing or using Logistico, and ideas, go to Discussions (Arabic or English).
   - name: Report a security vulnerability
     url: https://docs.github.com/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability
     about: Please report security problems privately from this repository's Security tab ("Report a vulnerability"), not in a public issue.

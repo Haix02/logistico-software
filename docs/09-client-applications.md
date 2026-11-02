@@ -7,7 +7,7 @@
 | **Logistico Web** | Current Chrome, Edge, Firefox, Safari on Windows, macOS, Linux, tablets | All office roles, partners, managers | Blazor WebAssembly + Blueprint 6, Arabic + English | ✅ Running |
 | **Public tracking** | Any browser | Customers | Anonymous pages of the same app (`/track`) | ✅ Running |
 | **Desktop app** | Windows, macOS | Power users who need offline cache, multi-window or local hardware | See §4: three options | ⏳ Open for discussion |
-| **Logistico mobile** | Android (phones and rugged handhelds), iOS | Senders (shops), couriers, managers and hub staff — one app, screens by role | **Flutter** (Riverpod, go_router, dio), decided 28 Oct 2026 ([ADR-031](14-architecture-decisions.md)) | ✅ First version ([`mobile/`](../mobile/README.md)) |
+| **Logistico mobile** | Android (phones and rugged handhelds), iOS | Senders (shops), couriers, managers and hub staff — one app, screens by role | **Flutter** (Riverpod, go_router, dio), decided 28 Oct 2026 ([ADR-031](14-architecture-decisions.md)) | ✅ First version ([`mobile/`](https://github.com/Haix02/logistico-software/blob/main/mobile/README.md)) |
 
 ## 2. Web app (as built)
 
@@ -49,7 +49,7 @@ Browsers cannot reliably reach USB/serial devices, and Safari has no WebUSB or W
 
 ## 5. Mobile app (Flutter)
 
-How to run, build and test it, and how to set up the handheld scanners: [mobile/README.md](../mobile/README.md).
+How to run, build and test it, and how to set up the handheld scanners: [mobile/README.md](https://github.com/Haix02/logistico-software/blob/main/mobile/README.md).
 
 
 **One app, not three.** The account that signs in decides what the app shows, and the company decides, from the web

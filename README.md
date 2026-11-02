@@ -1,19 +1,24 @@
 <div align="center">
 
-# Logistico · لوجستيكو
+# Logistico · لوجستيكو — open-source delivery management system and courier app
 
-**Open-source delivery and logistics management system — courier app with proof of delivery, cash on delivery (COD), hubs and shelves, trucks between cities, returns, shipment tracking and an audit log. Built for Iraq, useful anywhere the address is a neighbourhood and a landmark.**
+**Free, self-hosted delivery and logistics software: orders from online shops, hubs and sort plans, trucks between cities, a courier app with proof of delivery and barcode scanners, cash on delivery (COD), returns, shipment tracking and an audit log. Arabic-first. Built for Iraq, useful anywhere the address is a neighbourhood and a landmark.**
 
+[![Latest release](https://img.shields.io/github/v/release/Haix02/logistico-software?label=release)](https://github.com/Haix02/logistico-software/releases/latest)
 [![CI](https://github.com/Haix02/logistico-software/actions/workflows/ci.yml/badge.svg)](https://github.com/Haix02/logistico-software/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/Haix02/logistico-software?style=flat)](https://github.com/Haix02/logistico-software/stargazers)
+[![Discussions](https://img.shields.io/github/discussions/Haix02/logistico-software)](https://github.com/Haix02/logistico-software/discussions)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-0a7d5a.svg)](CONTRIBUTING.md)
 ![.NET 10](https://img.shields.io/badge/.NET-10-512BD4)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16%2B-336791)
-![Arabic RTL](https://img.shields.io/badge/Arabic-RTL-0a7d5a)
 ![Flutter app](https://img.shields.io/badge/mobile-Flutter-02569B)
+![Arabic RTL](https://img.shields.io/badge/Arabic-RTL-0a7d5a)
 
-Version 3.0 · Arabic-first (RTL) · English · .NET 10 · Blazor WebAssembly · PostgreSQL · Flutter mobile app · Apache-2.0
+Version 3.1 · Arabic-first (RTL) · English · .NET 10 · Blazor WebAssembly · PostgreSQL · Flutter mobile app · Apache-2.0
 
-[Quick start](#quick-start) · [What it does](#what-it-does) · [Mobile app](#mobile-app) · [Demand intelligence](#demand-intelligence-the-data-advantage) · [Docs](#documentation) · [Contributing](CONTRIBUTING.md)
+**[Website](https://haix02.github.io/logistico-software/)** · [Quick start](#quick-start) · [What it does](#what-it-does) · [Mobile app](#mobile-app) · [Demand intelligence](#demand-intelligence-the-data-advantage) · [Docs](#documentation) · [FAQ](#faq) · [Contributing](CONTRIBUTING.md)
+
+**If Logistico is useful to you or your company, please ⭐ star it**: it is how other delivery companies find it.
 
 A delivery company runs the whole day in one console: book a parcel, scan it through hubs, put it on a truck, hand it to a courier, collect the cash, and see why deliveries fail. The interface is **light by default** (a quiet grey frame and white work panels). Dark mode is one click in the top bar. Arabic is the default language and the layout is right-to-left.
 
@@ -255,11 +260,56 @@ adapted for delivery (Odoo, ERPNext). Compared with open-source projects such as
 or [OpenBoxes](https://openboxes.com), it is built around **cash on delivery**, **Arabic and right-to-left first**,
 **Iraqi addresses** (governorate, area, nearest landmark), **line-haul between governorate hubs**, and **ASYCUDA customs**.
 
+## FAQ
+
+<details>
+<summary><b>Is there a free, open-source delivery management system?</b></summary>
+
+Yes: Logistico is free under Apache-2.0. Run it on your own server, change it, and use it commercially. It covers
+orders, hubs, trucks, couriers, cash on delivery, returns, tracking and customs in one system.
+</details>
+
+<details>
+<summary><b>Does it work in Arabic? / هل يعمل بالعربية؟</b></summary>
+
+Arabic is the default language, right to left, with English one click away; addresses follow how Iraqis give them
+(governorate, area, nearest landmark). نعم، العربية هي اللغة الافتراضية والواجهة من اليمين إلى اليسار.
+</details>
+
+<details>
+<summary><b>Is there a courier app with barcode scanning?</b></summary>
+
+One Flutter app for Android and iOS serves couriers, sellers and managers. Couriers deliver with proof of delivery
+(receiver, signature, location) and scan with the built-in scanners of Android handhelds, Bluetooth/USB scanner guns or
+the camera.
+</details>
+
+<details>
+<summary><b>How do I install it for a real company?</b></summary>
+
+Start it without demo settings: it writes a one-time setup code to its log, `/setup` creates your company and its
+first administrator, and a getting-started guide takes you through the rest. See
+[Production readiness](docs/15-production-readiness.md) and [First run](docs/19-first-run-and-getting-started.md).
+</details>
+
+<details>
+<summary><b>How is it different from Fleetbase, Odoo or Onfleet?</b></summary>
+
+See [Alternatives](#alternatives-and-how-logistico-differs): cash on delivery, Arabic and right-to-left first, Iraqi
+addresses, line-haul between governorate hubs, sort plans and ASYCUDA customs are built in, not added on.
+</details>
+
 ## Contributing
 
 Bug reports from real hubs, Arabic and Kurdish product words, new integrations (couriers, payment wallets, WhatsApp),
-and code are all welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) for setup and house rules, and
-[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Report security issues privately: [SECURITY.md](SECURITY.md).
+and code are all welcome. Start with a [good first issue](https://github.com/Haix02/logistico-software/labels/good%20first%20issue),
+ask anything in [Discussions](https://github.com/Haix02/logistico-software/discussions), and read
+[CONTRIBUTING.md](CONTRIBUTING.md) for setup and house rules, and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Report
+security issues privately: [SECURITY.md](SECURITY.md). Questions about using it: [SUPPORT.md](SUPPORT.md).
+
+## Star history
+
+[![Star history of Logistico](https://api.star-history.com/svg?repos=Haix02/logistico-software&type=Date)](https://star-history.com/#Haix02/logistico-software&Date)
 
 ## Licence
 

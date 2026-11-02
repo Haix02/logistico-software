@@ -1,0 +1,31 @@
+# The project website (GitHub Pages, built from this folder): a landing page (index.html) and every document here,
+# rendered with GitHub's default theme. Search engines get titles, descriptions, social cards and a sitemap.
+title: Logistico
+tagline: Open-source delivery management system and courier app
+description: >-
+  Logistico is a free, open-source delivery and logistics management system with a courier app: orders, hubs and
+  sort plans, trucks between cities, cash on delivery, proof of delivery, returns and tracking. Arabic-first, self-hosted.
+url: https://haix02.github.io
+baseurl: /logistico-software
+lang: en
+author: Haix02
+logo: /images/social-preview.png
+theme: jekyll-theme-primer
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-relative-links
+  - jekyll-optional-front-matter
+  - jekyll-titles-from-headings
+relative_links:
+  enabled: true
+titles_from_headings:
+  enabled: true
+  strip_title: false
+defaults:
+  - scope:
+      path: ""
+    values:
+      image: /images/social-preview.png
+github:
+  repository_url: https://github.com/Haix02/logistico-software

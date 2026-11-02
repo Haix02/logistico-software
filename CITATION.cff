@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use Logistico in research or a publication, please cite it as below."
+title: "Logistico: open-source delivery management system and courier app"
+type: software
+authors:
+  - name: "Haix02 and the Logistico contributors"
+version: 3.1.0
+date-released: 2026-11-02
+license: Apache-2.0
+repository-code: "https://github.com/Haix02/logistico-software"
+url: "https://haix02.github.io/logistico-software/"
+abstract: >-
+  Logistico is an open-source delivery and logistics management system built for Iraq: orders from online shops,
+  hubs and sort plans, line-haul trucks between governorates, a Flutter courier app with proof of delivery and
+  barcode scanners, cash-on-delivery settlements, returns, public tracking, ASYCUDA customs and anonymised demand
+  data. Arabic-first (right to left) with English.
+keywords:
+  - delivery management system
+  - courier management
+  - last-mile delivery
+  - logistics
+  - cash on delivery
+  - proof of delivery
+  - warehouse management
+  - transportation management system
+  - Iraq
+  - Arabic

@@ -1,0 +1,265 @@
+---
+layout: null
+sitemap: true
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logistico — open-source delivery management system and courier app</title>
+<meta name="description" content="Free, open-source delivery and logistics management software with a courier app: orders, hubs and sort plans, trucks between cities, cash on delivery (COD), proof of delivery, returns and tracking. Arabic-first, self-hosted, .NET and Flutter.">
+<meta name="keywords" content="delivery management system, courier management software, open source logistics, last mile delivery, cash on delivery, proof of delivery, warehouse management, TMS, WMS, Iraq, Arabic, self-hosted, نظام توصيل, نظام شحن, برنامج إدارة شركة توصيل">
+<link rel="canonical" href="https://haix02.github.io/logistico-software/">
+<meta name="theme-color" content="#1f75cb">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Logistico">
+<meta property="og:title" content="Logistico — open-source delivery management system and courier app">
+<meta property="og:description" content="Orders, hubs and sort plans, trucks, cash on delivery, proof of delivery, returns and tracking in one free system. Arabic-first, self-hosted.">
+<meta property="og:url" content="https://haix02.github.io/logistico-software/">
+<meta property="og:image" content="https://haix02.github.io/logistico-software/images/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ar_IQ">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Logistico — open-source delivery management system">
+<meta name="twitter:description" content="Orders, hubs, trucks, couriers, cash on delivery and returns in one free, Arabic-first system.">
+<meta name="twitter:image" content="https://haix02.github.io/logistico-software/images/social-preview.png">
+<link rel="icon" type="image/png" href="favicon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Logistico",
+  "alternateName": "لوجستيكو",
+  "description": "Open-source delivery and logistics management system with a courier app: orders, hubs and sort plans, trucks, cash on delivery, proof of delivery, returns and tracking.",
+  "applicationCategory": "BusinessApplication",
+  "applicationSubCategory": "Delivery and logistics management",
+  "operatingSystem": "Web, Android, iOS, Linux, Windows, macOS",
+  "softwareVersion": "3.1.0",
+  "inLanguage": ["ar", "en"],
+  "license": "https://www.apache.org/licenses/LICENSE-2.0",
+  "codeRepository": "https://github.com/Haix02/logistico-software",
+  "url": "https://haix02.github.io/logistico-software/",
+  "image": "https://haix02.github.io/logistico-software/images/social-preview.png",
+  "screenshot": "https://haix02.github.io/logistico-software/images/dashboard-light.png",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Is Logistico free?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Logistico is open source under the Apache-2.0 licence. You can run it on your own server, change it and use it commercially." } },
+    { "@type": "Question", "name": "Does it work in Arabic?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Arabic is the default language, right to left, with English one click away. Addresses follow how Iraqis give them: governorate, area and the nearest landmark." } },
+    { "@type": "Question", "name": "Is there a courier app?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes. One Flutter app for Android and iOS serves couriers, sellers and managers. Couriers deliver with proof of delivery and scan with Android handhelds, scanner guns or the camera." } },
+    { "@type": "Question", "name": "How do I install it?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Run docker compose up to try it with demo data. For a real installation, start it without demo settings: it writes a one-time setup code to its log and the setup page creates your company and its first administrator." } },
+    { "@type": "Question", "name": "Can it handle cash on delivery?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes: couriers collect cash per parcel, hand it in to the office against the parcels it covers, and sellers are paid in settlement batches with statements." } }
+  ]
+}
+</script>
+<style>
+  :root {
+    --bg: #ffffff; --bg-soft: #f6f6f8; --text: #1f1e24; --muted: #626168; --border: #dcdcde;
+    --primary: #1f75cb; --primary-text: #ffffff; --accent: #0a7d5a; --card: #ffffff; --code: #ececef;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #18171d; --bg-soft: #1f1e24; --text: #ececef; --muted: #a4a3a8; --border: #3a383f; --card: #232128;
+      --primary: #428fdc; --accent: #2da160; --code: #2b2a30; }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.6;
+    font-family: -apple-system, "Segoe UI", system-ui, "Noto Sans", "Noto Sans Arabic", Tahoma, Arial, sans-serif; }
+  a { color: var(--primary); }
+  img { max-width: 100%; height: auto; display: block; }
+  .wrap { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+  header.top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+  header.top .wrap { display: flex; align-items: center; gap: 16px; height: 60px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; color: var(--text); text-decoration: none; }
+  .logo { width: 26px; height: 26px; transform: rotate(45deg); border-radius: 5px; background: linear-gradient(135deg, #63a6e9, #1f75cb 60%, #0b5cad); }
+  nav.links { margin-inline-start: auto; display: flex; gap: 18px; font-size: 15px; }
+  nav.links a { color: var(--muted); text-decoration: none; }
+  nav.links a:hover { color: var(--text); }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 8px; font-weight: 700; text-decoration: none; border: 1px solid var(--border); color: var(--text); background: var(--card); }
+  .btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .hero { padding: 64px 0 28px; text-align: center; }
+  .hero h1 { font-size: clamp(30px, 5vw, 52px); line-height: 1.12; margin: 0 0 16px; letter-spacing: -0.02em; }
+  .hero p.lead { font-size: clamp(17px, 2.2vw, 20px); color: var(--muted); max-width: 760px; margin: 0 auto 26px; }
+  .hero .ar { font-size: 20px; margin: -8px auto 24px; color: var(--muted); }
+  .cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .chips { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 22px; font-size: 13px; color: var(--muted); }
+  .chips span { border: 1px solid var(--border); border-radius: 999px; padding: 3px 11px; }
+  .shot { margin: 34px auto 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 18px 48px rgba(0,0,0,.12); }
+  section { padding: 56px 0; }
+  section.soft { background: var(--bg-soft); }
+  h2 { font-size: clamp(24px, 3.4vw, 34px); margin: 0 0 10px; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); margin: 0 0 28px; max-width: 760px; }
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+  .card h3 { margin: 0 0 6px; font-size: 17px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+  .pair { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); align-items: start; }
+  .pair figure { margin: 0; }
+  .pair img { border: 1px solid var(--border); border-radius: 10px; }
+  figcaption { color: var(--muted); font-size: 14px; margin-top: 8px; text-align: center; }
+  .phones { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+  .phones img { width: 240px; border-radius: 18px; border: 1px solid var(--border); }
+  pre { background: var(--code); border-radius: 10px; padding: 16px 18px; overflow-x: auto; font-size: 14px; direction: ltr; text-align: left; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .rtl { direction: rtl; text-align: right; font-size: 18px; }
+  details { border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; background: var(--card); margin-bottom: 10px; }
+  summary { font-weight: 700; cursor: pointer; }
+  .docs a { display: block; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; text-decoration: none; color: var(--text); background: var(--card); }
+  .docs a span { color: var(--muted); font-size: 14px; display: block; }
+  footer { border-top: 1px solid var(--border); padding: 28px 0 40px; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; gap: 16px; flex-wrap: wrap; justify-content: space-between; }
+  @media (max-width: 640px) { nav.links a.hide-sm { display: none; } .hero { padding-top: 40px; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true"></span>Logistico</a>
+    <nav class="links" aria-label="Site">
+      <a href="#features" class="hide-sm">Features</a>
+      <a href="#quick-start">Quick start</a>
+      <a href="#docs" class="hide-sm">Docs</a>
+      <a href="https://github.com/Haix02/logistico-software">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero wrap">
+    <h1>Open-source delivery management system and courier app</h1>
+    <p class="lead">Run a delivery company in one free system: orders from online shops, hubs and sort plans, trucks between cities,
+      couriers with proof of delivery, cash on delivery, returns and customer tracking. Built for Iraq, useful anywhere an
+      address is a neighbourhood and a landmark.</p>
+    <p class="ar" dir="rtl" lang="ar">نظام مجاني ومفتوح المصدر لإدارة شركات الشحن والتوصيل، بالعربية أولاً</p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/Haix02/logistico-software">★ Star on GitHub</a>
+      <a class="btn" href="#quick-start">Try it in 2 minutes</a>
+      <a class="btn" href="00-overview.html">Read the docs</a>
+    </div>
+    <div class="chips" aria-label="Technology">
+      <span>Apache-2.0</span><span>Self-hosted</span><span>Arabic RTL + English</span><span>.NET 10 · Blazor</span><span>PostgreSQL</span><span>Flutter app</span>
+    </div>
+    <div class="shot"><img src="images/dashboard-light.png" width="1680" height="1180" alt="Logistico operations dashboard: orders, delivery success, cash collected and daily volume, in Arabic"></div>
+  </div>
+
+  <section id="features" class="soft">
+    <div class="wrap">
+      <h2>Everything a delivery company runs on</h2>
+      <p class="sub">One console for the office, one app for couriers, sellers and managers, and a public tracking page for customers.</p>
+      <div class="grid">
+        <div class="card"><h3>Delivery orders</h3><p>Seller, customer and Iraqi address (governorate, area, landmark), COD in IQD, a delivery promise that skips Fridays, customer risk while typing the phone.</p></div>
+        <div class="card"><h3>Hubs, trucks and sort plans</h3><p>Scan parcels through hubs; the sort plan picks the shelf, trucks between cities are planned, loaded and unloaded by scan.</p></div>
+        <div class="card"><h3>Courier app</h3><p>The day's run, call or WhatsApp the customer, proof of delivery with signature and location, cash to hand in.</p></div>
+        <div class="card"><h3>Barcode scanners</h3><p>Built-in scanners of Android handhelds (Zebra, Urovo, Sunmi…), Bluetooth/USB scanner guns, or the camera.</p></div>
+        <div class="card"><h3>Cash on delivery</h3><p>Cash held by each courier, hand-ins against parcels, seller balances and settlement batches with statements.</p></div>
+        <div class="card"><h3>Returns and requests</h3><p>Returns after the last failed attempt, back by truck; customers reschedule or change the address from the tracking page.</p></div>
+        <div class="card"><h3>Seller portal</h3><p>Shops book their own orders at your prices, follow them, and see what they are owed and every payout.</p></div>
+        <div class="card"><h3>Demand intelligence</h3><p>What customers order, where and when, basket size against refusals, and an anonymised open-data export.</p></div>
+        <div class="card"><h3>Automation</h3><p>Alerts, rescheduling, truck planning and auto-cancel every minute, by your company's rules.</p></div>
+        <div class="card"><h3>Audit log and roles</h3><p>Who changed what and when, field by field; five office roles enforced by the API.</p></div>
+        <div class="card"><h3>Customs (ASYCUDA)</h3><p>International bookings, declaration workbench, e-verification and SAD XML export.</p></div>
+        <div class="card"><h3>Guided first run</h3><p>A setup page, a getting-started guide for each role, and installation health before going live.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Sort plans: the scan picks the shelf</h2>
+      <p class="sub">Each hub says which parcels go on which shelves and how many fit. A full shelf overflows to the next; the station shows the chosen shelf large.</p>
+      <div class="pair">
+        <figure><img src="images/sort-plan.png" width="1680" height="1180" alt="Sort plan of the Baghdad hub with rules, shelf loads in walking order and a parcel lookup" loading="lazy"><figcaption>Rules, shelf loads and "where would this parcel go?"</figcaption></figure>
+        <figure><img src="images/hub-station.png" width="1680" height="1000" alt="Hub station receiving a parcel that the sort plan put on shelf K-01" loading="lazy"><figcaption>The hub station after a scan</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="soft">
+    <div class="wrap">
+      <h2>One mobile app for couriers, sellers and managers</h2>
+      <p class="sub">Flutter for Android and iOS. What each kind of account sees is controlled from the console.</p>
+      <div class="phones">
+        <img src="images/mobile-courier-run.png" width="240" alt="Courier app: today's run with the cash to collect at each stop" loading="lazy">
+        <img src="images/mobile-courier-stop.png" width="240" alt="Courier app: one stop with call, WhatsApp, delivered and not delivered" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <section id="quick-start">
+    <div class="wrap">
+      <h2>Quick start</h2>
+      <p class="sub">Try it with demo data (any computer with Docker), then open <code>http://localhost:5210</code> and sign in as <code>admin@logistico.local</code> / <code>Logistico#2026</code>.</p>
+      <pre><code>git clone https://github.com/Haix02/logistico-software.git
+cd logistico-software
+docker compose up --build</code></pre>
+      <p class="sub">For a real company, start it without demo settings: it writes a one-time setup code to its log, and <code>/setup</code> creates your company and its first administrator. A getting-started guide takes you through the rest.</p>
+      <div class="pair">
+        <figure><img src="images/setup.png" width="1680" height="1180" alt="Setup page with the setup code, the company and the first administrator" loading="lazy"><figcaption>The setup page</figcaption></figure>
+        <figure><img src="images/getting-started.png" width="1680" height="1180" alt="Getting started guide with twelve steps, ten of them done" loading="lazy"><figcaption>Getting started, step by step</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="soft">
+    <div class="wrap rtl" lang="ar" dir="rtl">
+      <h2>لوجستيكو بالعربية</h2>
+      <p>نظام مفتوح المصدر ومجاني لإدارة شركات الشحن والتوصيل في العراق: الطلبات ومتاجر الإنستغرام، الدفع عند الاستلام، المخازن والرفوف وخطة الفرز،
+        الشاحنات بين المحافظات، تطبيق المندوب مع إثبات التسليم، المرتجعات، تسوية مستحقات المتاجر، الجمارك (أسيكودا)، وصفحة تتبع للزبون.
+        الواجهة عربية أولاً من اليمين إلى اليسار، مع الإنجليزية، وتعمل على خادمك الخاص.</p>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <h2>Questions</h2>
+      <details><summary>Is Logistico free?</summary><p>Yes. It is open source under the Apache-2.0 licence: run it on your own server, change it, and use it commercially.</p></details>
+      <details><summary>Does it work in Arabic?</summary><p>Arabic is the default language, right to left, with English one click away. Addresses follow how Iraqis give them: governorate, area and the nearest landmark.</p></details>
+      <details><summary>Is there a courier app?</summary><p>Yes. One Flutter app for Android and iOS serves couriers, sellers and managers, with proof of delivery and hardware barcode scanners.</p></details>
+      <details><summary>How do I install it?</summary><p><code>docker compose up</code> to try it with demo data. For a real installation, the setup page creates your company with a one-time code from the server log; see <a href="15-production-readiness.html">production readiness</a>.</p></details>
+      <details><summary>Can it handle cash on delivery?</summary><p>Yes: couriers collect cash per parcel and hand it in against the parcels it covers; sellers are paid in settlement batches with statements.</p></details>
+    </div>
+  </section>
+
+  <section id="docs" class="soft">
+    <div class="wrap">
+      <h2>Documentation</h2>
+      <div class="grid docs">
+        <a href="00-overview.html">Overview<span>What Logistico is and what is built</span></a>
+        <a href="19-first-run-and-getting-started.html">First run &amp; getting started<span>Setup page, guide, installation health</span></a>
+        <a href="02-domain-model.html">Domain model<span>Shipment lifecycle and business rules</span></a>
+        <a href="03-system-architecture.html">Architecture<span>Modules, components, performance</span></a>
+        <a href="06-device-integration.html">Device integration<span>Scanners, label printers, GPS</span></a>
+        <a href="07-customs-asycuda.html">Customs &amp; ASYCUDA<span>Declarations and e-verification</span></a>
+        <a href="10-security-and-compliance.html">Security<span>Identity, roles, audit, data protection</span></a>
+        <a href="15-production-readiness.html">Production readiness<span>Configuration and go-live checklist</span></a>
+        <a href="16-data-and-insights.html">Demand intelligence<span>Insights and open data</span></a>
+        <a href="18-ideas-from-open-source.html">Ideas from open source<span>Fleetbase, OpenBoxes, Karrio, Odoo…</span></a>
+        <a href="14-architecture-decisions.html">Architecture decisions<span>The ADR log</span></a>
+        <a href="13-roadmap.html">Roadmap<span>Done, next, known limits</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Logistico · open source under Apache-2.0</span>
+    <span><a href="https://github.com/Haix02/logistico-software">GitHub</a> · <a href="https://github.com/Haix02/logistico-software/releases">Releases</a> · <a href="https://github.com/Haix02/logistico-software/discussions">Discussions</a> · <a href="https://github.com/Haix02/logistico-software/blob/main/CONTRIBUTING.md">Contributing</a></span>
+  </div>
+</footer>
+</body>
+</html>

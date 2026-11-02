@@ -6,7 +6,7 @@ Logistico is an open-source shipping and delivery platform built for **Iraq**. I
 
 It is **.NET end to end**, runs **in the browser**, and works in **Arabic (default, right-to-left) and English**.
 
-## 2. What is built (3.0)
+## 2. What is built (3.1)
 
 | Area | What works today |
 |---|---|

@@ -5,7 +5,13 @@ versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-11-02
+
+
 ### Added
+- **Project website** (GitHub Pages, https://haix02.github.io/logistico-software/): a landing page with screenshots,
+  quick start and FAQ, and every document in `docs/` rendered and searchable, with a sitemap and social cards. The
+  repository has releases, Discussions, a citation file and a support page.
 - **First run: a setup page instead of settings** (ADR-033, docs/19). A new installation writes a one-time setup code
   to its log and every page leads to `/setup`: the code, the company's name and phone, and the first administrator,
   with sample data to learn with if wanted. It runs once, under a database lock, so two people submitting together get
@@ -78,6 +84,46 @@ versions follow [Semantic Versioning](https://semver.org/).
   the company's care. It is fixed on the parcel when the seller collects it, shown on the order (office and seller
   portal) and deducted from the seller's next payout, listed in the statement CSV. A fee larger than what is left of a
   payout waits for the next one. 0 % (the default) keeps returns free.
+- **Courier app** (`/courier`): couriers sign in on their phone and see only the parcels out for delivery with them,
+  with the customer, address and nearest landmark, the cash to collect, one-tap call and WhatsApp, and Delivered or
+  Not delivered (with the reason). Their day in numbers: to deliver, delivered and cash collected. Deliveries go through
+  the same scan logic as the hub station, so cash collection, customer messages and automation rules apply unchanged.
+- **Courier role**: administrators give an account the Courier role on the Team page and link it to a courier from the
+  Fleet page. Couriers see no other company data. `Seed:DemoTeam` adds `courier@logistico.local` for the demo courier.
+- **Seller portal** (`/seller`): online shops sign in and book their own orders (paste the customer's message and the
+  form fills itself; the fee comes from the company's prices, with the shop's discount), follow them with filters for
+  in progress, delivered and returns, cancel an order before pickup, and see what they are owed, the cash still to
+  collect, their delivery rate and every payout with its CSV statement. The figures are the Finance page's own.
+  Booking goes through the same code as the office's order screen (`OrderDesk`), so numbering, routing and
+  confirmation calls apply unchanged.
+- **Seller role**: administrators give an account the Seller role on the Team page and link it to one shop. Sellers
+  see no other company data. `Seed:DemoTeam` adds `seller@logistico.local` for the demo shop "بوتيك لمار".
+- **Install on a phone**: a web app manifest and icons, so Logistico can be added to the home screen.
+- **Paid to seller** on an order: once its cash is collected, the order shows the payout (settlement number and date)
+  that carried it to the seller, or "Not paid yet".
+
+### Changed
+- **Tests reach the whole system.** Every read endpoint is called as every role on the demo company and must never
+  fail; the setup page, the guide, the company profile and the health checks have end-to-end tests; a new test project
+  renders the console's components with bUnit (the guide card, the health page, role-gated actions, tables, paging,
+  mixed Arabic/Latin text) and checks that every menu entry and guide step leads to a page and has its texts in both
+  languages. CI reports the console's coverage on its own line.
+- **Orderly lists.** Shelves sort the way people walk a hub (A-2 before A-10, B-01-9 before B-01-10) in the order list,
+  the station and shelf checks; sorting by status follows the order a parcel lives through them instead of the
+  alphabet; every sort has a tiebreaker, so paging never shows an order twice or skips one. The hub station no longer
+  pre-fills shelf A-01-1: an empty shelf field means "use the sort plan".
+- **Tests cover the demo company and customer ratings; CI shows coverage.** A test company seeded with the 150-order
+  demo (staff, couriers, seller, fleet, settlements) must open every screen, sort the order list by every column both
+  ways, add up its money and open each demo account's app; seeding twice adds nothing. Customer ratings are tested end
+  to end (only after delivery, only once, only with the phone digits; two stars or fewer open a complaint). Each CI run
+  lists line coverage per module on its page (86.6 % of the server code) and fails below 85 %.
+- **README and docs match the light console.** New screenshots of the dashboard (light and dark), the shipments list, the Iraq map and demand intelligence. Dark-mode borders are documented as hairlines.
+- **New look: GitLab's Pajamas design system on Blueprint.** Navigation sits on a quiet grey frame and each page is a
+  white panel; buttons, inputs, badges, alerts, tabs, tables, dialogs, drawers and toasts follow Pajamas (32 px
+  controls, 8 px corners, a near-black main action, blue links and focus rings, colour kept for status). Blueprint
+  still does the work underneath (tables, menus, popovers, dialogs, icons, hotkeys); it now loads in a CSS cascade
+  layer so the Pajamas rules always apply. **Light is the default**; dark mode follows Pajamas' dark palette and is one
+  click away. Arabic stays first-class (Almarai, right-to-left).
 
 ### Fixed
 - **Hubs and trucks.** Each hub on the network map opens its scan station and its trucks. A truck cannot be opened from a hub to itself. Map lanes follow the theme colours. Warehouse list shows an error when the network cannot be loaded.
@@ -106,31 +152,6 @@ versions follow [Semantic Versioning](https://semver.org/).
   payout number and the statement download is an icon.
 - "COD with couriers" on the Fleet page reset at midnight, so cash a courier kept overnight disappeared from view; it
   now shows all collected cash not handed in, whatever the day.
-
-### Changed
-- **Tests reach the whole system.** Every read endpoint is called as every role on the demo company and must never
-  fail; the setup page, the guide, the company profile and the health checks have end-to-end tests; a new test project
-  renders the console's components with bUnit (the guide card, the health page, role-gated actions, tables, paging,
-  mixed Arabic/Latin text) and checks that every menu entry and guide step leads to a page and has its texts in both
-  languages. CI reports the console's coverage on its own line.
-- **Orderly lists.** Shelves sort the way people walk a hub (A-2 before A-10, B-01-9 before B-01-10) in the order list,
-  the station and shelf checks; sorting by status follows the order a parcel lives through them instead of the
-  alphabet; every sort has a tiebreaker, so paging never shows an order twice or skips one. The hub station no longer
-  pre-fills shelf A-01-1: an empty shelf field means "use the sort plan".
-- **Tests cover the demo company and customer ratings; CI shows coverage.** A test company seeded with the 150-order
-  demo (staff, couriers, seller, fleet, settlements) must open every screen, sort the order list by every column both
-  ways, add up its money and open each demo account's app; seeding twice adds nothing. Customer ratings are tested end
-  to end (only after delivery, only once, only with the phone digits; two stars or fewer open a complaint). Each CI run
-  lists line coverage per module on its page (86.6 % of the server code) and fails below 85 %.
-- **README and docs match the light console.** New screenshots of the dashboard (light and dark), the shipments list, the Iraq map and demand intelligence. Dark-mode borders are documented as hairlines.
-- **New look: GitLab's Pajamas design system on Blueprint.** Navigation sits on a quiet grey frame and each page is a
-  white panel; buttons, inputs, badges, alerts, tabs, tables, dialogs, drawers and toasts follow Pajamas (32 px
-  controls, 8 px corners, a near-black main action, blue links and focus rings, colour kept for status). Blueprint
-  still does the work underneath (tables, menus, popovers, dialogs, icons, hotkeys); it now loads in a CSS cascade
-  layer so the Pajamas rules always apply. **Light is the default**; dark mode follows Pajamas' dark palette and is one
-  click away. Arabic stays first-class (Almarai, right-to-left).
-
-### Fixed
 - **Search finds what people type.** Arabic letters written either way match (احمد = أحمد, فاطمه = فاطمة,
   الاناقة = الأناقة), as do Arabic-Indic digits and words with harakat. Part of a phone number works with or without the
   leading 0 or +964 (`0770 123`, `770123`). Several words match across fields in any order (customer + area, customer +
@@ -149,25 +170,6 @@ versions follow [Semantic Versioning](https://semver.org/).
 ### Performance
 - Search reads one indexed column instead of six: with 50,000 parcels a two-word Arabic search takes about 4 ms and every
   list and dashboard call stays under 75 ms.
-
-### Added
-- **Courier app** (`/courier`): couriers sign in on their phone and see only the parcels out for delivery with them,
-  with the customer, address and nearest landmark, the cash to collect, one-tap call and WhatsApp, and Delivered or
-  Not delivered (with the reason). Their day in numbers: to deliver, delivered and cash collected. Deliveries go through
-  the same scan logic as the hub station, so cash collection, customer messages and automation rules apply unchanged.
-- **Courier role**: administrators give an account the Courier role on the Team page and link it to a courier from the
-  Fleet page. Couriers see no other company data. `Seed:DemoTeam` adds `courier@logistico.local` for the demo courier.
-- **Seller portal** (`/seller`): online shops sign in and book their own orders (paste the customer's message and the
-  form fills itself; the fee comes from the company's prices, with the shop's discount), follow them with filters for
-  in progress, delivered and returns, cancel an order before pickup, and see what they are owed, the cash still to
-  collect, their delivery rate and every payout with its CSV statement. The figures are the Finance page's own.
-  Booking goes through the same code as the office's order screen (`OrderDesk`), so numbering, routing and
-  confirmation calls apply unchanged.
-- **Seller role**: administrators give an account the Seller role on the Team page and link it to one shop. Sellers
-  see no other company data. `Seed:DemoTeam` adds `seller@logistico.local` for the demo shop "بوتيك لمار".
-- **Install on a phone**: a web app manifest and icons, so Logistico can be added to the home screen.
-- **Paid to seller** on an order: once its cash is collected, the order shows the payout (settlement number and date)
-  that carried it to the seller, or "Not paid yet".
 
 ## [3.0.0] - 2026-10-21
 
