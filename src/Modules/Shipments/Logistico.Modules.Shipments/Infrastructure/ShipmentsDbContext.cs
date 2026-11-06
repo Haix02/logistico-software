@@ -37,6 +37,8 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
     public DbSet<ShelfCheck> ShelfChecks => Set<ShelfCheck>();
     public DbSet<ShelfCheckLine> ShelfCheckLines => Set<ShelfCheckLine>();
     public DbSet<ShelfRule> ShelfRules => Set<ShelfRule>();
+    public DbSet<OperatingCountry> OperatingCountries => Set<OperatingCountry>();
+    public DbSet<ServiceArea> ServiceAreas => Set<ServiceArea>();
 
     // Referenced by the query filters so EF Core parameterises the tenant per context instance.
     private Guid CurrentTenantId => tenant.TenantId;
@@ -123,6 +125,10 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
             e.HasIndex(x => new { x.TenantId, x.ReturnManifestNumber }).HasFilter("return_manifest_number IS NOT NULL");
             e.HasIndex(x => new { x.TenantId, x.Status, x.EtaAt });
             e.HasIndex(x => new { x.TenantId, x.CreatedAt });
+            // Open parcels (not delivered, returned or cancelled), in the order the board shows them.
+            e.HasIndex(x => new { x.TenantId, x.Status, x.CreatedAt })
+                .HasFilter("status NOT IN ('Delivered', 'Returned', 'Cancelled')")
+                .HasDatabaseName("ix_shipments_tenant_open_created");
             e.HasIndex(x => new { x.TenantId, x.MerchantId, x.CreatedAt });
             e.HasIndex(x => new { x.TenantId, x.ConsigneePhone });
             e.HasIndex(x => new { x.TenantId, x.WarehouseBin }).HasFilter("warehouse_bin IS NOT NULL");
@@ -555,6 +561,26 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
             e.Property(x => x.Version).IsRowVersion();
             e.HasIndex(x => new { x.TenantId, x.Code }).IsUnique();
             e.HasIndex(x => new { x.TenantId, x.IsPrimary }).IsUnique().HasFilter("is_primary");
+            e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
+        });
+
+        modelBuilder.Entity<OperatingCountry>(e =>
+        {
+            e.ToTable("operating_countries");
+            e.HasKey(x => x.TenantId);
+            e.Property(x => x.Country).HasMaxLength(2).IsFixedLength();
+            e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
+        });
+
+        modelBuilder.Entity<ServiceArea>(e =>
+        {
+            e.ToTable("service_areas");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).ValueGeneratedNever();
+            e.Property(x => x.Code).HasMaxLength(5);
+            e.Property(x => x.NameEn).HasMaxLength(80);
+            e.Property(x => x.NameAr).HasMaxLength(80);
+            e.HasIndex(x => new { x.TenantId, x.Code }).IsUnique();
             e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
         });
     }

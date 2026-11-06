@@ -4,7 +4,6 @@ using Logistico.Modules.Shipments.Contracts.Rules;
 using Logistico.Modules.Shipments.Infrastructure;
 using Logistico.SharedKernel;
 using Logistico.SharedKernel.Identity;
-using Logistico.SharedKernel.Iraq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -25,7 +24,8 @@ internal static class NetworkEndpoints
         return app;
     }
 
-    private static async Task<Ok<NetworkOverview>> OverviewAsync(ShipmentsDbContext db, AutomationPolicies policies, HubDirectory directory, ITenantContext tenant, TimeProvider clock, CancellationToken ct)
+    private static async Task<Ok<NetworkOverview>> OverviewAsync(
+        ShipmentsDbContext db, AutomationPolicies policies, HubDirectory directory, OperatingPlaces places, ITenantContext tenant, TimeProvider clock, CancellationToken ct)
     {
         var now = clock.GetUtcNow();
         var startOfDay = Api.StartOfBaghdadDay(now);
@@ -74,7 +74,8 @@ internal static class NetworkEndpoints
             .GroupBy(a => a.HubCode!).Select(g => new { Hub = g.Key, Count = g.Count() }).ToListAsync(ct);
         var openAlerts = await db.Alerts.AsNoTracking().CountAsync(a => a.ResolvedAt == null, ct);
 
-        var hubs = (await directory.NetworkAsync(tenant.TenantId, ct)).All.Select(h =>
+        var network = await directory.TryNetworkAsync(tenant.TenantId, ct);
+        var hubs = (network?.All ?? []).Select(h =>
         {
             var load = atHubs.FirstOrDefault(a => a.Hub == h.Code);
             return new HubLoad(
@@ -97,7 +98,9 @@ internal static class NetworkEndpoints
                 g.Any(t => t.Status == TransferStatus.InTransit && t.ExpectedAt < now.AddHours(-grace))))
             .ToList();
 
-        var known = governorates.Where(g => IraqGovernorates.IsKnown(g.Code)).ToList();
+        var country = await places.CountryAsync(tenant.TenantId, ct);
+        var catalog = (await places.PlacesAsync(tenant.TenantId, ct)).Select(place => place.Code).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var known = governorates.Where(g => catalog.Contains(g.Code)).ToList();
         return TypedResults.Ok(new NetworkOverview(
             known,
             hubs,
@@ -106,6 +109,7 @@ internal static class NetworkEndpoints
             lanes.Sum(l => l.Parcels),
             known.Sum(g => g.Late),
             openAlerts,
-            now));
+            now,
+            country));
     }
 }

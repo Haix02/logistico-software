@@ -3,7 +3,7 @@ using Logistico.Modules.Shipments.Contracts;
 using Logistico.Modules.Shipments.Contracts.Rules;
 using Logistico.Modules.Shipments.Domain;
 using Logistico.SharedKernel;
-using Logistico.SharedKernel.Iraq;
+using Logistico.SharedKernel.Geo;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logistico.Modules.Shipments.Infrastructure;
@@ -108,7 +108,7 @@ internal static class ShipmentSearch
             return source.Where(s => s.TrackingNumber == tracking);
         }
 
-        if (IraqPhone.Normalize(text) is { } phone)
+        if (PhoneNumbers.Normalize(text) is { } phone)
         {
             return source.Where(s => s.ConsigneePhone == phone);
         }

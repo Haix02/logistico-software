@@ -140,7 +140,17 @@ internal sealed class OperationsApi(HttpClient http) : ApiClient(http)
         SendAsync<WarehouseDetails>(HttpMethod.Put, ShipmentsApiRoutes.WarehouseById(id), request, version, ct);
 
     /// <summary>Reloads the company's network into <see cref="Ui.HubCatalog"/> (after warehouses change, or at start-up).</summary>
-    public async Task RefreshNetworkAsync(CancellationToken ct = default) => Ui.HubCatalog.Set((await GetNetworkHubsAsync(ct)).Hubs);
+    public async Task RefreshNetworkAsync(CancellationToken ct = default)
+    {
+        var hubs = await GetNetworkHubsAsync(ct);
+        Ui.HubCatalog.Set(hubs.Hubs, hubs.Country, hubs.Places);
+    }
+
+    public Task<PlaceInfo> AddAreaAsync(ServiceAreaRequest request, CancellationToken ct = default) =>
+        SendAsync<PlaceInfo>(HttpMethod.Post, ShipmentsApiRoutes.NetworkAreas, request, null, ct);
+
+    public Task DeleteAreaAsync(string code, CancellationToken ct = default) =>
+        SendAsync(HttpMethod.Delete, ShipmentsApiRoutes.NetworkArea(code), null, null, ct);
 }
 
 public sealed record TransferRef(Guid Id, string Number);

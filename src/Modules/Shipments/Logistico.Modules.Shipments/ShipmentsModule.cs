@@ -1,4 +1,5 @@
 using Logistico.Modules.Shipments.Application;
+using Logistico.Modules.Shipments.Contracts;
 using Logistico.Modules.Shipments.Endpoints;
 using Logistico.Modules.Shipments.Infrastructure;
 using Logistico.SharedKernel.Setup;
@@ -31,6 +32,8 @@ public static class ShipmentsModule
         services.AddScoped<ShipmentsDemoSeeder>();
         services.AddScoped<AutomationPolicies>();
         services.AddScoped<Activity>();
+        services.AddScoped<OperatingPlaces>();
+        services.AddScoped<IOperatingNetwork>(sp => sp.GetRequiredService<OperatingPlaces>());
         services.AddScoped<HubDirectory>();
         services.AddScoped<WarehouseAdmin>();
         services.AddScoped<ConfirmationDesk>();

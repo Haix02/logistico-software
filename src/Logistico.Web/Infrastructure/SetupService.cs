@@ -1,6 +1,8 @@
 using Logistico.Modules.Merchants;
 using Logistico.Modules.Shipments;
+using Logistico.Modules.Shipments.Contracts;
 using Logistico.SharedKernel;
+using Logistico.SharedKernel.Geo;
 using Logistico.SharedKernel.Identity;
 using Logistico.SharedKernel.Setup;
 using Logistico.Web.Data;
@@ -28,6 +30,7 @@ internal sealed class SetupService(
     UserManager<ApplicationUser> users,
     SetupGate gate,
     IServiceProvider services,
+    IOperatingNetwork network,
     TimeProvider clock,
     ILogger<SetupService> logger)
 {
@@ -95,8 +98,9 @@ internal sealed class SetupService(
         }
 
         gate.Completed();
+        await network.SetCountryAsync(Tenants.Default, request.Company.Country, CancellationToken.None);
         logger.LogInformation("Installation set up by {Email} for {Company}", request.Email, request.Company.Name);
-        if (request.SampleData)
+        if (request.SampleData && Countries.IsIraq(request.Company.Country))
         {
             // Sample shops, orders, trucks and returns to learn with; seeding is idempotent and stays out of the audit trail.
             using var unaudited = AuditScope.Suppress();

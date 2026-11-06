@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Logistico.SharedKernel;
-using Logistico.SharedKernel.Iraq;
+using Logistico.SharedKernel.Geo;
 
 namespace Logistico.Modules.Shipments.Contracts;
 
@@ -76,7 +76,7 @@ public sealed partial class ShelfRuleRequest : IValidatableObject
             yield return new(ValidationText.Choice, [nameof(ToHubCode)]);
         }
 
-        if (!string.IsNullOrWhiteSpace(Governorate) && !IraqGovernorates.IsKnown(Governorate))
+        if (!string.IsNullOrWhiteSpace(Governorate) && !PlaceCodes.IsValid(Governorate))
         {
             yield return new(ValidationText.Governorate, [nameof(Governorate)]);
         }

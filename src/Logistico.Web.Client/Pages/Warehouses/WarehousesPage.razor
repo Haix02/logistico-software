@@ -49,14 +49,59 @@ else
     @if (list.UncoveredGovernorates.Count > 0)
     {
         <Callout Intent="Intent.Warning" Icon="warning-sign" Title="@L["UncoveredTitle"]" CssClass="lx-mb">
-            @string.Format(CultureInfo.CurrentCulture, L["UncoveredHint"], string.Join("، ", list.UncoveredGovernorates.Select(g => $"{IraqGovernorates.NameOrCode(g)} → {HubCatalog.ResolveDestinationHub(g).RoutingTag}")))
+            @string.Format(CultureInfo.CurrentCulture, L["UncoveredHint"], string.Join("، ", list.UncoveredGovernorates.Select(PlaceLabel)))
         </Callout>
     }
 
+    @if (!Countries.IsIraq(list.Country))
+    {
+        <Section Title="@L["AreasTitle"]" Subtitle="@L["AreasHint"]" Icon="map-marker" CssClass="lx-mb">
+            <Allowed Policy="@StaffPolicies.Administer">
+                <EditForm Model="area" OnValidSubmit="AddAreaAsync">
+                    <DataAnnotationsValidator />
+                    <div class="lx-form-grid">
+                        <FormField Label="@L["Field_RegionCode"]" Required="true" Field="() => area.Code" Helper="@string.Format(CultureInfo.CurrentCulture, L["RegionCodeHint"], list.Country)">
+                            <InputText class="bp6-input bp6-fill lx-mono lx-upper" @bind-Value="area.Code" maxlength="5" dir="ltr" placeholder="@($"{list.Country}-AM")" />
+                        </FormField>
+                        <FormField Label="@L["Field_NameAr"]" Required="true" Field="() => area.NameAr">
+                            <InputText class="bp6-input bp6-fill" @bind-Value="area.NameAr" dir="rtl" />
+                        </FormField>
+                        <FormField Label="@L["Field_NameEn"]" Required="true" Field="() => area.NameEn">
+                            <InputText class="bp6-input bp6-fill" @bind-Value="area.NameEn" dir="ltr" />
+                        </FormField>
+                        <FormField Label="@L["Field_Location"]" Field="() => area.Latitude">
+                            <div class="lx-row">
+                                <InputNumber class="bp6-input" @bind-Value="area.Latitude" dir="ltr" placeholder="31.95" />
+                                <InputNumber class="bp6-input" @bind-Value="area.Longitude" dir="ltr" placeholder="35.93" />
+                            </div>
+                        </FormField>
+                    </div>
+                    @if (areaError is not null)
+                    {
+                        <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mb">@areaError</Callout>
+                    }
+                    <Button Type="submit" Intent="Intent.Primary" Icon="add" Text="@L["AddArea"]" Loading="areaSaving" />
+                </EditForm>
+            </Allowed>
+            @if (list.Places is { Count: > 0 })
+            {
+                <div class="lx-chip-grid lx-mt" role="list">
+                    @foreach (var place in list.Places)
+                    {
+                        <span class="lx-chip lx-chip-on" role="listitem">@place.Name <bdi>@place.Code</bdi></span>
+                    }
+                </div>
+            }
+        </Section>
+    }
+
     <div class="lx-map-layout">
-        <div class="lx-card lx-map-card">
-            <CoverageMap Hubs="CoverageHubs" />
-        </div>
+        @if (Countries.IsIraq(list.Country))
+        {
+            <div class="lx-card lx-map-card">
+                <CoverageMap Hubs="CoverageHubs" />
+            </div>
+        }
 
         <div class="lx-stack" style="gap:14px">
             @foreach (var w in active)
@@ -88,7 +133,7 @@ else
     }
 }
 
-<WarehouseEditor @bind-IsOpen="editorOpen" Existing="editing" All="@(list?.Items ?? [])" OnSaved="SavedAsync" />
+<WarehouseEditor @bind-IsOpen="editorOpen" Existing="editing" All="@(list?.Items ?? [])" Places="@(list?.Places ?? [])" Country="@(list?.Country ?? "IQ")" OnSaved="SavedAsync" />
 
 @code {
     private WarehouseList? list;
@@ -96,6 +141,36 @@ else
     private string? error;
     private bool editorOpen;
     private WarehouseDetails? editing;
+    private ServiceAreaRequest area = new();
+    private string? areaError;
+    private bool areaSaving;
+
+    private string PlaceLabel(string code)
+    {
+        var name = list?.Places?.FirstOrDefault(place => string.Equals(place.Code, code, StringComparison.OrdinalIgnoreCase))?.Name ?? IraqGovernorates.NameOrCode(code);
+        return Countries.IsIraq(list?.Country) && list!.Items.Count > 0 ? $"{name} → {HubCatalog.ResolveDestinationHub(code).RoutingTag}" : name;
+    }
+
+    private async Task AddAreaAsync()
+    {
+        areaError = null;
+        areaSaving = true;
+        try
+        {
+            await Operations.AddAreaAsync(area);
+            area = new();
+            await LoadAsync();
+            await Operations.RefreshNetworkAsync();
+        }
+        catch (ApiException ex)
+        {
+            areaError = ex.UserMessage;
+        }
+        finally
+        {
+            areaSaving = false;
+        }
+    }
 
     private IReadOnlyList<HubInfo> CoverageHubs => list?.Items.Where(w => w.IsActive)
         .Select(w => new HubInfo(w.Code, w.RoutingTag, w.Governorate, w.NameAr, w.NameEn) { Kind = w.Kind, Latitude = w.Latitude, Longitude = w.Longitude, Covers = w.Covers })

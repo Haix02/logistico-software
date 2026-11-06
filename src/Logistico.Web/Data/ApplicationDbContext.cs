@@ -31,6 +31,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             e.HasKey(x => x.TenantId);
             e.Property(x => x.Name).HasMaxLength(100);
             e.Property(x => x.Phone).HasMaxLength(20);
+            e.Property(x => x.Country).HasMaxLength(2).IsFixedLength().HasDefaultValue("IQ");
             e.Property(x => x.Governorate).HasMaxLength(5);
             e.Property(x => x.Address).HasMaxLength(300);
             e.Property(x => x.SkippedSteps).HasColumnType("text[]");

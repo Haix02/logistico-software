@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Logistico.SharedKernel;
+using Logistico.SharedKernel.Geo;
 using Logistico.SharedKernel.Iraq;
 
 namespace Logistico.Modules.Shipments.Contracts.Rules;
@@ -75,7 +76,7 @@ public sealed class RateCard : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (GovernorateFees.Any(f => !IraqGovernorates.IsKnown(f.Key) || f.Value is < 0 or > 1_000_000))
+        if (GovernorateFees.Any(f => !PlaceCodes.IsValid(f.Key) || f.Value is < 0 or > 1_000_000))
         {
             yield return new(ValidationText.Governorate, [nameof(GovernorateFees)]);
         }

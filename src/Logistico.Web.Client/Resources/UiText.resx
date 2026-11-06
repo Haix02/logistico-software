@@ -707,7 +707,7 @@
   <data name="NeedsAttention" xml:space="preserve"><value>Needs attention</value></data>
   <data name="NeedsAttentionHint" xml:space="preserve"><value>Failed deliveries and customs holds</value></data>
   <data name="NeedsTruckNotice" xml:space="preserve"><value>At {0}; it must go by truck to {1}.</value></data>
-  <data name="NetworkSubtitle" xml:space="preserve"><value>Every parcel across Iraq: where it is, what is late, and which trucks are on the road.</value></data>
+  <data name="NetworkSubtitle" xml:space="preserve"><value>Every open parcel: where it is, what is late, and which trucks are on the road.</value></data>
   <data name="NetworkTitle" xml:space="preserve"><value>Iraq network map</value></data>
   <data name="NewCourier" xml:space="preserve"><value>New courier</value></data>
   <data name="NewInternationalSubtitle" xml:space="preserve"><value>Freight into Iraq by sea, air or road</value></data>
@@ -1232,7 +1232,7 @@
   <data name="WarehouseMain" xml:space="preserve"><value>Main warehouse (takes parcels that match no other)</value></data>
   <data name="WarehouseOperations" xml:space="preserve"><value>Operations</value></data>
   <data name="WarehouseSavedN" xml:space="preserve"><value>{0} was saved</value></data>
-  <data name="WarehousesSubtitle" xml:space="preserve"><value>Your sorting hubs, branches and stores across Iraq, which governorates each one serves, and how busy they are now.</value></data>
+  <data name="WarehousesSubtitle" xml:space="preserve"><value>Your sorting hubs, branches and stores, the areas each one serves, and how busy they are now.</value></data>
   <data name="WarehousesTitle" xml:space="preserve"><value>Warehouses &amp; branches</value></data>
   <data name="WarehouseSubtitle" xml:space="preserve"><value>Scan parcels in, onto trucks and out to couriers. Pick your hub first.</value></data>
   <data name="WarehouseTitle" xml:space="preserve"><value>Hub station</value></data>
@@ -1459,7 +1459,14 @@
   <data name="Company_Profile" xml:space="preserve"><value>Profile</value></data>
   <data name="Company_ProfileHint" xml:space="preserve"><value>The name appears in the top bar and is the mobile app's name unless the app settings give another.</value></data>
   <data name="Company_Name" xml:space="preserve"><value>Company name</value></data>
+  <data name="Company_Country" xml:space="preserve"><value>Country</value></data>
+  <data name="Company_Region" xml:space="preserve"><value>Head office region</value></data>
   <data name="Company_Governorate" xml:space="preserve"><value>Head office governorate</value></data>
+  <data name="AreasTitle" xml:space="preserve"><value>Regions you deliver to</value></data>
+  <data name="AreasHint" xml:space="preserve"><value>Add each region before a warehouse can cover it. The code is the country and two letters, such as JO-AM.</value></data>
+  <data name="Field_RegionCode" xml:space="preserve"><value>Region code</value></data>
+  <data name="RegionCodeHint" xml:space="preserve"><value>Starts with {0}-</value></data>
+  <data name="AddArea" xml:space="preserve"><value>Add region</value></data>
   <data name="Company_Saved" xml:space="preserve"><value>Company profile saved</value></data>
   <data name="System_Subtitle" xml:space="preserve"><value>What this installation needs before real customers' data goes in</value></data>
   <data name="System_HasProblems" xml:space="preserve"><value>Some things must be fixed before going live.</value></data>

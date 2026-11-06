@@ -2,6 +2,7 @@ using System.Globalization;
 using Logistico.Modules.Shipments.Contracts;
 using Logistico.Modules.Shipments.Contracts.Rules;
 using Logistico.SharedKernel;
+using Logistico.SharedKernel.Geo;
 using Logistico.SharedKernel.Iraq;
 
 namespace Logistico.Modules.Shipments.Domain;
@@ -177,8 +178,8 @@ internal sealed class Shipment
         string? phone;
         if (service == ServiceType.Domestic)
         {
-            phone = IraqPhone.Normalize(request.ConsigneePhone);
-            if (!IraqGovernorates.IsKnown(destination) || phone is null || string.IsNullOrWhiteSpace(request.DeliveryAddress))
+            phone = PhoneNumbers.Normalize(request.ConsigneePhone);
+            if (!network.Knows(destination) || !network.Knows(origin) || phone is null || string.IsNullOrWhiteSpace(request.DeliveryAddress))
             {
                 throw Rule("shipment.domestic_address", "Domestic deliveries need governorate, address and mobile number.");
             }
@@ -530,7 +531,7 @@ internal sealed class Shipment
         EnsureChangeable();
         if (governorate is not null)
         {
-            if (!IraqGovernorates.IsKnown(governorate))
+            if (!network.Knows(governorate))
             {
                 throw Rule("shipment.domestic_address", "Domestic deliveries need governorate, address and mobile number.");
             }
@@ -549,7 +550,7 @@ internal sealed class Shipment
     public void ChangePhone(string phone, Actor actor, DateTimeOffset now)
     {
         EnsureChangeable();
-        ConsigneePhone = IraqPhone.Normalize(phone) ?? throw Rule("shipment.domestic_address", "Domestic deliveries need governorate, address and mobile number.");
+        ConsigneePhone = PhoneNumbers.Normalize(phone) ?? throw Rule("shipment.domestic_address", "Domestic deliveries need governorate, address and mobile number.");
         UpdatedAt = now;
         Note(IraqPhone.Display(ConsigneePhone), actor, now);
     }
@@ -566,10 +567,10 @@ internal sealed class Shipment
             throw Rule("shipment.not_changeable", "This order can no longer be changed.", ShipmentTexts.Of(Status));
         }
 
-        var phone = IraqPhone.Normalize(request.ConsigneePhone)
+        var phone = PhoneNumbers.Normalize(request.ConsigneePhone)
             ?? throw Rule("shipment.domestic_address", "Domestic deliveries need governorate, address and mobile number.");
         var governorate = request.DestinationCode.Trim().ToUpperInvariant();
-        if (!IraqGovernorates.IsKnown(governorate) || string.IsNullOrWhiteSpace(request.DeliveryAddress))
+        if (!network.Knows(governorate) || string.IsNullOrWhiteSpace(request.DeliveryAddress))
         {
             throw Rule("shipment.domestic_address", "Domestic deliveries need governorate, address and mobile number.");
         }

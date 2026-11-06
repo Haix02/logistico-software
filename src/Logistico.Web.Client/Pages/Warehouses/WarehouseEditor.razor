@@ -35,7 +35,7 @@
                             <span class="bp6-html-select bp6-fill">
                                 <InputSelect @bind-Value="model.Governorate" @bind-Value:after="GovernorateChanged">
                                     <option value="">@L["ChooseGovernorate"]</option>
-                                    @foreach (var g in IraqGovernorates.All.OrderBy(g => g.Name, StringComparer.CurrentCulture))
+                                    @foreach (var g in Areas.OrderBy(g => g.Name, StringComparer.CurrentCulture))
                                     {
                                         <option value="@g.Code">@g.Name</option>
                                     }
@@ -53,15 +53,18 @@
                             </div>
                         </FormField>
                     </div>
-                    <div class="lx-editor-map">
-                        <CoverageMap Hubs="PreviewHubs" Editing="@PreviewCode" Pin="Pin" OnPick="Pick" Compact="true" />
-                    </div>
+                    @if (Countries.IsIraq(Country))
+                    {
+                        <div class="lx-editor-map">
+                            <CoverageMap Hubs="PreviewHubs" Editing="@PreviewCode" Pin="Pin" OnPick="Pick" Compact="true" />
+                        </div>
+                    }
                 </div>
 
                 <h4 class="lx-form-section">@L["WarehouseCoverage"]</h4>
                 <p class="bp6-text-muted lx-small" style="margin-top:0">@L["CoverageHint"]</p>
                 <div class="lx-chip-grid" role="group" aria-label="@L["WarehouseCoverage"]">
-                    @foreach (var g in IraqGovernorates.All.OrderBy(g => g.Name, StringComparer.CurrentCulture))
+                    @foreach (var g in Areas.OrderBy(g => g.Name, StringComparer.CurrentCulture))
                     {
                         var on = model.Covers.Contains(g.Code);
                         var owner = OwnerOf(g.Code);
@@ -80,7 +83,7 @@
                 @if (Moves.Count > 0)
                 {
                     <Callout Intent="Intent.Warning" Icon="swap-horizontal" CssClass="lx-mt">
-                        @string.Format(CultureInfo.CurrentCulture, L["CoverageMovesN"], string.Join("، ", Moves.Select(m => $"{IraqGovernorates.NameOrCode(m.Governorate)} ← {m.From.RoutingTag}")))
+                        @string.Format(CultureInfo.CurrentCulture, L["CoverageMovesN"], string.Join("، ", Moves.Select(m => $"{PlaceName(m.Governorate)} ← {m.From.RoutingTag}")))
                     </Callout>
                 }
 
@@ -147,6 +150,17 @@
 
     /// <summary>All warehouses (for coverage owners and the map).</summary>
     [Parameter] public IReadOnlyList<WarehouseDetails> All { get; set; } = [];
+
+    /// <summary>Areas this company delivers to. Empty until the network loads; Iraq then uses its governorates.</summary>
+    [Parameter] public IReadOnlyList<PlaceInfo> Places { get; set; } = [];
+
+    [Parameter] public string Country { get; set; } = "IQ";
+
+    private IReadOnlyList<PlaceInfo> Areas => Places.Count > 0
+        ? Places
+        : IraqGovernorates.All.Select(g => new PlaceInfo(g.Code, g.NameEn, g.NameAr, g.Latitude, g.Longitude)).ToList();
+
+    private string PlaceName(string code) => Areas.FirstOrDefault(place => string.Equals(place.Code, code, StringComparison.OrdinalIgnoreCase))?.Name ?? code;
 
     [Parameter] public EventCallback<WarehouseDetails> OnSaved { get; set; }
 
@@ -228,7 +242,7 @@
 
     private void UseCentre()
     {
-        if (IraqGovernorates.Find(model.Governorate) is { } g)
+        if (Areas.FirstOrDefault(place => string.Equals(place.Code, model.Governorate, StringComparison.OrdinalIgnoreCase)) is { } g)
         {
             model.Latitude = g.Latitude;
             model.Longitude = g.Longitude;
@@ -252,7 +266,7 @@
         var moves = Moves;
         if (moves.Count > 0)
         {
-            var names = string.Join("، ", moves.Select(m => $"{IraqGovernorates.NameOrCode(m.Governorate)} ({m.From.RoutingTag})"));
+            var names = string.Join("، ", moves.Select(m => $"{PlaceName(m.Governorate)} ({m.From.RoutingTag})"));
             if (!await Confirm.AskAsync(L["MoveCoverageTitle"], string.Format(CultureInfo.CurrentCulture, L["MoveCoverageMessage"], names), L["MoveCoverageConfirm"], Intent.Warning, "swap-horizontal"))
             {
                 return;

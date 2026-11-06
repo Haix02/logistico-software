@@ -5,6 +5,10 @@
 @using System.Text.Encodings.Web
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
+@using Logistico.Modules.Shipments.Contracts
+@using Logistico.SharedKernel.Geo
+@using Logistico.SharedKernel.Identity
+@using Logistico.SharedKernel.Setup
 @using Logistico.Web.Data
 
 @inject UserManager<ApplicationUser> UserManager
@@ -15,6 +19,8 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 @inject IConfiguration Configuration
+@inject ApplicationDbContext Db
+@inject IOperatingNetwork Network
 
 <PageTitle>Register</PageTitle>
 
@@ -28,6 +34,20 @@
             <h2>Create a new account.</h2>
             <hr />
             <ValidationSummary class="text-danger" role="alert" />
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.CompanyName" id="Input.CompanyName" class="form-control" autocomplete="organization" aria-required="true" placeholder="Company" />
+                <label for="Input.CompanyName">Company</label>
+                <ValidationMessage For="() => Input.CompanyName" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputSelect @bind-Value="Input.Country" id="Input.Country" class="form-control">
+                    @foreach (var country in Countries.All.OrderBy(c => c.Name, StringComparer.CurrentCulture))
+                    {
+                        <option value="@country.Code">@country.Name</option>
+                    }
+                </InputSelect>
+                <label for="Input.Country">Country</label>
+            </div>
             <div class="form-floating mb-3">
                 <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
                 <label for="Input.Email">Email</label>
@@ -79,6 +99,8 @@
     public async Task RegisterUser(EditContext editContext)
     {
         var user = CreateUser();
+        user.TenantId = Guid.CreateVersion7();
+        user.DisplayName = Input.CompanyName.Trim();
 
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
@@ -91,7 +113,19 @@
             return;
         }
 
-        Logger.LogInformation("User created a new account with password.");
+        var role = await UserManager.AddToRoleAsync(user, StaffRoles.Admin);
+        if (!role.Succeeded)
+        {
+            identityErrors = role.Errors;
+            return;
+        }
+
+        var profile = new CompanyProfileRecord { TenantId = user.TenantId };
+        profile.Write(new CompanyProfile { Name = Input.CompanyName, Country = Input.Country }, user.Email, DateTimeOffset.UtcNow);
+        Db.CompanyProfiles.Add(profile);
+        await Db.SaveChangesAsync();
+        await Network.SetCountryAsync(user.TenantId, Input.Country, CancellationToken.None);
+        Logger.LogInformation("User created a new company {Company} in {Country}.", Input.CompanyName, Input.Country);
 
         var userId = await UserManager.GetUserIdAsync(user);
         var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
@@ -139,6 +173,15 @@
 
     private sealed class InputModel
     {
+        [Required]
+        [StringLength(100, MinimumLength = 2)]
+        [Display(Name = "Company")]
+        public string CompanyName { get; set; } = "";
+
+        [Required]
+        [StringLength(2, MinimumLength = 2)]
+        public string Country { get; set; } = Countries.Iraq;
+
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]

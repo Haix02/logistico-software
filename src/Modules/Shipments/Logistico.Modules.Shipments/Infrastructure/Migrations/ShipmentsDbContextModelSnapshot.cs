@@ -20,7 +20,7 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
             modelBuilder
                 .HasDefaultSchema("shipment")
                 .HasAnnotation("Npgsql:CollationDefinition:public.natural", "und-u-kn-true,und-u-kn-true,icu,True")
-                .HasAnnotation("ProductVersion", "10.0.13")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
@@ -950,6 +950,26 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                     b.ToTable("transfers", "shipment");
                 });
 
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.OperatingCountry", b =>
+                {
+                    b.Property<Guid>("TenantId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("character(2)")
+                        .HasColumnName("country")
+                        .IsFixedLength();
+
+                    b.HasKey("TenantId")
+                        .HasName("pk_operating_countries");
+
+                    b.ToTable("operating_countries", "shipment");
+                });
+
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.OpsAlert", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1168,6 +1188,52 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                         .HasDatabaseName("ix_saved_views_tenant_id_user_id_list_name");
 
                     b.ToTable("saved_views", "shipment");
+                });
+
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ServiceArea", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)")
+                        .HasColumnName("code");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("latitude");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("longitude");
+
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)")
+                        .HasColumnName("name_ar");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)")
+                        .HasColumnName("name_en");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_service_areas");
+
+                    b.HasIndex("TenantId", "Code")
+                        .IsUnique()
+                        .HasDatabaseName("ix_service_areas_tenant_id_code");
+
+                    b.ToTable("service_areas", "shipment");
                 });
 
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.ServiceRequest", b =>
@@ -1919,6 +1985,10 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
 
                     b.HasIndex("TenantId", "MerchantId", "CreatedAt")
                         .HasDatabaseName("ix_shipments_tenant_id_merchant_id_created_at");
+
+                    b.HasIndex("TenantId", "Status", "CreatedAt")
+                        .HasDatabaseName("ix_shipments_tenant_open_created")
+                        .HasFilter("status NOT IN ('Delivered', 'Returned', 'Cancelled')");
 
                     b.HasIndex("TenantId", "Status", "EtaAt")
                         .HasDatabaseName("ix_shipments_tenant_id_status_eta_at");

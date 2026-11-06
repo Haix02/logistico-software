@@ -1,19 +1,26 @@
 using Logistico.Modules.Shipments.Contracts.Rules;
 using Logistico.Modules.Shipments.Domain;
 using Logistico.Modules.Shipments.Infrastructure;
+using Logistico.SharedKernel;
+using Logistico.SharedKernel.Geo;
 using Microsoft.EntityFrameworkCore;
 
 namespace Logistico.Modules.Shipments.Application;
 
 /// <summary>
-/// A company's warehouse network, loaded once per request from its active warehouses. A company that has never set up
-/// warehouses starts with the standard Iraqi network (<see cref="IraqHubs.Standard"/>), created on first use.
+/// A company's warehouse network, loaded once per request from its active warehouses. An Iraqi company that has never
+/// set up warehouses starts with the standard network (<see cref="IraqHubs.Standard"/>). A company elsewhere starts
+/// empty until it adds its own warehouses.
 /// </summary>
-internal sealed class HubDirectory(ShipmentsDbContext db, TimeProvider clock)
+internal sealed class HubDirectory(ShipmentsDbContext db, OperatingPlaces places, TimeProvider clock)
 {
     private readonly Dictionary<Guid, HubNetwork> cache = [];
 
-    public async Task<HubNetwork> NetworkAsync(Guid tenantId, CancellationToken ct)
+    public async Task<HubNetwork> NetworkAsync(Guid tenantId, CancellationToken ct) =>
+        await TryNetworkAsync(tenantId, ct) ?? throw new DomainException("network.not_ready", "Add a warehouse before routing parcels.");
+
+    /// <summary>The company's hubs, or null when it has none yet (a company outside Iraq, before its first warehouse).</summary>
+    public async Task<HubNetwork?> TryNetworkAsync(Guid tenantId, CancellationToken ct)
     {
         if (cache.TryGetValue(tenantId, out var cached))
         {
@@ -21,13 +28,20 @@ internal sealed class HubDirectory(ShipmentsDbContext db, TimeProvider clock)
         }
 
         var hubs = await LoadAsync(tenantId, ct);
-        if (hubs is null)
+        if (hubs is null && Countries.IsIraq(await places.CountryAsync(tenantId, ct)))
         {
             await EnsureStandardAsync(tenantId, ct);
             hubs = await LoadAsync(tenantId, ct);
         }
 
-        var network = hubs is { Count: > 0 } ? new HubNetwork(hubs) : IraqHubs.Default;
+        if (hubs is not { Count: > 0 })
+        {
+            return null;
+        }
+
+        var country = await places.CountryAsync(tenantId, ct);
+        var known = Countries.IsIraq(country) ? null : (await places.PlacesAsync(tenantId, ct)).Select(place => place.Code);
+        var network = new HubNetwork(hubs, iraqCatalog: Countries.IsIraq(country), knownPlaces: known);
         cache[tenantId] = network;
         return network;
     }
@@ -38,6 +52,11 @@ internal sealed class HubDirectory(ShipmentsDbContext db, TimeProvider clock)
     /// <summary>Creates the standard hubs for a company that has no warehouses yet (safe when two requests race).</summary>
     public async Task EnsureStandardAsync(Guid tenantId, CancellationToken ct)
     {
+        if (!Countries.IsIraq(await places.CountryAsync(tenantId, ct)))
+        {
+            return;
+        }
+
         if (db.Database.CurrentTransaction is not null)
         {
             await CreateStandardIfMissingAsync(tenantId, ct);

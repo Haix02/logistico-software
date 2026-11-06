@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Resources;
 using Logistico.SharedKernel;
-using Logistico.SharedKernel.Iraq;
+using Logistico.SharedKernel.Geo;
 
 namespace Logistico.Modules.Merchants.Contracts;
 
@@ -72,12 +72,12 @@ public sealed class MerchantRequest : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (!IraqPhone.IsValid(Phone))
+        if (!PhoneNumbers.IsValid(Phone))
         {
-            yield return new(ValidationText.IraqiMobile, [nameof(Phone)]);
+            yield return new(ValidationText.Phone, [nameof(Phone)]);
         }
 
-        if (!IraqGovernorates.IsKnown(Governorate))
+        if (!PlaceCodes.IsValid(Governorate))
         {
             yield return new(ValidationText.Governorate, [nameof(Governorate)]);
         }

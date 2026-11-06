@@ -39,15 +39,18 @@ else
     </div>
 
     <div class="lx-map-layout">
-        <div class="lx-card lx-map-card">
-            <IraqMap Governorates="network.Governorates" Hubs="network.Hubs" Lanes="network.Lanes" Measure="MeasureFn" Selected="@selected"
-                     OnSelect="@(code => selected = code)" OnHub="@(code => Navigation.NavigateTo($"shipments?hub={code}&inWarehouse=true"))" />
-        </div>
+        @if (Countries.IsIraq(network.Country))
+        {
+            <div class="lx-card lx-map-card">
+                <IraqMap Governorates="network.Governorates" Hubs="network.Hubs" Lanes="network.Lanes" Measure="MeasureFn" Selected="@selected"
+                         OnSelect="@(code => selected = code)" OnHub="@(code => Navigation.NavigateTo($"shipments?hub={code}&inWarehouse=true"))" />
+            </div>
+        }
 
         <div class="lx-stack" style="gap:18px">
             @if (Selected is { } g)
             {
-                var name = IraqGovernorates.Find(g.Code)?.Name ?? g.Code;
+                var name = HubCatalog.PlaceName(g.Code);
                 <Section Title="@name" Subtitle="@string.Format(CultureInfo.CurrentCulture, L["ServedBy"], HubCatalog.ResolveDestinationHub(g.Code).Name)" Icon="map-marker" Padded="false">
                     <Actions><Button Minimal="true" Small="true" Icon="cross" Tip="@L["Close"]" OnClick="@(() => selected = null)" /></Actions>
                     <ChildContent>
@@ -131,7 +134,7 @@ else
             {
                 var value = MeasureFn(g);
                 <a class="@Bp.Cls("lx-bar-row", Bp.When(selected == g.Code, "lx-bar-selected"))" href="@($"shipments?governorate={g.Code}")">
-                    <span class="lx-ellipsis">@(IraqGovernorates.Find(g.Code)?.Name ?? g.Code)</span>
+                    <span class="lx-ellipsis">@HubCatalog.PlaceName(g.Code)</span>
                     <span class="lx-bar-track"><span class="@Bp.Cls("lx-bar-fill", measure is "late" or "failed" ? "lx-bar-fill-warning" : null)" style="@($"width:{(value * 100.0 / max).ToString("0.#", CultureInfo.InvariantCulture)}%")"></span></span>
                     <span class="lx-bar-value">@Fmt.Number(value)</span>
                 </a>

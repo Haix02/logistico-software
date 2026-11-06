@@ -20,6 +20,9 @@ public static class ShipmentsApiRoutes
     public const string Transfers = "api/v1/transfers";
     public const string Network = "api/v1/network";
     public const string NetworkHubs = Network + "/hubs";
+    public const string NetworkAreas = Network + "/areas";
+
+    public static string NetworkArea(string code) => NetworkAreas + "/" + Uri.EscapeDataString(code);
     public const string Returns = "api/v1/returns";
     public const string ReturnsHandOver = Returns + "/hand-over";
     public const string Requests = "api/v1/requests";

@@ -5,6 +5,10 @@ versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- **A company chooses its country.** Iraq keeps the governorates, the map and the five starting hubs. Any other country starts with no hubs: staff add the regions they deliver to (a code such as JO-AM) and the warehouses that cover them. Phones accept an Iraqi mobile or an international number with a plus. Each company's data stays on its own tenant.
+- **Open parcels are indexed** for large lists (`ix_shipments_tenant_open_created`), so the board of parcels that are not delivered, returned or cancelled does not scan the closed history.
+
 ### Fixed
 - **Baghdad on the network map can be selected.** Its hub marker sat on the governorate, so the click opened the hub instead. The marker is shifted off the shape; truck lines still meet at the real hub.
 - **The dashboard "right now" strip no longer clips its last figure** when the sidebar is open. The chips scroll inside the strip.

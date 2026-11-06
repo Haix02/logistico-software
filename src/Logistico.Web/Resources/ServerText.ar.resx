@@ -40,19 +40,19 @@
   <data name="SignInSubtitle" xml:space="preserve"><value>دخول موظفي لوجستيكو.</value></data>
   <data name="SignInTitle" xml:space="preserve"><value>تسجيل الدخول</value></data>
   <data name="SignInWithPasskey" xml:space="preserve"><value>الدخول بمفتاح المرور (Passkey)</value></data>
-  <data name="Tagline" xml:space="preserve"><value>الشحن والتخزين والتوصيل في كل العراق</value></data>
+  <data name="Tagline" xml:space="preserve"><value>برنامج لوجستي مفتوح المصدر</value></data>
   <data name="TrackShipment" xml:space="preserve"><value>تتبع شحنة</value></data>
   <data name="Forbidden" xml:space="preserve"><value>صلاحياتك لا تسمح بهذا الإجراء. اطلب الصلاحية من مدير النظام.</value></data>
   <data name="Problem_team.self" xml:space="preserve"><value>لا يمكنك تغيير صلاحيات حسابك أو قفله من هنا.</value></data>
   <data name="TooManyRequests" xml:space="preserve"><value>محاولات كثيرة من هذا الاتصال. انتظر دقيقة ثم أعد المحاولة.</value></data>
-  <data name="SignInHeroTitle" xml:space="preserve"><value>توصيل العراق، يُدار بالبيانات</value></data>
-  <data name="SignInHeroText" xml:space="preserve"><value>طلبات المتاجر الإلكترونية إلى كل محافظة: مسح المخازن والشاحنات بين المدن والدفع عند الاستلام وما يريده الزبائن، في نظام واحد مفتوح المصدر.</value></data>
-  <data name="SignInPoint1" xml:space="preserve"><value>خريطة حيّة لكل محافظة ومخزن وشاحنة</value></data>
+  <data name="SignInHeroTitle" xml:space="preserve"><value>برنامج لوجستي مفتوح المصدر</value></data>
+  <data name="SignInHeroText" xml:space="preserve"><value>الطلبات والمخازن والشاحنات والمندوبون لشركة توصيل في أي بلد: الدفع عند الاستلام والتتبع وسجل التدقيق، في نظام تستضيفه أنت.</value></data>
+  <data name="SignInPoint1" xml:space="preserve"><value>خريطة حيّة للمخازن والمناطق والشاحنات</value></data>
   <data name="SignInPoint2" xml:space="preserve"><value>ذكاء الطلب: ماذا يطلب الزبائن وأين ومتى</value></data>
   <data name="SignInPoint3" xml:space="preserve"><value>تسوية مبالغ الدفع عند الاستلام مع التجار شحنةً بشحنة</value></data>
   <data name="OpenSourceLine" xml:space="preserve"><value>مفتوح المصدر · Apache-2.0</value></data>
-  <data name="SeoTitle" xml:space="preserve"><value>لوجستيكو — نظام توصيل مفتوح المصدر للعراق</value></data>
-  <data name="SeoDescription" xml:space="preserve"><value>نظام لوجستي مفتوح المصدر لشركات التوصيل في العراق: الطلبات والمخازن والشاحنات والمندوبون والمرتجعات والدفع عند الاستلام. العربية أولاً والإنجليزية.</value></data>
+  <data name="SeoTitle" xml:space="preserve"><value>لوجستيكو — برنامج لوجستي مفتوح المصدر</value></data>
+  <data name="SeoDescription" xml:space="preserve"><value>برنامج لوجستي مفتوح المصدر لشركات التوصيل: الطلبات والمخازن والشاحنات والمندوبون والمرتجعات والدفع عند الاستلام. العربية والإنجليزية. تستضيفه بنفسك.</value></data>
   <data name="SetupTitle" xml:space="preserve"><value>إعداد لوجستيكو</value></data>
   <data name="SetupSubtitle" xml:space="preserve"><value>أنشئ شركتك وأول مدير لها. تعمل هذه الصفحة مرة واحدة.</value></data>
   <data name="SetupHeroTitle" xml:space="preserve"><value>شركة التوصيل الخاصة بك جاهزة خلال دقيقة</value></data>
@@ -66,6 +66,8 @@
   <data name="SetupCompanyName" xml:space="preserve"><value>اسم الشركة</value></data>
   <data name="SetupCompanyNamePlaceholder" xml:space="preserve"><value>الرافدين للتوصيل</value></data>
   <data name="SetupCompanyPhone" xml:space="preserve"><value>هاتف الشركة</value></data>
+  <data name="SetupCountry" xml:space="preserve"><value>البلد</value></data>
+  <data name="SetupCountryHelp" xml:space="preserve"><value>العراق يبدأ بمحافظاته ومراكزه. أي بلد آخر يبدأ فارغًا: تضيف المناطق والمخازن التي توصل إليها.</value></data>
   <data name="SetupGovernorate" xml:space="preserve"><value>محافظة المكتب الرئيسي</value></data>
   <data name="Optional" xml:space="preserve"><value>اختياري</value></data>
   <data name="SetupAdmin" xml:space="preserve"><value>أول مدير</value></data>

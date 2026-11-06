@@ -29,10 +29,15 @@ public sealed class HubNetwork
     private readonly Dictionary<string, HubInfo> byCode = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, HubInfo> byTag = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, HubInfo> byGovernorate = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> places = new(StringComparer.OrdinalIgnoreCase);
+    private readonly bool iraqCatalog;
 
-    /// <param name="hubs">Active hubs, the primary hub first. A governorate covered twice goes to the first hub listing it.</param>
-    public HubNetwork(IEnumerable<HubInfo> hubs)
+    /// <param name="hubs">Active hubs, the primary hub first. A place covered twice goes to the first hub listing it.</param>
+    /// <param name="iraqCatalog">When true, every Iraqi governorate and port is a domestic place. A company outside Iraq passes false and lists its own areas.</param>
+    /// <param name="knownPlaces">Area codes the company delivers to, besides the ones its warehouses already cover.</param>
+    public HubNetwork(IEnumerable<HubInfo> hubs, bool iraqCatalog = true, IEnumerable<string>? knownPlaces = null)
     {
+        this.iraqCatalog = iraqCatalog;
         All = hubs.ToList();
         if (All.Count == 0)
         {
@@ -46,6 +51,18 @@ public sealed class HubNetwork
             foreach (var governorate in hub.Covers)
             {
                 byGovernorate.TryAdd(governorate, hub);
+                places.Add(governorate);
+            }
+        }
+
+        if (knownPlaces is not null)
+        {
+            foreach (var place in knownPlaces)
+            {
+                if (!string.IsNullOrWhiteSpace(place))
+                {
+                    places.Add(place.Trim());
+                }
             }
         }
 
@@ -99,28 +116,52 @@ public sealed class HubNetwork
         return new HubInfo(IraqHubs.CodeFor(tag), tag, "", tag, tag);
     }
 
-    /// <summary>The hub that delivers to a place (governorate "IQ-BA" or Iraqi port "IQUQR"); the primary hub for anything else.</summary>
+    /// <summary>True when this company's domestic network includes the place (an area it defined, or an Iraqi governorate or port).</summary>
+    public bool Knows(string? locationCode)
+    {
+        var code = locationCode?.Trim();
+        if (string.IsNullOrEmpty(code))
+        {
+            return false;
+        }
+
+        if (places.Contains(code) || byGovernorate.ContainsKey(code))
+        {
+            return true;
+        }
+
+        return iraqCatalog && (IraqGovernorates.IsKnown(code) || PortGovernorates.ContainsKey(code));
+    }
+
+    /// <summary>The hub that delivers to a place (an area code, a governorate "IQ-BA", or an Iraqi port "IQUQR"); the primary hub when the place is known but no warehouse covers it.</summary>
     public HubInfo ResolveDestinationHub(string? locationCode)
     {
-        if (GovernorateOf(locationCode) is not { } governorate)
+        var code = locationCode?.Trim();
+        if (string.IsNullOrEmpty(code))
         {
             return Primary;
         }
 
-        if (byGovernorate.TryGetValue(governorate, out var hub))
+        if (byGovernorate.TryGetValue(code, out var covered))
+        {
+            return covered;
+        }
+
+        var governorate = GovernorateOf(code);
+        if (governorate is not null && byGovernorate.TryGetValue(governorate, out var hub))
         {
             return hub;
         }
 
-        // Not covered by any hub (e.g. its hub was retired): the nearest hub takes it.
-        var place = IraqGovernorates.Find(governorate);
+        // Known, but no warehouse lists it (its hub was retired): the nearest hub takes an Iraqi governorate.
+        var place = IraqGovernorates.Find(governorate ?? code);
         return place is null || All.All(h => h.Latitude == 0)
             ? Primary
             : All.MinBy(h => DistanceKm(place.Latitude, place.Longitude, h.Latitude, h.Longitude))!;
     }
 
-    /// <summary>The hub that collects from an Iraqi origin (seller's governorate, Iraqi port); null for origins abroad.</summary>
-    public HubInfo? OriginHubFor(string? originCode) => GovernorateOf(originCode) is null ? null : ResolveDestinationHub(originCode);
+    /// <summary>The hub that collects from a domestic origin; null when the origin is abroad.</summary>
+    public HubInfo? OriginHubFor(string? originCode) => Knows(originCode) ? ResolveDestinationHub(originCode) : null;
 
     /// <summary>Typical road time for a line-haul truck between two hubs (hours), used for ETAs and overdue alerts.</summary>
     public int TransitHours(string fromHub, string toHub)

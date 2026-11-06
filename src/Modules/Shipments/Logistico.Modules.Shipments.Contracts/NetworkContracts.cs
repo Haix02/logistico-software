@@ -245,4 +245,5 @@ public sealed record NetworkOverview(
     int OnTrucks,
     int Late,
     int OpenAlerts,
-    DateTimeOffset GeneratedAt);
+    DateTimeOffset GeneratedAt,
+    string Country = "IQ");

@@ -63,7 +63,7 @@
                 <div class="bp6-form-content">
                     <div class="bp6-input-group bp6-large @(Invalid(nameof(InputModel.Email)) ? "bp6-intent-danger" : "")">
                         <span class="bp6-icon bp6-icon-standard bp6-icon-envelope"></span>
-                        <InputText @bind-Value="Input.Email" id="Input.Email" class="bp6-input" dir="ltr" autocomplete="username webauthn" aria-required="true" placeholder="name@company.iq" />
+                        <InputText @bind-Value="Input.Email" id="Input.Email" class="bp6-input" dir="ltr" autocomplete="username webauthn" aria-required="true" placeholder="name@company.com" />
                     </div>
                     <div class="bp6-form-helper-text"><ValidationMessage For="() => Input.Email" /></div>
                 </div>

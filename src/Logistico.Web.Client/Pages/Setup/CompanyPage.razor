@@ -21,18 +21,44 @@ else
                 <FormField Label="@L["Company_Name"]" Required="true" Field="() => model.Name" CssClass="lx-span-2">
                     <InputText class="bp6-input bp6-fill" @bind-Value="model.Name" dir="auto" maxlength="100" />
                 </FormField>
+                <FormField Label="@L["Company_Country"]" Required="true" Field="() => model.Country">
+                    <span class="bp6-html-select bp6-fill">
+                        <InputSelect @bind-Value="model.Country" @bind-Value:after="CountryChanged">
+                            @foreach (var country in Countries.All.OrderBy(c => c.Name, StringComparer.CurrentCulture))
+                            {
+                                <option value="@country.Code">@country.Name</option>
+                            }
+                        </InputSelect>
+                        <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                    </span>
+                </FormField>
                 <FormField Label="@L["Field_Phone"]" Field="() => model.Phone">
-                    <InputText class="bp6-input bp6-fill" @bind-Value="model.Phone" type="tel" dir="ltr" maxlength="20" placeholder="0770 123 4567" />
+                    <InputText class="bp6-input bp6-fill" @bind-Value="model.Phone" type="tel" dir="ltr" maxlength="20" placeholder="@(Countries.IsIraq(model.Country) ? "0770 123 4567" : "+962 7 9000 0000")" />
                 </FormField>
-                <FormField TValue="string" Label="@L["Company_Governorate"]" Hint="@L["Optional"]" For="lx-company-gov">
-                    <HtmlSelect Id="lx-company-gov" Value="@model.Governorate" ValueChanged="@(v => model.Governorate = string.IsNullOrEmpty(v) ? null : v)" Fill="true" Label="@L["Company_Governorate"]">
-                        <option value="">—</option>
-                        @foreach (var g in IraqGovernorates.All.OrderBy(g => g.Name, StringComparer.CurrentCulture))
-                        {
-                            <option value="@g.Code">@g.Name</option>
-                        }
-                    </HtmlSelect>
-                </FormField>
+                @if (Countries.IsIraq(model.Country))
+                {
+                    <FormField TValue="string" Label="@L["Company_Governorate"]" Hint="@L["Optional"]" For="lx-company-gov">
+                        <HtmlSelect Id="lx-company-gov" Value="@model.Governorate" ValueChanged="@(v => model.Governorate = string.IsNullOrEmpty(v) ? null : v)" Fill="true" Label="@L["Company_Governorate"]">
+                            <option value="">—</option>
+                            @foreach (var g in IraqGovernorates.All.OrderBy(g => g.Name, StringComparer.CurrentCulture))
+                            {
+                                <option value="@g.Code">@g.Name</option>
+                            }
+                        </HtmlSelect>
+                    </FormField>
+                }
+                else
+                {
+                    <FormField TValue="string" Label="@L["Company_Region"]" Hint="@L["Optional"]" For="lx-company-region">
+                        <HtmlSelect Id="lx-company-region" Value="@model.Governorate" ValueChanged="@(v => model.Governorate = string.IsNullOrEmpty(v) ? null : v)" Fill="true" Label="@L["Company_Region"]">
+                            <option value="">—</option>
+                            @foreach (var place in HubCatalog.Places.OrderBy(p => p.Name, StringComparer.CurrentCulture))
+                            {
+                                <option value="@place.Code">@place.Name</option>
+                            }
+                        </HtmlSelect>
+                    </FormField>
+                }
                 <FormField Label="@L["Field_Address"]" Hint="@L["Optional"]" Field="() => model.Address" CssClass="lx-span-2">
                     <InputTextArea class="bp6-input bp6-fill" rows="2" @bind-Value="model.Address" dir="auto" maxlength="300" />
                 </FormField>
@@ -63,6 +89,14 @@ else
     {
         view = await Company.GetCompanyAsync(refresh: true);
         model = view.Profile.Clone();
+    }
+
+    private void CountryChanged()
+    {
+        if (!string.IsNullOrEmpty(model.Governorate) && Countries.IsIraq(model.Country) != model.Governorate.StartsWith("IQ-", StringComparison.Ordinal))
+        {
+            model.Governorate = null;
+        }
     }
 
     private async Task SaveAsync()

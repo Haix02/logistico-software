@@ -8,6 +8,7 @@ public class CompanyProfileRecord
     public Guid TenantId { get; set; }
     public string Name { get; set; } = "";
     public string? Phone { get; set; }
+    public string Country { get; set; } = "IQ";
     public string? Governorate { get; set; }
     public string? Address { get; set; }
 
@@ -21,12 +22,13 @@ public class CompanyProfileRecord
     /// <summary>The profile has what customers and staff need to recognise and reach the company.</summary>
     public bool IsSet => Name.Length > 0 && Phone is not null;
 
-    public CompanyProfile Read() => new() { Name = Name, Phone = Phone, Governorate = Governorate, Address = Address };
+    public CompanyProfile Read() => new() { Name = Name, Phone = Phone, Country = string.IsNullOrEmpty(Country) ? "IQ" : Country, Governorate = Governorate, Address = Address };
 
     public void Write(CompanyProfile profile, string? by, DateTimeOffset now)
     {
         Name = profile.Name.Trim();
         Phone = Clean(profile.Phone);
+        Country = string.IsNullOrWhiteSpace(profile.Country) ? "IQ" : profile.Country.Trim().ToUpperInvariant();
         Governorate = Clean(profile.Governorate)?.ToUpperInvariant();
         Address = Clean(profile.Address);
         UpdatedAt = now;

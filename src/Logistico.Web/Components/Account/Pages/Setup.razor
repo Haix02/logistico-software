@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.Extensions.Localization
 @using Logistico.SharedKernel
+@using Logistico.SharedKernel.Geo
 @using Logistico.SharedKernel.Iraq
 @using Logistico.SharedKernel.Setup
 @using Logistico.Web.Data
@@ -81,25 +82,41 @@
                     <InputText @bind-Value="Input.CompanyName" id="Input.CompanyName" class="bp6-input bp6-fill" dir="auto" maxlength="100" placeholder="@T["SetupCompanyNamePlaceholder"]" />
                     <div class="bp6-form-helper-text"><ValidationMessage For="() => Input.CompanyName" /></div>
                 </div>
+                <div class="bp6-form-group @Danger(nameof(InputModel.Country))">
+                    <label class="bp6-label" for="Input.Country">@T["SetupCountry"]</label>
+                    <div class="bp6-html-select bp6-fill">
+                        <InputSelect @bind-Value="Input.Country" id="Input.Country">
+                            @foreach (var country in Countries.All.OrderBy(c => c.Name, StringComparer.CurrentCulture))
+                            {
+                                <option value="@country.Code">@country.Name</option>
+                            }
+                        </InputSelect>
+                        <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                    </div>
+                    <div class="bp6-form-helper-text">@T["SetupCountryHelp"]</div>
+                </div>
                 <div class="lx-setup-row">
                     <div class="bp6-form-group @Danger(nameof(InputModel.CompanyPhone))">
                         <label class="bp6-label" for="Input.CompanyPhone">@T["SetupCompanyPhone"]</label>
                         <InputText @bind-Value="Input.CompanyPhone" id="Input.CompanyPhone" class="bp6-input bp6-fill" type="tel" dir="ltr" maxlength="20" placeholder="0770 123 4567" />
                         <div class="bp6-form-helper-text"><ValidationMessage For="() => Input.CompanyPhone" /></div>
                     </div>
-                    <div class="bp6-form-group">
-                        <label class="bp6-label" for="Input.Governorate">@T["SetupGovernorate"] <span class="bp6-text-muted">(@T["Optional"])</span></label>
-                        <div class="bp6-html-select bp6-fill">
-                            <InputSelect @bind-Value="Input.Governorate" id="Input.Governorate">
-                                <option value="">—</option>
-                                @foreach (var g in IraqGovernorates.All.OrderBy(g => g.Name, StringComparer.CurrentCulture))
-                                {
-                                    <option value="@g.Code">@g.Name</option>
-                                }
-                            </InputSelect>
-                            <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                    @if (Countries.IsIraq(Input.Country))
+                    {
+                        <div class="bp6-form-group">
+                            <label class="bp6-label" for="Input.Governorate">@T["SetupGovernorate"] <span class="bp6-text-muted">(@T["Optional"])</span></label>
+                            <div class="bp6-html-select bp6-fill">
+                                <InputSelect @bind-Value="Input.Governorate" id="Input.Governorate">
+                                    <option value="">—</option>
+                                    @foreach (var g in IraqGovernorates.All.OrderBy(g => g.Name, StringComparer.CurrentCulture))
+                                    {
+                                        <option value="@g.Code">@g.Name</option>
+                                    }
+                                </InputSelect>
+                                <span class="bp6-icon bp6-icon-standard bp6-icon-double-caret-vertical"></span>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
 
                 <h3 class="lx-setup-section"><span class="bp6-icon-standard bp6-icon-person" aria-hidden="true"></span> @T["SetupAdmin"]</h3>
@@ -110,7 +127,7 @@
                 </div>
                 <div class="bp6-form-group @Danger(nameof(InputModel.Email))">
                     <label class="bp6-label" for="Input.Email">@T["Email"]</label>
-                    <InputText @bind-Value="Input.Email" id="Input.Email" class="bp6-input bp6-fill" dir="ltr" autocomplete="username" placeholder="name@company.iq" />
+                    <InputText @bind-Value="Input.Email" id="Input.Email" class="bp6-input bp6-fill" dir="ltr" autocomplete="username" placeholder="name@company.com" />
                     <div class="bp6-form-helper-text"><ValidationMessage For="() => Input.Email" /></div>
                 </div>
                 <div class="lx-setup-row">
@@ -127,7 +144,7 @@
                 </div>
 
                 <label class="bp6-control bp6-checkbox lx-setup-sample">
-                    <InputCheckbox class="bp6-control-input" @bind-Value="Input.SampleData" />
+                    <InputCheckbox class="bp6-control-input" @bind-Value="Input.SampleData" disabled="@(!Countries.IsIraq(Input.Country))" />
                     <span class="bp6-control-indicator"></span>
                     <strong>@T["SetupSampleData"]</strong>
                     <span class="bp6-text-muted lx-small">@T["SetupSampleDataHelp"]</span>
@@ -174,7 +191,13 @@
             return;
         }
 
-        var company = new CompanyProfile { Name = Input.CompanyName, Phone = Input.CompanyPhone, Governorate = Input.Governorate };
+        var company = new CompanyProfile
+        {
+            Name = Input.CompanyName,
+            Phone = Input.CompanyPhone,
+            Country = Input.Country,
+            Governorate = Countries.IsIraq(Input.Country) ? Input.Governorate : null,
+        };
         var outcome = await Installer.RunAsync(new SetupRequest(company, Input.AdminName, Input.Email, Input.Password, Input.SampleData), CancellationToken.None);
         switch (outcome)
         {
@@ -202,6 +225,8 @@
         [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
         public string CompanyPhone { get; set; } = "";
 
+        public string Country { get; set; } = Countries.Iraq;
+
         public string? Governorate { get; set; }
 
         [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
@@ -224,7 +249,7 @@
         public bool SampleData { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) =>
-            new CompanyProfile { Name = CompanyName, Phone = CompanyPhone, Governorate = Governorate }.Validate(validationContext)
+            new CompanyProfile { Name = CompanyName, Phone = CompanyPhone, Country = Country, Governorate = Countries.IsIraq(Country) ? Governorate : null }.Validate(validationContext)
                 .Select(r => new ValidationResult(r.ErrorMessage, r.MemberNames.Select(m => m == nameof(CompanyProfile.Phone) ? nameof(CompanyPhone) : m)));
     }
 }

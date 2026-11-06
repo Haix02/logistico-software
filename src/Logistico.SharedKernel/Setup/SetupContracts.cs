@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using Logistico.SharedKernel.Geo;
 using Logistico.SharedKernel.Identity;
 using Logistico.SharedKernel.Iraq;
 
@@ -29,7 +30,12 @@ public sealed class CompanyProfile : IValidatableObject
     [StringLength(20, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.MaxLength))]
     public string? Phone { get; set; }
 
-    /// <summary>Where the head office is.</summary>
+    /// <summary>ISO country. Iraq keeps the governorates; any other country uses regions the company adds.</summary>
+    [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
+    [StringLength(2, MinimumLength = 2, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.MaxLength))]
+    public string Country { get; set; } = Countries.Iraq;
+
+    /// <summary>Where the head office is: an Iraqi governorate, or one of the company's regions.</summary>
     [StringLength(5, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.MaxLength))]
     public string? Governorate { get; set; }
 
@@ -38,18 +44,29 @@ public sealed class CompanyProfile : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (!string.IsNullOrWhiteSpace(Phone) && IraqPhone.Normalize(Phone) is null)
+        Country = Countries.Normalize(Country);
+        if (!Countries.IsKnown(Country))
+        {
+            yield return new(ValidationText.Governorate, [nameof(Country)]);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Phone) && PhoneNumbers.Normalize(Phone) is null)
         {
             yield return new(ValidationText.Phone, [nameof(Phone)]);
         }
 
-        if (!string.IsNullOrWhiteSpace(Governorate) && !IraqGovernorates.IsKnown(Governorate))
+        if (!string.IsNullOrWhiteSpace(Governorate))
         {
-            yield return new(ValidationText.Governorate, [nameof(Governorate)]);
+            var place = Governorate.Trim().ToUpperInvariant();
+            var known = Countries.IsIraq(Country) ? IraqGovernorates.IsKnown(place) : PlaceCodes.IsValid(place) && place.StartsWith(Country + "-", StringComparison.Ordinal);
+            if (!known)
+            {
+                yield return new(ValidationText.Governorate, [nameof(Governorate)]);
+            }
         }
     }
 
-    public CompanyProfile Clone() => new() { Name = Name, Phone = Phone, Governorate = Governorate, Address = Address };
+    public CompanyProfile Clone() => new() { Name = Name, Phone = Phone, Country = Country, Governorate = Governorate, Address = Address };
 }
 
 public sealed record CompanyProfileView(CompanyProfile Profile, bool IsSet, DateTimeOffset? UpdatedAt, string? UpdatedBy, uint Version);

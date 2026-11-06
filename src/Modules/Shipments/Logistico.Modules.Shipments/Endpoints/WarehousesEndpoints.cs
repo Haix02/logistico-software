@@ -5,8 +5,8 @@ using Logistico.Modules.Shipments.Contracts.Rules;
 using Logistico.Modules.Shipments.Domain;
 using Logistico.Modules.Shipments.Infrastructure;
 using Logistico.SharedKernel;
+using Logistico.SharedKernel.Geo;
 using Logistico.SharedKernel.Identity;
-using Logistico.SharedKernel.Iraq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -35,26 +35,90 @@ internal static class WarehousesEndpoints
             .RequireAuthorization(StaffPolicies.Administer);
         group.MapPut("/{id:guid}", UpdateAsync).WithSummary("Edits, moves coverage, makes main or retires a warehouse. Requires If-Match.")
             .RequireAuthorization(StaffPolicies.Administer);
+
+        var areas = app.MapGroup("/" + ShipmentsApiRoutes.NetworkAreas)
+            .WithTags("Warehouses")
+            .RequireAuthorization(StaffPolicies.Administer)
+            .WithValidation();
+        areas.MapPost("/", AddAreaAsync).WithSummary("Adds a region a company outside Iraq delivers to.");
+        areas.MapDelete("/{code}", DeleteAreaAsync).WithSummary("Removes a region no warehouse covers.");
         return app;
     }
 
-    private static async Task<Ok<NetworkHubs>> HubsAsync(HubDirectory directory, ShipmentsDbContext db, ITenantContext tenant, CancellationToken ct)
+    private static async Task<Ok<NetworkHubs>> HubsAsync(HubDirectory directory, OperatingPlaces places, ShipmentsDbContext db, ITenantContext tenant, CancellationToken ct)
     {
-        var network = await directory.NetworkAsync(tenant.TenantId, ct);
+        var network = await directory.TryNetworkAsync(tenant.TenantId, ct);
         var updated = await db.Warehouses.AsNoTracking().MaxAsync(w => (DateTimeOffset?)w.UpdatedAt, ct) ?? DateTimeOffset.MinValue;
-        return TypedResults.Ok(new NetworkHubs(network.All, updated));
+        var country = await places.CountryAsync(tenant.TenantId, ct);
+        var catalog = await places.PlacesAsync(tenant.TenantId, ct);
+        return TypedResults.Ok(new NetworkHubs(network?.All ?? [], updated, country, catalog));
     }
 
-    private static async Task<Ok<WarehouseList>> ListAsync(ShipmentsDbContext db, HubDirectory directory, ITenantContext tenant, TimeProvider clock, CancellationToken ct)
+    private static async Task<Ok<WarehouseList>> ListAsync(ShipmentsDbContext db, HubDirectory directory, OperatingPlaces places, ITenantContext tenant, TimeProvider clock, CancellationToken ct)
     {
-        await directory.NetworkAsync(tenant.TenantId, ct); // creates the standard network on first use
+        await directory.TryNetworkAsync(tenant.TenantId, ct); // an Iraqi company receives the standard hubs on first use
+        var country = await places.CountryAsync(tenant.TenantId, ct);
+        var catalog = await places.PlacesAsync(tenant.TenantId, ct);
         var warehouses = await db.Warehouses.AsNoTracking()
             .OrderByDescending(w => w.IsActive).ThenByDescending(w => w.IsPrimary).ThenBy(w => w.CreatedAt)
             .ToListAsync(ct);
         var loads = await LoadsAsync(db, warehouses, clock.GetUtcNow(), ct);
         var covered = warehouses.Where(w => w.IsActive).SelectMany(w => w.Covers).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        var uncovered = IraqGovernorates.All.Select(g => g.Code).Where(c => !covered.Contains(c)).ToList();
-        return TypedResults.Ok(new WarehouseList(warehouses.Select(w => ToDetails(w, loads[w.Code])).ToList(), uncovered));
+        var uncovered = catalog.Select(place => place.Code).Where(code => !covered.Contains(code)).ToList();
+        return TypedResults.Ok(new WarehouseList(warehouses.Select(w => ToDetails(w, loads[w.Code])).ToList(), uncovered, country, catalog));
+    }
+
+    private static async Task<IResult> AddAreaAsync(ServiceAreaRequest request, OperatingPlaces places, ShipmentsDbContext db, ITenantContext tenant, CancellationToken ct)
+    {
+        var country = await places.CountryAsync(tenant.TenantId, ct);
+        if (Countries.IsIraq(country))
+        {
+            return Api.Rule(new DomainException("area.iraq_catalog", "Iraqi companies use the governorates. Change the company's country to add other regions."));
+        }
+
+        var code = PlaceCodes.Normalize(request.Code);
+        if (!code.StartsWith(country + "-", StringComparison.Ordinal))
+        {
+            return Api.Rule(new DomainException("area.wrong_country", "The region code starts with the company's country.", country));
+        }
+
+        if (await db.ServiceAreas.AnyAsync(area => area.Code == code, ct))
+        {
+            return Api.Conflict("area.taken", code);
+        }
+
+        db.ServiceAreas.Add(new ServiceArea
+        {
+            Id = Guid.CreateVersion7(),
+            TenantId = tenant.TenantId,
+            Code = code,
+            NameEn = request.NameEn.Trim(),
+            NameAr = request.NameAr.Trim(),
+            Latitude = Math.Round(request.Latitude, 5),
+            Longitude = Math.Round(request.Longitude, 5),
+        });
+        await db.SaveChangesAsync(ct);
+        return TypedResults.Created("/" + ShipmentsApiRoutes.NetworkArea(code), new PlaceInfo(code, request.NameEn.Trim(), request.NameAr.Trim(), request.Latitude, request.Longitude));
+    }
+
+    private static async Task<IResult> DeleteAreaAsync(string code, ShipmentsDbContext db, CancellationToken ct)
+    {
+        var normalized = PlaceCodes.Normalize(code);
+        var area = await db.ServiceAreas.FirstOrDefaultAsync(item => item.Code == normalized, ct);
+        if (area is null)
+        {
+            return Api.NotFound("area.not_found");
+        }
+
+        var used = await db.Warehouses.AnyAsync(warehouse => warehouse.Governorate == normalized || warehouse.Covers.Contains(normalized), ct);
+        if (used)
+        {
+            return Api.Rule(new DomainException("area.in_use", "A warehouse still covers this region."));
+        }
+
+        db.ServiceAreas.Remove(area);
+        await db.SaveChangesAsync(ct);
+        return TypedResults.NoContent();
     }
 
     private static async Task<IResult> GetAsync(Guid id, HttpResponse response, ShipmentsDbContext db, TimeProvider clock, CancellationToken ct)

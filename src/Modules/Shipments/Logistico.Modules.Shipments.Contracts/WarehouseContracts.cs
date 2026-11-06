@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using Logistico.Modules.Shipments.Contracts.Rules;
 using Logistico.SharedKernel;
+using Logistico.SharedKernel.Geo;
 using Logistico.SharedKernel.Iraq;
 
 namespace Logistico.Modules.Shipments.Contracts;
@@ -70,22 +71,26 @@ public sealed partial class WarehouseRequest : IValidatableObject
             yield return new(ValidationText.RoutingTag, [nameof(RoutingTag)]);
         }
 
-        if (!IraqGovernorates.IsKnown(Governorate))
+        if (!PlaceCodes.IsValid(Governorate))
         {
             yield return new(ValidationText.Governorate, [nameof(Governorate)]);
         }
-
-        if (Latitude is < MinLatitude or > MaxLatitude || Longitude is < MinLongitude or > MaxLongitude)
+        else if (IraqGovernorates.IsKnown(Governorate)
+            && (Latitude is < MinLatitude or > MaxLatitude || Longitude is < MinLongitude or > MaxLongitude))
+        {
+            yield return new(ValidationText.InsideIraq, [nameof(Latitude)]);
+        }
+        else if (Latitude is < -90 or > 90 || Longitude is < -180 or > 180)
         {
             yield return new(ValidationText.InsideIraq, [nameof(Latitude)]);
         }
 
-        if (!string.IsNullOrWhiteSpace(Phone) && !IraqPhone.IsValid(Phone))
+        if (!string.IsNullOrWhiteSpace(Phone) && !PhoneNumbers.IsValid(Phone))
         {
-            yield return new(ValidationText.IraqiMobile, [nameof(Phone)]);
+            yield return new(ValidationText.Phone, [nameof(Phone)]);
         }
 
-        if (Covers.Any(c => !IraqGovernorates.IsKnown(c)))
+        if (Covers.Any(c => !PlaceCodes.IsValid(c)))
         {
             yield return new(ValidationText.Governorate, [nameof(Covers)]);
         }
@@ -161,7 +166,53 @@ public sealed record WarehouseLoad(
     int DeliveredToday,
     int ActiveCouriers);
 
-public sealed record WarehouseList(IReadOnlyList<WarehouseDetails> Items, IReadOnlyList<string> UncoveredGovernorates);
+public sealed record WarehouseList(
+    IReadOnlyList<WarehouseDetails> Items,
+    IReadOnlyList<string> UncoveredGovernorates,
+    string Country = "IQ",
+    IReadOnlyList<PlaceInfo>? Places = null);
+
+/// <summary>An area a company delivers to: an Iraqi governorate, or a region the company added.</summary>
+public sealed record PlaceInfo(string Code, string NameEn, string NameAr, double Latitude, double Longitude)
+{
+    public string Name => System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar" && NameAr.Length > 0 ? NameAr : NameEn;
+}
+
+/// <summary>A region the company adds when it does not use the Iraqi governorates.</summary>
+public sealed class ServiceAreaRequest : IValidatableObject
+{
+    [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
+    public string Code { get; set; } = "";
+
+    [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
+    [StringLength(80, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.MaxLength))]
+    public string NameEn { get; set; } = "";
+
+    [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
+    [StringLength(80, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.MaxLength))]
+    public string NameAr { get; set; } = "";
+
+    public double Latitude { get; set; }
+
+    public double Longitude { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (!PlaceCodes.IsValid(Code))
+        {
+            yield return new(ValidationText.Governorate, [nameof(Code)]);
+        }
+
+        if (Latitude is < -90 or > 90 || Longitude is < -180 or > 180 || Latitude == 0 && Longitude == 0)
+        {
+            yield return new(ValidationText.InsideIraq, [nameof(Latitude)]);
+        }
+    }
+}
 
 /// <summary>The company's active network as the browser needs it for routing and display.</summary>
-public sealed record NetworkHubs(IReadOnlyList<HubInfo> Hubs, DateTimeOffset UpdatedAt);
+public sealed record NetworkHubs(
+    IReadOnlyList<HubInfo> Hubs,
+    DateTimeOffset UpdatedAt,
+    string Country = "IQ",
+    IReadOnlyList<PlaceInfo>? Places = null);

@@ -1,7 +1,7 @@
 using Logistico.Modules.Shipments.Contracts;
 using Logistico.Modules.Shipments.Contracts.Rules;
 using Logistico.SharedKernel;
-using Logistico.SharedKernel.Iraq;
+using Logistico.SharedKernel.Geo;
 
 namespace Logistico.Modules.Shipments.Domain;
 
@@ -60,7 +60,7 @@ internal sealed class ServiceRequest
             NewCity = Clean(fields.NewCity),
             NewAddress = Clean(fields.NewAddress),
             NewLandmark = Clean(fields.NewLandmark),
-            NewPhone = fields.Type == RequestType.ChangePhone ? IraqPhone.Normalize(fields.NewPhone) : null,
+            NewPhone = fields.Type == RequestType.ChangePhone ? PhoneNumbers.Normalize(fields.NewPhone) : null,
             CreatedAt = now,
             DueAt = now.AddHours(slaHours),
             CreatedBy = by,

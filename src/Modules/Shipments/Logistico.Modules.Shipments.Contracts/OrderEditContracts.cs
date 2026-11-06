@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Logistico.SharedKernel;
-using Logistico.SharedKernel.Iraq;
+using Logistico.SharedKernel.Geo;
 
 namespace Logistico.Modules.Shipments.Contracts;
 
@@ -53,12 +53,12 @@ public sealed class UpdateOrderRequest : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (!IraqPhone.IsValid(ConsigneePhone))
+        if (!PhoneNumbers.IsValid(ConsigneePhone))
         {
-            yield return new(ValidationText.IraqiMobile, [nameof(ConsigneePhone)]);
+            yield return new(ValidationText.Phone, [nameof(ConsigneePhone)]);
         }
 
-        if (!IraqGovernorates.IsKnown(DestinationCode))
+        if (!PlaceCodes.IsValid(DestinationCode))
         {
             yield return new(ValidationText.Governorate, [nameof(DestinationCode)]);
         }
@@ -67,7 +67,7 @@ public sealed class UpdateOrderRequest : IValidatableObject
     public static UpdateOrderRequest From(ShipmentDetails s) => new()
     {
         ConsigneeName = s.ConsigneeName,
-        ConsigneePhone = IraqPhone.Display(s.ConsigneePhone),
+        ConsigneePhone = PhoneNumbers.Display(s.ConsigneePhone),
         DestinationCode = s.DestinationCode,
         DestinationCity = s.DestinationCity,
         DeliveryAddress = s.DeliveryAddress ?? "",

@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Logistico.Modules.Shipments.Contracts.Rules;
 using Logistico.SharedKernel;
-using Logistico.SharedKernel.Iraq;
+using Logistico.SharedKernel.Geo;
 
 namespace Logistico.Modules.Shipments.Contracts;
 
@@ -104,16 +104,16 @@ public abstract class RequestFields : IValidatableObject
                     yield return new(ValidationText.Required, [nameof(NewAddress)]);
                 }
 
-                if (NewGovernorate is not null && !IraqGovernorates.IsKnown(NewGovernorate))
+                if (NewGovernorate is not null && !PlaceCodes.IsValid(NewGovernorate))
                 {
                     yield return new(ValidationText.Governorate, [nameof(NewGovernorate)]);
                 }
 
                 break;
             case RequestType.ChangePhone:
-                if (!IraqPhone.IsValid(NewPhone))
+                if (!PhoneNumbers.IsValid(NewPhone))
                 {
-                    yield return new(ValidationText.IraqiMobile, [nameof(NewPhone)]);
+                    yield return new(ValidationText.Phone, [nameof(NewPhone)]);
                 }
 
                 break;

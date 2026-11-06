@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Logistico.Modules.Shipments.Contracts.Rules;
 using Logistico.SharedKernel;
-using Logistico.SharedKernel.Iraq;
+using Logistico.SharedKernel.Geo;
 
 namespace Logistico.Modules.Shipments.Contracts;
 
@@ -204,12 +204,12 @@ public sealed class CourierRequest : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (!IraqPhone.IsValid(Phone))
+        if (!PhoneNumbers.IsValid(Phone))
         {
-            yield return new(ValidationText.IraqiMobile, [nameof(Phone)]);
+            yield return new(ValidationText.Phone, [nameof(Phone)]);
         }
 
-        if (!IraqGovernorates.IsKnown(Governorate))
+        if (!PlaceCodes.IsValid(Governorate))
         {
             yield return new(ValidationText.Governorate, [nameof(Governorate)]);
         }

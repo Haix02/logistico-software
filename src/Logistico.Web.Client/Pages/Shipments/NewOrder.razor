@@ -98,7 +98,7 @@
                             <span class="bp6-html-select bp6-fill">
                                 <InputSelect @bind-Value="model.DestinationCode" @bind-Value:after="RecalculateTariff">
                                     <option value="">@L["ChooseGovernorate"]</option>
-                                    @foreach (var g in IraqGovernorates.All)
+                                    @foreach (var g in HubCatalog.Destinations.OrderBy(g => g.Name, StringComparer.CurrentCulture))
                                     {
                                         <option value="@g.Code">@g.Name</option>
                                     }
@@ -262,7 +262,7 @@ else
                                         <td>
                                             <span class="bp6-html-select bp6-small">
                                                 <select value="@row.DestinationCode" @onchange="@(e => UpdateBatchRowGovernorate(row, e.Value?.ToString()))">
-                                                    @foreach (var g in IraqGovernorates.All)
+                                                    @foreach (var g in HubCatalog.Destinations.OrderBy(g => g.Name, StringComparer.CurrentCulture))
                                                     {
                                                         <option value="@g.Code">@g.Name</option>
                                                     }
@@ -381,7 +381,7 @@ else
     private IReadOnlyList<ParsedOrderDraft> ValidBatchOrders => batchDrafts.Where(d => d.IsValid).ToList();
 
     private DateTimeOffset? Promise =>
-        IraqGovernorates.IsKnown(model.DestinationCode) ? DeliveryPromise.Estimate(model.OriginCode, model.DestinationCode, DateTimeOffset.UtcNow) : null;
+        PlaceCodes.IsValid(model.DestinationCode) ? DeliveryPromise.Estimate(model.OriginCode, model.DestinationCode, DateTimeOffset.UtcNow) : null;
 
     protected override async Task OnInitializedAsync()
     {

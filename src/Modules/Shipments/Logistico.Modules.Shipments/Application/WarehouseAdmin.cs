@@ -12,11 +12,18 @@ namespace Logistico.Modules.Shipments.Application;
 /// Adds, edits and retires warehouses while keeping the network consistent: one main warehouse, every governorate
 /// covered at most once, and no warehouse retired while parcels or trucks still depend on it.
 /// </summary>
-internal sealed class WarehouseAdmin(ShipmentsDbContext db, HubDirectory hubs, ITenantContext tenant, TimeProvider clock)
+internal sealed class WarehouseAdmin(ShipmentsDbContext db, HubDirectory hubs, OperatingPlaces places, ITenantContext tenant, TimeProvider clock)
 {
     public async Task<Warehouse> CreateAsync(WarehouseRequest request, string? by, CancellationToken ct)
     {
         await hubs.EnsureStandardAsync(tenant.TenantId, ct);
+        if (!await db.Warehouses.AnyAsync(ct))
+        {
+            request.IsPrimary = true;
+            request.IsActive = true;
+        }
+
+        await places.EnsureWarehousePlacesAsync(tenant.TenantId, request, ct);
         var tag = Warehouse.NormalizeTag(request.RoutingTag);
         if (await db.Warehouses.AnyAsync(w => w.RoutingTag == tag, ct))
         {
@@ -43,6 +50,7 @@ internal sealed class WarehouseAdmin(ShipmentsDbContext db, HubDirectory hubs, I
             await EnsureCanRetireAsync(warehouse, ct);
         }
 
+        await places.EnsureWarehousePlacesAsync(tenant.TenantId, request, ct);
         var all = await db.Warehouses.ToListAsync(ct);
         warehouse.Update(request, by, clock.GetUtcNow());
         await SaveAsync(warehouse, request, all, isNew: false, ct, afterSave: wasActive && !warehouse.IsActive ? RerouteAroundAsync : null);

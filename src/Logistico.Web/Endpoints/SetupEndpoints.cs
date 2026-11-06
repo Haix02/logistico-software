@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Logistico.Modules.Shipments.Contracts;
 using Logistico.SharedKernel;
 using Logistico.SharedKernel.Identity;
 using Logistico.SharedKernel.Setup;
@@ -55,7 +56,7 @@ internal static class SetupEndpoints
 
     private static async Task<IResult> SaveCompanyAsync(
         CompanyProfile profile, HttpRequest request, HttpResponse response, ClaimsPrincipal user, ApplicationDbContext db, ITenantContext tenant,
-        TimeProvider clock, CancellationToken ct)
+        IOperatingNetwork network, TimeProvider clock, CancellationToken ct)
     {
         var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
         if (!System.ComponentModel.DataAnnotations.Validator.TryValidateObject(profile, new(profile), results, validateAllProperties: true))
@@ -98,6 +99,7 @@ internal static class SetupEndpoints
             return TypedResults.Problem(statusCode: StatusCodes.Status412PreconditionFailed, title: "Changed by someone else");
         }
 
+        await network.SetCountryAsync(tenant.TenantId, record.Country, ct);
         response.Headers.ETag = $"\"{record.Version}\"";
         return TypedResults.Ok(View(record));
     }

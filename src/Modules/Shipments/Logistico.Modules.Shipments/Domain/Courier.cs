@@ -1,6 +1,6 @@
 using Logistico.Modules.Shipments.Contracts;
 using Logistico.SharedKernel;
-using Logistico.SharedKernel.Iraq;
+using Logistico.SharedKernel.Geo;
 
 namespace Logistico.Modules.Shipments.Domain;
 
@@ -43,11 +43,11 @@ internal sealed class Courier
 
     private void Apply(CourierRequest request, DateTimeOffset now)
     {
-        var phone = IraqPhone.Normalize(request.Phone)
-            ?? throw new DomainException("courier.invalid_phone", "A valid Iraqi mobile number is required.");
-        if (!IraqGovernorates.IsKnown(request.Governorate))
+        var phone = PhoneNumbers.Normalize(request.Phone)
+            ?? throw new DomainException("courier.invalid_phone", "A valid phone number is required.");
+        if (!PlaceCodes.IsValid(request.Governorate))
         {
-            throw new DomainException("courier.invalid_governorate", "Unknown governorate.");
+            throw new DomainException("courier.invalid_governorate", "Unknown area.");
         }
 
         Code = NormalizeCode(request.Code);

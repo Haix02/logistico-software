@@ -741,7 +741,7 @@
   <data name="NeedsAttention" xml:space="preserve"><value>تحتاج متابعة</value></data>
   <data name="NeedsAttentionHint" xml:space="preserve"><value>تسليمات فاشلة وشحنات محتجزة</value></data>
   <data name="NeedsTruckNotice" xml:space="preserve"><value>في {0}، ويجب نقلها بالشاحنة إلى {1}.</value></data>
-  <data name="NetworkSubtitle" xml:space="preserve"><value>كل الطرود في العراق: أين هي، وما المتأخر، وأي الشاحنات في الطريق.</value></data>
+  <data name="NetworkSubtitle" xml:space="preserve"><value>كل الطرود المفتوحة: أين هي، وما المتأخر، وأي الشاحنات في الطريق.</value></data>
   <data name="NetworkTitle" xml:space="preserve"><value>خريطة شبكة العراق</value></data>
   <data name="NewCourier" xml:space="preserve"><value>مندوب جديد</value></data>
   <data name="NewInternationalSubtitle" xml:space="preserve"><value>شحن إلى العراق بحراً أو جواً أو براً</value></data>
@@ -1287,7 +1287,7 @@
   <data name="WarehouseMain" xml:space="preserve"><value>المخزن الرئيسي (يستقبل الطرود التي لا تطابق مخزناً آخر)</value></data>
   <data name="WarehouseOperations" xml:space="preserve"><value>التشغيل</value></data>
   <data name="WarehouseSavedN" xml:space="preserve"><value>حُفظ {0}</value></data>
-  <data name="WarehousesSubtitle" xml:space="preserve"><value>مراكز الفرز والفروع والمستودعات في العراق، والمحافظات التي يخدمها كل منها، وحجم العمل فيها الآن.</value></data>
+  <data name="WarehousesSubtitle" xml:space="preserve"><value>مراكز الفرز والفروع والمستودعات، والمناطق التي يخدمها كل منها، وحجم العمل فيها الآن.</value></data>
   <data name="WarehousesTitle" xml:space="preserve"><value>المخازن والفروع</value></data>
   <data name="WarehouseSubtitle" xml:space="preserve"><value>امسح الطرود عند الاستلام والتحميل والتسليم للمندوب. اختر المركز أولاً.</value></data>
   <data name="WarehouseTitle" xml:space="preserve"><value>محطة المركز</value></data>
@@ -1519,7 +1519,14 @@
   <data name="Company_Profile" xml:space="preserve"><value>الملف</value></data>
   <data name="Company_ProfileHint" xml:space="preserve"><value>يظهر الاسم في الشريط العلوي، وهو اسم التطبيق ما لم تحدد إعدادات التطبيق اسماً آخر.</value></data>
   <data name="Company_Name" xml:space="preserve"><value>اسم الشركة</value></data>
+  <data name="Company_Country" xml:space="preserve"><value>البلد</value></data>
+  <data name="Company_Region" xml:space="preserve"><value>منطقة المكتب الرئيسي</value></data>
   <data name="Company_Governorate" xml:space="preserve"><value>محافظة المكتب الرئيسي</value></data>
+  <data name="AreasTitle" xml:space="preserve"><value>المناطق التي توصل إليها</value></data>
+  <data name="AreasHint" xml:space="preserve"><value>أضف كل منطقة قبل أن يغطيها مخزن. الرمز هو البلد وحرفان، مثل JO-AM.</value></data>
+  <data name="Field_RegionCode" xml:space="preserve"><value>رمز المنطقة</value></data>
+  <data name="RegionCodeHint" xml:space="preserve"><value>يبدأ بـ {0}-</value></data>
+  <data name="AddArea" xml:space="preserve"><value>إضافة منطقة</value></data>
   <data name="Company_Saved" xml:space="preserve"><value>حُفظ ملف الشركة</value></data>
   <data name="System_Subtitle" xml:space="preserve"><value>ما يحتاجه هذا التثبيت قبل إدخال بيانات زبائن حقيقيين</value></data>
   <data name="System_HasProblems" xml:space="preserve"><value>هناك أمور يجب إصلاحها قبل التشغيل الفعلي.</value></data>

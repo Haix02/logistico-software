@@ -55,7 +55,7 @@
         <StatusFilter Value="@(query.Status ?? [])" ValueChanged="@(v => ApplyAsync(q => q.Status = v.Count == 0 ? null : v.ToArray()))" />
         <HtmlSelect Value="@query.Governorate" ValueChanged="@(v => ApplyAsync(q => q.Governorate = v))" Label="@L["Col_Destination"]">
             <option value="">@L["AllGovernorates"]</option>
-            @foreach (var g in IraqGovernorates.All)
+            @foreach (var g in HubCatalog.Destinations.OrderBy(g => g.Name, StringComparer.CurrentCulture))
             {
                 <option value="@g.Code">@g.Name</option>
             }

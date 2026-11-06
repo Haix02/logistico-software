@@ -1,6 +1,7 @@
 using Logistico.Modules.Shipments.Contracts;
 using Logistico.Modules.Shipments.Contracts.Rules;
 using Logistico.SharedKernel;
+using Logistico.SharedKernel.Geo;
 using Logistico.SharedKernel.Iraq;
 
 namespace Logistico.Modules.Shipments.Domain;
@@ -116,13 +117,26 @@ internal sealed class Warehouse
 
     private void Apply(WarehouseRequest request, string? by, DateTimeOffset now)
     {
-        if (!IraqGovernorates.IsKnown(request.Governorate))
+        var governorate = request.Governorate.Trim().ToUpperInvariant();
+        if (!PlaceCodes.IsValid(governorate))
         {
-            throw new DomainException("warehouse.invalid_governorate", "Unknown governorate.", request.Governorate);
+            throw new DomainException("warehouse.invalid_governorate", "Unknown area.", request.Governorate);
         }
 
-        var phone = string.IsNullOrWhiteSpace(request.Phone) ? null : IraqPhone.Normalize(request.Phone)
-            ?? throw new DomainException("warehouse.invalid_phone", "A valid Iraqi phone number is required.");
+        if (IraqGovernorates.IsKnown(governorate)
+            && (request.Latitude is < WarehouseRequest.MinLatitude or > WarehouseRequest.MaxLatitude
+                || request.Longitude is < WarehouseRequest.MinLongitude or > WarehouseRequest.MaxLongitude))
+        {
+            throw new DomainException("warehouse.outside_iraq", "An Iraqi warehouse must sit inside Iraq.");
+        }
+
+        if (request.Latitude is < -90 or > 90 || request.Longitude is < -180 or > 180)
+        {
+            throw new DomainException("warehouse.invalid_location", "The map position is not a real coordinate.");
+        }
+
+        var phone = string.IsNullOrWhiteSpace(request.Phone) ? null : PhoneNumbers.Normalize(request.Phone)
+            ?? throw new DomainException("warehouse.invalid_phone", "A valid phone number is required.");
         if (!request.IsActive && request.IsPrimary)
         {
             throw new DomainException("warehouse.primary_inactive", "The main warehouse must stay active.");
@@ -131,7 +145,7 @@ internal sealed class Warehouse
         NameAr = request.NameAr.Trim();
         NameEn = request.NameEn.Trim();
         Kind = request.Kind;
-        Governorate = request.Governorate.Trim().ToUpperInvariant();
+        Governorate = governorate;
         Address = Clean(request.Address);
         Latitude = Math.Round(request.Latitude, 5);
         Longitude = Math.Round(request.Longitude, 5);
@@ -140,7 +154,7 @@ internal sealed class Warehouse
         OpeningHours = Clean(request.OpeningHours);
         ShelfCapacity = request.ShelfCapacity is > 0 ? request.ShelfCapacity : null;
         Covers = request.IsActive
-            ? [.. request.Covers.Select(c => c.Trim().ToUpperInvariant()).Where(IraqGovernorates.IsKnown).Distinct().Order(StringComparer.Ordinal)]
+            ? [.. request.Covers.Select(c => c.Trim().ToUpperInvariant()).Where(PlaceCodes.IsValid).Distinct().Order(StringComparer.Ordinal)]
             : [];
         IsActive = request.IsActive;
         IsPrimary = request.IsPrimary;

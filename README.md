@@ -2,7 +2,7 @@
 
 # Logistico · لوجستيكو — open-source delivery management system and courier app
 
-**Free, self-hosted delivery and logistics software: orders from online shops, hubs and sort plans, trucks between cities, a courier app with proof of delivery and barcode scanners, cash on delivery (COD), returns, shipment tracking and an audit log. Arabic-first. Built for Iraq, useful anywhere the address is a neighbourhood and a landmark.**
+**Open-source logistics software.** Free, self-hosted delivery management: orders, warehouses, trucks, a courier app with proof of delivery and barcode scanners, cash on delivery (COD), returns, shipment tracking and an audit log. Arabic and English. A company in Iraq starts with the country's governorates; a company anywhere else adds the regions and warehouses it delivers to.
 
 [![Latest release](https://img.shields.io/github/v/release/Haix02/logistico-software?label=release)](https://github.com/Haix02/logistico-software/releases/latest)
 [![CI](https://github.com/Haix02/logistico-software/actions/workflows/ci.yml/badge.svg)](https://github.com/Haix02/logistico-software/actions/workflows/ci.yml)
@@ -28,22 +28,21 @@ A delivery company runs the whole day in one console: book a parcel, scan it thr
 
 <div dir="rtl">
 
-**لوجستيكو** نظام مفتوح المصدر ومجاني لإدارة شركات الشحن والتوصيل في العراق: الطلبات ومتاجر الإنستغرام، الدفع عند الاستلام،
-المخازن والرفوف، الشاحنات بين المحافظات، تطبيق المندوب مع إثبات التسليم، المرتجعات، تسوية مستحقات المتاجر، الجمارك (أسيكودا)،
-وصفحة تتبع للزبون. الواجهة عربية أولاً من اليمين إلى اليسار، مع الإنجليزية.
+**لوجستيكو** برنامج لوجستي مفتوح المصدر ومجاني لشركات الشحن والتوصيل في أي بلد: الطلبات، الدفع عند الاستلام،
+المخازن والرفوف، الشاحنات، تطبيق المندوب مع إثبات التسليم، المرتجعات، تسوية مستحقات المتاجر، وصفحة تتبع للزبون.
+شركة في العراق تبدأ بمحافظاته؛ وشركة في بلد آخر تضيف مناطقها ومخازنها. الواجهة عربية من اليمين إلى اليسار، مع الإنجليزية.
 
 </div>
 
 ## Why
 
-Iraqi e-commerce runs on Instagram shops, cash on delivery and couriers who know every neighbourhood by its nearest
-landmark. The software behind it is mostly spreadsheets, WhatsApp groups and closed systems that were not made for
-Arabic, for Iraqi addresses, or for cash.
+Most delivery companies still run on spreadsheets, chat groups and closed systems that were not made for Arabic,
+for cash on delivery, or for an address that is a neighbourhood and a landmark.
 
-Logistico is a complete, free system for a delivery company: orders, hubs and trucks between governorates, couriers,
-returns, cash-on-delivery settlements, customs, and a public tracking page. Because every order flows through it, it
-also answers questions nobody in the market could answer before: **what do Iraqi customers order, where, when, and why
-do deliveries fail?** Companies can publish anonymised answers as open data, so the whole industry can learn.
+Logistico is open-source logistics software for that work: orders, warehouses and trucks, couriers, returns,
+cash-on-delivery settlements and a public tracking page. A company in Iraq also gets the governorate network,
+Instagram-shop orders and ASYCUDA customs. Because every order flows through it, it can answer **what customers order,
+where, when, and why deliveries fail.** Companies can publish anonymised answers as open data.
 
 ## What it does
 

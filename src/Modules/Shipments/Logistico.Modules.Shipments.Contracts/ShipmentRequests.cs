@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using Logistico.Modules.Shipments.Contracts.Rules;
 using Logistico.SharedKernel;
-using Logistico.SharedKernel.Iraq;
+using Logistico.SharedKernel.Geo;
 
 namespace Logistico.Modules.Shipments.Contracts;
 
@@ -99,19 +99,19 @@ public sealed partial class CreateShipmentRequest : IValidatableObject
     {
         if (ServiceType == Contracts.ServiceType.Domestic)
         {
-            if (!IraqGovernorates.IsKnown(DestinationCode))
+            if (!PlaceCodes.IsValid(DestinationCode))
             {
                 yield return new(ValidationText.Governorate, [nameof(DestinationCode)]);
             }
 
-            if (!IraqGovernorates.IsKnown(OriginCode))
+            if (!PlaceCodes.IsValid(OriginCode))
             {
                 yield return new(ValidationText.Governorate, [nameof(OriginCode)]);
             }
 
-            if (!IraqPhone.IsValid(ConsigneePhone))
+            if (!PhoneNumbers.IsValid(ConsigneePhone))
             {
-                yield return new(ValidationText.IraqiMobile, [nameof(ConsigneePhone)]);
+                yield return new(ValidationText.Phone, [nameof(ConsigneePhone)]);
             }
 
             if (string.IsNullOrWhiteSpace(DeliveryAddress))
@@ -238,12 +238,12 @@ public sealed class BulkBookOrdersRequest : IValidatableObject
                 yield return new(ValidationText.Required, [$"{nameof(Orders)}[{i}].{nameof(o.ConsigneeName)}"]);
             }
 
-            if (!IraqPhone.IsValid(o.ConsigneePhone))
+            if (!PhoneNumbers.IsValid(o.ConsigneePhone))
             {
-                yield return new(ValidationText.IraqiMobile, [$"{nameof(Orders)}[{i}].{nameof(o.ConsigneePhone)}"]);
+                yield return new(ValidationText.Phone, [$"{nameof(Orders)}[{i}].{nameof(o.ConsigneePhone)}"]);
             }
 
-            if (!IraqGovernorates.IsKnown(o.DestinationCode))
+            if (!PlaceCodes.IsValid(o.DestinationCode))
             {
                 yield return new(ValidationText.Governorate, [$"{nameof(Orders)}[{i}].{nameof(o.DestinationCode)}"]);
             }
