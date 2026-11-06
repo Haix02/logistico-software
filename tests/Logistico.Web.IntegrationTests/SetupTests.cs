@@ -82,6 +82,7 @@ public sealed partial class SetupTests(FreshInstallFactory factory) : IClassFixt
         ["Input.Code"] = code,
         ["Input.CompanyName"] = "الرافدين للتوصيل",
         ["Input.CompanyPhone"] = "0770 123 4567",
+        ["Input.Country"] = "IQ",
         ["Input.Governorate"] = "IQ-BG",
         ["Input.AdminName"] = "علي حسن",
         ["Input.Email"] = email,

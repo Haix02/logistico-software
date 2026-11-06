@@ -185,6 +185,11 @@
             return;
         }
 
+        if (string.IsNullOrWhiteSpace(Input.Country))
+        {
+            Input.Country = Countries.Iraq;
+        }
+
         if (!Gate.Accepts(Input.Code))
         {
             errors = [T["SetupWrongCode"]];
@@ -248,8 +253,15 @@
 
         public bool SampleData { get; set; }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) =>
-            new CompanyProfile { Name = CompanyName, Phone = CompanyPhone, Country = Country, Governorate = Countries.IsIraq(Country) ? Governorate : null }.Validate(validationContext)
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (string.IsNullOrWhiteSpace(Country))
+            {
+                Country = Countries.Iraq;
+            }
+
+            return new CompanyProfile { Name = CompanyName, Phone = CompanyPhone, Country = Country, Governorate = Countries.IsIraq(Country) ? Governorate : null }.Validate(validationContext)
                 .Select(r => new ValidationResult(r.ErrorMessage, r.MemberNames.Select(m => m == nameof(CompanyProfile.Phone) ? nameof(CompanyPhone) : m)));
+        }
     }
 }

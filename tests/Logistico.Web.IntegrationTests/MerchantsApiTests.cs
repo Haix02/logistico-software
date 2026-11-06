@@ -54,7 +54,7 @@ public sealed class MerchantsApiTests(LogisticoApiFactory factory)
             Name = "Bad Shop",
             ContactName = "X",
             Phone = "123",
-            Governorate = "XX-YY",
+            Governorate = "NOPE",
         });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);

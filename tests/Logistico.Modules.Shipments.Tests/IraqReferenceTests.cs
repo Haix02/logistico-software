@@ -79,20 +79,25 @@ public class IraqReferenceTests
     }
 
     [Fact]
-    public void Domestic_orders_need_an_iraqi_mobile_and_address()
+    public void Domestic_orders_need_a_callable_phone_and_an_address()
     {
         var request = new CreateShipmentRequest
         {
             ServiceType = ServiceType.Domestic,
             ConsigneeName = "زينب",
             DestinationCode = "IQ-BA",
-            ConsigneePhone = "+44 20 7946 0000",
+            ConsigneePhone = "123",
         };
         var results = new List<ValidationResult>();
         Validator.TryValidateObject(request, new ValidationContext(request), results, validateAllProperties: true);
 
         Assert.Contains(results, r => r.MemberNames.Contains(nameof(CreateShipmentRequest.ConsigneePhone)));
         Assert.Contains(results, r => r.MemberNames.Contains(nameof(CreateShipmentRequest.DeliveryAddress)));
+
+        request.ConsigneePhone = "+44 20 7946 0000";
+        request.DeliveryAddress = "12 High Street";
+        results.Clear();
+        Assert.True(Validator.TryValidateObject(request, new ValidationContext(request), results, validateAllProperties: true));
     }
 
     [Fact]
