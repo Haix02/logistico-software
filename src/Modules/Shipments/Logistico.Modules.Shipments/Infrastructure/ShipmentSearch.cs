@@ -66,6 +66,12 @@ internal static class ShipmentSearch
                 && (returning.Contains(s.Status) ? (s.OriginHubCode ?? s.DestinationHubCode) : s.DestinationHubCode) != s.CurrentHubCode);
         }
 
+        if (query.Open == true)
+        {
+            var closed = ShipmentLifecycle.ClosedStatuses;
+            source = source.Where(s => !closed.Contains(s.Status));
+        }
+
         if (query.Late == true)
         {
             var closed = ShipmentLifecycle.ClosedStatuses;

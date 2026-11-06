@@ -50,20 +50,21 @@
                 continue;
             }
 
+            var marker = hub.Code == IraqHubs.Baghdad ? (p.X + 26, p.Y + 18) : p;
             var load = Hubs.FirstOrDefault(h => h.HubCode == hub.Code);
             var size = (Compact ? 11 : 14) * (hub.Kind == HubKind.SortingHub ? 1 : 0.82);
             var css = Bp.Cls("lx-map-hub", $"lx-map-hub-{hub.Kind.ToString().ToLowerInvariant()}", Bp.When(load?.OpenAlerts > 0, "lx-map-hub-alert"));
             <g @onclick="@(() => OnHub.InvokeAsync(hub.Code))" style="cursor:pointer" role="button" tabindex="0" aria-label="@hub.Name">
                 @if (hub.Kind == HubKind.SortingHub)
                 {
-                    <circle cx="@F(p.X)" cy="@F(p.Y)" r="@F(size)" class="@css" />
+                    <circle cx="@F(marker.Item1)" cy="@F(marker.Item2)" r="@F(size)" class="@css" />
                 }
                 else
                 {
-                    <rect x="@F(p.X - size)" y="@F(p.Y - size)" width="@F(size * 2)" height="@F(size * 2)" rx="@(hub.Kind == HubKind.Branch ? "5" : "2")" class="@css" />
+                    <rect x="@F(marker.Item1 - size)" y="@F(marker.Item2 - size)" width="@F(size * 2)" height="@F(size * 2)" rx="@(hub.Kind == HubKind.Branch ? "5" : "2")" class="@css" />
                 }
                 <title>@hub.Name · @ShipmentTexts.Of(hub.Kind) · @string.Format(CultureInfo.CurrentCulture, L["OnShelvesN"], Fmt.Number(load?.OnShelves ?? 0))</title>
-                @SvgText(p.X, p.Y + 3.4, "lx-map-hub-text", hub.RoutingTag)
+                @SvgText(marker.Item1, marker.Item2 + 3.4, "lx-map-hub-text", hub.RoutingTag)
             </g>
         }
     </g>

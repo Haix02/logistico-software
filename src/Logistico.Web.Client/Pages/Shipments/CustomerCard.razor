@@ -36,7 +36,7 @@
         {
             <div class="lx-customer-address">
                 <Icon Name="map-marker" />
-                <span class="lx-grow"><Mixed Text="@AddressLine" /></span>
+                <span class="lx-grow"><Tag Minimal="true" Round="true">@Fmt.Place(Profile.Governorate)</Tag> <Mixed Text="@AddressLine" /></span>
                 @if (!IsSameAddress)
                 {
                     <Button Small="true" Icon="import" Text="@L["Customer_UseAddress"]" OnClick="@(() => OnUseAddress.InvokeAsync(Profile))" />

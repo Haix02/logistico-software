@@ -5,6 +5,12 @@ versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- **Baghdad on the network map can be selected.** Its hub marker sat on the governorate, so the click opened the hub instead. The marker is shifted off the shape; truck lines still meet at the real hub.
+- **The dashboard "right now" strip no longer clips its last figure** when the sidebar is open. The chips scroll inside the strip.
+- **A known phone shows the governorate** next to the saved address, so a Basra address is not applied as if it were Baghdad.
+- **If the application has not appeared after 45 seconds,** the splash is replaced by the reload bar instead of spinning with an empty page.
+
 ## [3.1.0] - 2026-11-02
 
 
@@ -126,6 +132,8 @@ versions follow [Semantic Versioning](https://semver.org/).
   click away. Arabic stays first-class (Almarai, right-to-left).
 
 ### Fixed
+- **A clerk's next click matches the number.** The network's active parcels open the open list, a hub's "ready for couriers" opens parcels already at that destination, and the shipment board's "with couriers" column is only parcels out for delivery. Changing the dashboard period no longer leaves the previous period's figures under the new choice. Booking the next order stays on a cleared form, and a known phone fills the saved address.
+- **A clerk's next click matches the number.** The network's active parcels open the open list, a hub's "ready for couriers" opens parcels already at that destination, and the shipment board's "with couriers" column is only parcels out for delivery. Changing the dashboard period no longer leaves the previous period's figures under the new choice. Booking the next order stays on a cleared form, and a known phone fills the saved address.
 - **Hubs and trucks.** Each hub on the network map opens its scan station and its trucks. A truck cannot be opened from a hub to itself. Map lanes follow the theme colours. Warehouse list shows an error when the network cannot be loaded.
 - **Operations console.** Changing the dashboard period no longer lets a slower answer overwrite the one just chosen. The Iraq map says when the network could not be loaded instead of spinning forever, and its refresh no longer runs off the page. Typing a customer's phone no longer applies an older lookup. An international booking cannot use the same place twice, and the form asks for the goods.
 - **Dark mode drew a hard grid.** Cards, tables, the dashboard pulse, shipment rows and the Iraq map used solid mid-grey borders on a near-black surface. Those lines are now faint white hairlines, and status outlines are tinted instead of fully saturated. Inputs stay visible.

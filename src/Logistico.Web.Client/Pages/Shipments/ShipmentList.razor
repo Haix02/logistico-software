@@ -127,13 +127,13 @@
         <Callout Intent="Intent.Danger" Icon="error" CssClass="lx-mt">@error</Callout>
     }
 
-    @if (board && result is not null)
+    @if (board && (loading || result is not null))
     {
-        <div class="lx-card-pad">
+        <div class="lx-card-pad" aria-busy="@loading">
             <div class="lx-kanban">
                 @foreach (var (title, icon, predicate) in BoardColumns)
                 {
-                    var items = result.Items.Where(predicate).ToList();
+                    var items = (result?.Items ?? []).Where(predicate).ToList();
                     <div class="lx-kanban-col">
                         <div class="lx-kanban-head"><span class="lx-row"><Icon Name="@icon" /> @title</span><Tag Round="true">@Fmt.Number(items.Count)</Tag></div>
                         <div class="lx-kanban-list">
@@ -189,6 +189,7 @@
     [SupplyParameterFromQuery(Name = "destinationHub")] public string? DestinationHub { get; set; }
     [SupplyParameterFromQuery(Name = "needsTransfer")] public bool? NeedsTransfer { get; set; }
     [SupplyParameterFromQuery(Name = "late")] public bool? Late { get; set; }
+    [SupplyParameterFromQuery(Name = "open")] public bool? Open { get; set; }
     [SupplyParameterFromQuery(Name = "sort")] public string? Sort { get; set; }
     [SupplyParameterFromQuery(Name = "desc")] public bool? Desc { get; set; }
     [SupplyParameterFromQuery(Name = "page")] public int? Page { get; set; }
@@ -266,7 +267,8 @@
         (L["Board_Booked"], "shopping-cart", s => s.Status is ShipmentStatus.Booked or ShipmentStatus.PickedUp or ShipmentStatus.ReceivedAtOrigin or ShipmentStatus.DepartedOrigin or ShipmentStatus.InTransit or ShipmentStatus.ArrivedPortOfEntry or ShipmentStatus.CustomsPending or ShipmentStatus.CustomsHold or ShipmentStatus.Released),
         (L["View_InWarehouse"], "box", s => ShipmentLifecycle.IsInWarehouse(s.Status)),
         (ShipmentTexts.Of(ShipmentStatus.InTransitToHub), "drive-time", s => s.Status == ShipmentStatus.InTransitToHub),
-        (L["View_WithCourier"], "truck", s => s.Status is ShipmentStatus.OutForDelivery or ShipmentStatus.DeliveryFailed),
+        (L["View_WithCourier"], "truck", s => s.Status == ShipmentStatus.OutForDelivery),
+        (L["View_Failed"], "warning-sign", s => s.Status == ShipmentStatus.DeliveryFailed),
         (L["View_Returns"], "undo", s => ShipmentLifecycle.IsReturning(s.Status) || s.Status == ShipmentStatus.Returned),
         (ShipmentTexts.Of(ShipmentStatus.Delivered), "tick-circle", s => s.Status == ShipmentStatus.Delivered),
     ];
@@ -305,6 +307,7 @@
             DestinationHub = DestinationHub,
             NeedsTransfer = NeedsTransfer,
             Late = Late,
+            Open = Open,
             Sort = string.IsNullOrWhiteSpace(Sort) ? null : Sort,
             Desc = Desc,
             Page = Page is > 1 ? Page : null,

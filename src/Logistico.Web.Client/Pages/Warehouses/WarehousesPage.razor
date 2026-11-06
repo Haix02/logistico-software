@@ -13,6 +13,10 @@
     </Actions>
 </PageHeader>
 
+@if (error is not null && list is not null)
+{
+    <Callout Intent="Intent.Warning" Icon="warning-sign" CssClass="lx-mb">@error</Callout>
+}
 @if (error is not null && list is null)
 {
     <Callout Intent="Intent.Danger" Icon="error" Title="@L["UnhandledError"]">

@@ -65,6 +65,20 @@
                 </div>
             </div>
         </div>
+        <div id="lx-boot-failed" class="lx-boot-splash" style="display:none">
+            <p>لم يكتمل فتح لوجستيكو. أعد تحميل الصفحة.</p>
+            <p>Logistico did not finish opening. Reload the page.</p>
+            <a href=".">إعادة التحميل · Reload</a>
+        </div>
+        <script nonce="@HttpContext.CspNonce()">
+            setTimeout(function () {
+                if (document.querySelector(".lx-app, .lx-public, .lx-boot, .lx-account")) return;
+                var splash = document.querySelector(".lx-boot-splash");
+                if (splash) splash.hidden = true;
+                var failed = document.getElementById("lx-boot-failed");
+                if (failed) failed.style.display = "flex";
+            }, 45000);
+        </script>
     }
     <Routes @rendermode="PageRenderMode" />
     @if (!IsAccountPage)

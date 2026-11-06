@@ -464,8 +464,12 @@ else
 
             customer = found;
 
-            // A returning customer: fill what the operator has not typed yet.
-            if (customer is { Orders: > 0 } && string.IsNullOrWhiteSpace(model.ConsigneeName))
+            // A returning customer: fill the name and the saved address when the clerk has not typed them.
+            if (customer is { Orders: > 0 } && string.IsNullOrWhiteSpace(model.DeliveryAddress))
+            {
+                UseCustomerAddress(customer);
+            }
+            else if (customer is { Orders: > 0 } && string.IsNullOrWhiteSpace(model.ConsigneeName))
             {
                 model.ConsigneeName = customer.Name ?? "";
             }
@@ -481,6 +485,22 @@ else
                 lookingUp = false;
             }
         }
+    }
+
+    private void ClearCustomer()
+    {
+        model.ConsigneeName = "";
+        model.ConsigneePhone = "";
+        model.DestinationCode = model.OriginCode;
+        model.DestinationCity = null;
+        model.DeliveryAddress = null;
+        model.Landmark = null;
+        model.ItemsDescription = null;
+        model.CodAmount = null;
+        model.ExternalReference = null;
+        customer = null;
+        lookedUpPhone = null;
+        RecalculateTariff();
     }
 
     private void UseCustomerAddress(CustomerProfile profile)
@@ -561,7 +581,7 @@ else
             var created = await Shipments.CreateAsync(model);
             Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["OrderCreated"], created.TrackingNumber));
             await Ops.RefreshAsync();
-            Navigation.NavigateTo($"shipments/{created.Id}");
+            ClearCustomer();
         }
         catch (ApiException ex)
         {

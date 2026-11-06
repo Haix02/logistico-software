@@ -37,7 +37,7 @@ else
         </div>
     </Callout>
 }
-else if (analytics is null || summary is null || network is null)
+else if (analytics is null || summary is null || network is null || (loading && analytics.Days != days))
 {
     <div class="lx-dashboard-skeleton" aria-hidden="true">
         <div class="lx-kpis lx-kpis-4">

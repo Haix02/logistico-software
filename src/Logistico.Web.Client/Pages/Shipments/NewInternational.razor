@@ -163,7 +163,17 @@
         ? L["RuleSea"]
         : string.Format(CultureInfo.CurrentCulture, L["RuleDivisor"], ChargeableWeight.VolumetricDivisor(model.Mode ?? TransportMode.Air));
 
-    protected override async Task OnInitializedAsync() => merchants = await Merchants.LookupAsync();
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            merchants = await Merchants.LookupAsync();
+        }
+        catch (Exception ex) when (ex is HttpRequestException or ApiException)
+        {
+            serverError = L["ServiceUnavailable"];
+        }
+    }
 
     private async Task SubmitAsync()
     {

@@ -12,6 +12,10 @@
     </Actions>
 </PageHeader>
 
+@if (error is not null && network is not null)
+{
+    <Callout Intent="Intent.Warning" Icon="warning-sign" CssClass="lx-mb">@error</Callout>
+}
 @if (error is not null && network is null)
 {
     <Callout Intent="Intent.Danger" Icon="error" Title="@L["UnhandledError"]">
@@ -28,7 +32,7 @@ else if (network is null)
 else
 {
     <div class="lx-kpis">
-        <KpiCard Icon="box" Label="@L["Kpi_ActiveParcels"]" Value="@Fmt.Number(network.ActiveTotal)" Intent="Intent.Primary" Href="shipments" />
+        <KpiCard Icon="box" Label="@L["Kpi_ActiveParcels"]" Value="@Fmt.Number(network.ActiveTotal)" Intent="Intent.Primary" Href="shipments?open=true" />
         <KpiCard Icon="drive-time" Label="@L["Kpi_OnTrucks"]" Value="@Fmt.Number(network.OnTrucks)" Intent="Intent.Primary" Href="transfers?status=InTransit" />
         <KpiCard Icon="time" Label="@L["Kpi_Late"]" Value="@Fmt.Number(network.Late)" Intent="@(network.Late > 0 ? Intent.Warning : Intent.Success)" Href="shipments?late=true" />
         <KpiCard Icon="notifications" Label="@L["Kpi_OpenAlerts"]" Value="@Fmt.Number(network.OpenAlerts)" Intent="@(network.OpenAlerts > 0 ? Intent.Danger : Intent.Success)" Href="automation" />

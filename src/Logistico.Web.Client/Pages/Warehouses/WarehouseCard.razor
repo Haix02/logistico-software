@@ -26,7 +26,7 @@
 
     <div class="lx-warehouse-stats">
         <a href="@($"shipments?hub={Warehouse.Code}&inWarehouse=true")"><strong>@Fmt.Number(Warehouse.Load.OnShelves)</strong><span>@L["OnShelves"]</span></a>
-        <a href="@($"shipments?hub={Warehouse.Code}&inWarehouse=true")"><strong>@Fmt.Number(Warehouse.Load.ToDispatch)</strong><span>@L["ToDispatch"]</span></a>
+        <a href="@($"shipments?hub={Warehouse.Code}&destinationHub={Warehouse.Code}&inWarehouse=true")"><strong>@Fmt.Number(Warehouse.Load.ToDispatch)</strong><span>@L["ToDispatch"]</span></a>
         <a href="@($"transfers?hub={Warehouse.Code}")"><strong>@Fmt.Number(Warehouse.Load.ToTransfer)</strong><span>@L["WaitingForTruck"]</span></a>
         <a href="@($"transfers?hub={Warehouse.Code}&status=InTransit")"><strong>@Fmt.Number(Warehouse.Load.InboundParcels)</strong><span>@L["InboundParcels"]</span></a>
         <div><strong>@Fmt.Number(Warehouse.Load.DeliveredToday)</strong><span>@L["Kpi_DeliveredToday"]</span></div>

@@ -33,6 +33,9 @@ public sealed class ShipmentQuery
     /// <summary>Delivery promise passed and the parcel is still on its way.</summary>
     public bool? Late { get; set; }
 
+    /// <summary>Parcels that are not delivered, returned or cancelled.</summary>
+    public bool? Open { get; set; }
+
     /// <summary>Orders in this confirmation state (e.g. Pending: waiting for the customer to confirm).</summary>
     public ConfirmationStatus? Confirmation { get; set; }
 
@@ -73,6 +76,7 @@ public sealed class ShipmentQuery
         Add("destinationHub", DestinationHub);
         Add("needsTransfer", NeedsTransfer?.ToString(CultureInfo.InvariantCulture).ToLowerInvariant());
         Add("late", Late?.ToString(CultureInfo.InvariantCulture).ToLowerInvariant());
+        Add("open", Open?.ToString(CultureInfo.InvariantCulture).ToLowerInvariant());
         Add("confirmation", Confirmation?.ToString());
         Add("courier", Courier);
         Add("sort", Sort);

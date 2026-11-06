@@ -933,7 +933,7 @@ button.lx-list-item { width: 100%; background: none; border: 0; border-block-end
     background: var(--lx-surface-2); color: var(--lx-text-strong); font-size: var(--lx-font-size); font-weight: 700;
     border-inline-end: 1px solid var(--lx-border); white-space: nowrap;
 }
-.lx-ops-pulse-items { display: grid; grid-template-columns: repeat(6, minmax(max-content, 1fr)); min-width: 0; }
+.lx-ops-pulse-items { display: grid; grid-template-columns: repeat(6, minmax(max-content, 1fr)); min-width: 0; overflow-x: auto; overscroll-behavior-x: contain; }
 .lx-ops-pulse-item {
     display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 46px; padding-inline: 12px;
     border-inline-end: 1px solid var(--lx-border); color: var(--lx-text) !important; text-decoration: none !important;
