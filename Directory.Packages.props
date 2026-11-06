@@ -3,7 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <!-- Lets a PackageVersion entry override a vulnerable transitive version (NuGet audit fails the build otherwise). -->
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
-    <AspNetCoreVersion>10.0.13</AspNetCoreVersion>
+    <AspNetCoreVersion>10.0.14</AspNetCoreVersion>
     <EfCoreVersion>10.0.13</EfCoreVersion>
   </PropertyGroup>
   <ItemGroup Label="ASP.NET Core">
