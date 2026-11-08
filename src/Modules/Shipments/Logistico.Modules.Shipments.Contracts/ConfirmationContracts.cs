@@ -18,7 +18,8 @@ public sealed class RecordConfirmationRequest
 public sealed partial class CustomerConfirmation : IValidatableObject
 {
     [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
-    public string PhoneLast4 { get; set; } = "";
+    /// <summary>The last four digits of the customer's mobile, as typed (Arabic-Indic digits too).</summary>
+    public string PhoneLast4 { get; set => field = SearchText.LatinDigits(value)?.Trim() ?? ""; } = "";
 
     public bool Confirm { get; set; } = true;
 

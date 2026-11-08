@@ -1,3 +1,5 @@
+using Logistico.SharedKernel;
+
 namespace Logistico.Modules.Shipments.Contracts.Rules;
 
 /// <summary>
@@ -42,7 +44,7 @@ public static class TrackingNumber
     public static string Normalize(string? value) =>
         string.IsNullOrWhiteSpace(value)
             ? ""
-            : string.Concat(value.Where(c => c is not (' ' or '-'))).ToUpperInvariant();
+            : string.Concat(SearchText.LatinDigits(value)!.Where(c => c is not (' ' or '-'))).ToUpperInvariant();
 
     /// <summary>Luhn (mod 10) check digit for a string of decimal digits.</summary>
     public static int LuhnCheckDigit(ReadOnlySpan<char> digits)

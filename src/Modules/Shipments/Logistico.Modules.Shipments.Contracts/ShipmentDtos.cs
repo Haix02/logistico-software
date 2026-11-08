@@ -175,9 +175,12 @@ public sealed record PublicTrackingView(
     IReadOnlyList<Rules.HubInfo> RouteHubs,
     bool AwaitingConfirmation = false,
     bool CanRate = false,
-    int? Rating = null)
+    int? Rating = null,
+    bool BetweenHubs = false,
+    bool AtDestinationHub = false)
 {
-    public bool CrossesHubs => OriginHubCode is not null && DestinationHubCode is not null && OriginHubCode != DestinationHubCode;
+    /// <summary>The parcel travels between two hubs. Anonymous tracking gets the flag, not the hubs (see ToPublicView).</summary>
+    public bool CrossesHubs => BetweenHubs || (OriginHubCode is not null && DestinationHubCode is not null && OriginHubCode != DestinationHubCode);
 
     /// <summary>A hub on this parcel's route (the page has no access to the company's full network).</summary>
     public Rules.HubInfo? Hub(string? code) => RouteHubs.FirstOrDefault(h => string.Equals(h.Code, code, StringComparison.OrdinalIgnoreCase));

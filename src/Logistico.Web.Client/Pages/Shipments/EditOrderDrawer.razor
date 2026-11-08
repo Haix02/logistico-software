@@ -60,13 +60,13 @@
             <div class="lx-form-grid">
                 <FormField Label="@L["Field_Cod"]" Field="() => model.CodAmount">
                     <div class="bp6-input-group bp6-fill">
-                        <InputNumber class="bp6-input" @bind-Value="model.CodAmount" step="250" min="0" dir="ltr" />
+                        <InputNumber class="bp6-input" @bind-Value="model.CodAmount" step="1" min="0" dir="ltr" />
                         <span class="bp6-input-action lx-input-suffix">@L["Iqd"]</span>
                     </div>
                 </FormField>
                 <FormField Label="@L["Field_DeliveryFee"]" Field="() => model.DeliveryFee">
                     <div class="bp6-input-group bp6-fill">
-                        <InputNumber class="bp6-input" @bind-Value="model.DeliveryFee" step="250" min="0" dir="ltr" />
+                        <InputNumber class="bp6-input" @bind-Value="model.DeliveryFee" step="1" min="0" dir="ltr" />
                         <span class="bp6-input-action lx-input-suffix">@L["Iqd"]</span>
                     </div>
                 </FormField>

@@ -87,6 +87,8 @@ public sealed class DomesticDeliveryFlowTests(LogisticoApiFactory factory)
         Assert.Null(view.CurrentHubCode);
         Assert.Null(view.DestinationHubCode);
         Assert.Empty(view.RouteHubs);
+        Assert.True(view.CrossesHubs); // Baghdad to Basra: the bar shows "between cities", though no hub is named
+        Assert.False(view.AtDestinationHub); // with the courier, at no hub
         Assert.Equal(DeliveryFailureReason.NoAnswer, view.Events[0].FailureReason);
         Assert.Contains(RequestType.Reschedule, view.AllowedRequests);
         Assert.DoesNotContain("زينب", body, StringComparison.Ordinal);
@@ -185,5 +187,60 @@ public sealed class DomesticDeliveryFlowTests(LogisticoApiFactory factory)
         Assert.Equal(IraqHubs.Basra, secondDetails.DestinationHubCode);
         Assert.Equal(65_000m, secondDetails.CodAmount);
         Assert.Equal(7_000m, secondDetails.DeliveryFee);
+    }
+
+    [Fact]
+    public async Task Parcels_scanned_at_the_same_moment_all_go_on_one_truck()
+    {
+        var company = Guid.CreateVersion7();
+        var client = factory.CreateUserClient(tenant: company);
+        var shop = await client.CreateMerchantAsync("متجر التزامن", "scan.race.shop");
+        var orders = await Task.WhenAll(Enumerable.Range(0, 12).Select(n => client.BookAsync(ApiTestHelpers.DomesticOrder(shop, $"زبون {n}"))));
+
+        // Two stations at one hub: nobody is asked to scan again, and the lane gets one truck.
+        var received = await Task.WhenAll(orders.Select(o => client.TryScanAsync(ScanOperation.Receive, o.TrackingNumber, IraqHubs.Baghdad, "A-1")));
+        Assert.All(received, r => Assert.Equal(HttpStatusCode.OK, r.StatusCode));
+        var outcomes = await Task.WhenAll(received.Select(r => r.Content.ReadFromJsonAsync<ScanOutcome>()));
+        Assert.Single(outcomes.Select(o => o!.TransferNumber).Distinct());
+
+        var loaded = await Task.WhenAll(orders.Select(o => client.TryScanAsync(ScanOperation.Load, o.TrackingNumber, IraqHubs.Baghdad)));
+        Assert.All(loaded, l => Assert.Equal(HttpStatusCode.OK, l.StatusCode));
+        var trucks = (await client.GetFromJsonAsync<TransferListResult>("/" + ShipmentsApiRoutes.Transfers + "?status=Loading&hub=" + IraqHubs.Baghdad))!;
+        Assert.Equal(12, Assert.Single(trucks.Items).Loaded);
+    }
+
+    [Fact]
+    public async Task A_parcel_a_truck_counted_missing_says_so_and_is_cleared_when_it_turns_up()
+    {
+        var company = Guid.CreateVersion7();
+        var client = factory.CreateUserClient(tenant: company);
+        var shop = await client.CreateMerchantAsync("متجر المفقود", "missing.truck.shop");
+        var kept = await client.BookAsync(ApiTestHelpers.DomesticOrder(shop, "زبون أ"));
+        var lost = await client.BookAsync(ApiTestHelpers.DomesticOrder(shop, "زبون ب"));
+        foreach (var order in new[] { kept, lost })
+        {
+            await client.ScanAsync(ScanOperation.Receive, order.TrackingNumber, IraqHubs.Baghdad, "A-1");
+            await client.ScanAsync(ScanOperation.Load, order.TrackingNumber, IraqHubs.Baghdad);
+        }
+
+        var truck = (await client.GetFromJsonAsync<TransferListResult>("/" + ShipmentsApiRoutes.Transfers + "?status=Loading&hub=" + IraqHubs.Baghdad))!.Items.Single();
+        var departed = await client.PostWithETagAsync(ShipmentsApiRoutes.TransferDepart(truck.Id), new DepartTransferRequest { VehiclePlate = "BG-1", DriverName = "سلام" },
+            (await client.GetAsync("/" + ShipmentsApiRoutes.TransferById(truck.Id))).Headers.ETag!);
+        Assert.True(departed.IsSuccessStatusCode, await departed.Content.ReadAsStringAsync());
+        await client.ScanAsync(ScanOperation.Unload, kept.TrackingNumber, IraqHubs.Basra);
+        var closed = await client.PostWithETagAsync(ShipmentsApiRoutes.TransferClose(truck.Id), new CloseTransferRequest(),
+            (await client.GetAsync("/" + ShipmentsApiRoutes.TransferById(truck.Id))).Headers.ETag!);
+        Assert.True(closed.IsSuccessStatusCode, await closed.Content.ReadAsStringAsync());
+
+        // The missing parcel's own timeline says what happened, and an alert is open.
+        Assert.Contains((await client.GetShipmentAsync(lost.Id)).Events, e => e.Notes?.Contains(truck.Number, StringComparison.Ordinal) == true);
+        Assert.Contains((await client.GetFromJsonAsync<AlertList>("/" + ShipmentsApiRoutes.AutomationAlerts))!.Items, a => a.TrackingNumber == lost.TrackingNumber);
+
+        // It turns up at Basra a day later: received, the manifest line is no longer missing and the alert closes.
+        var found = await client.ScanAsync(ScanOperation.Receive, lost.TrackingNumber, IraqHubs.Basra);
+        Assert.Equal(ShipmentStatus.AtWarehouse, found.Status);
+        var manifest = (await client.GetFromJsonAsync<TransferDetails>("/" + ShipmentsApiRoutes.TransferById(truck.Id)))!;
+        Assert.DoesNotContain(manifest.Items, i => i.State == TransferItemState.Missing);
+        Assert.DoesNotContain((await client.GetFromJsonAsync<AlertList>("/" + ShipmentsApiRoutes.AutomationAlerts))!.Items, a => a.TrackingNumber == lost.TrackingNumber);
     }
 }

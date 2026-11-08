@@ -21,6 +21,9 @@ internal sealed class WarehouseScanner(
     ITenantContext tenant,
     TimeProvider clock)
 {
+    /// <summary>How many times a scan is tried when something else changed its parcel or truck at the same moment.</summary>
+    private const int MaxAttempts = 4;
+
     public async Task<IReadOnlyList<ScanOutcome>> ScanAsync(
         ScanOperation operation,
         IEnumerable<string> trackingNumbers,
@@ -34,6 +37,46 @@ internal sealed class WarehouseScanner(
     {
         var hub = (await hubs.NetworkAsync(tenant.TenantId, ct)).Find(hubCode) ?? throw new DomainException("scan.unknown_hub", "Unknown hub.", hubCode);
         var numbers = trackingNumbers.Select(TrackingNumber.Normalize).Where(n => n.Length > 0).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+
+        // Stations must not ask people to scan again: a parcel changed by the automation sweep a moment ago is simply read again.
+        // Inside a caller's transaction (the courier app keeps the proof with the scan) the caller decides instead.
+        var retry = db.Database.CurrentTransaction is null;
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                return await ScanOnceAsync(operation, numbers, hub, bin, courierName, transferId, failureReason, user, ct);
+            }
+            catch (DbUpdateException ex) when (retry && attempt < MaxAttempts && (ex is DbUpdateConcurrencyException || ex.IsUniqueViolation()))
+            {
+                db.ChangeTracker.Clear();
+            }
+        }
+    }
+
+    /// <summary>
+    /// One try. Scans that put parcels on a shelf or a truck wait for each other at the hub: they share the hub's trucks,
+    /// and two scans at the same moment would otherwise collide on the truck's manifest or each open a truck for the lane.
+    /// </summary>
+    private async Task<IReadOnlyList<ScanOutcome>> ScanOnceAsync(
+        ScanOperation operation,
+        List<string> numbers,
+        HubInfo hub,
+        string? bin,
+        string? courierName,
+        Guid? transferId,
+        DeliveryFailureReason? failureReason,
+        string? user,
+        CancellationToken ct)
+    {
+        var waitsForHub = operation is ScanOperation.Receive or ScanOperation.Unload or ScanOperation.Load;
+        await using var transaction = waitsForHub && db.Database.CurrentTransaction is null ? await db.Database.BeginTransactionAsync(ct) : null;
+        if (waitsForHub)
+        {
+            var key = $"hub-scan:{tenant.TenantId}:{hub.Code}";
+            await db.Database.ExecuteSqlAsync($"SELECT pg_advisory_xact_lock(hashtextextended({key}, 0))", ct);
+        }
+
         var shipments = await db.Shipments.Where(s => numbers.Contains(s.TrackingNumber)).ToDictionaryAsync(s => s.TrackingNumber, StringComparer.OrdinalIgnoreCase, ct);
         var transfer = transferId is { } id
             ? await db.Transfers.Include(t => t.Items).FirstOrDefaultAsync(t => t.Id == id, ct) ?? throw new DomainException("transfer.not_found", "Truck manifest not found.")
@@ -79,6 +122,11 @@ internal sealed class WarehouseScanner(
 
         db.HubScans.AddRange(scans);
         await db.SaveChangesAsync(ct);
+        if (transaction is not null)
+        {
+            await transaction.CommitAsync(ct);
+        }
+
         return scans.Select(scan =>
         {
             var outcome = ToOutcome(scan, scan.ShipmentId is { } sid ? shipments.Values.FirstOrDefault(s => s.Id == sid) : null);
@@ -118,6 +166,15 @@ internal sealed class WarehouseScanner(
                     {
                         arriving.Receive(shipment, actor.Name, now);
                     }
+                    else if (arriving is { Status: TransferStatus.Received } closed && closed.FoundAfterClosing(shipment, now))
+                    {
+                        // Counted missing when its truck was closed, here after all: the manifest and the alert say so.
+                        shipment.RecordJourneyNote(ShipmentTexts.Problem("transfer.parcel_found", closed.Number), actor, now);
+                        foreach (var alert in await db.Alerts.Where(a => a.ShipmentId == shipment.Id && a.Kind == AlertKind.MissingInTransfer && a.ResolvedAt == null).ToListAsync(ct))
+                        {
+                            alert.Resolve(actor.Name, automatic: true, now);
+                        }
+                    }
                     else if (arriving is null && shipment.TransferId is { } plannedId && shipment.CurrentHubCode != hub.Code)
                     {
                         // Planned on a truck at another hub but physically here now: take it off that truck.
@@ -125,6 +182,7 @@ internal sealed class WarehouseScanner(
                         if (otherTruck is { Status: TransferStatus.Loading })
                         {
                             otherTruck.Unplan(shipment, now);
+                            shipment.RecordJourneyNote(ShipmentTexts.Problem("transfer.arrived_without_truck", otherTruck.Number), actor, now);
                         }
                     }
 

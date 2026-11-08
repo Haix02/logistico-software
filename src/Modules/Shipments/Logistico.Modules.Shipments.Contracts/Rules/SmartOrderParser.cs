@@ -138,6 +138,14 @@ public static partial class SmartOrderParser
             {
                 sb.Append((char)('0' + (ch - '٠')));
             }
+            else if (ch is '٬' or '،' && sb.Length > 0 && char.IsAsciiDigit(sb[^1]) && sb.Length < input.Length)
+            {
+                sb.Append(','); // ٤٥٬٠٠٠ and 45،000: the Arabic thousands separator and comma between digits
+            }
+            else if (ch == '٫')
+            {
+                sb.Append('.');
+            }
             else if (ch is >= '۰' and <= '۹')
             {
                 sb.Append((char)('0' + (ch - '۰')));
@@ -169,9 +177,11 @@ public static partial class SmartOrderParser
             textWithoutPhone = normalized.Remove(phoneMatch.Index, phoneMatch.Length);
         }
 
-        // 2. Extract COD amount in IQD (e.g. "45 الف", "45,000", "45000", "35k")
+        // 2. Extract COD amount in IQD (e.g. "45 الف", "45,000", "45000", "35k"). House, alley and block numbers are
+        //    address, not money: they are hidden from the search (same length, so positions stay right).
         decimal? codAmount = null;
-        var thousandWordMatch = ThousandWordAmountRegex().Match(textWithoutPhone);
+        var amountText = AddressNumberRegex().Replace(textWithoutPhone, m => new string('#', m.Length));
+        var thousandWordMatch = ThousandWordAmountRegex().Match(amountText);
         if (thousandWordMatch.Success && decimal.TryParse(thousandWordMatch.Groups[1].Value, NumberStyles.Any, CultureInfo.InvariantCulture, out var thousands))
         {
             codAmount = thousands * 1_000m;
@@ -179,11 +189,12 @@ public static partial class SmartOrderParser
         }
         else
         {
-            var numberMatch = ExplicitIqdAmountRegex().Match(textWithoutPhone);
+            var numberMatch = ExplicitIqdAmountRegex().Match(amountText);
             if (numberMatch.Success)
             {
                 var cleanDigits = numberMatch.Groups[1].Value.Replace(",", "").Replace(".", "");
-                if (decimal.TryParse(cleanDigits, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedAmount) && parsedAmount >= 1_000m)
+                // Prices in dinars are whole hundreds (250 is the smallest note); "1205" is an alley, not a price.
+                if (decimal.TryParse(cleanDigits, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedAmount) && parsedAmount >= 1_000m && parsedAmount % 250 == 0)
                 {
                     codAmount = parsedAmount;
                     textWithoutPhone = textWithoutPhone.Remove(numberMatch.Index, numberMatch.Length);
@@ -191,18 +202,17 @@ public static partial class SmartOrderParser
             }
         }
 
-        // 3. Detect Governorate and District/Area
-        var governorate = "IQ-BG";
-        string? detectedDistrict = null;
-        foreach (var (keyword, govCode, district) in LocationKeywords)
-        {
-            if (textWithoutPhone.Contains(keyword, StringComparison.OrdinalIgnoreCase))
-            {
-                governorate = govCode;
-                detectedDistrict ??= district;
-                break;
-            }
-        }
+        // 3. Detect Governorate and District/Area. A governorate named in the message wins over a neighbourhood that
+        //    shares a name elsewhere ("النجف حي الجامعة"), and the place named first wins over a street named after
+        //    another city ("البصرة شارع بغداد"). A place we do not know stays empty: the person chooses it.
+        var found = LocationKeywords
+            .Select(k => (k.Keyword, Governorate: k.GovernorateCode, District: (string?)k.DistrictName, At: textWithoutPhone.IndexOf(k.Keyword, StringComparison.OrdinalIgnoreCase)))
+            .Where(k => k.At >= 0)
+            .ToList();
+        var named = found.Where(k => k.District is null).OrderBy(k => k.At).FirstOrDefault();
+        var area = found.Where(k => k.District is not null && (named.Keyword is null || k.Governorate == named.Governorate)).OrderBy(k => k.At).FirstOrDefault();
+        var governorate = named.Keyword is not null ? named.Governorate : area.Keyword is not null ? area.Governorate : "";
+        var detectedDistrict = area.District;
 
         // 4. Split remaining text into segments by '-', '|', '/', ',', tab, or newline
         var segments = SegmentSplitterRegex()
@@ -219,7 +229,7 @@ public static partial class SmartOrderParser
         foreach (var rawSeg in segments)
         {
             var isExplicitLandmark = LandmarkLabelRegex().IsMatch(rawSeg) ||
-                LandmarkPrefixes.Any(p => rawSeg.Contains(p, StringComparison.OrdinalIgnoreCase));
+                LandmarkPrefixes.Any(p => rawSeg.StartsWith(p, StringComparison.OrdinalIgnoreCase) || rawSeg.Contains(" " + p, StringComparison.OrdinalIgnoreCase));
             var seg = CleanSegment(rawSeg);
             if (seg.Length <= 1)
             {
@@ -253,10 +263,10 @@ public static partial class SmartOrderParser
 
         var address = addressParts.Count > 0
             ? string.Join(" — ", addressParts)
-            : detectedDistrict ?? IraqGovernorates.NameOrCode(governorate);
+            : detectedDistrict ?? (governorate.Length > 0 ? IraqGovernorates.NameOrCode(governorate) : "");
 
         var items = itemParts.Count > 0 ? string.Join(" · ", itemParts) : null;
-        var deliveryFee = IraqTariffCalculator.CalculateDeliveryFeeIqd(originGovernorate, governorate, 1m);
+        var deliveryFee = governorate.Length > 0 ? IraqTariffCalculator.CalculateDeliveryFeeIqd(originGovernorate, governorate, 1m) : 0m;
 
         return new ParsedOrderDraft
         {
@@ -267,7 +277,7 @@ public static partial class SmartOrderParser
             DeliveryAddress = address,
             Landmark = landmark,
             ItemsDescription = items,
-            CodAmount = codAmount ?? 25_000m,
+            CodAmount = codAmount, // no price in the message: none is invented
             DeliveryFee = deliveryFee,
         };
     }
@@ -314,8 +324,12 @@ public static partial class SmartOrderParser
     private static string CleanSegment(string value) =>
         LabelPrefixRegex().Replace(value, "").Trim(' ', '-', '—', ':', '،', ',', '.', '/');
 
-    [GeneratedRegex(@"(?:\+?964|00964|0)?7[3-9][\d\s\-]{8,11}")]
+    [GeneratedRegex(@"(?<!\d)(?:(?:\+|00)?964[\s\-]?|0)?7[3-9]\d(?:[\s\-]?\d){7}(?!\d)")]
     private static partial Regex IraqiPhoneMatchRegex();
+
+    /// <summary>A number that belongs to the address: "زقاق 1205", "دار 17", "محلة 905", "بلوك 3".</summary>
+    [GeneratedRegex(@"(?:زقاق|زقاقه|محلة|محله|دار|بيت|عمارة|شقة|بلوك|قطاع|شارع|ز|م|د)\s*\.?\s*\d+")]
+    private static partial Regex AddressNumberRegex();
 
     [GeneratedRegex(@"\b(\d{1,4}(?:\.\d+)?)\s*(?:الف|ألف|آلاف|الاف|k|K)\b")]
     private static partial Regex ThousandWordAmountRegex();
@@ -346,7 +360,7 @@ public sealed class ParsedOrderDraft
     public string ConsigneePhone { get; set; } = "";
 
     [System.ComponentModel.DataAnnotations.Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
-    public string DestinationCode { get; set; } = "IQ-BG";
+    public string DestinationCode { get; set; } = "";
 
     [System.ComponentModel.DataAnnotations.StringLength(80, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.MaxLength))]
     public string? DestinationCity { get; set; }
@@ -362,7 +376,7 @@ public sealed class ParsedOrderDraft
     public string? ItemsDescription { get; set; }
 
     [System.ComponentModel.DataAnnotations.Range(typeof(decimal), "0", "1000000000", ParseLimitsInInvariantCulture = true, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Range))]
-    public decimal CodAmount { get; set; } = 25_000m;
+    public decimal? CodAmount { get; set; }
 
     [System.ComponentModel.DataAnnotations.Range(typeof(decimal), "0", "10000000", ParseLimitsInInvariantCulture = true, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Range))]
     public decimal DeliveryFee { get; set; } = 5_000m;

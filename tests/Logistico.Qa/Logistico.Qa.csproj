@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JunitXml.TestLogger" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Microsoft.Playwright" />
+    <PackageReference Include="Npgsql" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Logistico.SharedKernel\Logistico.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Shipments\Logistico.Modules.Shipments.Contracts\Logistico.Modules.Shipments.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Merchants\Logistico.Modules.Merchants.Contracts\Logistico.Modules.Merchants.Contracts.csproj" />
+    <!-- Built first, not referenced: QaServer runs it as its own process, the way it runs in production. -->
+    <ProjectReference Include="..\..\src\Logistico.Web\Logistico.Web.csproj" ReferenceOutputAssembly="false" Private="false" />
+  </ItemGroup>
+
+</Project>

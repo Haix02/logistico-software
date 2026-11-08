@@ -65,7 +65,16 @@ internal static class PublicEndpoints
                 {
                     // An unhappy customer gets a call back: the low rating becomes a complaint in the requests inbox.
                     var details = $"{new string('★', request.Stars)}{new string('☆', 5 - request.Stars)} {shipment.RatingComment}".Trim();
-                    await desk.CreateAsync(shipment, new CreateServiceRequest { ShipmentId = shipment.Id, Type = RequestType.Complaint, Details = details }, RequestSource.Customer, "customer", ct);
+                    var open = await db.Requests.IgnoreQueryFilters().FirstOrDefaultAsync(r => r.TenantId == shipment.TenantId && r.ShipmentId == shipment.Id
+                        && r.Type == RequestType.Complaint && (r.Status == RequestStatus.Open || r.Status == RequestStatus.InProgress), ct);
+                    if (open is not null)
+                    {
+                        open.AddDetails(details); // a complaint is already open: the rating joins it instead of being refused
+                    }
+                    else
+                    {
+                        await desk.CreateAsync(shipment, new CreateServiceRequest { ShipmentId = shipment.Id, Type = RequestType.Complaint, Details = details }, RequestSource.Customer, "customer", ct);
+                    }
                 }
 
                 await db.SaveChangesAsync(ct);

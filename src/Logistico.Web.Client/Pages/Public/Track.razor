@@ -62,7 +62,7 @@
 
             <div class="lx-track-headline">@Headline</div>
 
-            <TrackingStages Service="view.ServiceType" Status="view.Status" Large="true" CrossesHubs="view.CrossesHubs" AtDestinationHub="@(view.CurrentHubCode == view.DestinationHubCode)" />
+            <TrackingStages Service="view.ServiceType" Status="view.Status" Large="true" CrossesHubs="view.CrossesHubs" AtDestinationHub="@(view.AtDestinationHub || (view.CurrentHubCode is not null && view.CurrentHubCode == view.DestinationHubCode))" />
 
             <div class="lx-track-facts">
                 <div class="lx-track-fact">
@@ -76,13 +76,17 @@
                         <div><div class="bp6-text-muted lx-small">@L["WhereNow"]</div><div>@where</div></div>
                     </div>
                 }
-                <div class="lx-track-fact">
-                    <Icon Name="calendar" Large="true" />
-                    <div>
-                        <div class="bp6-text-muted lx-small">@(view.DeliveredAt is null ? L["ExpectedBy"] : L["DeliveredOn"])</div>
-                        <div>@(view.DeliveredAt is { } delivered ? Fmt.DateTime(delivered) : Fmt.Date(view.RescheduledTo ?? view.EtaAt ?? view.PromisedAt))</div>
+                @* A parcel going back to the shop (or cancelled) is not expected any more: no stale date. *@
+                @if (view.DeliveredAt is not null || !TrackingProgress.IsAborted(view.Status))
+                {
+                    <div class="lx-track-fact">
+                        <Icon Name="calendar" Large="true" />
+                        <div>
+                            <div class="bp6-text-muted lx-small">@(view.DeliveredAt is null ? L["ExpectedBy"] : L["DeliveredOn"])</div>
+                            <div>@(view.DeliveredAt is { } delivered ? Fmt.DateTime(delivered) : Fmt.Date(view.RescheduledTo ?? view.EtaAt ?? view.PromisedAt))</div>
+                        </div>
                     </div>
-                </div>
+                }
                 @if (view.AmountToPay is { } amount)
                 {
                     <div class="lx-track-fact lx-track-pay">
@@ -283,7 +287,7 @@
     private string? WhereNow => view switch
     {
         null => null,
-        { Status: ShipmentStatus.InTransitToHub } => string.Format(CultureInfo.CurrentCulture, L["OnTheWayTo"], Fmt.Place(view.Hub(view.DestinationHubCode)?.Governorate)),
+        { Status: ShipmentStatus.InTransitToHub } => string.Format(CultureInfo.CurrentCulture, L["OnTheWayTo"], Fmt.Place(view.Hub(view.DestinationHubCode)?.Governorate ?? view.DestinationCode)),
         { CurrentHubCode: { } hub } when ShipmentLifecycle.IsActive(view.Status) => string.Format(CultureInfo.CurrentCulture, L["AtOurHubIn"], Fmt.Place(view.Hub(hub)?.Governorate)),
         _ => null,
     };

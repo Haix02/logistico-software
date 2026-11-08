@@ -130,7 +130,7 @@
                             <InputNumber class="bp6-input bp6-fill" @bind-Value="model.GrossWeightKg" @bind-Value:after="RecalculateTariff" step="0.1" min="0" />
                         </FormField>
                         <FormField Label="@L["Field_DeliveryFee"]" Hint="@L["IqdHint"]" Field="() => model.DeliveryFee">
-                            <InputNumber class="bp6-input bp6-fill" @bind-Value="model.DeliveryFee" step="250" min="0" />
+                            <InputNumber class="bp6-input bp6-fill" @bind-Value="model.DeliveryFee" step="1" min="0" />
                         </FormField>
                     </div>
                 </Section>
@@ -139,7 +139,7 @@
                     <div class="lx-form-grid">
                         <FormField Label="@L["Field_Cod"]" Helper="@L["CodHelper"]" Field="() => model.CodAmount">
                             <div class="bp6-input-group bp6-fill">
-                                <InputNumber class="bp6-input" @bind-Value="model.CodAmount" step="250" min="0" />
+                                <InputNumber class="bp6-input" @bind-Value="model.CodAmount" step="1" min="0" />
                                 <span class="bp6-input-action lx-input-suffix">@L["Iqd"]</span>
                             </div>
                         </FormField>
@@ -262,6 +262,7 @@ else
                                         <td>
                                             <span class="bp6-html-select bp6-small">
                                                 <select value="@row.DestinationCode" @onchange="@(e => UpdateBatchRowGovernorate(row, e.Value?.ToString()))">
+                                                    <option value="">@L["ChooseGovernorate"]</option>
                                                     @foreach (var g in HubCatalog.Destinations.OrderBy(g => g.Name, StringComparer.CurrentCulture))
                                                     {
                                                         <option value="@g.Code">@g.Name</option>
@@ -277,7 +278,7 @@ else
                                             <input class="bp6-input bp6-small bp6-fill" @bind="row.ItemsDescription" />
                                         </td>
                                         <td>
-                                            <input type="number" class="bp6-input bp6-small" dir="ltr" style="width:105px" step="250" min="0" @bind="row.CodAmount" />
+                                            <input type="number" class="bp6-input bp6-small" dir="ltr" style="width:105px" step="1" min="0" @bind="row.CodAmount" />
                                         </td>
                                         <td class="lx-nowrap">@Fmt.Money(row.DeliveryFee, "IQD")</td>
                                         <td>
@@ -300,11 +301,11 @@ else
                     <dt>@L["ValidOrders"]</dt>
                     <dd class="lx-strong">@Fmt.Number(ValidBatchOrders.Count) / @Fmt.Number(batchDrafts.Count)</dd>
                     <dt>@L["CustomerPays"]</dt>
-                    <dd class="lx-strong">@Fmt.Money(ValidBatchOrders.Sum(o => o.CodAmount), "IQD")</dd>
+                    <dd class="lx-strong">@Fmt.Money(ValidBatchOrders.Sum(o => o.CodAmount ?? 0), "IQD")</dd>
                     <dt>@L["Field_DeliveryFee"]</dt>
                     <dd>@Fmt.Money(ValidBatchOrders.Sum(o => o.DeliveryFee), "IQD")</dd>
                     <dt>@L["SellerReceives"]</dt>
-                    <dd class="lx-strong">@Fmt.Money(ValidBatchOrders.Sum(o => o.CodAmount - o.DeliveryFee), "IQD")</dd>
+                    <dd class="lx-strong">@Fmt.Money(ValidBatchOrders.Sum(o => (o.CodAmount ?? 0) - o.DeliveryFee), "IQD")</dd>
                 </dl>
 
                 @if (serverError is not null)
@@ -409,7 +410,7 @@ else
             RecalculateTariff();
             foreach (var row in batchDrafts)
             {
-                row.DeliveryFee = Quote(row.DestinationCode, 1m).Fee;
+                row.DeliveryFee = IraqGovernorates.IsKnown(row.DestinationCode) ? Quote(row.DestinationCode, 1m).Fee : 0;
             }
         }
     }
@@ -556,14 +557,14 @@ else
         batchDrafts = SmartOrderParser.ParseBatch(batchRawText, model.OriginCode).ToList();
         foreach (var row in batchDrafts)
         {
-            row.DeliveryFee = Quote(row.DestinationCode, 1m).Fee;
+            row.DeliveryFee = IraqGovernorates.IsKnown(row.DestinationCode) ? Quote(row.DestinationCode, 1m).Fee : 0;
         }
     }
 
     private void UpdateBatchRowGovernorate(ParsedOrderDraft row, string? govCode)
     {
-        row.DestinationCode = govCode ?? "IQ-BG";
-        row.DeliveryFee = Quote(row.DestinationCode, 1m).Fee;
+        row.DestinationCode = govCode ?? "";
+        row.DeliveryFee = IraqGovernorates.IsKnown(row.DestinationCode) ? Quote(row.DestinationCode, 1m).Fee : 0;
     }
 
     private async Task SubmitAsync()

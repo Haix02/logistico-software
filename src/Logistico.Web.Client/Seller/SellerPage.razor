@@ -27,8 +27,8 @@
         </header>
 
         <div class="lx-kpis lx-kpis-4">
-            <KpiCard Label="@L["Seller_Owed"]" Amount="home.OwedIqd" Icon="bank-account" Intent="Intent.Success" Hint="@L.Count("Seller_OwedHint", home.OwedOrders)" />
-            <KpiCard Label="@L["Seller_OnTheWay"]" Amount="home.OnTheWayIqd" Icon="truck" Hint="@L.Count("Seller_OnTheWayHint", home.OnTheWayOrders)" />
+            <KpiCard Label="@L["Seller_Owed"]" Amount="home.OwedIqd" ExactAmount="true" Icon="bank-account" Intent="Intent.Success" Hint="@L.Count("Seller_OwedHint", home.OwedOrders)" />
+            <KpiCard Label="@L["Seller_OnTheWay"]" Amount="home.OnTheWayIqd" ExactAmount="true" Icon="truck" Hint="@L.Count("Seller_OnTheWayHint", home.OnTheWayOrders)" />
             <KpiCard Label="@L["Seller_Active"]" Value="@Fmt.Number(home.ActiveOrders)" Icon="box"
                      Hint="@(home.ReturningOrders > 0 ? L.Count("Seller_ReturningHint", home.ReturningOrders) : null)" />
             <KpiCard Label="@L["Seller_Success"]" Value="@Fmt.Percent(SuccessRate)" Icon="tick-circle"
@@ -175,7 +175,7 @@
                 </FormField>
                 <FormField Label="@L["Field_Cod"]" Helper="@L["CodHelper"]" Field="() => draft.CodAmount">
                     <div class="bp6-input-group bp6-fill">
-                        <InputNumber class="bp6-input" @bind-Value="draft.CodAmount" step="250" min="0" />
+                        <InputNumber class="bp6-input" @bind-Value="draft.CodAmount" step="1" min="0" />
                         <span class="bp6-input-action lx-input-suffix">@L["Iqd"]</span>
                     </div>
                 </FormField>
@@ -341,7 +341,7 @@
 
     private async Task CancelAsync(SellerOrder o)
     {
-        if (!await Confirm.AskAsync(L["Seller_CancelTitle"], string.Format(CultureInfo.CurrentCulture, L["Seller_CancelMessage"], o.TrackingNumber), L["Seller_Cancel"], Intent.Danger, "cross"))
+        if (!await Confirm.AskAsync(L["Seller_CancelTitle"], string.Format(CultureInfo.CurrentCulture, L["Seller_CancelMessage"], o.TrackingNumber), L["Seller_Cancel"], Intent.Danger, "cross", L["Back"]))
         {
             return;
         }

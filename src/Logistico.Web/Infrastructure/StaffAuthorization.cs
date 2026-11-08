@@ -7,7 +7,7 @@ namespace Logistico.Web.Infrastructure;
 internal static class StaffAuthorization
 {
     private static readonly HashSet<string> ExplicitPolicies =
-        [StaffPolicies.Operate, StaffPolicies.Care, StaffPolicies.Finance, StaffPolicies.Administer, StaffPolicies.Deliver, StaffPolicies.Sell, StaffPolicies.Personal];
+        [StaffPolicies.Operate, StaffPolicies.Care, StaffPolicies.Finance, StaffPolicies.Administer, StaffPolicies.Cash, StaffPolicies.Deliver, StaffPolicies.Sell, StaffPolicies.Personal];
 
     public static AuthorizationBuilder AddStaffPolicies(this AuthorizationBuilder builder)
     {

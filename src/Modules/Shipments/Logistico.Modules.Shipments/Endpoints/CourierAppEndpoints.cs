@@ -120,11 +120,20 @@ internal static class CourierAppEndpoints
         }
 
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
-        var outcome = (await scanner.ScanAsync(operation, [parcel.TrackingNumber], parcel.Hub, null, courier.DisplayLabel, null, reason, user.UserName(), ct)).Single();
-        if (outcome.Ok)
+        ScanOutcome outcome;
+        try
         {
-            db.DeliveryProofs.Add(proof(parcel.TenantId, courier.DisplayLabel));
-            await db.SaveChangesAsync(ct);
+            outcome = (await scanner.ScanAsync(operation, [parcel.TrackingNumber], parcel.Hub, null, courier.DisplayLabel, null, reason, user.UserName(), ct)).Single();
+            if (outcome.Ok)
+            {
+                db.DeliveryProofs.Add(proof(parcel.TenantId, courier.DisplayLabel));
+                await db.SaveChangesAsync(ct);
+            }
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            // The same parcel recorded at the same moment (a double tap): the first one counts.
+            return Api.Conflict("courier.not_on_run", parcel.TrackingNumber);
         }
 
         await transaction.CommitAsync(ct); // a refused scan stays in the hub's scan log, as before

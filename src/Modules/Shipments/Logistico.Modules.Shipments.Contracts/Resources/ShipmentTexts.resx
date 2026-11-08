@@ -88,6 +88,9 @@
   <data name="Payout_ZainCash" xml:space="preserve"><value>ZainCash wallet</value></data>
   <data name="Problem_alert.not_found" xml:space="preserve"><value>Alert not found.</value></data>
   <data name="Problem_automation.stale" xml:space="preserve"><value>Someone else changed these rules. Reload and try again.</value></data>
+  <data name="Problem_cash.changed" xml:space="preserve"><value>This courier's cash changed while it was being counted. Open the hand-in again.</value></data>
+  <data name="Problem_shipment.return_after_payout" xml:space="preserve"><value>The cash of parcel {0} has already been paid to the seller. Agree the refund with the seller first; then the return can start.</value></data>
+  <data name="Problem_cash.repayment_too_high" xml:space="preserve"><value>The courier owes {0} IQD; a repayment cannot be more than that.</value></data>
   <data name="Problem_cash.negative" xml:space="preserve"><value>The amount received cannot be negative.</value></data>
   <data name="Problem_cash.not_with_courier" xml:space="preserve"><value>The cash of parcel {0} is not with the courier.</value></data>
   <data name="Problem_cash.nothing_to_hand_in" xml:space="preserve"><value>This courier has no collected cash to hand in.</value></data>
@@ -145,6 +148,9 @@
   <data name="Problem_shipment.tracking_not_found" xml:space="preserve"><value>No shipment with tracking number {0}.</value></data>
   <data name="Problem_shipment.with_courier" xml:space="preserve"><value>This parcel is out for delivery. Record the delivery result first.</value></data>
   <data name="Problem_shipment.wrong_hub_for_dispatch" xml:space="preserve"><value>This parcel must first travel to {0}.</value></data>
+  <data name="Problem_transfer.parcel_missing" xml:space="preserve"><value>Missing: truck {0} arrived without this parcel.</value></data>
+  <data name="Problem_transfer.parcel_found" xml:space="preserve"><value>Found: truck {0} had counted this parcel missing.</value></data>
+  <data name="Problem_transfer.arrived_without_truck" xml:space="preserve"><value>Arrived here without truck {0}, which was still loading; taken off that truck.</value></data>
   <data name="Problem_transfer.already_loading" xml:space="preserve"><value>Truck {0} is already loading on this route.</value></data>
   <data name="Problem_transfer.empty" xml:space="preserve"><value>Scan at least one parcel onto the truck before it leaves.</value></data>
   <data name="Problem_transfer.invalid_lane" xml:space="preserve"><value>Choose two different hubs.</value></data>
@@ -270,4 +276,19 @@
   <data name="Category_Food" xml:space="preserve"><value>Food &amp; sweets</value></data>
   <data name="Category_Health" xml:space="preserve"><value>Health &amp; supplements</value></data>
   <data name="Category_Other" xml:space="preserve"><value>Other</value></data>
+  <data name="Problem_area.in_use" xml:space="preserve"><value>A warehouse still covers this region. Take it off that warehouse's coverage first.</value></data>
+  <data name="Problem_area.iraq_catalog" xml:space="preserve"><value>Iraqi companies use the governorates. Change the company's country to add other regions.</value></data>
+  <data name="Problem_area.not_found" xml:space="preserve"><value>This region does not exist.</value></data>
+  <data name="Problem_area.taken" xml:space="preserve"><value>There is already a region with the code {0}.</value></data>
+  <data name="Problem_area.wrong_country" xml:space="preserve"><value>A region code starts with the company's country ({0}-).</value></data>
+  <data name="Problem_company.unknown_country" xml:space="preserve"><value>Choose a country from the list.</value></data>
+  <data name="Problem_courier.invalid_governorate" xml:space="preserve"><value>Choose an area the company delivers to.</value></data>
+  <data name="Problem_courier.invalid_phone" xml:space="preserve"><value>Enter a valid mobile number.</value></data>
+  <data name="Problem_network.not_ready" xml:space="preserve"><value>Add a warehouse before routing parcels.</value></data>
+  <data name="Problem_pricing.stale" xml:space="preserve"><value>Someone else changed the prices. Reload and try again.</value></data>
+  <data name="Problem_shipment.merchant_origin_mismatch" xml:space="preserve"><value>The order must start from the seller's governorate ({0}).</value></data>
+  <data name="Problem_shipment.rating_not_possible" xml:space="preserve"><value>This delivery can no longer be rated.</value></data>
+  <data name="Problem_transfer.wrong_destination" xml:space="preserve"><value>Truck {0} goes to {1}; it is received there.</value></data>
+  <data name="Problem_warehouse.invalid_location" xml:space="preserve"><value>The map position is not a real place. Pick it on the map again.</value></data>
+  <data name="Problem_warehouse.outside_iraq" xml:space="preserve"><value>An Iraqi warehouse must be inside Iraq.</value></data>
 </root>

@@ -3,6 +3,47 @@
 Each release records what was checked, what was found and what changed, so contributors and operators can see why the
 code looks the way it does. The newest release comes first.
 
+## QA pass (8 November 2026)
+
+**How it was done.** Seven testers worked on a running copy of the product with demo data, each in one role: a
+courier, a customer on the tracking page, a seller, a hub clerk, the office (operations and finance), a new company
+setting up from nothing, and a security reviewer. They used the screens in Chrome and the API as the mobile app does,
+in Arabic and English, and wrote down every step that failed with what they expected. Their scenarios became the QA
+suite (`tests/Logistico.Qa`, [11](11-ci-cd-and-devops.md) §3), which now runs in GitHub Actions and Jenkins on every
+change.
+
+### Fixed
+
+| Area | What people hit | Now |
+|---|---|---|
+| Cash desk | Finance could not take a courier's cash; a hand-in took parcels delivered after the count; a shortage vanished; a renamed courier's cash could not be handed in | Finance has the cash desk; only the counted parcels are handed in; a shortage stays on the courier until repaid; a rename follows their open parcels |
+| Returns | A parcel already paid out to the seller could be returned, rewriting the payout | Refused until the refund is agreed |
+| Hub | Back-to-back scans were lost; scans at the same moment conflicted (412) or opened two trucks | The station queues scans; scans at a hub take a turn each, one truck per destination |
+| Trucks | A parcel counted missing, or received without its truck, left no trace on the parcel | Its history says so; a missing parcel that turns up is received and its alert cleared |
+| Customers | Rescheduling from a phone failed (500); Arabic-Indic digits were refused; a low rating with an open complaint was lost; a parcel on a truck or on its way back showed the wrong stage; a repeat rating showed a raw code | All fixed; every refusal code now has a message in both languages, checked by a test |
+| Couriers | A double tap on Delivered gave a server error | A clear message |
+| Sellers | Paste to order made up prices and places, read alley numbers as prices, took names ending in يم as landmarks; "Owed to you" was rounded | Read correctly or left for the seller to fill in; exact amounts |
+| Office | Orders with an amount that is not a multiple of 250 could not be edited | Any whole-dinar amount |
+| New company | Pages opened directly showed the standard Iraqi hubs after the network was changed | The company's own network |
+| Security | Sign-in time revealed whether an account exists; a backslash return address crashed the language switch | Same time for both; the switch goes home |
+
+### Still open
+
+- **Needs a decision:** the delivery fee of an order without cash on delivery is counted as revenue but never charged to
+  the seller (no invoice or deduction yet). Which one should it be?
+- Couriers: a used refresh token can be used again and signing out does not end the app's session; the run shows no
+  total of cash to collect; small touch targets.
+- Sellers: "cash on its way" is before fees while "owed" is after; no page for their own order's details; two account
+  endpoints answer 500 without the antiforgery cookie; the rows selector under their order list does nothing.
+- Hub: some station and truck counts disagree with their own lists; unloading accepts a parcel that is not on the
+  truck; the printed manifest does not name the truck; a typed shelf is not checked against the sort plan.
+- Office: dashboard tiles open all-time lists; CSV exports give UTC times without saying so, and amounts with four
+  decimals; the payout dialog preselects ZainCash.
+- New company: defaults assume Baghdad even when the head office is elsewhere; the guide asks for the team before
+  couriers and sellers exist; customers and sellers see "Logistico" instead of the company's name.
+- Customers: a cancellation asked for while the parcel is on a truck cannot be applied by staff; searching the same
+  number again after a typo does nothing.
+
 ## 3.0 (21 October 2026)
 
 **Decision:** release candidate for controlled pilots, after the requirements in

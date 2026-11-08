@@ -38,7 +38,8 @@ internal static class LocalizationSetup
                 CookieRequestCultureProvider.DefaultCookieName,
                 CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
                 new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1), IsEssential = true, SameSite = SameSiteMode.Lax, HttpOnly = false });
-            var target = string.IsNullOrEmpty(returnUrl) || !returnUrl.StartsWith('/') || returnUrl.StartsWith("//", StringComparison.Ordinal) ? "/" : returnUrl;
+            // Only a path on this site: not "//host" nor "/\host", which browsers treat as another site.
+            var target = string.IsNullOrEmpty(returnUrl) || !returnUrl.StartsWith('/') || (returnUrl.Length > 1 && returnUrl[1] is '/' or '\\') ? "/" : returnUrl;
             return Results.LocalRedirect(target);
         }).AllowAnonymous().ExcludeFromDescription();
         return app;

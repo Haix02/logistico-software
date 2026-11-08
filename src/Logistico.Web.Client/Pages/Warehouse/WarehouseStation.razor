@@ -349,15 +349,41 @@
         await ScanAsync();
     }
 
+    /// <summary>Labels scanned while the previous one is still saving: a scanner gun is faster than the network.</summary>
+    private readonly Queue<string> waitingScans = new();
+    private bool draining;
+
     private async Task ScanAsync()
     {
         var raw = scan?.Trim();
-        if (string.IsNullOrEmpty(raw) || busy)
+        scan = null;
+        if (string.IsNullOrEmpty(raw))
         {
             return;
         }
 
-        scan = null;
+        waitingScans.Enqueue(raw); // never lost, never overwritten: handled in order, one at a time
+        if (draining)
+        {
+            return;
+        }
+
+        draining = true;
+        try
+        {
+            while (waitingScans.TryDequeue(out var next))
+            {
+                await HandleScanAsync(next);
+            }
+        }
+        finally
+        {
+            draining = false;
+        }
+    }
+
+    private async Task HandleScanAsync(string raw)
+    {
         if (HubCatalog.TryParseActionBarcode(raw, out var command))
         {
             await ApplyCommandAsync(command, raw);

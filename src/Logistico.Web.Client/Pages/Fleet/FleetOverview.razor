@@ -99,7 +99,7 @@
                 {
                     <Tag>@L["Inactive"]</Tag>
                 }
-                @if (canOperate && c.CashToHandInIqd > 0)
+                @if (canReceiveCash && c.CashToHandInIqd > 0)
                 {
                     <Button Small="true" Icon="bank-account" Text="@L["ReceiveCash"]" OnClick="@(() => OpenCashAsync(c))" />
                 }
@@ -148,12 +148,18 @@
         {
             <Skeleton Lines="4" />
         }
-        else if (cash.Parcels.Count == 0)
+        else if (cash.Parcels.Count == 0 && cash.ShortageIqd <= 0)
         {
             <NonIdealState Icon="tick-circle" Title="@L["NothingToHandIn"]" />
         }
         else
         {
+            @if (cash.ShortageIqd > 0)
+            {
+                <Callout Intent="Intent.Warning" Icon="warning-sign" CssClass="lx-mb">
+                    @string.Format(CultureInfo.CurrentCulture, L[cash.Parcels.Count == 0 ? "Cash_RepayShortage" : "Cash_StillShort"], Fmt.Money(cash.ShortageIqd, "IQD"))
+                </Callout>
+            }
             <p class="bp6-text-muted lx-mb">@L["ReceiveCashHelper"]</p>
             <div class="lx-table-wrap lx-table-scroll lx-card lx-mb">
                 <table class="bp6-html-table lx-table lx-table-compact">
@@ -177,7 +183,7 @@
                 </FormField>
                 <FormField TValue="string" Label="@L["Field_CashCounted"]" Required="true" For="lx-cash-counted">
                     <div class="bp6-input-group bp6-fill">
-                        <input id="lx-cash-counted" class="bp6-input" type="number" min="0" step="250" dir="ltr" @bind="counted" />
+                        <input id="lx-cash-counted" class="bp6-input" type="number" min="0" step="1" dir="ltr" @bind="counted" />
                         <span class="bp6-input-action lx-input-suffix">@L["Iqd"]</span>
                     </div>
                 </FormField>
@@ -196,7 +202,7 @@
     <Footer>
         <Button Text="@L["Cancel"]" OnClick="@(() => cashFor = null)" />
         <Button Intent="Intent.Primary" Icon="tick" Text="@L["ConfirmCashReceived"]" Loading="receiving"
-                Disabled="@(cash is not { Parcels.Count: > 0 } || counted is null || counted < 0)" OnClick="ReceiveCashAsync" />
+                Disabled="@(cash is null || (cash.Parcels.Count == 0 && cash.ShortageIqd <= 0) || counted is null || counted < 0)" OnClick="ReceiveCashAsync" />
     </Footer>
 </Dialog>
 
@@ -331,6 +337,7 @@
     private bool runsheetLoading;
     private bool saving;
     private bool canOperate;
+    private bool canReceiveCash;
     private string? error;
     private CourierListItem? editing;
     private CourierListItem? runsheetCourier;
@@ -342,6 +349,7 @@
     protected override async Task OnInitializedAsync()
     {
         canOperate = await AuthState.CanAsync(StaffPolicies.Operate);
+        canReceiveCash = await AuthState.CanAsync(StaffPolicies.Cash);
         await Task.WhenAll(LoadAsync(), LoadHandoversAsync());
     }
 
@@ -397,7 +405,8 @@
         try
         {
             cash = await Shipments.GetCourierCashAsync(courier.Id);
-            counted = decimal.Round(cash.ExpectedIqd, 0); // dinars have no fractions; the database keeps four places
+            // Dinars have no fractions (the database keeps four places); with no new parcels, the count is a repayment.
+            counted = decimal.Round(cash.Parcels.Count == 0 ? cash.ShortageIqd : cash.ExpectedIqd, 0);
         }
         catch (ApiException ex)
         {
@@ -416,7 +425,14 @@
         receiving = true;
         try
         {
-            var handover = await Shipments.ReceiveCashAsync(courier.Id, new ReceiveCashRequest { ReceivedIqd = amount, Notes = cashNotes });
+            // Exactly the parcels on screen: cash collected while counting waits for the next hand-in.
+            var handover = await Shipments.ReceiveCashAsync(courier.Id, new ReceiveCashRequest
+            {
+                ReceivedIqd = amount,
+                Notes = cashNotes,
+                ParcelIds = [.. cash?.Parcels.Select(p => p.Id) ?? []],
+                RepaysShortage = cash is { Parcels.Count: 0, ShortageIqd: > 0 },
+            });
             Toaster.Show(string.Format(CultureInfo.CurrentCulture, L["CashReceivedToast"], handover.Number, Fmt.Money(handover.ReceivedIqd, "IQD")),
                 handover.DifferenceIqd < 0 ? Intent.Warning : Intent.Success, "bank-account");
             cashFor = null;

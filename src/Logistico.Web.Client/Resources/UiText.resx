@@ -1518,4 +1518,6 @@
   <data name="Check_automation_Title" xml:space="preserve"><value>Automation</value></data>
   <data name="Check_automation_Ok" xml:space="preserve"><value>Alerts, truck planning and auto-cancel run every minute.</value></data>
   <data name="Check_automation_Warning" xml:space="preserve"><value>Automation:Enabled is off: alerts and truck planning do not run.</value></data>
+  <data name="Cash_StillShort" xml:space="preserve"><value>Also still short {0} from earlier hand-ins: count it in to pay it back.</value></data>
+  <data name="Cash_RepayShortage" xml:space="preserve"><value>No new cash to hand in. Earlier hand-ins were short {0}: record what the courier pays back.</value></data>
 </root>

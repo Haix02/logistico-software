@@ -29,4 +29,24 @@ public class TrackingProgressTests
         var stages = TrackingProgress.Stages(ServiceType.International);
         Assert.Equal(expected, stages[TrackingProgress.CurrentIndex(ServiceType.International, status)]);
     }
+
+    [Theory]
+    [InlineData(ShipmentStatus.ReturnInitiated)]
+    [InlineData(ShipmentStatus.ReturnAtHub)]
+    [InlineData(ShipmentStatus.Returned)]
+    public void A_return_ends_the_journey_at_the_delivery_step_not_at_delivered(ShipmentStatus status)
+    {
+        var stages = TrackingProgress.Stages(ServiceType.Domestic, crossesHubs: true);
+        Assert.Equal(TrackingStage.OutForDelivery, stages[TrackingProgress.CurrentIndex(ServiceType.Domestic, status, crossesHubs: true)]);
+        Assert.True(TrackingProgress.IsAborted(status));
+    }
+
+    [Fact]
+    public void A_parcel_on_a_truck_is_between_cities_not_back_at_order_placed()
+    {
+        var stages = TrackingProgress.Stages(ServiceType.Domestic, crossesHubs: true);
+        Assert.Equal(TrackingStage.InTransit, stages[TrackingProgress.CurrentIndex(ServiceType.Domestic, ShipmentStatus.InTransitToHub, crossesHubs: true)]);
+        Assert.True(new PublicTrackingView("LX", ServiceType.Domestic, TransportMode.Road, ShipmentStatus.InTransitToHub, null, "IQ-BG", "IQ-BA", null, null, null,
+            0, null, null, null, [], null, null, null, null, [], 0, [], BetweenHubs: true).CrossesHubs);
+    }
 }

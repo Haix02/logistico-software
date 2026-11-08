@@ -116,7 +116,9 @@
             <div class="lx-sidebar-scrim" @onclick="@(() => menuOpen = false)"></div>
         }
         <main class="lx-main" id="main">
-            @if (!staff || HubCatalog.IsLoaded || networkUnavailable)
+            @* Pages start once it is known who is signed in and, for staff, the company's own network has loaded:
+               a page started earlier would keep the standard hubs (Baghdad first) for good. *@
+            @if (signedInKnown && (!staff || HubCatalog.IsLoaded || networkUnavailable))
             {
                 <PageBoundary @ref="page">@Body</PageBoundary>
             }
@@ -204,6 +206,7 @@
     private string shortcutHint = "Ctrl K";
     private HubRadar? radar;
     private bool networkUnavailable;
+    private bool signedInKnown;
     private DotNetObjectReference<MainLayout>? selfRef;
     private CancellationTokenSource? loopCts;
     private ClaimsPrincipal user = new();
@@ -223,6 +226,7 @@
         HubCatalog.Changed += OnNetworkChanged;
         user = AuthState is null ? new() : (await AuthState).User;
         staff = user.IsStaff();
+        signedInKnown = true;
         dark = await JS.InvokeAsync<bool>("lx.isDark");
         muted = await JS.InvokeAsync<bool>("lx.isMuted");
         shortcutHint = await JS.InvokeAsync<string>("lx.shortcutHint");

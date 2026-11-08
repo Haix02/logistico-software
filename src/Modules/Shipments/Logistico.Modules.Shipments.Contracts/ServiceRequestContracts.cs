@@ -66,7 +66,8 @@ public abstract class RequestFields : IValidatableObject
     [StringLength(1000, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.MaxLength))]
     public string? Details { get; set; }
 
-    public DateTimeOffset? PreferredDate { get; set; }
+    /// <summary>The day the customer asks for. Stored as the same instant in UTC: phones in Iraq send +03:00, PostgreSQL keeps UTC.</summary>
+    public DateTimeOffset? PreferredDate { get; set => field = value?.ToUniversalTime(); }
 
     public string? NewGovernorate { get; set; }
 
@@ -142,7 +143,8 @@ public sealed class CustomerRequest : RequestFields
 {
     [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
     [RegularExpression("^[0-9]{4}$", ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.PhoneLast4))]
-    public string PhoneLast4 { get; set; } = "";
+    /// <summary>The last four digits of the customer's mobile, as typed (Arabic-Indic digits too).</summary>
+    public string PhoneLast4 { get; set => field = SearchText.LatinDigits(value)?.Trim() ?? ""; } = "";
 }
 
 public sealed record CustomerRequestReceipt(string Number, RequestType Type, RequestStatus Status, bool AppliedAutomatically, DateTimeOffset CreatedAt);

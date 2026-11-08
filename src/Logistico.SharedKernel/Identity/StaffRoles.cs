@@ -51,6 +51,9 @@ public static class StaffPolicies
     public const string Finance = "finance";
     public const string Administer = "administer";
 
+    /// <summary>Receiving couriers' cash: the hub's operations staff or the finance office (whoever runs the cash desk).</summary>
+    public const string Cash = "cash";
+
     /// <summary>The courier app: a courier's own parcels (see <see cref="LogisticoClaimTypes.CourierCode"/>).</summary>
     public const string Deliver = "deliver";
 
@@ -63,7 +66,7 @@ public static class StaffPolicies
     /// <summary>Any account of the company with a role, couriers and sellers included (the mobile app's start-up).</summary>
     public const string Member = "member";
 
-    public static readonly IReadOnlyList<string> All = [Staff, Operate, Care, Finance, Administer, Deliver, Sell, Personal, Member];
+    public static readonly IReadOnlyList<string> All = [Staff, Operate, Care, Finance, Administer, Cash, Deliver, Sell, Personal, Member];
 
     /// <summary>The roles that satisfy a policy.</summary>
     public static IReadOnlyList<string> RolesFor(string policy) => policy switch
@@ -73,6 +76,7 @@ public static class StaffPolicies
         Operate => [StaffRoles.Admin, StaffRoles.Operations],
         Care => [StaffRoles.Admin, StaffRoles.Operations, StaffRoles.CustomerSupport],
         Finance => [StaffRoles.Admin, StaffRoles.Finance],
+        Cash => [StaffRoles.Admin, StaffRoles.Operations, StaffRoles.Finance],
         Administer => [StaffRoles.Admin],
         Deliver => [StaffRoles.Courier],
         Sell => [StaffRoles.Seller],

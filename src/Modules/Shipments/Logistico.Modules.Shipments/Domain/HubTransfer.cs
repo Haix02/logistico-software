@@ -197,6 +197,14 @@ internal sealed class HubTransfer
         return item;
     }
 
+    /// <summary>A parcel this closed manifest counted missing has turned up at a hub: its line is received after all.</summary>
+    public bool FoundAfterClosing(Shipment shipment, DateTimeOffset now)
+    {
+        var item = _items.FirstOrDefault(i => i.ShipmentId == shipment.Id && i.State == TransferItemState.Missing);
+        item?.MarkReceived(now);
+        return item is not null;
+    }
+
     /// <summary>Closes the manifest at the destination; parcels that never came off the truck are marked missing.</summary>
     public IReadOnlyList<TransferItem> Close(string? notes, string? by, DateTimeOffset now)
     {

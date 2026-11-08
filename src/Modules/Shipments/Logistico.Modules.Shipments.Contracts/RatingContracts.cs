@@ -8,7 +8,8 @@ namespace Logistico.Modules.Shipments.Contracts;
 public sealed partial class CustomerRating : IValidatableObject
 {
     [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
-    public string PhoneLast4 { get; set; } = "";
+    /// <summary>The last four digits of the customer's mobile, as typed (Arabic-Indic digits too).</summary>
+    public string PhoneLast4 { get; set => field = SearchText.LatinDigits(value)?.Trim() ?? ""; } = "";
 
     [Range(1, 5, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Range))]
     public int Stars { get; set; } = 5;

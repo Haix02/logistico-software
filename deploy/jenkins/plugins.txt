@@ -1,0 +1,13 @@
+# Plugins of the Logistico Jenkins, resolved with their dependencies by scripts/jenkins.sh setup.
+configuration-as-code
+job-dsl
+workflow-aggregator
+pipeline-stage-view
+pipeline-graph-view
+git
+branch-api
+credentials-binding
+junit
+coverage
+timestamper
+ws-cleanup

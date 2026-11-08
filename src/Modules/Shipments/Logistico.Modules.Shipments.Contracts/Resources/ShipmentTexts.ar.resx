@@ -88,6 +88,9 @@
   <data name="Payout_ZainCash" xml:space="preserve"><value>محفظة زين كاش</value></data>
   <data name="Problem_alert.not_found" xml:space="preserve"><value>التنبيه غير موجود.</value></data>
   <data name="Problem_automation.stale" xml:space="preserve"><value>عدّل شخص آخر هذه القواعد. حدّث الصفحة وأعد المحاولة.</value></data>
+  <data name="Problem_cash.changed" xml:space="preserve"><value>تغيّر نقد المندوب أثناء العدّ. افتح الاستلام مرة أخرى.</value></data>
+  <data name="Problem_shipment.return_after_payout" xml:space="preserve"><value>نقد الطرد {0} دُفع للبائع بالفعل. اتفق على الاسترداد مع البائع أولاً، ثم يمكن بدء الإرجاع.</value></data>
+  <data name="Problem_cash.repayment_too_high" xml:space="preserve"><value>على المندوب {0} د.ع فقط؛ لا يمكن أن يزيد التسديد على ذلك.</value></data>
   <data name="Problem_cash.negative" xml:space="preserve"><value>لا يمكن أن يكون المبلغ المستلم سالباً.</value></data>
   <data name="Problem_cash.not_with_courier" xml:space="preserve"><value>مبلغ الطرد {0} ليس لدى المندوب.</value></data>
   <data name="Problem_cash.nothing_to_hand_in" xml:space="preserve"><value>لا توجد لدى هذا المندوب مبالغ محصَّلة للتسليم.</value></data>
@@ -145,6 +148,9 @@
   <data name="Problem_shipment.tracking_not_found" xml:space="preserve"><value>لا توجد شحنة برقم التتبع {0}.</value></data>
   <data name="Problem_shipment.with_courier" xml:space="preserve"><value>الشحنة مع المندوب الآن. سجّل نتيجة التوصيل أولاً.</value></data>
   <data name="Problem_shipment.wrong_hub_for_dispatch" xml:space="preserve"><value>يجب نقل الشحنة أولاً إلى {0}.</value></data>
+  <data name="Problem_transfer.parcel_missing" xml:space="preserve"><value>مفقود: وصلت الشاحنة {0} بدون هذا الطرد.</value></data>
+  <data name="Problem_transfer.parcel_found" xml:space="preserve"><value>وُجد: كانت الشاحنة {0} قد عدّت هذا الطرد مفقوداً.</value></data>
+  <data name="Problem_transfer.arrived_without_truck" xml:space="preserve"><value>وصل إلى هنا بدون الشاحنة {0} التي كانت ما تزال تُحمَّل؛ أُزيل منها.</value></data>
   <data name="Problem_transfer.already_loading" xml:space="preserve"><value>الشاحنة {0} قيد التحميل على هذا المسار.</value></data>
   <data name="Problem_transfer.empty" xml:space="preserve"><value>امسح شحنة واحدة على الأقل قبل مغادرة الشاحنة.</value></data>
   <data name="Problem_transfer.invalid_lane" xml:space="preserve"><value>اختر مركزين مختلفين.</value></data>
@@ -270,4 +276,19 @@
   <data name="Category_Food" xml:space="preserve"><value>أطعمة وحلويات</value></data>
   <data name="Category_Health" xml:space="preserve"><value>صحة ومكمّلات</value></data>
   <data name="Category_Other" xml:space="preserve"><value>أخرى</value></data>
+  <data name="Problem_area.in_use" xml:space="preserve"><value>لا يزال مخزن يغطي هذه المنطقة. أزلها من تغطية ذلك المخزن أولاً.</value></data>
+  <data name="Problem_area.iraq_catalog" xml:space="preserve"><value>الشركات العراقية تعمل بالمحافظات. غيّر بلد الشركة لإضافة مناطق أخرى.</value></data>
+  <data name="Problem_area.not_found" xml:space="preserve"><value>هذه المنطقة غير موجودة.</value></data>
+  <data name="Problem_area.taken" xml:space="preserve"><value>توجد منطقة بالرمز {0} بالفعل.</value></data>
+  <data name="Problem_area.wrong_country" xml:space="preserve"><value>يبدأ رمز المنطقة برمز بلد الشركة ({0}-).</value></data>
+  <data name="Problem_company.unknown_country" xml:space="preserve"><value>اختر بلداً من القائمة.</value></data>
+  <data name="Problem_courier.invalid_governorate" xml:space="preserve"><value>اختر منطقة تخدمها الشركة.</value></data>
+  <data name="Problem_courier.invalid_phone" xml:space="preserve"><value>أدخل رقم هاتف صحيحاً.</value></data>
+  <data name="Problem_network.not_ready" xml:space="preserve"><value>أضف مخزناً قبل توجيه الطرود.</value></data>
+  <data name="Problem_pricing.stale" xml:space="preserve"><value>عدّل شخص آخر الأسعار. حدّث الصفحة وأعد المحاولة.</value></data>
+  <data name="Problem_shipment.merchant_origin_mismatch" xml:space="preserve"><value>يجب أن ينطلق الطلب من محافظة البائع ({0}).</value></data>
+  <data name="Problem_shipment.rating_not_possible" xml:space="preserve"><value>لم يعد بالإمكان تقييم هذا التوصيل.</value></data>
+  <data name="Problem_transfer.wrong_destination" xml:space="preserve"><value>الشاحنة {0} متجهة إلى {1}، وتُستلم هناك.</value></data>
+  <data name="Problem_warehouse.invalid_location" xml:space="preserve"><value>الموقع على الخريطة غير صحيح. اختره على الخريطة مرة أخرى.</value></data>
+  <data name="Problem_warehouse.outside_iraq" xml:space="preserve"><value>يجب أن يكون المخزن العراقي داخل العراق.</value></data>
 </root>

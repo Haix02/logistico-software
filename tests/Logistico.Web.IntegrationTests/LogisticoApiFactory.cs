@@ -59,10 +59,21 @@ public class LogisticoApiFactory : WebApplicationFactory<Program>, IAsyncLifetim
         await DisposeAsync();
         NpgsqlConnection.ClearAllPools();
         var builder = new NpgsqlConnectionStringBuilder(_connectionString) { Database = "postgres" };
-        await using var connection = new NpgsqlConnection(builder.ConnectionString);
-        await connection.OpenAsync();
-        await using var drop = new NpgsqlCommand($"DROP DATABASE IF EXISTS \"{_database}\" WITH (FORCE)", connection);
-        await drop.ExecuteNonQueryAsync();
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                await using var connection = new NpgsqlConnection(builder.ConnectionString);
+                await connection.OpenAsync();
+                await using var drop = new NpgsqlCommand($"DROP DATABASE IF EXISTS \"{_database}\" WITH (FORCE)", connection);
+                await drop.ExecuteNonQueryAsync();
+                return;
+            }
+            catch (PostgresException) when (attempt < 5)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1)); // the host's connections are still closing
+            }
+        }
     }
 
     /// <summary>

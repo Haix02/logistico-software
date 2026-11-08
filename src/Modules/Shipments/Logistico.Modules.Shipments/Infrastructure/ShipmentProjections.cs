@@ -141,7 +141,10 @@ internal static class ShipmentProjections
             [],
             s.Confirmation == ConfirmationStatus.Pending,
             s.CanBeRated(now),
-            s.Rating);
+            s.Rating,
+            // Coarse flags so the progress bar is right ("between cities"), without revealing the hubs themselves.
+            s.ServiceType == ServiceType.Domestic && s.OriginHubCode is not null && s.OriginHubCode != s.DestinationHubCode,
+            s.CurrentHubCode is not null && s.CurrentHubCode == s.DestinationHubCode);
     }
 
 }

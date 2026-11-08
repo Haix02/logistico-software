@@ -59,4 +59,19 @@ public class TrackingNumberTests
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => TrackingNumber.Create(2026, sequence));
     }
+
+    [Fact]
+    public void Numbers_typed_on_an_Arabic_keyboard_are_the_same_number()
+    {
+        var number = TrackingNumber.Create(2026, 123);
+        var arabic = string.Concat(number.Select(c => char.IsAsciiDigit(c) ? (char)('\u0660' + (c - '0')) : c));
+        var persian = string.Concat(number.Select(c => char.IsAsciiDigit(c) ? (char)('\u06F0' + (c - '0')) : c));
+
+        Assert.Equal(number, TrackingNumber.Normalize(arabic.ToLowerInvariant()));
+        Assert.True(TrackingNumber.IsValid(persian));
+        Assert.Equal("+9647701234567", Logistico.SharedKernel.Iraq.IraqPhone.Normalize("٠٧٧٠ ١٢٣ ٤٥٦٧"));
+        Assert.Equal("+9647701234567", Logistico.SharedKernel.Iraq.IraqPhone.Normalize("+٩٦٤ ٧٧٠ ١٢٣ ٤٥٦٧"));
+        Assert.Equal("3344", new Logistico.Modules.Shipments.Contracts.CustomerRating { PhoneLast4 = " ٣٣٤٤ " }.PhoneLast4);
+        Assert.Equal("abc", Logistico.SharedKernel.SearchText.LatinDigits("abc"));
+    }
 }

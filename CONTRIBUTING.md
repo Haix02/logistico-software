@@ -47,8 +47,12 @@ Run what CI runs:
 ```bash
 dotnet format Logistico.slnx --verify-no-changes --severity warn
 dotnet build Logistico.slnx -c Release          # warnings are errors
-dotnet test Logistico.slnx -c Release           # integration tests need PostgreSQL (LOGISTICO_TEST_DB)
+dotnet test Logistico.slnx -c Release --filter "Category!=Qa"   # integration tests need PostgreSQL (LOGISTICO_TEST_DB)
+dotnet test tests/Logistico.Qa -c Release --no-build           # QA: the real server, agents over the API, every page in Chrome
 ```
+
+A local Jenkins runs the same pipeline on every branch you push (`scripts/jenkins.sh setup`, then `start`; see
+[docs/11 §7](docs/11-ci-cd-and-devops.md)).
 
 The integration tests create and drop a throw-away database per test class on the local PostgreSQL server; set
 `LOGISTICO_TEST_DB` (a full connection string) to use another server.
@@ -122,6 +126,8 @@ conventions.
 | `tests/Logistico.Modules.Shipments.Tests` | Domain rules and pure functions: state machines, routing, pricing, risk, catalogue, formatting. Fast, no database. |
 | `tests/Logistico.ArchitectureTests` | Module boundaries, texts in both languages, UI conventions. |
 | `tests/Logistico.Web.IntegrationTests` | The real API on real PostgreSQL: flows, roles, tenant isolation, concurrency. |
+| `tests/Logistico.Web.Client.Tests` | The console's logic and shared components (bUnit). |
+| `tests/Logistico.Qa` | Whole-product checks against the running server: a working day by many people at once over the API, and every page in a real browser. Add a scenario here when a bug only shows with the real server, the browser or several people at once. |
 
 Every behaviour change needs a test that would have failed before it; a bug fix starts with the test that reproduces it.
 

@@ -23,12 +23,22 @@ internal static class AuthTokenEndpoints
         return app;
     }
 
+    /// <summary>A password hash nobody can match, checked when the email has no account.</summary>
+    private static readonly Lazy<string> UnknownAccountHash = new(() => new PasswordHasher<ApplicationUser>().HashPassword(new ApplicationUser(), Guid.NewGuid().ToString()));
+
     private static async Task<IResult> TokenAsync(TokenRequest request, SignInManager<ApplicationUser> signIn, IStringLocalizer<ServerText> texts)
     {
         ProblemHttpResult Refused(string code) => Problem(code, texts);
 
         if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrEmpty(request.Password))
         {
+            return Refused("auth.invalid");
+        }
+
+        if (await signIn.UserManager.FindByNameAsync(request.Email.Trim()) is null)
+        {
+            // As long as checking a real password, so the time of the answer does not tell which emails have accounts.
+            signIn.UserManager.PasswordHasher.VerifyHashedPassword(new ApplicationUser(), UnknownAccountHash.Value, request.Password);
             return Refused("auth.invalid");
         }
 
