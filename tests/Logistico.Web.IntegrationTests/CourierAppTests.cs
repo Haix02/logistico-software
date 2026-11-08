@@ -12,6 +12,24 @@ namespace Logistico.Web.IntegrationTests;
 public sealed class CourierAppTests(LogisticoApiFactory factory)
 {
     [Fact]
+    public async Task A_double_tap_on_delivered_records_one_delivery_and_never_fails()
+    {
+        var company = Guid.CreateVersion7();
+        var admin = factory.CreateUserClient(tenant: company);
+        await AddCourierAsync(admin, "Tap-A", "علي");
+        var merchant = await admin.CreateMerchantAsync("Double Tap Shop", "double.tap.shop");
+        var parcel = await DispatchAsync(admin, merchant, "علي (Tap-A)", 30_000);
+        var courier = factory.CreateUserClient("tap@logistico.test", company, StaffRoles.Courier, courierCode: "Tap-A");
+
+        var taps = await Task.WhenAll(Enumerable.Range(0, 4).Select(_ => courier.PostAsync("/" + ShipmentsApiRoutes.CourierDelivered(parcel.Id), null)));
+
+        Assert.Single(taps, t => t.StatusCode == HttpStatusCode.OK);
+        Assert.All(taps, t => Assert.True((int)t.StatusCode < 500, $"{(int)t.StatusCode}"));
+        var order = await admin.GetShipmentAsync(parcel.Id);
+        Assert.Equal((ShipmentStatus.Delivered, 1), (order.Status, order.DeliveryAttempts));
+    }
+
+    [Fact]
     public async Task A_courier_delivers_their_own_parcels_and_sees_their_day()
     {
         var company = Guid.CreateVersion7();

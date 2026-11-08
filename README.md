@@ -185,12 +185,15 @@ before real customers' data goes in. See [First run & getting started](docs/19-f
 ### Tests
 
 ```bash
-dotnet test tests/Logistico.Modules.Shipments.Tests     # domain rules, product catalogue, open data, formatting, sort plans (260)
-dotnet test tests/Logistico.ArchitectureTests            # module boundaries, texts in both languages, RTL/CSS and icon guards (33)
-dotnet test tests/Logistico.Web.IntegrationTests         # REST API on real PostgreSQL: flows, roles, setup, every endpoint × every role (150)
+dotnet test tests/Logistico.Modules.Shipments.Tests     # domain rules, product catalogue, open data, formatting, sort plans, paste-to-order (277)
+dotnet test tests/Logistico.ArchitectureTests            # module boundaries, texts in both languages, RTL/CSS and icon guards, a message for every refusal code (34)
+dotnet test tests/Logistico.Web.IntegrationTests         # REST API on real PostgreSQL: flows, roles, setup, every endpoint × every role (162)
 dotnet test tests/Logistico.Web.Client.Tests             # the console: components (bUnit), navigation, plurals, texts (46)
+dotnet test tests/Logistico.Qa -c Release                # QA: a delivery day by shops, couriers and a hub, then every page in Chrome (9)
 ```
 
+The QA suite starts the built server on its own port with its own database (build in Release first) and needs Google
+Chrome; it writes the time of every endpoint to `TestResults/qa/delivery-day.md`.
 Set `LOGISTICO_TEST_DB` to point the integration tests at another PostgreSQL server.
 
 CI also measures line coverage of the server code and fails below 85 % (87.7 % today); see
@@ -207,7 +210,7 @@ CI also measures line coverage of the server code and fails below 85 % (87.7 % t
 | Database | PostgreSQL with EF Core 10 (schema per module, snake_case, optimistic concurrency) |
 | Identity | ASP.NET Core Identity (cookies, roles, 2FA, passkeys), multi-company (tenant) data isolation |
 | Mobile | Flutter (Android and iOS), one app for senders, couriers and managers; Riverpod, go_router, dio |
-| CI | GitHub Actions: format → build → tests on PostgreSQL → Docker image check → container image + migration bundles |
+| CI | GitHub Actions: format → build → tests on PostgreSQL → QA (API + Chrome) → Docker image check → container image + migration bundles; the same pipeline on a local Jenkins (`Jenkinsfile`, `scripts/jenkins.sh`) |
 
 No paid licences, no map service, no CDN at run time: everything (Blueprint, fonts, the Iraq map) is vendored.
 

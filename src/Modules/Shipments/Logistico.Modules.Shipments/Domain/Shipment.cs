@@ -422,6 +422,12 @@ internal sealed class Shipment
             throw Rule("shipment.with_courier", "This parcel is out for delivery. Record the delivery result first.");
         }
 
+        // Its cash is already in a seller's payout: a return would leave that payout wrong. The refund is settled first.
+        if (CodSettlementId is not null)
+        {
+            throw Rule("shipment.return_after_payout", "The cash of this parcel has already been paid to the seller.", TrackingNumber);
+        }
+
         AdvanceTo(ShipmentStatus.ReturnInitiated, now, new MilestoneDetails(Location: CurrentHubCode, Notes: notes ?? ShipmentTexts.Of(reason)), actor.Source, actor.Name, now);
         ReturnReason = reason;
         ReturnRequestedAt = now;
@@ -701,6 +707,20 @@ internal sealed class Shipment
     }
 
     /// <summary>The courier handed this parcel's collected cash in at the office.</summary>
+    /// <summary>Something about the parcel's journey staff must see on its timeline (a truck it missed, a missing manifest line).</summary>
+    public void RecordJourneyNote(string text, Actor actor, DateTimeOffset now)
+    {
+        Note(text, actor, now);
+        UpdatedAt = now;
+    }
+
+    /// <summary>The courier's name or code changed: the parcel follows them (their run, the cash they hold).</summary>
+    public void CourierRenamed(string label, DateTimeOffset now)
+    {
+        CourierName = label;
+        UpdatedAt = now;
+    }
+
     public void MarkCashHandedOver(Guid handoverId, DateTimeOffset now)
     {
         if (CodCollectedAt is null || CodHandedOverAt is not null)

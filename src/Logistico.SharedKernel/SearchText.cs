@@ -34,6 +34,32 @@ public static class SearchText
 
     private static readonly Dictionary<char, char?> Map = BuildMap();
 
+    /// <summary>
+    /// The text with Arabic-Indic (٠…٩) and Persian (۰…۹) digits written as 0…9, everything else unchanged: what people
+    /// type on an Arabic keyboard is the same number.
+    /// </summary>
+    public static string? LatinDigits(string? text)
+    {
+        if (string.IsNullOrEmpty(text) || !text.Any(c => c is >= '\u0660' and <= '\u0669' or >= '\u06F0' and <= '\u06F9'))
+        {
+            return text;
+        }
+
+        return string.Create(text.Length, text, (chars, source) =>
+        {
+            for (var i = 0; i < source.Length; i++)
+            {
+                var c = source[i];
+                chars[i] = c switch
+                {
+                    >= '\u0660' and <= '\u0669' => (char)('0' + (c - '\u0660')),
+                    >= '\u06F0' and <= '\u06F9' => (char)('0' + (c - '\u06F0')),
+                    _ => c,
+                };
+            }
+        });
+    }
+
     /// <summary>Lower-cases <paramref name="text"/> and folds Arabic letter variants, digits and marks.</summary>
     public static string Fold(string? text)
     {

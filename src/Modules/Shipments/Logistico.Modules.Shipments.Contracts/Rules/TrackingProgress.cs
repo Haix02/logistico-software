@@ -25,7 +25,9 @@ public static class TrackingProgress
         ShipmentStatus.ArrivedPortOfEntry or ShipmentStatus.CustomsPending or ShipmentStatus.CustomsHold or ShipmentStatus.Released => TrackingStage.Customs,
         ShipmentStatus.AtWarehouse or ShipmentStatus.ReadyForDispatch or ShipmentStatus.AtDestinationWarehouse => TrackingStage.AtWarehouse,
         ShipmentStatus.OutForDelivery or ShipmentStatus.DeliveryFailed => TrackingStage.OutForDelivery,
-        ShipmentStatus.Delivered or ShipmentStatus.ReturnInitiated or ShipmentStatus.ReturnInTransit or ShipmentStatus.ReturnAtHub or ShipmentStatus.Returned => TrackingStage.Delivered,
+        ShipmentStatus.Delivered => TrackingStage.Delivered,
+        // A return stops the journey at the delivery step (the bar shows it as ended there, not as delivered).
+        ShipmentStatus.ReturnInitiated or ShipmentStatus.ReturnInTransit or ShipmentStatus.ReturnAtHub or ShipmentStatus.Returned => TrackingStage.OutForDelivery,
         _ => TrackingStage.OrderPlaced,
     };
 

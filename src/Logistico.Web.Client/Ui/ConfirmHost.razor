@@ -17,7 +17,7 @@
                     </div>
                     <div class="bp6-alert-footer">
                         <Button Intent="@request.Intent" Text="@request.ConfirmText" OnClick="@(() => Confirmer.Resolve(true))" autofocus />
-                        <Button Text="@L["Cancel"]" OnClick="@(() => Confirmer.Resolve(false))" />
+                        <Button Text="@(request.DismissText ?? L["Cancel"])" OnClick="@(() => Confirmer.Resolve(false))" />
                     </div>
                 </div>
             </div>

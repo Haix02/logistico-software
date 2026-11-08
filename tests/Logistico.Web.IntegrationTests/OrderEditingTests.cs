@@ -34,6 +34,8 @@ public sealed class OrderEditingTests(LogisticoApiFactory factory)
         // Correct the order: new mobile and a move to Najaf (its hub changes); the history says what changed.
         var order = await client.GetShipmentAsync(first.Id);
         var edit = UpdateOrderRequest.From(order);
+        Assert.Equal(order.CodAmount, edit.CodAmount);
+        Assert.DoesNotContain(".", edit.CodAmount!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture), StringComparison.Ordinal); // the form shows 45000, not 45000.0000
         edit.ConsigneePhone = "07701112233";
         edit.DestinationCode = "IQ-NA";
         edit.DeliveryAddress = "حي الأمير، قرب الجامع";

@@ -16,6 +16,9 @@ else
     [Parameter] public decimal? Amount { get; set; }
     [Parameter] public string Currency { get; set; } = "IQD";
 
+    /// <summary>Show every dinar (money owed to someone) instead of the rounded 1.7M.</summary>
+    [Parameter] public bool ExactAmount { get; set; }
+
     /// <summary>Several currency totals, shown compact with the exact totals on hover.</summary>
     [Parameter] public IEnumerable<Logistico.Modules.Shipments.Contracts.MoneyTotal>? Totals { get; set; }
     [Parameter] public string? Unit { get; set; }
@@ -41,7 +44,7 @@ else
     {
         if (Amount is { } amount)
         {
-            (Value, Unit) = Fmt.CompactParts(amount, Currency);
+            (Value, Unit) = ExactAmount ? Fmt.MoneyParts(amount, Currency) : Fmt.CompactParts(amount, Currency);
             Exact ??= Fmt.Money(amount, Currency);
         }
         else if (Totals is not null)

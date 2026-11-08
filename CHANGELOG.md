@@ -8,12 +8,33 @@ versions follow [Semantic Versioning](https://semver.org/).
 ### Added
 - **A company chooses its country.** Iraq keeps the governorates, the map and the five starting hubs. Any other country starts with no hubs: staff add the regions they deliver to (a code such as JO-AM) and the warehouses that cover them. Phones accept an Iraqi mobile or an international number with a plus. Each company's data stays on its own tenant.
 - **Open parcels are indexed** for large lists (`ix_shipments_tenant_open_created`), so the board of parcels that are not delivered, returned or cancelled does not scan the closed history.
+- **A QA suite that uses the product as a company does** (`tests/Logistico.Qa`, docs/11 §3). It starts the built server with its own database. Three shops book 36 orders, the hub receives them all at once and loads one truck to Basra, and three couriers deliver, get refused or get no answer, and retry. Customers track and rate, cash is handed in and the sellers are paid. Every parcel and every dinar must be accounted for, and the time of every endpoint goes into `TestResults/qa/delivery-day.md`. Then Chrome opens every menu page as admin, operations, support, finance and viewer, in Arabic and English and at phone width, and fails on script errors, refused calls, untranslated keys and sideways scrolling. GitHub Actions runs it as its own step.
+- **Jenkins** (`Jenkinsfile`, `deploy/jenkins/`, `scripts/jenkins.sh`, docs/11 §7): the same pipeline on a local Jenkins, set up entirely from the repository (Configuration as Code, a pinned plugin list). It covers format, build, tests with coverage, migrations, the Flutter app, QA and the Docker image, and on `main` it packages the server tarball and the migration bundles. It listens on 127.0.0.1 only, needs a sign-in, and builds this repository's branches only, never pull requests from forks.
+- **Finance can take cash at the cash desk** (new `cash` policy: administrators, operations, finance). The dialog shows any shortage the courier still owes and records its repayment explicitly, capped at what is owed. Only the parcels on the screen are handed in: one the courier delivered meanwhile waits for the next count instead of being added silently.
 
 ### Fixed
 - **Baghdad on the network map can be selected.** Its hub marker sat on the governorate, so the click opened the hub instead. The marker is shifted off the shape; truck lines still meet at the real hub.
 - **The dashboard "right now" strip no longer clips its last figure** when the sidebar is open. The chips scroll inside the strip.
 - **A known phone shows the governorate** next to the saved address, so a Basra address is not applied as if it were Baghdad.
 - **If the application has not appeared after 45 seconds,** the splash is replaced by the reload bar instead of spinning with an empty page.
+- **Parcels scanned at the same moment at one hub** no longer conflict (412) or open two trucks to the same hub: scans at a hub take a turn each. The warehouse station also queues fast scanner input instead of dropping it.
+- **A courier's double tap on Delivered** returns a clear "not on your run" instead of a server error.
+- **A customer's reschedule from a phone** (a date with +03:00) no longer fails with a server error; promised and event dates from the API are stored as UTC.
+- **Arabic-Indic digits** (٠١٢٣…) work in phone numbers, tracking numbers and the last four digits customers type to confirm, rate or ask for a change.
+- **A low rating while a complaint is open** adds to that complaint instead of opening a second one.
+- **Public tracking** shows a parcel on a truck or on its way back at the right stage, keeps hub codes private, and hides the expected date once the delivery is called off.
+- **A truck that arrives with a parcel short** says so on that parcel's history; when the parcel turns up, it is received and the missing alert is cleared. A parcel received off a truck says it came without one.
+- **Renaming a courier** updates the name on their open parcels. **A return after the seller was paid** for the parcel is refused.
+- **Paste to order** no longer makes up prices or places: a price right after the phone number, prices written 25,000 / ٢٥٬٠٠٠ / 25 ألف, house and alley numbers, names starting with يم, and an unknown place (left for the clerk to choose) are all read correctly. The fee waits until the governorate is known.
+- **Orders with an amount that is not a multiple of 250** (from the API, the app or an import) can be edited: money inputs take any whole-dinar amount and show 12504, not 12504.0000.
+- **Every refusal has a message in Arabic and English.** Fifteen codes (a repeat rating, region and pricing conflicts, courier and warehouse checks…) reached the screen raw; a test now fails when a new one has no text.
+- **A seller sees exactly what they are owed** (1,714,000, not 1.7M), and the cancel dialog's buttons read "Back" and "Cancel order".
+- **Changing the language** never redirects to another site (`//host` and `/\host` return addresses go home).
+- **Sign-in from a page opened by IP address** no longer logs a browser security error from passkey autofill. The console no longer flashes its pages before it knows who is signed in.
+
+### Security
+- **The Blazor debug-proxy package** that NuGet audit flagged (CVE-2026-102870) is on 10.0.14 with the other ASP.NET Core packages.
+- **Signing in with an unknown account** takes as long as with a wrong password, so the token endpoint does not reveal which accounts exist.
 
 ## [3.1.0] - 2026-11-02
 

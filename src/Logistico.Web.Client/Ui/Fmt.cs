@@ -116,14 +116,14 @@ public static class Fmt
     public static string Hub(string? hubCode) => HubCatalog.Find(hubCode)?.Name ?? "—";
 
     /// <summary>Compact amount split into number and unit for KPI cards: ("131.9", "مليون د.ع").</summary>
-    public static (string Number, string Unit) CompactParts(decimal? amount, string? currency)
-    {
-        var text = Compact(amount, currency);
-        if (amount is null)
-        {
-            return (text, "");
-        }
+    public static (string Number, string Unit) CompactParts(decimal? amount, string? currency) =>
+        amount is null ? (Compact(amount, currency), "") : Parts(Compact(amount, currency), currency);
 
+    /// <summary>The exact amount, split like <see cref="CompactParts"/>: for money a person is owed, 1,714,000 and not 1.7M.</summary>
+    public static (string Number, string Unit) MoneyParts(decimal amount, string? currency) => Parts(Money(amount, currency), currency);
+
+    private static (string Number, string Unit) Parts(string text, string? currency)
+    {
         if (currency == "USD")
         {
             return (text.TrimStart('$'), "$");

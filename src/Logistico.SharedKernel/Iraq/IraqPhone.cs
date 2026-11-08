@@ -10,7 +10,7 @@ public static class IraqPhone
             return null;
         }
 
-        var digits = new string(input.Where(char.IsAsciiDigit).ToArray());
+        var digits = new string(SearchText.LatinDigits(input)!.Where(char.IsAsciiDigit).ToArray());
         if (digits.StartsWith("00964", StringComparison.Ordinal))
         {
             digits = digits[5..];

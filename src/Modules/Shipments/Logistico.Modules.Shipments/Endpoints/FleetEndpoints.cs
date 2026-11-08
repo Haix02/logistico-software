@@ -28,8 +28,9 @@ internal static class FleetEndpoints
         fleet.MapPut("/couriers/{id:guid}", UpdateAsync).WithSummary("Updates a courier. Requires If-Match with the current ETag.")
             .RequireAuthorization(StaffPolicies.Operate);
         fleet.MapGet("/couriers/{id:guid}/cash", CashAsync).WithSummary("The cash a courier collected on delivery and has not handed in yet, parcel by parcel.");
-        fleet.MapPost("/couriers/{id:guid}/cash", ReceiveCashAsync).WithSummary("Records a courier's cash hand-in: every collected parcel not handed in yet, with the amount counted.")
-            .RequireAuthorization(StaffPolicies.Operate);
+        fleet.MapPost("/couriers/{id:guid}/cash", ReceiveCashAsync)
+            .WithSummary("Records a courier's cash hand-in: the parcels counted (or every collected parcel), with the amount counted; without parcels, a shortage paid back.")
+            .RequireAuthorization(StaffPolicies.Cash);
         fleet.MapGet("/cash-handovers", HandoversAsync).WithSummary("Cash hand-ins, newest first, with any shortage.");
         return app;
     }
@@ -105,7 +106,7 @@ internal static class FleetEndpoints
             .OrderBy(s => s.DeliveredAt)
             .Select(s => new CourierCashParcel(s.Id, s.TrackingNumber, s.ConsigneeName, s.MerchantName, s.CodAmount ?? 0m, s.DeliveredAt))
             .ToListAsync(ct);
-        return TypedResults.Ok(new CourierCash(courier.Id, courier.Code, courier.Name, parcels.Sum(p => p.CodAmount), parcels));
+        return TypedResults.Ok(new CourierCash(courier.Id, courier.Code, courier.Name, parcels.Sum(p => p.CodAmount), parcels, await ShortageAsync(db, courier.Id, ct)));
     }
 
     private static async Task<IResult> ReceiveCashAsync(
@@ -116,11 +117,23 @@ internal static class FleetEndpoints
             return Api.NotFound("courier.not_found");
         }
 
-        var parcels = await WithCourier(db.Shipments, courier.DisplayLabel).OrderBy(s => s.DeliveredAt).ToListAsync(ct);
+        var collected = WithCourier(db.Shipments, courier.DisplayLabel);
+        var counted = request.ParcelIds?.Distinct().ToList() ?? [];
+        if (counted.Count > 0)
+        {
+            collected = collected.Where(s => counted.Contains(s.Id));
+        }
+
+        var parcels = await collected.OrderBy(s => s.DeliveredAt).ToListAsync(ct);
+        if (parcels.Count != counted.Count && counted.Count > 0)
+        {
+            return Api.Stale("cash.changed"); // a parcel on the clerk's screen was handed in or returned meanwhile
+        }
+
         try
         {
             var handover = CashHandover.Create(tenant.TenantId, await numbers.CashHandoverNumberAsync(ct), courier, parcels, request.ReceivedIqd!.Value, request.Notes,
-                user.UserName(), clock.GetUtcNow());
+                user.UserName(), clock.GetUtcNow(), request.RepaysShortage && parcels.Count == 0 ? await ShortageAsync(db, courier.Id, ct) : 0m);
             db.CashHandovers.Add(handover);
             await db.SaveChangesAsync(ct);
             return TypedResults.Created("/" + ShipmentsApiRoutes.CashHandovers, ToItem(handover));
@@ -150,6 +163,10 @@ internal static class FleetEndpoints
         var items = await query.OrderByDescending(h => h.ReceivedAt).Skip((number - 1) * size).Take(size).ToListAsync(ct);
         return TypedResults.Ok(new PagedResult<CashHandoverItem>(items.Select(ToItem).ToList(), total, number, size));
     }
+
+    /// <summary>What earlier hand-ins were short and has not been paid back (surpluses count against it).</summary>
+    private static async Task<decimal> ShortageAsync(ShipmentsDbContext db, Guid courierId, CancellationToken ct) =>
+        Math.Max(0m, -await db.CashHandovers.Where(h => h.CourierId == courierId).SumAsync(h => (decimal?)h.DifferenceIqd, ct) ?? 0m);
 
     /// <summary>Parcels whose cash on delivery this courier collected and has not handed in yet.</summary>
     private static IQueryable<Shipment> WithCourier(IQueryable<Shipment> shipments, string label) =>
@@ -220,8 +237,21 @@ internal static class FleetEndpoints
 
         try
         {
+            var before = courier.DisplayLabel;
             courier.Update(request, clock.GetUtcNow());
             db.Entry(courier).Property(c => c.Version).OriginalValue = expected;
+            if (courier.DisplayLabel != before)
+            {
+                // Parcels name their courier: those on the run or with cash not handed in move to the new name.
+                var open = await db.Shipments
+                    .Where(s => s.CourierName == before && (s.Status == ShipmentStatus.OutForDelivery || (s.CodCollectedAt != null && s.CodHandedOverAt == null)))
+                    .ToListAsync(ct);
+                foreach (var parcel in open)
+                {
+                    parcel.CourierRenamed(courier.DisplayLabel, clock.GetUtcNow());
+                }
+            }
+
             await db.SaveChangesAsync(ct);
         }
         catch (DomainException ex)

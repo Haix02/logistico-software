@@ -92,4 +92,55 @@ public class SmartOrderAndTariffTests
         Assert.Contains("<svg", svg, StringComparison.Ordinal);
         Assert.Contains("LX2600001842", svg, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void A_message_without_a_price_gets_none_invented()
+    {
+        var draft = SmartOrderParser.ParseSingle("زينب كاظم - 07701234567 - المنصور - فستان أسود");
+        Assert.Null(draft.CodAmount);
+        Assert.Equal("زينب كاظم", draft.ConsigneeName);
+    }
+
+    [Theory]
+    [InlineData("سارة - 07701234567 - الكرادة - حقيبة - ٤٥،٠٠٠", 45_000)]
+    [InlineData("سارة - 07701234567 - الكرادة - حقيبة - ٤٥٬٠٠٠ دينار", 45_000)]
+    [InlineData("سارة 07701234567 45000 الكرادة حقيبة", 45_000)]
+    [InlineData("سارة - ٠٧٧٠١٢٣٤٥٦٧ - الكرادة - حقيبة - 35 الف", 35_000)]
+    public void Prices_are_read_however_they_are_written(string message, decimal price)
+    {
+        var draft = SmartOrderParser.ParseSingle(message);
+        Assert.Equal(price, draft.CodAmount);
+        Assert.Equal("0770 123 4567", draft.ConsigneePhone);
+    }
+
+    [Fact]
+    public void An_alley_or_house_number_is_address_not_money()
+    {
+        var draft = SmartOrderParser.ParseSingle("علي - 07701234567 - الكرادة زقاق 1205 دار 17 - حذاء");
+        Assert.Null(draft.CodAmount);
+        Assert.Contains("1205", draft.DeliveryAddress, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData("مريم")]
+    [InlineData("كريم")]
+    [InlineData("ابراهيم")]
+    public void Names_ending_like_near_are_names(string name)
+    {
+        var draft = SmartOrderParser.ParseSingle($"{name} - 07701234567 - المنصور - ساعة يد - 30000");
+        Assert.Equal(name, draft.ConsigneeName);
+        Assert.Null(draft.Landmark);
+        Assert.Equal("ساعة يد", draft.ItemsDescription);
+    }
+
+    [Theory]
+    [InlineData("علي - 07701234567 - البصرة شارع بغداد - 30000", "IQ-BA")]
+    [InlineData("علي - 07701234567 - النجف حي الجامعة - 30000", "IQ-NA")]
+    [InlineData("علي - 07701234567 - حلبجة - 30000", "")]
+    public void The_place_named_in_the_message_decides_and_an_unknown_one_is_left_to_choose(string message, string governorate)
+    {
+        var draft = SmartOrderParser.ParseSingle(message);
+        Assert.Equal(governorate, draft.DestinationCode);
+        Assert.Equal(governorate.Length > 0, draft.IsValid);
+    }
 }

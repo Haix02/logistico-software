@@ -100,6 +100,13 @@ internal sealed class ServiceRequest
 
     public void Resolve(string? note, string? by, DateTimeOffset now) => Close(RequestStatus.Resolved, note, by, now);
 
+    /// <summary>More from the customer about an open request (a low rating while a complaint is open): kept, newest last.</summary>
+    public void AddDetails(string text)
+    {
+        var joined = Clean(Details is null ? text : $"{Details}\n{text}");
+        Details = joined is { Length: > 1000 } ? joined[^1000..] : joined;
+    }
+
     public void Reject(string? note, string? by, DateTimeOffset now) => Close(RequestStatus.Rejected, note, by, now);
 
     /// <summary>

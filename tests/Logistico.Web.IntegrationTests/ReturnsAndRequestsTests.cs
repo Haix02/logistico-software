@@ -94,8 +94,8 @@ public sealed class ReturnsAndRequestsTests(LogisticoApiFactory factory)
         var friday = await anonymous.PostAsJsonAsync(route, new CustomerRequest { Type = RequestType.Reschedule, PreferredDate = NextFriday(), PhoneLast4 = "3344" });
         Assert.Equal(HttpStatusCode.BadRequest, friday.StatusCode);
 
-        // A new day is applied automatically.
-        var reschedule = await anonymous.PostAsJsonAsync(route, new CustomerRequest { Type = RequestType.Reschedule, PreferredDate = day, PhoneLast4 = "3344" });
+        // A new day is applied automatically. The browser sends it in Iraq time (+03:00), as phones in Iraq do.
+        var reschedule = await anonymous.PostAsJsonAsync(route, new CustomerRequest { Type = RequestType.Reschedule, PreferredDate = day.ToOffset(TimeSpan.FromHours(3)), PhoneLast4 = "3344" });
         Assert.True(reschedule.IsSuccessStatusCode, await reschedule.Content.ReadAsStringAsync());
         var receipt = (await reschedule.Content.ReadFromJsonAsync<CustomerRequestReceipt>())!;
         Assert.True(receipt.AppliedAutomatically);
@@ -128,6 +128,30 @@ public sealed class ReturnsAndRequestsTests(LogisticoApiFactory factory)
         // Staff can record requests too (e.g. a complaint taken by phone).
         var complaint = await staff.PostAsJsonAsync("/" + ShipmentsApiRoutes.Requests, new CreateServiceRequest { ShipmentId = created.Id, Type = RequestType.Complaint, Details = "اتصل الزبون مرتين" });
         Assert.Equal(HttpStatusCode.Created, complaint.StatusCode);
+    }
+
+    [Fact]
+    public async Task A_low_rating_joins_a_complaint_that_is_already_open()
+    {
+        var staff = factory.CreateUserClient();
+        var shop = await staff.CreateMerchantAsync("متجر الشكوى", "open.complaint.shop");
+        var order = ApiTestHelpers.DomesticOrder(shop, "زبون الشكوى");
+        order.DestinationCode = "IQ-BG";
+        var created = await staff.BookAsync(order);
+        await staff.ScanAsync(ScanOperation.Receive, created.TrackingNumber, IraqHubs.Baghdad, "A-01-1");
+        await staff.ScanAsync(ScanOperation.Dispatch, created.TrackingNumber, IraqHubs.Baghdad, courier: "حيدر (Baghdad-02)");
+        await staff.ScanAsync(ScanOperation.Deliver, created.TrackingNumber, IraqHubs.Baghdad, courier: "حيدر (Baghdad-02)");
+        var complaint = await staff.PostAsJsonAsync("/" + ShipmentsApiRoutes.Requests, new CreateServiceRequest { ShipmentId = created.Id, Type = RequestType.Complaint, Details = "اتصل الزبون غاضباً" });
+        Assert.Equal(HttpStatusCode.Created, complaint.StatusCode);
+
+        var rated = await factory.CreateCustomerClient().PostAsJsonAsync("/" + ShipmentsApiRoutes.TrackRating(created.TrackingNumber),
+            new CustomerRating { Stars = 1, Comment = "الطرد مكسور", PhoneLast4 = "٣٣٤٤" });
+
+        Assert.True(rated.IsSuccessStatusCode, await rated.Content.ReadAsStringAsync());
+        var inbox = (await staff.GetFromJsonAsync<ServiceRequestList>("/" + ShipmentsApiRoutes.Requests + $"?shipmentId={created.Id}"))!;
+        var open = Assert.Single(inbox.Items);
+        Assert.Contains("اتصل الزبون غاضباً", open.Details, StringComparison.Ordinal);
+        Assert.Contains("★☆☆☆☆ الطرد مكسور", open.Details, StringComparison.Ordinal);
     }
 
     [Fact]

@@ -116,7 +116,9 @@ customElements.define('passkey-submit', class extends HTMLElement {
     }
 
     async tryAutofillPasskey() {
-        if (browserSupportsPasskeys && this.attrs.operation === 'Request' && await PublicKeyCredential.isConditionalMediationAvailable?.()) {
+        // Passkeys belong to a domain name: opened by an IP address (a test server, an office LAN) there is nothing to offer.
+        const openedByAddress = /^[\d.]+$/.test(location.hostname) || location.hostname.includes(':');
+        if (browserSupportsPasskeys && !openedByAddress && this.attrs.operation === 'Request' && await PublicKeyCredential.isConditionalMediationAvailable?.()) {
             await this.obtainAndSubmitCredential(/* useConditionalMediation */ true);
         }
     }

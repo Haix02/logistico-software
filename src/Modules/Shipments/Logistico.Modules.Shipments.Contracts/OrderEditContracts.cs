@@ -74,12 +74,17 @@ public sealed class UpdateOrderRequest : IValidatableObject
         Landmark = s.Landmark,
         ItemsDescription = s.ItemsDescription,
         Pieces = s.Pieces,
-        GrossWeightKg = s.GrossWeightKg,
-        CodAmount = s.CodAmount,
-        DeliveryFee = s.DeliveryFee,
+        GrossWeightKg = Plain(s.GrossWeightKg),
+        CodAmount = Plain(s.CodAmount),
+        DeliveryFee = Plain(s.DeliveryFee),
         ExternalReference = s.ExternalReference,
         Notes = s.Notes,
     };
+
+    /// <summary>The stored amount without the database's trailing zeros: 12504, not 12504.0000, in the form.</summary>
+    private static decimal Plain(decimal value) => value / 1.0000000000000000000000000000m;
+
+    private static decimal? Plain(decimal? value) => value is { } v ? Plain(v) : null;
 }
 
 /// <summary>Staff cancel an order: before collection it is cancelled, afterwards it goes back to the seller.</summary>

@@ -90,7 +90,8 @@ public sealed partial class CreateShipmentRequest : IValidatableObject
     [Range(typeof(decimal), "0", "10000000", ParseLimitsInInvariantCulture = true, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Range))]
     public decimal? DeliveryFee { get; set; }
 
-    public DateTimeOffset? PromisedAt { get; set; }
+    /// <summary>When the delivery is promised. Stored as the same instant in UTC: phones in Iraq send +03:00, PostgreSQL keeps UTC.</summary>
+    public DateTimeOffset? PromisedAt { get; set => field = value?.ToUniversalTime(); }
 
     [StringLength(2000, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.MaxLength))]
     public string? Notes { get; set; }
@@ -168,8 +169,8 @@ public sealed class RecordShipmentEventRequest : IValidatableObject
     [Required(ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.Required))]
     public ShipmentStatus? Status { get; set; }
 
-    /// <summary>When it happened in the real world. Defaults to now.</summary>
-    public DateTimeOffset? OccurredAt { get; set; }
+    /// <summary>When it happened in the real world. Defaults to now. Stored as the same instant in UTC: phones in Iraq send +03:00, PostgreSQL keeps UTC.</summary>
+    public DateTimeOffset? OccurredAt { get; set => field = value?.ToUniversalTime(); }
 
     [StringLength(100, ErrorMessageResourceType = typeof(ValidationText), ErrorMessageResourceName = nameof(ValidationText.MaxLength))]
     public string? Location { get; set; }

@@ -1,0 +1,72 @@
+# Jenkins Configuration as Code: the whole Logistico Jenkins, read at start-up (scripts/jenkins.sh, docs/11 §7).
+# Secrets come from the environment, never from this file.
+jenkins:
+  systemMessage: "Logistico CI. Pipeline: Jenkinsfile in the repository. Settings: deploy/jenkins/jenkins.yaml (changes made here are lost at restart)."
+  numExecutors: 2
+  mode: NORMAL
+  labelString: "dotnet flutter postgres"
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          name: "Logistico CI administrator"
+          password: "${JENKINS_ADMIN_PASSWORD}"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+  # Cross-site request forgery protection (the session-bound crumb; agent-to-controller security is always on).
+  crumbIssuer: "standard"
+  markupFormatter: "plainText"
+
+unclassified:
+  location:
+    url: "${JENKINS_URL}"
+  timestamper:
+    allPipelines: true
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          # A PostgreSQL role that may create databases: the tests create and drop throw-away ones.
+          - string:
+              scope: GLOBAL
+              id: "logistico-test-db"
+              description: "Connection string for the test databases"
+              secret: "${LOGISTICO_TEST_DB}"
+
+jobs:
+  - script: |
+      multibranchPipelineJob('logistico') {
+        displayName('Logistico')
+        description('Every branch of Haix02/logistico-software that has a Jenkinsfile. Pull requests from forks are never built: this server runs what it builds.')
+        branchSources {
+          branchSource {
+            source {
+              git {
+                id('logistico-origin')
+                remote('https://github.com/Haix02/logistico-software.git')
+                traits {
+                  gitBranchDiscovery()
+                }
+              }
+            }
+          }
+        }
+        factory {
+          workflowBranchProjectFactory {
+            scriptPath('Jenkinsfile')
+          }
+        }
+        orphanedItemStrategy {
+          discardOldItems {
+            numToKeep(10)
+          }
+        }
+        triggers {
+          periodicFolderTrigger {
+            interval('5m')
+          }
+        }
+      }

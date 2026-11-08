@@ -36,11 +36,18 @@ internal sealed class CashHandover
         decimal receivedIqd,
         string? notes,
         string? receivedBy,
-        DateTimeOffset now)
+        DateTimeOffset now,
+        decimal shortageIqd = 0)
     {
-        if (parcels.Count == 0)
+        // Without parcels, a hand-in can only pay back what earlier hand-ins were short, and not more than that.
+        if (parcels.Count == 0 && (shortageIqd <= 0 || receivedIqd <= 0))
         {
             throw new DomainException("cash.nothing_to_hand_in", "This courier has no collected cash to hand in.");
+        }
+
+        if (parcels.Count == 0 && receivedIqd > shortageIqd)
+        {
+            throw new DomainException("cash.repayment_too_high", "The courier owes less than this.", shortageIqd);
         }
 
         if (receivedIqd < 0)

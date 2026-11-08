@@ -19,7 +19,8 @@ flowchart LR
     R --> F[Format check]
     F --> B[Build Release<br/>warnings = errors]
     B --> T[Tests<br/>unit · architecture ·<br/>API on PostgreSQL 18]
-    T --> M[EF Core: migrations<br/>match the model]
+    T --> Q[QA<br/>a delivery day over the API ·<br/>every page in Chrome]
+    Q --> M[EF Core: migrations<br/>match the model]
     M -->|main only| P[Package<br/>container image → GHCR<br/>migration bundles]
     P -.-> D[Deploy ⏳<br/>staging → production]
 ```
@@ -30,6 +31,7 @@ flowchart LR
 | Format check | Consistent code style; no style churn in reviews |
 | Build (Release, warnings as errors) | Nullable and analyzer warnings are fixed, not ignored |
 | Tests | Domain rules, module boundaries, and the real HTTP API against a real PostgreSQL service container |
+| QA | The built server started as people run it, then used the way a company uses it: shops book, the hub receives and loads a truck, couriers deliver and fail, cash is handed in and sellers are paid; then every menu page is opened in Chrome by every office role, in Arabic and English and at phone width (§3) |
 | Migrations vs model | Nobody changes the EF model without adding a migration |
 | Docker image (parallel job) | The `Dockerfile` behind `docker compose up` still builds, so people can try Logistico without the .NET SDK |
 | Package (main) | Immutable container image tagged with the commit SHA; self-contained EF migration bundles as artifacts |
@@ -44,11 +46,23 @@ flowchart LR
 
 | Suite | Scope | Runs against | Count today |
 |---|---|---|---|
-| `Logistico.Modules.Shipments.Tests` | Tracking-number check digit, chargeable weight, state machines (incl. dead-end detection), shipment and COD rules, delivery promise, tracking stages, customs duties, Code-128, hub routing and misroutes, Iraqi phone numbers, Arabic/English number and date formats | Pure C# | 88 |
-| `Logistico.ArchitectureTests` | Module boundaries (contracts free of server deps, client sees only contracts, single public entry point, modules talk only through contracts); every UI text exists in Arabic and English and every key used on a page exists | Reflection + resx | 12 |
-| `Logistico.Web.IntegrationTests` | REST API end to end: 401s, booking, Instagram order through the warehouse to COD delivery, sellers, multi-hub scans and misroutes, customs e-verification gate and SAD XML, customs queue paging and filters, fleet couriers, COD settlements, ETag concurrency (428/412), 422 rule codes, 400 validation, Arabic error messages, list filters/paging/totals in SQL, CSV export, tenant isolation, public tracking | `WebApplicationFactory` + PostgreSQL (one throw-away database per test class) | 20 |
-| Browser E2E (🟡) | Arabic journey: sign in → new seller order → warehouse receive → dispatch with courier → delivered with COD → public tracking page; plus a crawl of every page in both languages and at phone width checking console errors, failed requests and horizontal overflow (scripted and passing with headless Chrome; to be ported to Playwright for .NET in CI) | Chrome | — |
+| `Logistico.Modules.Shipments.Tests` | Tracking-number check digit, chargeable weight, state machines (incl. dead-end detection), shipment and COD rules, delivery promise, tracking stages, customs duties, Code-128, hub routing and misroutes, Iraqi phone numbers (Arabic-Indic digits too), Arabic/English number and date formats, the paste-to-order reader | Pure C# | 277 |
+| `Logistico.ArchitectureTests` | Module boundaries (contracts free of server deps, client sees only contracts, single public entry point, modules talk only through contracts); every UI text exists in Arabic and English and every key used on a page exists; every refusal code the API can send has a message in both languages | Reflection + resx | 34 |
+| `Logistico.Web.Client.Tests` | The console's own logic and shared components rendered with bUnit: which pages and actions each role sees, menu and guide links, shortcuts, plurals and money in both languages, tables, pager, status tags, the getting-started card and installation health | bUnit | 46 |
+| `Logistico.Web.IntegrationTests` | REST API end to end: 401s, booking, Instagram order through the warehouse to COD delivery, sellers, multi-hub scans, trucks and misroutes, simultaneous scans, customs e-verification gate and SAD XML, fleet couriers and the cash desk, COD settlements, ETag concurrency (428/412), 422 rule codes, 400 validation, Arabic error messages, list filters/paging/totals in SQL, CSV export, tenant isolation, public tracking, first run, roles | `WebApplicationFactory` + PostgreSQL (one throw-away database per test class) | 162 |
+| `Logistico.Qa` (category `Qa`) | **A delivery day**: three shops, three couriers and a hub working at once through the API (simultaneous receive scans, one truck to Basra, delivered, refused and no-answer attempts, re-dispatch, public tracking, a rating, cash hand-in, payouts, a double payout refused); every parcel and every dinar must be accounted for and no call may fail with 5xx. Writes `TestResults/qa/delivery-day.md` with the time of every endpoint (p50/p95). **Every page**: every menu page opened in Chrome by admin, operations, support, finance and viewer, in Arabic and English and at 390 px, failing on script errors, refused or failed API calls, untranslated text keys and sideways scrolling | The built server in its own process on a free port with its own database; Playwright for .NET with the installed Chrome | 9 |
 | Load (🟡) | k6 against grid and booking endpoints with 1 M seeded shipments | Staging | — |
+
+Run them:
+
+```bash
+dotnet test Logistico.slnx --filter "Category!=Qa"      # everything but the QA suite (about a minute)
+dotnet build Logistico.slnx -c Release && dotnet test tests/Logistico.Qa -c Release --no-build   # the QA suite (about two minutes)
+LOGISTICO_QA_URL=http://127.0.0.1:5311/ dotnet test tests/Logistico.Qa --filter "FullyQualifiedName~EveryPage"   # against a server you started
+```
+
+The QA suite needs PostgreSQL (`LOGISTICO_TEST_DB`, as the integration tests) and Google Chrome. It drops its database
+when it finishes; the server's log is kept in `TestResults/qa/server.log`.
 
 ## 4. Database migrations
 
@@ -90,3 +104,34 @@ dotnet format Logistico.slnx                # fix formatting before committing
 ```
 
 Hot reload: `dotnet watch --project src/Logistico.Web` rebuilds the WebAssembly client and server on change.
+
+## 7. Jenkins (implemented: `Jenkinsfile`, `deploy/jenkins/`, `scripts/jenkins.sh`)
+
+A Jenkins on a developer's or the office's own machine runs the same checks as GitHub Actions, plus the package step,
+for every branch of the repository. Everything about it is in the repository: the pipeline (`Jenkinsfile`), the
+server's settings as code (`deploy/jenkins/jenkins.yaml`, Configuration as Code) and its plugins
+(`deploy/jenkins/plugins.txt`). Nothing is configured by clicking, so a broken Jenkins is rebuilt by starting it again.
+
+```bash
+brew install jenkins-lts openjdk@21      # once
+scripts/jenkins.sh setup                 # once: plugins, and an administrator password in ~/.logistico-jenkins
+scripts/jenkins.sh start                 # http://127.0.0.1:8090/  (user admin)
+scripts/jenkins.sh password              # prints the administrator password
+scripts/jenkins.sh status | logs | stop
+```
+
+| Stage | What runs |
+|---|---|
+| Tools, Restore, Format, Build | As in GitHub Actions: NuGet audit, `dotnet format --verify-no-changes`, Release build with warnings as errors |
+| Checks (in parallel) | Tests with coverage (fails below 85 %), migrations match the model, the Flutter app (texts, analyze, tests) |
+| QA | `tests/Logistico.Qa` as in §3 |
+| Docker image | Only on a machine with Docker |
+| Package | On `main`, or when the build is started with *PACKAGE*: the published server as a tarball and the four migration bundles, kept with the build |
+
+Test results (JUnit) and coverage show on each build's page; the QA reports and the server log are kept as artifacts.
+
+**Security.** Jenkins listens on `127.0.0.1` only. Nobody can read it without signing in, and sign-up is closed. It
+builds the branches of `Haix02/logistico-software` only and never pull requests from forks, because a build runs the
+code it builds on this machine. The test database's connection string is a Jenkins credential
+(`logistico-test-db`), taken from `LOGISTICO_TEST_DB` at start-up; the administrator password is generated by `setup`
+and kept outside the repository. Branches are scanned every five minutes; *Scan Multibranch Pipeline Now* scans at once.

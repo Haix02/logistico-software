@@ -20,7 +20,7 @@ jobs:
   build-and-test:
     name: Build & test
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     services:
       postgres:
@@ -65,10 +65,15 @@ jobs:
         run: dotnet build Logistico.slnx -c Release --no-restore
 
       - name: Test (unit, architecture, API integration on PostgreSQL)
-        run: dotnet test Logistico.slnx -c Release --no-build --logger trx --results-directory TestResults --collect:"XPlat Code Coverage"
+        run: dotnet test Logistico.slnx -c Release --no-build --filter "Category!=Qa" --logger trx --results-directory TestResults --collect:"XPlat Code Coverage"
 
       - name: Coverage of the server code (summary on the run's page; fails below the minimum)
         run: python3 scripts/coverage-summary.py TestResults --min 85
+
+      # The real server on its own port: shops, couriers and a hub working one delivery day over the API, then every
+      # menu page opened in Chrome (already on the runner) by every office role. Reports land in TestResults/qa.
+      - name: QA (delivery day and every page in a browser)
+        run: dotnet test tests/Logistico.Qa -c Release --no-build --logger trx --results-directory TestResults
 
       - name: Check that EF Core migrations match the model
         run: |

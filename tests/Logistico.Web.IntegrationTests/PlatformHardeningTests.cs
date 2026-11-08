@@ -64,4 +64,19 @@ public sealed partial class PlatformHardeningTests(LogisticoApiFactory factory)
 
     [GeneratedRegex(@"<script(?![^>]*\bsrc=)([^>]*)>", RegexOptions.IgnoreCase)]
     private static partial Regex InlineScriptPattern();
+
+    [Theory]
+    [InlineData("/shipments", "/shipments")]
+    [InlineData("//evil.example", "/")]
+    [InlineData("/\\evil.example", "/")]
+    [InlineData("https://evil.example", "/")]
+    public async Task The_language_switch_only_returns_to_this_site(string returnUrl, string expected)
+    {
+        using var client = factory.CreateClient(new() { AllowAutoRedirect = false });
+
+        var response = await client.GetAsync($"/culture?c=en-US&returnUrl={Uri.EscapeDataString(returnUrl)}");
+
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Equal(expected, response.Headers.Location!.OriginalString);
+    }
 }
