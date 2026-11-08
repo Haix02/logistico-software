@@ -25,11 +25,11 @@
   </ItemGroup>
   <ItemGroup Label="Tests">
     <PackageVersion Include="bunit" Version="2.13.3" />
-    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="coverlet.collector" Version="10.1.0" />
     <PackageVersion Include="JunitXml.TestLogger" Version="8.1.0" />
     <PackageVersion Include="Microsoft.Playwright" Version="1.64.1" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.1" />
   </ItemGroup>
 </Project>
