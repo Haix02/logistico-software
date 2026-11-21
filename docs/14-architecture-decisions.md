@@ -297,3 +297,21 @@ licence); heuristics without a bound (no way to say "optimal").
 **Consequences.** Native OR-Tools runtimes are published per platform (the Docker image takes its own architecture
 only). Plans change nothing until approved, and those older than six hours cannot be approved. Accuracy is tested:
 brute-force optimality on small instances, limits and determinism, and the browser QA suite runs every planner.
+
+### ADR-035: Idempotency keys in PostgreSQL, checked by middleware — Accepted (21 Nov 2026)
+**Context.** A booking whose answer is lost (a phone on a weak network, a timeout, a second tap on "Try again") was
+booked twice: two tracking numbers, two pickups, two cash collections for one sale.
+**Decision.** Clients send an `Idempotency-Key` (IETF draft "The Idempotency-Key HTTP Header Field"; Kleppmann,
+*DDIA* ch. 12, request ids carried end to end). A middleware claims the key in `iam.idempotent_requests` before the
+endpoint runs, with the primary key (company, person, key) making the claim atomic, and keeps the answer after a 2xx.
+The key is tied to a fingerprint of the request (SHA-256 of method, path, query and body). It uses its own connection,
+so the request's transaction and the audit trail never see it. Keys are kept 24 hours and an unfinished attempt is
+given up after 5 minutes. Clients keep one key per order being booked, reuse it while the content is unchanged and
+start a new one after a success (`RetryKey` in the console and the app).
+**Alternatives.** A unique "client order reference" column per table (one table at a time, no stored answer); Redis
+(a second store to run); a key stored in the same transaction as the booking (exactly once, but every endpoint would
+need to take part).
+**Consequences.** If the server stops between the booking's commit and storing its answer, the key stays claimed:
+retries get 409 for five minutes, and one after that books again. This is the trade-off the draft accepts. If the key
+store is briefly unreachable after the work is done, the person still gets the real answer. Anonymous requests ignore the header:
+they are rate limited and cannot fill the store.

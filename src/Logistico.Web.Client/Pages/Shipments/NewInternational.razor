@@ -175,6 +175,9 @@
         }
     }
 
+    // A retry of the same booking after a lost answer is booked once (Idempotency-Key).
+    private readonly RetryKey bookingKey = new();
+
     private async Task SubmitAsync()
     {
         saving = true;
@@ -183,7 +186,8 @@
         {
             model.OriginCode = model.OriginCode.Trim().ToUpperInvariant();
             model.DestinationCode = model.DestinationCode.Trim().ToUpperInvariant();
-            var created = await Shipments.CreateAsync(model);
+            var created = await Shipments.CreateAsync(model, bookingKey.For(model));
+            bookingKey.Done();
             Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["ShipmentBooked"], created.TrackingNumber));
             Navigation.NavigateTo($"shipments/{created.Id}");
         }

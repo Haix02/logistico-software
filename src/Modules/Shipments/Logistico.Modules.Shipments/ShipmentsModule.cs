@@ -19,6 +19,9 @@ public static class ShipmentsModule
     /// <summary>Rate-limiting policy for anonymous customer requests (stricter: they change orders).</summary>
     public const string PublicRequestsRateLimitPolicy = "public-requests";
 
+    /// <summary>Request-timeout policy the host must register for work that is long by design (planning runs, CSV exports).</summary>
+    public const string LongRequestTimeoutPolicy = "long";
+
     public static IServiceCollection AddShipmentsModule(this IServiceCollection services, string connectionString)
     {
         // Registered save interceptors (the audit trail) record every change this module saves.

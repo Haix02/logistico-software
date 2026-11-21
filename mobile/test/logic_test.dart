@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:logistico_app/core/api/retry_key.dart';
 import 'package:logistico_app/core/config.dart';
 import 'package:logistico_app/core/format.dart';
 import 'package:logistico_app/core/models.dart';
@@ -26,6 +27,22 @@ AppConfig config(String kind, List<String> modules) => AppConfig.fromJson({
     });
 
 void main() {
+  group('retry key', () {
+    test('a retry of the same order keeps its key, a changed order or the next order gets a new one', () {
+      final retry = RetryKey();
+      final order = {'consigneeName': 'زبون', 'codAmount': 25000};
+      final first = retry.forBody(order);
+
+      expect(first, matches(RegExp(r'^[0-9a-f]{32}$')));
+      expect(retry.forBody({'consigneeName': 'زبون', 'codAmount': 25000}), first);
+      final changed = retry.forBody({'consigneeName': 'زبون', 'codAmount': 30000});
+      expect(changed, isNot(first));
+
+      retry.done();
+      expect(retry.forBody({'consigneeName': 'زبون', 'codAmount': 30000}), isNot(changed));
+    });
+  });
+
   group('version', () {
     test('compares numerically and never blocks on what it cannot read', () {
       expect(isOlderThan('1.2.0', '1.10.0'), isTrue);

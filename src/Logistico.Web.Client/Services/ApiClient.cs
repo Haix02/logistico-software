@@ -31,9 +31,9 @@ internal abstract class ApiClient(HttpClient http)
         return await response.Content.ReadFromJsonAsync<T>(ct);
     }
 
-    protected async Task<T> SendAsync<T>(HttpMethod method, string url, object? body, uint? version, CancellationToken ct)
+    protected async Task<T> SendAsync<T>(HttpMethod method, string url, object? body, uint? version, CancellationToken ct, string? idempotencyKey = null)
     {
-        using var response = await SendRawAsync(method, url, body, version, ct);
+        using var response = await SendRawAsync(method, url, body, version, ct, idempotencyKey);
         return (await response.Content.ReadFromJsonAsync<T>(ct))!;
     }
 
@@ -42,12 +42,17 @@ internal abstract class ApiClient(HttpClient http)
         using var _ = await SendRawAsync(method, url, body, version, ct);
     }
 
-    private async Task<HttpResponseMessage> SendRawAsync(HttpMethod method, string url, object? body, uint? version, CancellationToken ct)
+    private async Task<HttpResponseMessage> SendRawAsync(HttpMethod method, string url, object? body, uint? version, CancellationToken ct, string? idempotencyKey = null)
     {
         using var message = new HttpRequestMessage(method, url) { Content = body is null ? null : JsonContent.Create(body, body.GetType()) };
         if (version is { } v)
         {
             message.Headers.IfMatch.Add(new EntityTagHeaderValue($"\"{v}\""));
+        }
+
+        if (idempotencyKey is not null)
+        {
+            message.Headers.Add(Logistico.SharedKernel.IdempotencyKey.Header, idempotencyKey);
         }
 
         var response = await http.SendAsync(message, ct);

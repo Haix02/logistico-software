@@ -567,6 +567,10 @@ else
         row.DeliveryFee = IraqGovernorates.IsKnown(row.DestinationCode) ? Quote(row.DestinationCode, 1m).Fee : 0;
     }
 
+    // A retry of the same order or batch after a lost answer is booked once (Idempotency-Key).
+    private readonly RetryKey orderKey = new();
+    private readonly RetryKey batchKey = new();
+
     private async Task SubmitAsync()
     {
         if (model.MerchantId is null)
@@ -579,7 +583,8 @@ else
         serverError = null;
         try
         {
-            var created = await Shipments.CreateAsync(model);
+            var created = await Shipments.CreateAsync(model, orderKey.For(model));
+            orderKey.Done();
             Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["OrderCreated"], created.TrackingNumber));
             await Ops.RefreshAsync();
             ClearCustomer();
@@ -612,12 +617,14 @@ else
         serverError = null;
         try
         {
-            var response = await Shipments.BulkBookAsync(new BulkBookOrdersRequest
+            var batch = new BulkBookOrdersRequest
             {
                 MerchantId = model.MerchantId,
                 PickupRequired = model.PickupRequired,
                 Orders = valid.ToList(),
-            });
+            };
+            var response = await Shipments.BulkBookAsync(batch, batchKey.For(batch));
+            batchKey.Done();
             lastBookedNumbers = response.Orders.Select(o => o.TrackingNumber).ToList();
             batchDrafts.Clear();
             batchRawText = "";

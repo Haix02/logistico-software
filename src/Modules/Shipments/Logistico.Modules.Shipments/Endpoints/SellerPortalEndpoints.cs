@@ -35,7 +35,8 @@ internal static class SellerPortalEndpoints
         seller.MapPost("/orders", BookAsync).WithSummary("Books a delivery from the shop's governorate; the fee comes from the company's prices.");
         seller.MapGet("/quote", QuoteAsync).WithSummary("The company's delivery fee for this shop to a governorate.");
         seller.MapPost("/orders/{id:guid}/cancel", CancelAsync).WithSummary("Cancels an order that has not been picked up yet.");
-        seller.MapGet("/payouts/{id:guid}/statement.csv", StatementAsync).WithSummary("Parcel-by-parcel CSV statement of one of the shop's payouts.");
+        seller.MapGet("/payouts/{id:guid}/statement.csv", StatementAsync).WithSummary("Parcel-by-parcel CSV statement of one of the shop's payouts.")
+            .WithRequestTimeout(ShipmentsModule.LongRequestTimeoutPolicy);
         return app;
     }
 

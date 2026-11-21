@@ -16,11 +16,12 @@ internal sealed class ShipmentsApi(HttpClient http) : ApiClient(http)
 
     public Task<ShipmentDetails?> GetAsync(Guid id, CancellationToken ct = default) => FindAsync<ShipmentDetails>(ShipmentsApiRoutes.ById(id), ct);
 
-    public Task<CreateShipmentResponse> CreateAsync(CreateShipmentRequest request, CancellationToken ct = default) =>
-        SendAsync<CreateShipmentResponse>(HttpMethod.Post, ShipmentsApiRoutes.Shipments, request, null, ct);
+    /// <summary>Books an order; a retry with the same <paramref name="idempotencyKey"/> is booked once (see <see cref="RetryKey"/>).</summary>
+    public Task<CreateShipmentResponse> CreateAsync(CreateShipmentRequest request, string? idempotencyKey = null, CancellationToken ct = default) =>
+        SendAsync<CreateShipmentResponse>(HttpMethod.Post, ShipmentsApiRoutes.Shipments, request, null, ct, idempotencyKey);
 
-    public Task<BulkBookOrdersResponse> BulkBookAsync(BulkBookOrdersRequest request, CancellationToken ct = default) =>
-        SendAsync<BulkBookOrdersResponse>(HttpMethod.Post, ShipmentsApiRoutes.BulkBook, request, null, ct);
+    public Task<BulkBookOrdersResponse> BulkBookAsync(BulkBookOrdersRequest request, string? idempotencyKey = null, CancellationToken ct = default) =>
+        SendAsync<BulkBookOrdersResponse>(HttpMethod.Post, ShipmentsApiRoutes.BulkBook, request, null, ct, idempotencyKey);
 
     public async Task<IReadOnlyList<ShipmentListItem>> GetExactAsync(IEnumerable<string> references, CancellationToken ct = default) =>
         await SendAsync<List<ShipmentListItem>>(HttpMethod.Post, ShipmentsApiRoutes.ExactShipments,

@@ -86,3 +86,11 @@ public static class ValidationText
 
     private static string Get(string key) => Resources.GetString(key, CultureInfo.CurrentUICulture) ?? key;
 }
+
+/// <summary>Texts of refusals the host gives itself (not a module), by stable code, from the same shared resources.</summary>
+public static class CommonProblems
+{
+    private static readonly ResourceManager Resources = new("Logistico.SharedKernel.Resources.CommonText", typeof(CommonProblems).Assembly);
+
+    public static string Text(string code) => Resources.GetString("Problem_" + code, CultureInfo.CurrentUICulture) ?? code;
+}

@@ -182,7 +182,14 @@ src/
 - OpenAPI 3.1 document at `/openapi/v1.json` (development).
 - Public tracking is rate-limited (60 requests per minute per IP) and returns no personal data. Customer requests from the tracking page need the phone's last 4 digits and are limited to 10 per 10 minutes per IP.
 - Texts in errors follow the request language (`Accept-Language`, `ar-IQ` by default).
-- 🟡 Next: `Idempotency-Key` on create endpoints.
+- **Safe retries** (ADR-035): a `POST` or `PATCH` with an `Idempotency-Key` (1–255 visible ASCII characters) runs once
+  per key, company and person. A retry of the same request (method, path, query and body) gets the first answer again
+  with `Idempotent-Replayed: true`. The same key with a different request → **422** `idempotency.key_reused`; while the
+  first attempt is still running → **409** `idempotency.in_progress` with `Retry-After: 1`; a malformed key → **400**.
+  Only a 2xx answer spends a key, so a refused attempt can be corrected and sent again with it. Keys are kept 24 hours.
+  The console, the seller portal and the mobile app send one with every booking.
+- **Time limits:** every endpoint answers within 60 seconds, CSV exports, open data and planning runs within 180;
+  otherwise **504**. The phone app gives up after 30 seconds, and its retry is safe because of the key.
 
 ## 6. Technology stack
 

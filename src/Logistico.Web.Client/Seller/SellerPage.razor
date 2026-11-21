@@ -416,13 +416,17 @@
         }
     }
 
+    // A retry of the same order after a lost answer is booked once (Idempotency-Key).
+    private readonly RetryKey bookingKey = new();
+
     private async Task BookAsync()
     {
         saving = true;
         error = null;
         try
         {
-            var created = await Seller.BookAsync(draft);
+            var created = await Seller.BookAsync(draft, bookingKey.For(draft));
+            bookingKey.Done();
             newOpen = false;
             Toaster.Success(string.Format(CultureInfo.CurrentCulture, L["OrderCreated"], created.TrackingNumber));
             view = SellerOrderView.All;

@@ -222,8 +222,8 @@ before real customers' data goes in. See [First run & getting started](docs/19-f
 dotnet test tests/Logistico.Modules.Shipments.Tests     # domain rules, the order lifecycle over every status, trucks, cash, requests, sort plans (399)
 dotnet test tests/Logistico.Optimization.Tests           # the planners: brute-force optimality proofs, limits, checker, determinism (30)
 dotnet test tests/Logistico.ArchitectureTests            # module boundaries, texts in both languages, RTL/CSS and icon guards, a message for every refusal code (35)
-dotnet test tests/Logistico.Web.IntegrationTests         # REST API on real PostgreSQL: flows, roles, setup, planning, every endpoint × every role (171)
-dotnet test tests/Logistico.Web.Client.Tests             # the console: components (bUnit), navigation, plurals, texts (46)
+dotnet test tests/Logistico.Web.IntegrationTests         # REST API on real PostgreSQL: flows, roles, setup, planning, every endpoint × every role, retried bookings (176)
+dotnet test tests/Logistico.Web.Client.Tests             # the console: components (bUnit), navigation, plurals, texts, retry keys (47)
 dotnet test tests/Logistico.Qa -c Release                # QA: a delivery day by shops, couriers and a hub, every page and every planner in Chrome (11)
 ```
 

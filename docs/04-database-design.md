@@ -436,6 +436,8 @@ create policy tenant_isolation on shipment.shipments
 | `telematics.positions` | Daily chunks (Timescale) | 400 days raw, compressed after 7 days | Hourly aggregates kept 5 years |
 | `notify.deliveries` | Monthly | 12 months | Drop |
 | Customs declarations & documents | Not partitioned | **Never deleted** inside the retention period (⚠ confirm the Iraqi customs record-keeping period) | Archive tier |
+| `iam.idempotent_requests` (implemented) | Not partitioned | 24 hours | Deleted hourly by the application |
+| `shipment.hub_scans`, `shipment.automation_log`, `shipment.planning_runs` (implemented) | Not partitioned | ⚠ Not decided: they grow with every scan, rule run and plan | Proposal in [17](17-release-audits.md) |
 
 ## 8. Migrations (zero-downtime)
 

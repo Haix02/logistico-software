@@ -124,6 +124,19 @@ builder.Services.AddScoped<SetupService>();
 builder.Services.AddScoped<Logistico.SharedKernel.Mobile.IDeliveryRules, DeliveryRules>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddProblemDetails();
+
+// Safe retries of requests that create something (Idempotency-Key), on their own connection pool.
+builder.Services.AddSingleton(_ => Npgsql.NpgsqlDataSource.Create(connectionString));
+builder.Services.AddSingleton<IdempotencyStore>();
+builder.Services.AddHostedService<IdempotencyCleanup>();
+
+// Every request has a deadline (Nygard, Release It!: timeouts): a stuck query cannot hold a thread and a connection
+// forever. Planning runs and CSV exports work longer by design.
+builder.Services.AddRequestTimeouts(options =>
+{
+    options.DefaultPolicy = new Microsoft.AspNetCore.Http.Timeouts.RequestTimeoutPolicy { Timeout = TimeSpan.FromSeconds(60), TimeoutStatusCode = StatusCodes.Status504GatewayTimeout };
+    options.AddPolicy(ShipmentsModule.LongRequestTimeoutPolicy, new Microsoft.AspNetCore.Http.Timeouts.RequestTimeoutPolicy { Timeout = TimeSpan.FromSeconds(180), TimeoutStatusCode = StatusCodes.Status504GatewayTimeout });
+});
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton(new PostgresHealthCheck(connectionString));
 builder.Services.AddHealthChecks()
@@ -241,6 +254,8 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
+app.UseRequestTimeouts();
+app.UseMiddleware<IdempotencyMiddleware>();
 
 app.MapStaticAssets();
 
