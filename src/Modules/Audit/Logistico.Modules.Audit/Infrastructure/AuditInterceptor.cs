@@ -24,7 +24,8 @@ internal sealed class AuditInterceptor(IHttpContextAccessor http, ITenantContext
 {
     /// <summary>Records that keep their own history (timeline, scans, logs) or are working state, not business data.</summary>
     private static readonly HashSet<string> SkippedEntities =
-        ["ShipmentEvent", "HubScan", "TransferItem", "AutomationLogEntry", "CustomerNotification", "OpsAlert", "IdentityUserToken", "SavedView", "DeliveryProof", "ShelfCheckLine"];
+        ["ShipmentEvent", "HubScan", "TransferItem", "AutomationLogEntry", "CustomerNotification", "OpsAlert", "IdentityUserToken", "SavedView", "DeliveryProof", "ShelfCheckLine",
+        "PlanningRun", "CourierRunStop"]; // a plan run is its own record (who asked, the plan, who approved); what approving changes is audited
 
     /// <summary>Bookkeeping that changes with every save.</summary>
     private static readonly HashSet<string> SkippedFields =

@@ -128,6 +128,7 @@ internal sealed class ShipmentsDemoSeeder(
         await SeedCashHandoversAsync(ct);
         await SeedCodSettlementsAsync(ct);
         await SeedRatingsAsync(random, ct);
+        await SeedDoorPositionsAsync(random, ct);
         await automation.SweepAsync(tenant.TenantId, ct);
     }
 
@@ -176,6 +177,57 @@ internal sealed class ShipmentsDemoSeeder(
     }
 
     /// <summary>Customers rate about half of last fortnight's deliveries from the tracking page: mostly happy, a few not.</summary>
+    /// <summary>Approximate middles of the Baghdad demo areas, where the courier app's GPS puts demo deliveries.</summary>
+    private static readonly Dictionary<string, (double Latitude, double Longitude)> BaghdadAreaCentres = new(StringComparer.Ordinal)
+    {
+        ["الكرادة"] = (33.304, 44.426),
+        ["المنصور"] = (33.315, 44.345),
+        ["زيونة"] = (33.329, 44.456),
+        ["الأعظمية"] = (33.369, 44.379),
+        ["الكاظمية"] = (33.380, 44.340),
+        ["حي الجامعة"] = (33.312, 44.313),
+        ["الدورة"] = (33.254, 44.395),
+        ["البلديات"] = (33.345, 44.479),
+        ["اليرموك"] = (33.301, 44.336),
+        ["الشعب"] = (33.406, 44.427),
+    };
+
+    /// <summary>
+    /// Delivered Baghdad parcels get the proof the courier app records at the door (GPS within a few hundred metres of
+    /// their area's middle), so the demo's courier-run plans know where customers are, as a company using the app does.
+    /// </summary>
+    private async Task SeedDoorPositionsAsync(Random random, CancellationToken ct)
+    {
+        if (await db.DeliveryProofs.AnyAsync(p => p.Latitude != null, ct))
+        {
+            return;
+        }
+
+        var delivered = await db.Shipments.AsNoTracking()
+            .Where(s => s.ServiceType == ServiceType.Domestic && s.Status == ShipmentStatus.Delivered && s.DestinationCode == "IQ-BG" && s.DeliveredAt != null)
+            .OrderBy(s => s.DeliveredAt)
+            .Select(s => new { s.Id, s.DestinationCity, s.CourierName, s.DeliveredAt })
+            .ToListAsync(ct);
+        foreach (var parcel in delivered)
+        {
+            if (parcel.DestinationCity is not { } area || !BaghdadAreaCentres.TryGetValue(area, out var centre))
+            {
+                continue;
+            }
+
+            var door = new GeoPoint
+            {
+                Latitude = Math.Round(centre.Latitude + (random.NextDouble() - 0.5) * 0.012, 6),
+                Longitude = Math.Round(centre.Longitude + (random.NextDouble() - 0.5) * 0.014, 6),
+                AccuracyMeters = 8 + random.Next(25),
+            };
+            db.DeliveryProofs.Add(DeliveryProof.ForDelivery(tenant.TenantId, parcel.Id, parcel.CourierName ?? Couriers[0],
+                new CourierDeliveryRequest { ReceivedBy = DeliveryReceiver.Customer, Location = door }, parcel.DeliveredAt!.Value));
+        }
+
+        await db.SaveChangesAsync(ct);
+    }
+
     private async Task SeedRatingsAsync(Random random, CancellationToken ct)
     {
         if (await db.Shipments.AnyAsync(s => s.Rating != null, ct))

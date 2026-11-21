@@ -17,6 +17,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Logistico.SharedKernel\Logistico.SharedKernel.csproj" />
     <ProjectReference Include="..\Logistico.Modules.Shipments.Contracts\Logistico.Modules.Shipments.Contracts.csproj" />
+    <!-- Operations research (docs/20): pure models and solvers, no database or web code. -->
+    <ProjectReference Include="..\..\..\Logistico.Optimization\Logistico.Optimization.csproj" />
     <!-- Other modules are reached only through their contracts. -->
     <ProjectReference Include="..\..\Merchants\Logistico.Modules.Merchants.Contracts\Logistico.Modules.Merchants.Contracts.csproj" />
   </ItemGroup>

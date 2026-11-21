@@ -168,6 +168,7 @@ sitemap: true
         <div class="card"><h3>Cash on delivery</h3><p>Cash held by each courier, hand-ins against parcels, seller balances and settlement batches with statements.</p></div>
         <div class="card"><h3>Returns and requests</h3><p>Returns after the last failed attempt, back by truck; customers reschedule or change the address from the tracking page.</p></div>
         <div class="card"><h3>Seller portal</h3><p>Shops book their own orders at your prices, follow them, and see what they are owed and every payout.</p></div>
+        <div class="card"><h3>Planning (optimization)</h3><p>Trucks, courier runs and zones planned with operations research: proven optimal or within a stated gap, checked, and applied only when approved.</p></div>
         <div class="card"><h3>Demand intelligence</h3><p>What customers order, where and when, basket size against refusals, and an anonymised open-data export.</p></div>
         <div class="card"><h3>Automation</h3><p>Alerts, rescheduling, truck planning and auto-cancel every minute, by your company's rules.</p></div>
         <div class="card"><h3>Audit log and roles</h3><p>Who changed what and when, field by field; five office roles enforced by the API.</p></div>
@@ -190,6 +191,17 @@ sitemap: true
 
   <section class="soft">
     <div class="wrap">
+      <h2>Planning: proven plans, not guesses</h2>
+      <p class="sub">Operations research on Google OR-Tools plans trucks between hubs, courier runs within each courier's time, load and cash limit, and balanced zones. Every plan is re-checked, compared with today's practice and applied only when approved.</p>
+      <div class="pair">
+        <figure><img src="images/planning-courier-runs.png" width="1680" height="1500" alt="Courier runs from the Baghdad hub: 40 % less driving and the longest run halved against today's practice" loading="lazy"><figcaption>Courier runs against today's practice</figcaption></figure>
+        <figure><img src="images/planning-trucks.png" width="1680" height="1180" alt="Truck plan proven optimal, with every departure, its fill and the lanes on the Iraq map" loading="lazy"><figcaption>Trucks between hubs, proven optimal</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
       <h2>One mobile app for couriers, sellers and managers</h2>
       <p class="sub">Flutter for Android and iOS. What each kind of account sees is controlled from the console.</p>
       <div class="phones">
@@ -199,7 +211,7 @@ sitemap: true
     </div>
   </section>
 
-  <section id="quick-start">
+  <section id="quick-start" class="soft">
     <div class="wrap">
       <h2>Quick start</h2>
       <p class="sub">Try it with demo data (any computer with Docker), then open <code>http://localhost:5210</code> and sign in as <code>admin@logistico.local</code> / <code>Logistico#2026</code>.</p>
@@ -214,16 +226,16 @@ docker compose up --build</code></pre>
     </div>
   </section>
 
-  <section class="soft">
+  <section>
     <div class="wrap rtl" lang="ar" dir="rtl">
       <h2>لوجستيكو بالعربية</h2>
       <p>نظام مفتوح المصدر ومجاني لإدارة شركات الشحن والتوصيل في العراق: الطلبات ومتاجر الإنستغرام، الدفع عند الاستلام، المخازن والرفوف وخطة الفرز،
-        الشاحنات بين المحافظات، تطبيق المندوب مع إثبات التسليم، المرتجعات، تسوية مستحقات المتاجر، الجمارك (أسيكودا)، وصفحة تتبع للزبون.
+        الشاحنات بين المحافظات، تخطيط رياضي مُثبت للشاحنات وجولات المندوبين والمناطق، تطبيق المندوب مع إثبات التسليم، المرتجعات، تسوية مستحقات المتاجر، الجمارك (أسيكودا)، وصفحة تتبع للزبون.
         الواجهة عربية أولاً من اليمين إلى اليسار، مع الإنجليزية، وتعمل على خادمك الخاص.</p>
     </div>
   </section>
 
-  <section id="faq">
+  <section id="faq" class="soft">
     <div class="wrap">
       <h2>Questions</h2>
       <details><summary>Is Logistico free?</summary><p>Yes. It is open source under the Apache-2.0 licence: run it on your own server, change it, and use it commercially.</p></details>
@@ -234,7 +246,7 @@ docker compose up --build</code></pre>
     </div>
   </section>
 
-  <section id="docs" class="soft">
+  <section id="docs">
     <div class="wrap">
       <h2>Documentation</h2>
       <div class="grid docs">
@@ -247,6 +259,7 @@ docker compose up --build</code></pre>
         <a href="10-security-and-compliance.html">Security<span>Identity, roles, audit, data protection</span></a>
         <a href="15-production-readiness.html">Production readiness<span>Configuration and go-live checklist</span></a>
         <a href="16-data-and-insights.html">Demand intelligence<span>Insights and open data</span></a>
+        <a href="20-optimization-engine.html">Optimization engine<span>Trucks, courier runs and zones</span></a>
         <a href="18-ideas-from-open-source.html">Ideas from open source<span>Fleetbase, OpenBoxes, Karrio, Odoo…</span></a>
         <a href="14-architecture-decisions.html">Architecture decisions<span>The ADR log</span></a>
         <a href="13-roadmap.html">Roadmap<span>Done, next, known limits</span></a>

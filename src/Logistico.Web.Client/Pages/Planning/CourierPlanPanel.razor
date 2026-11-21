@@ -1,0 +1,119 @@
+@* Courier runs from one hub: the figures against today's practice, how sure the plan is of where customers are,
+   each courier's run in order (working time and cash carried against their limits) and what stays at the hub. *@
+
+<div class="lx-kpis">
+    <KpiCard Icon="box" Label="@L["Plan_Kpi_Stops"]" Value="@($"{Fmt.Number(Plan.Plan.Planned)} / {Fmt.Number(Plan.Plan.Planned + Plan.Plan.Deferred)}")" Intent="Intent.Primary"
+             Hint="@string.Format(CultureInfo.CurrentCulture, L["Plan_TodayStops"], Fmt.Number(Plan.Baseline.Planned))" />
+    <KpiCard Icon="path" Label="@L["Plan_Kpi_Km"]" Value="@Fmt.Number((decimal)Plan.Plan.Km, 1)" Unit="@L["Unit_Km"]" Intent="@(Plan.Plan.Km < Plan.Baseline.Km ? Intent.Success : Intent.None)"
+             Hint="@VsToday(Fmt.Number((decimal)Plan.Baseline.Km, 1), Delta((decimal)Plan.Plan.Km, (decimal)Plan.Baseline.Km))" />
+    <KpiCard Icon="time" Label="@L["Plan_Kpi_Longest"]" Value="@Fmt.Number(Plan.Plan.LongestMinutes)" Unit="@L["Unit_Minutes"]"
+             Hint="@VsToday(Fmt.Number(Plan.Baseline.LongestMinutes), Delta(Plan.Plan.LongestMinutes, Plan.Baseline.LongestMinutes))" />
+    <KpiCard Icon="people" Label="@L["Plan_Kpi_Couriers"]" Value="@Fmt.Number(Plan.Plan.CouriersUsed)"
+             Hint="@string.Format(CultureInfo.CurrentCulture, L["Plan_Spread"], Fmt.Number(Plan.Plan.Spread))" />
+    <KpiCard Icon="warning-sign" Label="@L["Plan_Kpi_MustGoLeft"]" Value="@Fmt.Number(Plan.Plan.MustGoDeferred)" Intent="@(Plan.Plan.MustGoDeferred > 0 ? Intent.Danger : Intent.Success)"
+             Hint="@L["Plan_MustGoHint"]" />
+</div>
+
+@if (Plan.GovernorateStops > 0)
+{
+    <Callout Intent="Intent.Warning" Icon="map-marker" Title="@L["Plan_PrecisionTitle"]" CssClass="lx-mb">
+        @string.Format(CultureInfo.CurrentCulture, L["Plan_PrecisionText"], Fmt.Number(Plan.GpsStops), Fmt.Number(Plan.AreaStops), Fmt.Number(Plan.GovernorateStops))
+    </Callout>
+}
+
+@if (Plan.Runs.All(r => r.Stops.Count == 0) && Plan.Deferred.Count == 0)
+{
+    <NonIdealState Icon="route" Title="@L["Plan_NoStops"]" Description="@L["Plan_NoStopsHint"]" />
+}
+else
+{
+    <div class="lx-split lx-plan-split">
+        <div class="lx-stack" style="gap:12px">
+            @foreach (var run in Plan.Runs.Select((r, i) => (Run: r, Index: i)).Where(x => x.Run.Stops.Count > 0))
+            {
+                <div class="lx-card lx-run-card">
+                    <div class="lx-run-head">
+                        <span class="@($"lx-route-swatch lx-route-{run.Index % 6}")"></span>
+                        <span class="lx-strong"><Mixed Text="@run.Run.Courier" /></span>
+                        <span class="lx-spacer"></span>
+                        <span class="bp6-text-muted lx-small">@string.Format(CultureInfo.CurrentCulture, L["Plan_RunSummary"], Fmt.Number(run.Run.Stops.Count), Fmt.Number(run.Run.MaxStops), Fmt.Number((decimal)run.Run.Km, 1))</span>
+                    </div>
+                    <div class="lx-run-meters">
+                        <div class="lx-plan-fill">
+                            <span class="lx-small">@L["Plan_Time"]</span>
+                            <ProgressBar Value="@Ratio(run.Run.Minutes, run.Run.ShiftMinutes)" Intent="@MeterIntent(Ratio(run.Run.Minutes, run.Run.ShiftMinutes))" />
+                            <bdi dir="ltr" class="lx-small lx-tabular">@Fmt.Number(run.Run.Minutes) / @Fmt.Number(run.Run.ShiftMinutes) @L["Unit_Minutes"]</bdi>
+                        </div>
+                        <div class="lx-plan-fill">
+                            <span class="lx-small">@L["Plan_Cash"]</span>
+                            <ProgressBar Value="@Ratio((double)run.Run.CashIqd, (double)run.Run.MaxCashIqd)" Intent="@MeterIntent(Ratio((double)run.Run.CashIqd, (double)run.Run.MaxCashIqd))" />
+                            <bdi dir="ltr" class="lx-small lx-tabular">@Fmt.Money(run.Run.CashIqd, "IQD")</bdi>
+                        </div>
+                    </div>
+                    <ol class="lx-run-stops">
+                        @foreach (var stop in run.Run.Stops.OrderBy(s => s.Sequence))
+                        {
+                            <li>
+                                <span class="lx-run-seq lx-tabular">@stop.Sequence</span>
+                                <a href="@($"shipments/{stop.ShipmentId}")" dir="ltr" class="lx-mono">@stop.TrackingNumber</a>
+                                <span class="bp6-text-muted lx-small lx-run-area"><Mixed Text="@(stop.Area ?? Fmt.Place(stop.Governorate))" /></span>
+                                @if (stop.Precision != StopPrecision.Gps)
+                                {
+                                    <Tag Title="@L["StopPrecision_" + stop.Precision]">@L["StopPrecisionShort_" + stop.Precision]</Tag>
+                                }
+                                <span class="lx-spacer"></span>
+                                <bdi dir="ltr" class="lx-small lx-tabular">@Fmt.Time(stop.ArriveAt)</bdi>
+                            </li>
+                        }
+                    </ol>
+                </div>
+            }
+        </div>
+
+        <div class="lx-card lx-card-pad lx-stack" style="gap:8px">
+            <span class="lx-strong">@L["Plan_RoutesMap"]</span>
+            @if (Plan.GpsStops + Plan.AreaStops > 0)
+            {
+                <RouteSketch Runs="Plan.Runs" HubCode="@Plan.HubCode" HubLatitude="Plan.HubLatitude" HubLongitude="Plan.HubLongitude" />
+            }
+            else
+            {
+                <NonIdealState Icon="map-marker" Title="@L["Plan_NoPositions"]" Description="@L["Plan_NoPositionsHint"]" />
+            }
+            <span class="bp6-text-muted lx-small">@string.Format(CultureInfo.CurrentCulture, L["Plan_StartsAt"], Fmt.DateTime(Plan.StartAt))</span>
+        </div>
+    </div>
+}
+
+@if (Plan.Deferred.Count > 0)
+{
+    <Section Title="@L["Plan_Deferred"]" Subtitle="@L["Plan_DeferredHint"]" Icon="inbox" Padded="false" CssClass="lx-mt">
+        <DataTable TItem="DeferredParcelView" Items="Plan.Deferred" ColumnCount="3">
+            <Header>
+                <th>@L["Col_Tracking"]</th>
+                <th>@L["Plan_Col_Due"]</th>
+                <th>@L["Plan_Col_Reason"]</th>
+            </Header>
+            <Row Context="d">
+                <td><a href="@($"shipments/{d.ShipmentId}")" dir="ltr" class="lx-mono">@d.TrackingNumber</a></td>
+                <td><Tag Intent="@(d.MustGo ? Intent.Danger : Intent.None)">@L[d.MustGo ? "Plan_DueToday" : "Plan_DueLater"]</Tag></td>
+                <td>@L["Defer_" + d.Reason]</td>
+            </Row>
+        </DataTable>
+    </Section>
+}
+
+@code {
+    [Parameter, EditorRequired] public CourierPlanView Plan { get; set; } = default!;
+
+    private static double Ratio(double value, double limit) => limit <= 0 ? 0 : Math.Clamp(value / limit, 0, 1);
+
+    private static Intent MeterIntent(double ratio) => ratio >= 0.95 ? Intent.Warning : Intent.Primary;
+
+    private static decimal? Delta(decimal plan, decimal today) => today == 0 ? null : Math.Round((plan - today) / today * 100, 1);
+
+    private string VsToday(string today, decimal? delta) =>
+        delta is { } d && d != 0
+            ? string.Format(CultureInfo.CurrentCulture, L["Plan_VsTodayDelta"], today, (d > 0 ? "+" : "") + Fmt.Percent(d))
+            : string.Format(CultureInfo.CurrentCulture, L["Plan_VsToday"], today);
+}

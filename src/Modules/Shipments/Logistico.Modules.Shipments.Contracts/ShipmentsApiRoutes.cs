@@ -42,6 +42,16 @@ public static class ShipmentsApiRoutes
     public const string Confirmations = "api/v1/confirmations";
     public const string Pricing = "api/v1/pricing";
 
+    public const string Planning = "api/v1/planning";
+    public const string PlanningPolicy = Planning + "/policy";
+    public const string PlanningRuns = Planning + "/runs";
+
+    public static string PlanningRun(Guid id) => $"{PlanningRuns}/{id}";
+
+    public static string PlanningRunApply(Guid id) => $"{PlanningRuns}/{id}/apply";
+
+    public static string PlanningRunDiscard(Guid id) => $"{PlanningRuns}/{id}/discard";
+
     public const string Customs = "api/v1/customs";
     public const string Fleet = "api/v1/fleet";
     public const string FleetCouriers = Fleet + "/couriers";

@@ -54,6 +54,17 @@ internal static class CourierAppEndpoints
                 s.Id, s.TrackingNumber, s.ConsigneeName, s.ConsigneePhone, s.DestinationCode, s.DestinationCity, s.DeliveryAddress,
                 s.Landmark, s.ItemsDescription, s.CodAmount, s.CodCurrency, s.DeliveryAttempts, s.MerchantName, s.Notes))
             .ToListAsync(ct);
+
+        // An approved courier-run plan sets the order of the stops; parcels added by hand come after it.
+        var stopIds = stops.Select(s => s.Id).ToList();
+        var planned = await db.CourierRunStops.AsNoTracking()
+            .Where(r => r.CourierLabel == label && stopIds.Contains(r.ShipmentId))
+            .ToDictionaryAsync(r => r.ShipmentId, r => r.Sequence, ct);
+        if (planned.Count > 0)
+        {
+            stops = stops.Select((stop, i) => (stop, i)).OrderBy(x => planned.TryGetValue(x.stop.Id, out var sequence) ? sequence : int.MaxValue).ThenBy(x => x.i).Select(x => x.stop).ToList();
+        }
+
         var delivered = await db.Shipments.AsNoTracking()
             .Where(s => s.CourierName == label && s.Status == ShipmentStatus.Delivered && s.DeliveredAt >= startOfDay)
             .GroupBy(_ => 1)

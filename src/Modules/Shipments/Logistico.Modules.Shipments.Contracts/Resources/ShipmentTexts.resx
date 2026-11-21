@@ -142,6 +142,13 @@
   <data name="Problem_shipment.not_found" xml:space="preserve"><value>Shipment not found</value></data>
   <data name="Problem_shipment.not_in_warehouse" xml:space="preserve"><value>This parcel is not in the warehouse.</value></data>
   <data name="Problem_shipment.return_not_at_hub" xml:space="preserve"><value>Only returns waiting at the hub can be handed over.</value></data>
+  <data name="Problem_planning.unknown_hub" xml:space="preserve"><value>Hub {0} is not active in your network.</value></data>
+  <data name="Problem_planning.busy" xml:space="preserve"><value>A plan is being made for your company. Try again in a moment.</value></data>
+  <data name="Problem_planning.not_ready" xml:space="preserve"><value>This plan was already applied or put aside.</value></data>
+  <data name="Problem_planning.expired" xml:space="preserve"><value>This plan is more than {0} hours old: parcels have moved since. Make a new plan.</value></data>
+  <data name="Problem_planning.not_valid" xml:space="preserve"><value>The checker found {0} problem(s) in this plan, so it cannot be applied.</value></data>
+  <data name="Problem_planning.not_found" xml:space="preserve"><value>Plan not found.</value></data>
+  <data name="Problem_planning.stale" xml:space="preserve"><value>Something in this plan changed at the same moment. Reload and try again.</value></data>
   <data name="Problem_shipment.step_by_workflow" xml:space="preserve"><value>'{0}' is not recorded by hand: scan the parcel at the hub, or use the truck manifest, the returns desk or the customs screen.</value></data>
   <data name="Problem_shipment.cod_already_settled" xml:space="preserve"><value>The cash of parcel {0} is already in a seller payout.</value></data>
   <data name="Problem_shipment.same_origin_destination" xml:space="preserve"><value>Origin and destination must differ.</value></data>

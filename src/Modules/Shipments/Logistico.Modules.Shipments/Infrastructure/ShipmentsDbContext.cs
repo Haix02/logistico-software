@@ -39,6 +39,9 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
     public DbSet<ShelfRule> ShelfRules => Set<ShelfRule>();
     public DbSet<OperatingCountry> OperatingCountries => Set<OperatingCountry>();
     public DbSet<ServiceArea> ServiceAreas => Set<ServiceArea>();
+    public DbSet<PlanningSettings> PlanningSettings => Set<PlanningSettings>();
+    public DbSet<PlanningRun> PlanningRuns => Set<PlanningRun>();
+    public DbSet<CourierRunStop> CourierRunStops => Set<CourierRunStop>();
 
     // Referenced by the query filters so EF Core parameterises the tenant per context instance.
     private Guid CurrentTenantId => tenant.TenantId;
@@ -581,6 +584,48 @@ internal sealed class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> op
             e.Property(x => x.NameEn).HasMaxLength(80);
             e.Property(x => x.NameAr).HasMaxLength(80);
             e.HasIndex(x => new { x.TenantId, x.Code }).IsUnique();
+            e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
+        });
+
+        modelBuilder.Entity<PlanningSettings>(e =>
+        {
+            e.ToTable("planning_settings");
+            e.HasKey(x => x.TenantId);
+            e.Property(x => x.Policy).HasColumnType("jsonb");
+            e.Property(x => x.UpdatedBy).HasMaxLength(256);
+            e.Property(x => x.Version).IsRowVersion();
+            e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
+        });
+
+        modelBuilder.Entity<PlanningRun>(e =>
+        {
+            e.ToTable("planning_runs");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).ValueGeneratedNever();
+            e.Property(x => x.Kind).HasConversion<string>().HasMaxLength(16);
+            e.Property(x => x.Status).HasConversion<string>().HasMaxLength(16);
+            e.Property(x => x.Quality).HasConversion<string>().HasMaxLength(16);
+            e.Property(x => x.HubCode).HasMaxLength(8);
+            e.Property(x => x.Solver).HasMaxLength(80);
+            e.Property(x => x.InputHash).HasMaxLength(64);
+            e.Property(x => x.Parameters).HasColumnType("jsonb");
+            e.Property(x => x.Result).HasColumnType("jsonb");
+            e.Property(x => x.CostIqd).HasPrecision(19, 2);
+            e.Property(x => x.RequestedBy).HasMaxLength(256);
+            e.Property(x => x.AppliedBy).HasMaxLength(256);
+            e.Property(x => x.Version).IsRowVersion();
+            e.HasIndex(x => new { x.TenantId, x.Kind, x.RequestedAt });
+            e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
+        });
+
+        modelBuilder.Entity<CourierRunStop>(e =>
+        {
+            e.ToTable("courier_run_stops");
+            e.HasKey(x => x.ShipmentId);
+            e.Property(x => x.ShipmentId).ValueGeneratedNever();
+            e.Property(x => x.CourierLabel).HasMaxLength(160);
+            e.HasOne<Shipment>().WithMany().HasForeignKey(x => x.ShipmentId).OnDelete(DeleteBehavior.Cascade);
+            e.HasIndex(x => new { x.TenantId, x.CourierLabel });
             e.HasQueryFilter(x => x.TenantId == CurrentTenantId);
         });
     }

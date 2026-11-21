@@ -36,6 +36,8 @@ Shipments (international and domestic), hub network and trucks, hub station with
 - **Hub sort plans:** each hub's rules choose the shelf at the scan, with capacity and overflow; shelves sort naturally, statuses by lifecycle, and pages never repeat an order ([18](18-ideas-from-open-source.md), ADR-032).
 - **First run and getting started:** a setup page with a one-time code from the server log, a getting-started guide for each role computed from the company's data, a company profile, and installation health ([19](19-first-run-and-getting-started.md), ADR-033).
 - **Tests across the system:** every read endpoint as every role on the demo data, the console's components (bUnit), coverage per module in CI with a minimum for the server code.
+- **Planning (optimization engine):** trucks between hubs, courier runs and courier zones planned with operations research on Google OR-Tools; an independent checker, a comparison with today's practice and approval before anything changes ([20](20-optimization-engine.md), ADR-034).
+- **Order lifecycle hardening:** workflow-only steps (trucks, return hand-over, customs) refused on the details page by the server too; returns moved away from the seller's hub, confirmations of cancelled orders, the reschedule date window and ETAs after a new governorate fixed; property tests over every status.
 
 ## Next
 
@@ -49,6 +51,7 @@ These are the most useful next steps, roughly in order.
 | **WhatsApp Business API sending** | Today messages are queued and sent by staff with one click | Provider-neutral interface |
 | **Saved views on more lists** | The same named views on returns, transfers, customs and finance | The API already takes a list name |
 | **Kurdish (Sorani)** | Third language, RTL | Texts only; the RTL work is done |
+| **Planning, part 2** | Sharper courier runs and fewer trucks | Customer location pins on the tracking page, road times from a self-hosted OSRM, trucks changing at a third hub (needs "routed via" on truck manifests), hub-location what-ifs ([20](20-optimization-engine.md) §7) |
 | **Load tests and telemetry** | Turn the targets in [00](00-overview.md) §6 into measurements | OpenTelemetry, k6 or NBomber |
 
 ## Later
@@ -65,5 +68,6 @@ These are the most useful next steps, roughly in order.
 - Email sending is a no-op: password reset and email confirmation do not send anything until a sender is configured.
 - The audit log records changes, not reads, sign-ins or exports, and is not hash-chained yet.
 - Performance targets have not been measured under production load.
+- Courier-run plans are only as good as the customers' positions: until couriers deliver with the app (GPS at the door), many addresses are known only by area or governorate, and the plan says so. Road times are estimates (straight line × road factor) until OSRM is added.
 
 Production requirements are listed in [15 — Production readiness](15-production-readiness.md).

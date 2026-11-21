@@ -1,0 +1,135 @@
+@* Planning settings (administrators change them): trucks and their cost, departure times, courier limits, travel
+   estimates and how long the solver may search. Validated by the same rules as the server. *@
+@using Logistico.Web.Client.Pages.Automation
+@inject PlanningApi Planning
+@inject Toaster Toaster
+
+@if (policy is null)
+{
+    <Skeleton Lines="8" />
+}
+else
+{
+    <EditForm Model="policy" OnValidSubmit="SaveAsync">
+        <DataAnnotationsValidator />
+        <EditableBy Policy="@StaffPolicies.Administer">
+            <div class="lx-grid-2">
+                <Section Title="@L["Plan_Set_Trucks"]" Icon="drive-time" Padded="false">
+                    @Number(L["Plan_Set_CapacityKg"], L["Plan_Set_CapacityKgHint"], L["Unit_Kg"], () => policy.TruckCapacityKg, v => policy.TruckCapacityKg = v)
+                    @Number(L["Plan_Set_CapacityM3"], L["Plan_Set_CapacityM3Hint"], "m³", () => policy.TruckCapacityM3, v => policy.TruckCapacityM3 = v)
+                    @Money(L["Plan_Set_TripCost"], L["Plan_Set_TripCostHint"], () => policy.TruckTripCostIqd, v => policy.TruckTripCostIqd = v)
+                    @Money(L["Plan_Set_KmCost"], L["Plan_Set_KmCostHint"], () => policy.TruckCostPerKmIqd, v => policy.TruckCostPerKmIqd = v)
+                    <div class="lx-rule">
+                        <div><div class="lx-rule-title">@L["Plan_Set_Departures"]</div><div class="lx-rule-desc">@L["Plan_Set_DeparturesHint"]</div></div>
+                        <div class="lx-rule-value"><input class="bp6-input" dir="ltr" value="@departures" @onchange="@(e => departures = e.Value?.ToString() ?? "")" aria-label="@L["Plan_Set_Departures"]" /></div>
+                    </div>
+                    <ValidationMessage For="() => policy.DepartureTimes" />
+                    <RuleNumber Title="@L["Plan_Set_Days"]" Hint="@L["Plan_Set_DaysHint"]" Unit="@L["Days"]" @bind-Value="policy.PlanningDays" Min="1" Max="3" />
+                    <RuleNumber Title="@L["Plan_Set_MaxTrucks"]" Hint="@L["Plan_Set_MaxTrucksHint"]" @bind-Value="policy.MaxTrucksPerDeparture" Min="1" Max="10" />
+                    <RuleNumber Title="@L["Plan_Set_HubTrucks"]" Hint="@L["Plan_Set_HubTrucksHint"]" @bind-Value="policy.TrucksPerHub" Min="0" Max="50" />
+                    @Time(L["Plan_Set_Cutoff"], L["Plan_Set_CutoffHint"], () => policy.HubArrivalCutoff, v => policy.HubArrivalCutoff = v)
+                </Section>
+
+                <Section Title="@L["Plan_Set_Couriers"]" Icon="people" Padded="false">
+                    <RuleNumber Title="@L["Plan_Set_MotoStops"]" Hint="@L["Plan_Set_MotoStopsHint"]" @bind-Value="policy.MotorcycleStops" Min="1" Max="400" />
+                    @Number(L["Plan_Set_MotoKg"], null, L["Unit_Kg"], () => policy.MotorcycleKg, v => policy.MotorcycleKg = v)
+                    <RuleNumber Title="@L["Plan_Set_VanStops"]" Hint="@L["Plan_Set_VanStopsHint"]" @bind-Value="policy.VanStops" Min="1" Max="400" />
+                    @Number(L["Plan_Set_VanKg"], null, L["Unit_Kg"], () => policy.VanKg, v => policy.VanKg = v)
+                    @Money(L["Plan_Set_Cash"], L["Plan_Set_CashHint"], () => policy.MaxCashPerCourierIqd, v => policy.MaxCashPerCourierIqd = v)
+                    <RuleNumber Title="@L["Plan_Set_Shift"]" Hint="@L["Plan_Set_ShiftHint"]" Unit="@L["Unit_Minutes"]" @bind-Value="policy.ShiftMinutes" Min="60" Max="840" />
+                    <RuleNumber Title="@L["Plan_Set_PerStop"]" Hint="@L["Plan_Set_PerStopHint"]" Unit="@L["Unit_Minutes"]" @bind-Value="policy.MinutesPerStop" Min="1" Max="60" />
+                    @Time(L["Plan_Set_RunStart"], L["Plan_Set_RunStartHint"], () => policy.RunStart, v => policy.RunStart = v)
+                    @Number(L["Plan_Set_Speed"], L["Plan_Set_SpeedHint"], L["Unit_Kmh"], () => policy.CitySpeedKmh, v => policy.CitySpeedKmh = v)
+                    @Number(L["Plan_Set_RoadFactor"], L["Plan_Set_RoadFactorHint"], "×", () => policy.RoadFactor, v => policy.RoadFactor = v)
+                </Section>
+
+                <Section Title="@L["Plan_Set_Zones"]" Icon="polygon-filter" Padded="false">
+                    <RuleNumber Title="@L["Plan_Set_Balance"]" Hint="@L["Plan_Set_BalanceHint"]" Unit="%" @bind-Value="policy.ZoneBalancePercent" Min="5" Max="100" />
+                    <RuleNumber Title="@L["Plan_Set_History"]" Hint="@L["Plan_Set_HistoryHint"]" Unit="@L["Days"]" @bind-Value="policy.ZoneHistoryDays" Min="7" Max="180" />
+                </Section>
+
+                <Section Title="@L["Plan_Set_Search"]" Icon="predictive-analysis" Padded="false">
+                    <RuleNumber Title="@L["Plan_Set_TimeLimit"]" Hint="@L["Plan_Set_TimeLimitHint"]" Unit="@L["Unit_Seconds"]" @bind-Value="policy.TimeLimitSeconds" Min="1" Max="60" />
+                </Section>
+            </div>
+            <div class="lx-form-actions">
+                <Button Type="submit" Intent="Intent.Primary" Icon="tick" Text="@L["Plan_Set_Save"]" Loading="saving" />
+                @if (policy.UpdatedAt is { } changed)
+                {
+                    <span class="bp6-text-muted lx-small">@string.Format(CultureInfo.CurrentCulture, L["ChangedBy"], Fmt.DateTime(changed), policy.UpdatedBy ?? "—")</span>
+                }
+            </div>
+        </EditableBy>
+    </EditForm>
+}
+
+@code {
+    private PlanningPolicy? policy;
+    private string departures = "";
+    private bool saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        policy = await Planning.GetPolicyAsync();
+        departures = string.Join(", ", policy.DepartureTimes);
+    }
+
+    private async Task SaveAsync()
+    {
+        if (policy is null)
+        {
+            return;
+        }
+
+        policy.DepartureTimes = departures.Split([',', '،', ' '], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+        saving = true;
+        try
+        {
+            policy = await Planning.UpdatePolicyAsync(policy);
+            departures = string.Join(", ", policy.DepartureTimes);
+            Toaster.Success(L["Plan_Set_Saved"]);
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private RenderFragment Number(string title, string? hint, string unit, Func<double> get, Action<double> set) => __builder =>
+    {
+        <div class="lx-rule">
+            <div><div class="lx-rule-title">@title</div>@if (hint is not null) { <div class="lx-rule-desc">@hint</div> }</div>
+            <div class="lx-rule-value">
+                <input class="bp6-input" type="number" step="any" min="0" dir="ltr" value="@get().ToString(CultureInfo.InvariantCulture)" aria-label="@title"
+                       @onchange="@(e => { if (double.TryParse(e.Value?.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out var v)) { set(v); } })" />
+                <span>@unit</span>
+            </div>
+        </div>
+    };
+
+    private RenderFragment Money(string title, string? hint, Func<decimal> get, Action<decimal> set) => __builder =>
+    {
+        <div class="lx-rule">
+            <div><div class="lx-rule-title">@title</div>@if (hint is not null) { <div class="lx-rule-desc">@hint</div> }</div>
+            <div class="lx-rule-value">
+                <input class="bp6-input" type="number" step="250" min="0" dir="ltr" value="@get().ToString(CultureInfo.InvariantCulture)" aria-label="@title"
+                       @onchange="@(e => { if (decimal.TryParse(e.Value?.ToString(), NumberStyles.Number, CultureInfo.InvariantCulture, out var v)) { set(v); } })" />
+                <span>@L["Unit_Iqd"]</span>
+            </div>
+        </div>
+    };
+
+    private RenderFragment Time(string title, string? hint, Func<string> get, Action<string> set) => __builder =>
+    {
+        <div class="lx-rule">
+            <div><div class="lx-rule-title">@title</div>@if (hint is not null) { <div class="lx-rule-desc">@hint</div> }</div>
+            <div class="lx-rule-value">
+                <input class="bp6-input" type="time" dir="ltr" value="@get()" aria-label="@title" @onchange="@(e => set(e.Value?.ToString() ?? ""))" />
+            </div>
+        </div>
+    };
+}

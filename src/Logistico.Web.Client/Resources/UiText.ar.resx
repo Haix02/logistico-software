@@ -1580,4 +1580,221 @@
   <data name="Check_automation_Warning" xml:space="preserve"><value>Automation:Enabled مطفأ: لا تعمل التنبيهات وتخطيط الشاحنات.</value></data>
   <data name="Cash_StillShort" xml:space="preserve"><value>ما زال عليه نقص {0} من استلامات سابقة: أضفه إلى العدّ لتسديده.</value></data>
   <data name="Cash_RepayShortage" xml:space="preserve"><value>لا يوجد نقد جديد للاستلام. كان في استلامات سابقة نقص {0}: سجّل ما يسدده المندوب.</value></data>
+  <data name="Nav_Planning" xml:space="preserve"><value>التخطيط</value></data>
+  <data name="Plan_Subtitle" xml:space="preserve"><value>خطط رياضية للشاحنات وجولات المندوبين والمناطق: مُثبتة ومدقّقة ومقارنة بطريقة العمل الحالية قبل أن يتغيّر أي شيء.</value></data>
+  <data name="Plan_TabTrucks" xml:space="preserve"><value>الشاحنات</value></data>
+  <data name="Plan_TabCouriers" xml:space="preserve"><value>جولات المندوبين</value></data>
+  <data name="Plan_TabZones" xml:space="preserve"><value>المناطق</value></data>
+  <data name="Plan_TabHistory" xml:space="preserve"><value>السجل</value></data>
+  <data name="Plan_TabSettings" xml:space="preserve"><value>الإعدادات</value></data>
+  <data name="Plan_TrucksTitle" xml:space="preserve"><value>الشاحنات بين المراكز</value></data>
+  <data name="Plan_TrucksHint" xml:space="preserve"><value>أي الشاحنات تنطلق ومتى وماذا تحمل، لتصل كل شحنة إلى مركز زبونها في موعدها وبأقل كلفة.</value></data>
+  <data name="Plan_CouriersTitle" xml:space="preserve"><value>جولات المندوبين لهذا اليوم</value></data>
+  <data name="Plan_CouriersHint" xml:space="preserve"><value>من يأخذ أي طرود وبأي ترتيب، ضمن وقت كل مندوب وحمولته وحدّ النقد الذي يحمله.</value></data>
+  <data name="Plan_ZonesTitle" xml:space="preserve"><value>مناطق المندوبين</value></data>
+  <data name="Plan_ZonesHint" xml:space="preserve"><value>تجميع الأحياء في مناطق متقاربة بعبء عمل متساوٍ، من توصيلات المركز الأخيرة.</value></data>
+  <data name="Plan_Run" xml:space="preserve"><value>أعدّ خطة</value></data>
+  <data name="Plan_ZoneCount" xml:space="preserve"><value>عدد المناطق</value></data>
+  <data name="Plan_ZoneCountAuto" xml:space="preserve"><value>تلقائي</value></data>
+  <data name="Plan_Ready" xml:space="preserve"><value>الخطة جاهزة وتم التحقق منها.</value></data>
+  <data name="Plan_NoPlanYet" xml:space="preserve"><value>لا توجد خطة بعد</value></data>
+  <data name="Plan_NoPlanYetHint" xml:space="preserve"><value>أعدّ خطة: تُحلّ خلال ثوانٍ ولا تغيّر شيئًا حتى تعتمدها.</value></data>
+  <data name="Plan_NoHistory" xml:space="preserve"><value>لم تُعدّ أي خطة بعد</value></data>
+  <data name="Plan_Optimal" xml:space="preserve"><value>مثلى ومُثبتة رياضيًا</value></data>
+  <data name="Plan_OptimalHint" xml:space="preserve"><value>لا توجد خطة أفضل منها ضمن هذه الإعدادات. حُلّت خلال {0} ثانية.</value></data>
+  <data name="Plan_WithinGap" xml:space="preserve"><value>ضمن {0} من أفضل خطة ممكنة</value></data>
+  <data name="Plan_GapHint" xml:space="preserve"><value>انتهى وقت البحث ({0} ثانية) قبل اكتمال الإثبات؛ الفجوة هي أقصى ما قد تبتعد به هذه الخطة عن الأفضل.</value></data>
+  <data name="Plan_BestFound" xml:space="preserve"><value>أفضل جولات تم إيجادها</value></data>
+  <data name="Plan_SearchHint" xml:space="preserve"><value>وُجدت خلال {0} ثانية من البحث: طريقة التوفير لكلارك ورايت أولًا، ثم البحث المحلي الموجَّه.</value></data>
+  <data name="Plan_NothingToPlan" xml:space="preserve"><value>لا شيء للتخطيط</value></data>
+  <data name="Plan_NothingHint" xml:space="preserve"><value>لا توجد شحنات تنتظر هذا المخطِّط الآن.</value></data>
+  <data name="Plan_Infeasible" xml:space="preserve"><value>لا توجد خطة تحقق القواعد</value></data>
+  <data name="Plan_NoSolution" xml:space="preserve"><value>لم تُوجد خطة ضمن وقت البحث</value></data>
+  <data name="Plan_FailedHint" xml:space="preserve"><value>راجع الإعدادات (الحدود، المندوبين، أوقات الانطلاق) أو امنح البحث وقتًا أطول.</value></data>
+  <data name="Plan_Checked" xml:space="preserve"><value>تم التحقق: لا مشكلات</value></data>
+  <data name="Plan_ViolationsN" xml:space="preserve"><value>{0} مشكلة</value></data>
+  <data name="Plan_ViolationsTitle" xml:space="preserve"><value>رفض المدقق هذه الخطة</value></data>
+  <data name="Plan_MadeBy" xml:space="preserve"><value>أُعدّت {0} بواسطة {1}</value></data>
+  <data name="Plan_AppliedBy" xml:space="preserve"><value>اعتُمدت {0} بواسطة {1}</value></data>
+  <data name="Plan_DiscardedBy" xml:space="preserve"><value>تُركت جانبًا {0} بواسطة {1}</value></data>
+  <data name="Plan_Discard" xml:space="preserve"><value>اتركها جانبًا</value></data>
+  <data name="Plan_ApplyTrucks" xml:space="preserve"><value>اعتمد: حمّل الشاحنات القادمة</value></data>
+  <data name="Plan_ApplyRuns" xml:space="preserve"><value>اعتمد: سلّم الجولات للمندوبين</value></data>
+  <data name="Plan_ApplyZones" xml:space="preserve"><value>اعتمدها مناطقَ للمركز</value></data>
+  <data name="PlanStatus_Ready" xml:space="preserve"><value>بانتظار الاعتماد</value></data>
+  <data name="PlanStatus_Applied" xml:space="preserve"><value>معتمدة</value></data>
+  <data name="PlanStatus_Discarded" xml:space="preserve"><value>متروكة جانبًا</value></data>
+  <data name="Plan_ConfirmTitle" xml:space="preserve"><value>اعتماد هذه الخطة؟</value></data>
+  <data name="Plan_Confirm_Trucks" xml:space="preserve"><value>ستُضاف الشحنات المخطط لها إلى كشف الشاحنة القادمة في كل خط. تُتجاوز الشحنات التي تحركت بعد إعداد الخطة.</value></data>
+  <data name="Plan_Confirm_CourierRuns" xml:space="preserve"><value>سيستلم كل مندوب طروده الآن بالترتيب المخطط ويُبلَّغ الزبائن. تُتجاوز الطرود التي تحركت بعد إعداد الخطة.</value></data>
+  <data name="Plan_Confirm_Zones" xml:space="preserve"><value>ستصبح هذه المناطق مناطقَ المركز الحالية.</value></data>
+  <data name="Plan_ConfirmYes" xml:space="preserve"><value>اعتمد</value></data>
+  <data name="Plan_AppliedN" xml:space="preserve"><value>طُبّقت الخطة على {0} شحنة.</value></data>
+  <data name="Plan_AppliedSkipped" xml:space="preserve"><value>طُبّقت الخطة على {0}، وتُجوّز {1} لأنها تحركت بعد إعداد الخطة.</value></data>
+  <data name="Plan_Kpi_Trucks" xml:space="preserve"><value>الشاحنات</value></data>
+  <data name="Plan_Kpi_Cost" xml:space="preserve"><value>كلفة النقل بين المدن</value></data>
+  <data name="Plan_Kpi_TruckKm" xml:space="preserve"><value>كيلومترات الشاحنات</value></data>
+  <data name="Plan_Kpi_OnTime" xml:space="preserve"><value>في الموعد</value></data>
+  <data name="Plan_Kpi_Waiting" xml:space="preserve"><value>تنتظر الخطة التالية</value></data>
+  <data name="Plan_VsToday" xml:space="preserve"><value>طريقة اليوم المعتادة: {0}</value></data>
+  <data name="Plan_VsTodayDelta" xml:space="preserve"><value>طريقة اليوم المعتادة: {0} ({1})</value></data>
+  <data name="Plan_TodayOnTime" xml:space="preserve"><value>طريقة اليوم المعتادة: {0} في الموعد</value></data>
+  <data name="Plan_WaitingHint" xml:space="preserve"><value>لا مكان لها في شاحنات أيام الخطة</value></data>
+  <data name="Plan_NoTrucks" xml:space="preserve"><value>لا حاجة إلى شاحنات</value></data>
+  <data name="Plan_NoTrucksHint" xml:space="preserve"><value>لا توجد شحنة تنتظر في مركز للانتقال إلى مركز آخر.</value></data>
+  <data name="Plan_Departures" xml:space="preserve"><value>الانطلاقات</value></data>
+  <data name="Plan_TruckSize" xml:space="preserve"><value>الشاحنة: {0} كغم · {1} م³</value></data>
+  <data name="Plan_Col_Leaves" xml:space="preserve"><value>تنطلق</value></data>
+  <data name="Plan_Col_Lane" xml:space="preserve"><value>الخط</value></data>
+  <data name="Plan_Col_Trucks" xml:space="preserve"><value>الشاحنات</value></data>
+  <data name="Plan_Col_Fill" xml:space="preserve"><value>نسبة الامتلاء</value></data>
+  <data name="Plan_Col_Parcels" xml:space="preserve"><value>الشحنات</value></data>
+  <data name="Plan_Col_Cost" xml:space="preserve"><value>الكلفة</value></data>
+  <data name="Plan_Col_Weight" xml:space="preserve"><value>حسب الوزن</value></data>
+  <data name="Plan_Col_Volume" xml:space="preserve"><value>حسب الحجم</value></data>
+  <data name="Plan_Weight" xml:space="preserve"><value>الوزن</value></data>
+  <data name="Plan_Volume" xml:space="preserve"><value>الحجم</value></data>
+  <data name="Plan_LoadsOnApproval" xml:space="preserve"><value>تُحمَّل عند الاعتماد</value></data>
+  <data name="Plan_ArrivesKm" xml:space="preserve"><value>تصل {0} · {1} كم</value></data>
+  <data name="Plan_LateN" xml:space="preserve"><value>{0} متأخرة</value></data>
+  <data name="Plan_LanesMap" xml:space="preserve"><value>خطوط هذه الخطة</value></data>
+  <data name="Plan_LanesMapHint" xml:space="preserve"><value>يزداد عرض الخط مع عدد الشحنات؛ الأحمر يعني وجود شحنة متأخرة على ذلك الخط.</value></data>
+  <data name="Plan_Attention" xml:space="preserve"><value>شحنات تحتاج إلى متابعة</value></data>
+  <data name="Plan_AttentionHint" xml:space="preserve"><value>متأخرة حتى في أفضل خطة، أو تنتظر الخطة التالية.</value></data>
+  <data name="Plan_Col_DueAtHub" xml:space="preserve"><value>موعدها في المركز</value></data>
+  <data name="Plan_Col_Outcome" xml:space="preserve"><value>في هذه الخطة</value></data>
+  <data name="Plan_LateBy" xml:space="preserve"><value>متأخرة {0} ساعة</value></data>
+  <data name="Plan_WaitsNextPlan" xml:space="preserve"><value>تنتظر الخطة التالية</value></data>
+  <data name="Plan_EstimatedVolumesN" xml:space="preserve"><value>حجم {0} شحنة غير مسجَّل: قُدِّر من الوزن.</value></data>
+  <data name="Plan_Kpi_Stops" xml:space="preserve"><value>طرود في الجولات</value></data>
+  <data name="Plan_TodayStops" xml:space="preserve"><value>طريقة اليوم المعتادة: {0}</value></data>
+  <data name="Plan_Kpi_Km" xml:space="preserve"><value>مسافة القيادة</value></data>
+  <data name="Plan_Kpi_Longest" xml:space="preserve"><value>أطول جولة</value></data>
+  <data name="Plan_Kpi_Couriers" xml:space="preserve"><value>المندوبون في الجولات</value></data>
+  <data name="Plan_Spread" xml:space="preserve"><value>الفرق في التوقفات بين المندوبين لا يتجاوز {0}</value></data>
+  <data name="Plan_Kpi_MustGoLeft" xml:space="preserve"><value>مستحقة اليوم وبقيت في المركز</value></data>
+  <data name="Plan_MustGoHint" xml:space="preserve"><value>فقط عندما لا يستطيع أي مندوب أخذها</value></data>
+  <data name="Plan_PrecisionTitle" xml:space="preserve"><value>بعض العناوين معروفة بالمحافظة فقط</value></data>
+  <data name="Plan_PrecisionText" xml:space="preserve"><value>بموقع GPS من توصيلات سابقة: {0}، حسب الحي: {1}، حسب المحافظة فقط: {2}. تزداد دقة الجولات كلما سلّم المندوبون عبر التطبيق.</value></data>
+  <data name="Plan_NoStops" xml:space="preserve"><value>لا طرود للتوزيع</value></data>
+  <data name="Plan_NoStopsHint" xml:space="preserve"><value>لا توجد طرود لزبائن هذا المركز على رفوفه.</value></data>
+  <data name="Plan_RunSummary" xml:space="preserve"><value>التوقفات {0} من {1} · {2} كم</value></data>
+  <data name="Plan_Time" xml:space="preserve"><value>الوقت</value></data>
+  <data name="Plan_Cash" xml:space="preserve"><value>النقد</value></data>
+  <data name="Plan_RoutesMap" xml:space="preserve"><value>الجولات حول المركز</value></data>
+  <data name="Plan_StartsAt" xml:space="preserve"><value>تبدأ الجولات {0}</value></data>
+  <data name="Plan_ApproxPosition" xml:space="preserve"><value>معروف بالمحافظة فقط</value></data>
+  <data name="Plan_Deferred" xml:space="preserve"><value>تبقى في المركز</value></data>
+  <data name="Plan_DeferredHint" xml:space="preserve"><value>سبب بقاء كل طرد خارج جولات اليوم.</value></data>
+  <data name="Plan_Col_Due" xml:space="preserve"><value>الاستحقاق</value></data>
+  <data name="Plan_Col_Reason" xml:space="preserve"><value>السبب</value></data>
+  <data name="Plan_DueToday" xml:space="preserve"><value>مستحق اليوم</value></data>
+  <data name="Plan_DueLater" xml:space="preserve"><value>مستحق لاحقًا</value></data>
+  <data name="Defer_NoCourier" xml:space="preserve"><value>لا يوجد مندوب يعمل لهذا المركز</value></data>
+  <data name="Defer_Stops" xml:space="preserve"><value>بلغ كل مندوب أقصى عدد من التوقفات</value></data>
+  <data name="Defer_Weight" xml:space="preserve"><value>أثقل مما تحمله مركبات المندوبين</value></data>
+  <data name="Defer_Cash" xml:space="preserve"><value>مبلغه سيتجاوز حدّ النقد الآمن للمندوب</value></data>
+  <data name="Defer_Time" xml:space="preserve"><value>لا يتسع له يوم العمل</value></data>
+  <data name="Defer_NotNeededToday" xml:space="preserve"><value>غير مستحق اليوم والالتفاف إليه لا يستحق</value></data>
+  <data name="StopPrecision_Gps" xml:space="preserve"><value>حُدّد بموقع GPS من توصيل سابق</value></data>
+  <data name="StopPrecision_Area" xml:space="preserve"><value>حُدّد بوسط الحي</value></data>
+  <data name="StopPrecision_Governorate" xml:space="preserve"><value>المحافظة فقط معروفة</value></data>
+  <data name="StopPrecisionShort_Gps" xml:space="preserve"><value>GPS</value></data>
+  <data name="StopPrecisionShort_Area" xml:space="preserve"><value>حي</value></data>
+  <data name="StopPrecisionShort_Governorate" xml:space="preserve"><value>تقريبي</value></data>
+  <data name="Plan_Kpi_Zones" xml:space="preserve"><value>المناطق</value></data>
+  <data name="Plan_CouriersAtHub" xml:space="preserve"><value>عدد المندوبين في المركز: {0}</value></data>
+  <data name="Plan_Kpi_Deliveries" xml:space="preserve"><value>التوصيلات المحسوبة</value></data>
+  <data name="Plan_InDays" xml:space="preserve"><value>على مدى الأيام الأخيرة: {0}</value></data>
+  <data name="Plan_Kpi_Balance" xml:space="preserve"><value>أكبر اختلال في التوازن</value></data>
+  <data name="Plan_BalanceAsked" xml:space="preserve"><value>المطلوب: ضمن ±{0}</value></data>
+  <data name="Plan_ToleranceWidened" xml:space="preserve"><value>حيٌّ واحد وحده يتجاوز ما تحتمله منطقة عند ±{0}، لذا وُسِّع التوازن إلى ±{1}.</value></data>
+  <data name="Plan_NoZones" xml:space="preserve"><value>لا توجد توصيلات لتجميعها</value></data>
+  <data name="Plan_NoZonesHint" xml:space="preserve"><value>تُبنى المناطق من الطرود التي سلّمها هذا المركز في الأسابيع الأخيرة.</value></data>
+  <data name="Plan_ZoneN" xml:space="preserve"><value>المنطقة {0}</value></data>
+  <data name="Plan_PerWeek" xml:space="preserve"><value>التوصيلات أسبوعيًا: {0}</value></data>
+  <data name="Plan_OfAverage" xml:space="preserve"><value>من المتوسط</value></data>
+  <data name="Plan_ZoneKm" xml:space="preserve"><value>متوسط البعد عن وسط المنطقة: {0} كم</value></data>
+  <data name="Plan_Centre" xml:space="preserve"><value>وسط المنطقة</value></data>
+  <data name="Plan_Col_Made" xml:space="preserve"><value>أُعدّت</value></data>
+  <data name="Plan_Col_Planner" xml:space="preserve"><value>المخطِّط</value></data>
+  <data name="Plan_Col_Proof" xml:space="preserve"><value>الإثبات</value></data>
+  <data name="Plan_Col_Status" xml:space="preserve"><value>الحالة</value></data>
+  <data name="Plan_Col_By" xml:space="preserve"><value>بواسطة</value></data>
+  <data name="PlanKind_Trucks" xml:space="preserve"><value>الشاحنات</value></data>
+  <data name="PlanKind_CourierRuns" xml:space="preserve"><value>جولات المندوبين</value></data>
+  <data name="PlanKind_Zones" xml:space="preserve"><value>المناطق</value></data>
+  <data name="PlanQuality_Empty" xml:space="preserve"><value>لا شيء للتخطيط</value></data>
+  <data name="PlanQuality_Optimal" xml:space="preserve"><value>مثلى مُثبتة</value></data>
+  <data name="PlanQuality_Feasible" xml:space="preserve"><value>صالحة</value></data>
+  <data name="PlanQuality_Infeasible" xml:space="preserve"><value>مستحيلة</value></data>
+  <data name="PlanQuality_NoSolution" xml:space="preserve"><value>لم تُوجد</value></data>
+  <data name="Plan_Set_Trucks" xml:space="preserve"><value>الشاحنات بين المراكز</value></data>
+  <data name="Plan_Set_CapacityKg" xml:space="preserve"><value>حمولة الشاحنة (وزن)</value></data>
+  <data name="Plan_Set_CapacityKgHint" xml:space="preserve"><value>ما تحمله شاحنة النقل الواحدة.</value></data>
+  <data name="Plan_Set_CapacityM3" xml:space="preserve"><value>سعة الشاحنة (حجم)</value></data>
+  <data name="Plan_Set_CapacityM3Hint" xml:space="preserve"><value>مساحة الحمولة بالمتر المكعب.</value></data>
+  <data name="Plan_Set_TripCost" xml:space="preserve"><value>كلفة الرحلة</value></data>
+  <data name="Plan_Set_TripCostHint" xml:space="preserve"><value>أجرة السائق والتكاليف الثابتة لكل انطلاقة.</value></data>
+  <data name="Plan_Set_KmCost" xml:space="preserve"><value>الكلفة لكل كيلومتر</value></data>
+  <data name="Plan_Set_KmCostHint" xml:space="preserve"><value>الوقود والاستهلاك.</value></data>
+  <data name="Plan_Set_Departures" xml:space="preserve"><value>أوقات الانطلاق</value></data>
+  <data name="Plan_Set_DeparturesHint" xml:space="preserve"><value>يوميًا بتوقيت بغداد، تفصل بينها فواصل (06:00, 14:00, 22:00).</value></data>
+  <data name="Plan_Set_Days" xml:space="preserve"><value>الأيام المشمولة</value></data>
+  <data name="Plan_Set_DaysHint" xml:space="preserve"><value>إلى أي مدى تنظر خطة الشاحنات إلى الأمام.</value></data>
+  <data name="Plan_Set_MaxTrucks" xml:space="preserve"><value>الشاحنات لكل انطلاقة</value></data>
+  <data name="Plan_Set_MaxTrucksHint" xml:space="preserve"><value>أقصى عدد من الشاحنات ينطلق على خط واحد في المرة.</value></data>
+  <data name="Plan_Set_HubTrucks" xml:space="preserve"><value>شاحنات المركز المتاحة</value></data>
+  <data name="Plan_Set_HubTrucksHint" xml:space="preserve"><value>في وقت الانطلاق الواحد لكل الخطوط (0 = حسب الحاجة).</value></data>
+  <data name="Plan_Set_Cutoff" xml:space="preserve"><value>الوصول إلى مركز الزبون قبل</value></data>
+  <data name="Plan_Set_CutoffHint" xml:space="preserve"><value>في يوم الموعد، قبل خروج المندوبين.</value></data>
+  <data name="Plan_Set_Couriers" xml:space="preserve"><value>المندوبون</value></data>
+  <data name="Plan_Set_MotoStops" xml:space="preserve"><value>توقفات الدراجة النارية</value></data>
+  <data name="Plan_Set_MotoStopsHint" xml:space="preserve"><value>أقصى عدد من الطرود في جولة الدراجة النارية.</value></data>
+  <data name="Plan_Set_MotoKg" xml:space="preserve"><value>حمولة الدراجة النارية</value></data>
+  <data name="Plan_Set_VanStops" xml:space="preserve"><value>توقفات السيارة</value></data>
+  <data name="Plan_Set_VanStopsHint" xml:space="preserve"><value>السيارات والشاحنات الصغيرة لدى المندوبين.</value></data>
+  <data name="Plan_Set_VanKg" xml:space="preserve"><value>حمولة السيارة</value></data>
+  <data name="Plan_Set_Cash" xml:space="preserve"><value>النقد المسموح للمندوب</value></data>
+  <data name="Plan_Set_CashHint" xml:space="preserve"><value>حدّ الأمان للمبالغ المحصّلة في جولة واحدة.</value></data>
+  <data name="Plan_Set_Shift" xml:space="preserve"><value>وقت العمل</value></data>
+  <data name="Plan_Set_ShiftHint" xml:space="preserve"><value>من الخروج من المركز حتى تسليم النقد.</value></data>
+  <data name="Plan_Set_PerStop" xml:space="preserve"><value>الدقائق عند كل باب</value></data>
+  <data name="Plan_Set_PerStopHint" xml:space="preserve"><value>الاتصال والتسليم واستلام المبلغ.</value></data>
+  <data name="Plan_Set_RunStart" xml:space="preserve"><value>بدء الجولات</value></data>
+  <data name="Plan_Set_RunStartHint" xml:space="preserve"><value>بتوقيت بغداد.</value></data>
+  <data name="Plan_Set_Speed" xml:space="preserve"><value>السرعة داخل المدينة</value></data>
+  <data name="Plan_Set_SpeedHint" xml:space="preserve"><value>المتوسط مع الزحام.</value></data>
+  <data name="Plan_Set_RoadFactor" xml:space="preserve"><value>معامل الطريق</value></data>
+  <data name="Plan_Set_RoadFactorHint" xml:space="preserve"><value>كم تطول الشوارع عن الخط المستقيم.</value></data>
+  <data name="Plan_Set_Zones" xml:space="preserve"><value>المناطق</value></data>
+  <data name="Plan_Set_Balance" xml:space="preserve"><value>التوازن</value></data>
+  <data name="Plan_Set_BalanceHint" xml:space="preserve"><value>عمل كل منطقة ضمن هذه النسبة من المتوسط.</value></data>
+  <data name="Plan_Set_History" xml:space="preserve"><value>الفترة المعتمدة</value></data>
+  <data name="Plan_Set_HistoryHint" xml:space="preserve"><value>توصيلات الأيام الأخيرة التي تُبنى منها المناطق.</value></data>
+  <data name="Plan_Set_Search" xml:space="preserve"><value>البحث</value></data>
+  <data name="Plan_Set_TimeLimit" xml:space="preserve"><value>وقت البحث</value></data>
+  <data name="Plan_Set_TimeLimitHint" xml:space="preserve"><value>الوقت الأطول قد يجد جولات أفضل؛ وخطط الشاحنات تُثبت مثاليتها عادةً أسرع بكثير.</value></data>
+  <data name="Plan_Set_Save" xml:space="preserve"><value>حفظ الإعدادات</value></data>
+  <data name="Plan_Set_Saved" xml:space="preserve"><value>حُفظت إعدادات التخطيط.</value></data>
+  <data name="Unit_Iqd" xml:space="preserve"><value>د.ع</value></data>
+  <data name="Unit_Kg" xml:space="preserve"><value>كغم</value></data>
+  <data name="Unit_Km" xml:space="preserve"><value>كم</value></data>
+  <data name="Unit_Kmh" xml:space="preserve"><value>كم/س</value></data>
+  <data name="Unit_Minutes" xml:space="preserve"><value>دقيقة</value></data>
+  <data name="Unit_Seconds" xml:space="preserve"><value>ثانية</value></data>
+  <data name="Plan_ViolationsN_One" xml:space="preserve"><value>مشكلة واحدة</value></data>
+  <data name="Plan_ViolationsN_Two" xml:space="preserve"><value>مشكلتان</value></data>
+  <data name="Plan_ViolationsN_Few" xml:space="preserve"><value>{0} مشكلات</value></data>
+  <data name="Plan_LateN_One" xml:space="preserve"><value>شحنة متأخرة</value></data>
+  <data name="Plan_LateN_Two" xml:space="preserve"><value>شحنتان متأخرتان</value></data>
+  <data name="Plan_LateN_Few" xml:space="preserve"><value>{0} شحنات متأخرة</value></data>
+  <data name="Plan_EstimatedVolumesN_One" xml:space="preserve"><value>حجم شحنة واحدة غير مسجَّل: قُدِّر من الوزن.</value></data>
+  <data name="Plan_EstimatedVolumesN_Two" xml:space="preserve"><value>حجم شحنتين غير مسجَّل: قُدِّر من الوزن.</value></data>
+  <data name="Plan_EstimatedVolumesN_Few" xml:space="preserve"><value>حجم {0} شحنات غير مسجَّل: قُدِّر من الوزن.</value></data>
+  <data name="Plan_AppliedN_One" xml:space="preserve"><value>طُبّقت الخطة على شحنة واحدة.</value></data>
+  <data name="Plan_AppliedN_Two" xml:space="preserve"><value>طُبّقت الخطة على شحنتين.</value></data>
+  <data name="Plan_AppliedN_Few" xml:space="preserve"><value>طُبّقت الخطة على {0} شحنات.</value></data>
+  <data name="Plan_NoPositions" xml:space="preserve"><value>المواقع غير معروفة بعد</value></data>
+  <data name="Plan_NoPositionsHint" xml:space="preserve"><value>تظهر خريطة الجولات عندما يسلّم المندوبون عبر التطبيق (موقع GPS عند الباب) أو تكون للزبائن توصيلات سابقة.</value></data>
 </root>

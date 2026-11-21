@@ -23,6 +23,7 @@ It is **.NET end to end**, runs **in the browser**, and works in **Arabic (defau
 | Tracking and ratings | Public tracking page without personal data; customers rate deliveries; low ratings become complaints |
 | Dashboard | Period-over-period KPIs, daily volume, pipeline, failure reasons, sellers, governorates, couriers and customer rating |
 | Demand intelligence | What Iraqi customers order, where and when, basket size against refusals, trade lanes, repeat customers, plain-language findings, anonymised open-data export ([16](16-data-and-insights.md)) |
+| Planning (optimization) | Trucks between hubs solved to proven optimality, courier runs within each courier's parcel, weight, time and cash limits, balanced courier zones; every plan re-checked, compared with today's practice and applied only when approved ([20](20-optimization-engine.md)) |
 | Labels | 4×6" thermal labels with Code-128 barcodes and the hub routing code |
 | Customs (ASYCUDA) | Declaration workbench, selectivity lanes, CoO and invoice e-verification gate, duty estimate, SAD XML export |
 | Fleet and finance | Couriers and vehicles, run sheets, cash held by couriers, seller COD balances, settlement batches with statements |

@@ -69,6 +69,29 @@ public class ModuleBoundaryTests
         Assert.DoesNotContain(MerchantsImplementation.GetName().Name, References(AuditImplementation));
     }
 
+    /// <summary>
+    /// The optimization engine (docs/20) is pure mathematics: no database, no web framework, no module. Only the Shipments
+    /// module uses it, and neither the browser nor any contract may reference it (it carries native solver code).
+    /// </summary>
+    [Fact]
+    public void The_optimization_engine_stays_pure_and_off_the_browser()
+    {
+        var engine = Load("Logistico.Optimization");
+        var refs = References(engine);
+
+        Assert.DoesNotContain(refs, r => r.StartsWith("Microsoft.EntityFrameworkCore", StringComparison.Ordinal));
+        Assert.DoesNotContain(refs, r => r.StartsWith("Microsoft.AspNetCore", StringComparison.Ordinal));
+        Assert.DoesNotContain(refs, r => r.StartsWith("Npgsql", StringComparison.Ordinal));
+        Assert.DoesNotContain(refs, r => r.StartsWith("Logistico.", StringComparison.Ordinal));
+        Assert.Contains(engine.GetName().Name, References(ShipmentsImplementation));
+
+        foreach (var assembly in new[] { BrowserClient, ShipmentsContracts, MerchantsContracts, AuditContracts, SharedKernel })
+        {
+            Assert.DoesNotContain(engine.GetName().Name, References(assembly));
+            Assert.DoesNotContain(References(assembly), r => r.StartsWith("Google.OrTools", StringComparison.Ordinal));
+        }
+    }
+
     [Fact]
     public void Modules_do_not_depend_on_the_host()
     {

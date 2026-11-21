@@ -1,0 +1,107 @@
+@* What the solver proved about a plan, what the independent checker found, who asked for it, and the approve /
+   put-aside actions. A plan the checker refused can never be approved (the server refuses it too). *@
+
+<div class="lx-card lx-card-pad lx-plan-head">
+    <div class="lx-plan-proof">
+        <Icon Name="@QualityIcon" Large="true" CssClass="@($"lx-plan-proof-icon lx-plan-proof-{QualityClass}")" />
+        <div class="lx-stack">
+            <span class="lx-strong">@QualityText</span>
+            <span class="bp6-text-muted lx-small">@ProofText</span>
+        </div>
+    </div>
+
+    <div class="lx-plan-meta">
+        @if (Details.Violations.Count == 0)
+        {
+            <Tag Intent="Intent.Success" Icon="tick-circle">@L["Plan_Checked"]</Tag>
+        }
+        else
+        {
+            <Tag Intent="Intent.Danger" Icon="error">@L.Count("Plan_ViolationsN", Details.Violations.Count)</Tag>
+        }
+
+        <Tag Intent="@StatusIntent">@L["PlanStatus_" + Details.Summary.Status]</Tag>
+        <span class="bp6-text-muted lx-small">
+            @string.Format(CultureInfo.CurrentCulture, L["Plan_MadeBy"], Fmt.DateTime(Details.Summary.RequestedAt), Details.Summary.RequestedBy ?? "—")
+            @if (Details.Summary.AppliedAt is { } at)
+            {
+                <span> · @string.Format(CultureInfo.CurrentCulture, L[Details.Summary.Status == PlanRunStatus.Applied ? "Plan_AppliedBy" : "Plan_DiscardedBy"], Fmt.DateTime(at), Details.Summary.AppliedBy ?? "—")</span>
+            }
+        </span>
+    </div>
+
+    @if (Details.Summary.Status == PlanRunStatus.Ready)
+    {
+        <Allowed Policy="@StaffPolicies.Operate">
+            <div class="lx-plan-actions">
+                <Button Icon="cross" Text="@L["Plan_Discard"]" Minimal="true" Disabled="Busy" OnClick="OnDiscard" />
+                <Button Icon="tick" Intent="Intent.Primary" Text="@ApplyText" Loading="Busy" Disabled="@(Details.Violations.Count > 0 || Details.Summary.Quality is PlanQuality.Empty or PlanQuality.Infeasible or PlanQuality.NoSolution)" OnClick="OnApply" />
+            </div>
+        </Allowed>
+    }
+</div>
+
+@if (Details.Violations.Count > 0)
+{
+    <Callout Intent="Intent.Danger" Icon="error" Title="@L["Plan_ViolationsTitle"]" CssClass="lx-mt">
+        <ul class="lx-plan-violations" dir="ltr">
+            @foreach (var v in Details.Violations.Take(12))
+            {
+                <li><code>@v</code></li>
+            }
+        </ul>
+    </Callout>
+}
+
+@code {
+    [Parameter, EditorRequired] public PlanRunDetails Details { get; set; } = default!;
+    [Parameter] public bool Busy { get; set; }
+    [Parameter] public EventCallback OnApply { get; set; }
+    [Parameter] public EventCallback OnDiscard { get; set; }
+
+    private PlanRunSummary S => Details.Summary;
+
+    /// <summary>lx-plan-proof-optimal, -feasible, -empty, -infeasible or -nosolution (app.css).</summary>
+    private string QualityClass => S.Quality.ToString().ToLowerInvariant();
+
+    private string QualityIcon => S.Quality switch
+    {
+        PlanQuality.Optimal => "endorsed",
+        PlanQuality.Feasible => "tick-circle",
+        PlanQuality.Empty => "inbox",
+        _ => "warning-sign",
+    };
+
+    private string QualityText => S.Quality switch
+    {
+        PlanQuality.Optimal => L["Plan_Optimal"],
+        PlanQuality.Feasible when S.Gap is { } gap => string.Format(CultureInfo.CurrentCulture, L["Plan_WithinGap"], Fmt.Percent((decimal)Math.Round(gap * 100, 1))),
+        PlanQuality.Feasible => L["Plan_BestFound"],
+        PlanQuality.Empty => L["Plan_NothingToPlan"],
+        PlanQuality.Infeasible => L["Plan_Infeasible"],
+        _ => L["Plan_NoSolution"],
+    };
+
+    private string ProofText => S.Quality switch
+    {
+        PlanQuality.Optimal => string.Format(CultureInfo.CurrentCulture, L["Plan_OptimalHint"], Fmt.Number((decimal)S.Seconds, 1)),
+        PlanQuality.Feasible when S.Gap is not null => string.Format(CultureInfo.CurrentCulture, L["Plan_GapHint"], Fmt.Number((decimal)S.Seconds, 1)),
+        PlanQuality.Feasible => string.Format(CultureInfo.CurrentCulture, L["Plan_SearchHint"], Fmt.Number((decimal)S.Seconds, 1)),
+        PlanQuality.Empty => L["Plan_NothingHint"],
+        _ => L["Plan_FailedHint"],
+    };
+
+    private Intent StatusIntent => S.Status switch
+    {
+        PlanRunStatus.Ready => Intent.Primary,
+        PlanRunStatus.Applied => Intent.Success,
+        _ => Intent.None,
+    };
+
+    private string ApplyText => S.Kind switch
+    {
+        PlanKind.Trucks => L["Plan_ApplyTrucks"],
+        PlanKind.CourierRuns => L["Plan_ApplyRuns"],
+        _ => L["Plan_ApplyZones"],
+    };
+}

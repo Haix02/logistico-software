@@ -22,6 +22,7 @@
   <data name="Validation_MaxLength" xml:space="preserve"><value>Use at most {1} characters.</value></data>
   <data name="Validation_Merchant" xml:space="preserve"><value>Choose the seller this account books orders for.</value></data>
   <data name="Validation_NoFriday" xml:space="preserve"><value>Couriers do not deliver on Friday. Please choose another day.</value></data>
+  <data name="Validation_TimeList" xml:space="preserve"><value>Enter times as HH:mm (for example 06:00), each once.</value></data>
   <data name="Validation_Phone" xml:space="preserve"><value>Phone must contain 7–20 digits, optionally starting with +.</value></data>
   <data name="Validation_PhoneLast4" xml:space="preserve"><value>Enter the last 4 digits of the mobile number on the order.</value></data>
   <data name="Validation_Range" xml:space="preserve"><value>Enter a value between {1} and {2}.</value></data>
