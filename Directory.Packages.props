@@ -23,6 +23,10 @@
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
     <PackageVersion Include="EFCore.NamingConventions" Version="10.0.1" />
   </ItemGroup>
+  <ItemGroup Label="Optimization">
+    <!-- Operations research solvers (Apache-2.0); see docs/20-optimization-engine.md. -->
+    <PackageVersion Include="Google.OrTools" Version="9.15.6755" />
+  </ItemGroup>
   <ItemGroup Label="Tests">
     <PackageVersion Include="bunit" Version="2.13.3" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />

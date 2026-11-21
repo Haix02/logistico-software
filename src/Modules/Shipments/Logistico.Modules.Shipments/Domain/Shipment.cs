@@ -125,6 +125,12 @@ internal sealed class Shipment
     public string? RatingComment { get; private set; }
     public DateTimeOffset? RatedAt { get; private set; }
 
+    /// <summary>
+    /// The order is held with the seller until the customer answers. A cancelled order no longer waits, even though its
+    /// <see cref="Confirmation"/> still says the question was asked.
+    /// </summary>
+    public bool AwaitsConfirmation => Confirmation == ConfirmationStatus.Pending && Status is ShipmentStatus.Booked or ShipmentStatus.Draft;
+
     /// <summary>Customers can rate a delivery once, within two weeks.</summary>
     public bool CanBeRated(DateTimeOffset now) => Status == ShipmentStatus.Delivered && Rating is null && DeliveredAt is { } at && now - at <= TimeSpan.FromDays(14);
 
@@ -260,7 +266,7 @@ internal sealed class Shipment
         }
 
         // An order waiting for the customer's confirmation stays with the seller.
-        if (Confirmation == ConfirmationStatus.Pending && Status is ShipmentStatus.Booked or ShipmentStatus.Draft && next != ShipmentStatus.Cancelled)
+        if (AwaitsConfirmation && next != ShipmentStatus.Cancelled)
         {
             throw Rule("shipment.awaiting_confirmation", "The customer has not confirmed this order yet.");
         }
@@ -320,6 +326,20 @@ internal sealed class Shipment
     }
 
     /// <summary>
+    /// Refuses a milestone typed by a person that belongs to a workflow (<see cref="ShipmentLifecycle.WorkflowStatuses"/>):
+    /// a truck step would leave its manifest wrong, a hand-over would skip the signed manifest and the return fee, a customs
+    /// step would skip e-verification. A parcel on a truck comes off it by a scan at the hub, which completes its manifest line.
+    /// </summary>
+    public void EnsureRecordableByHand(ShipmentStatus next)
+    {
+        var offTruck = ShipmentLifecycle.IsOnLineHaul(Status) && ShipmentLifecycle.IsInWarehouse(next);
+        if (offTruck || ShipmentLifecycle.WorkflowStatuses.Contains(next))
+        {
+            throw Rule("shipment.step_by_workflow", "This step is recorded by a scan, a truck manifest, the returns desk or customs.", ShipmentTexts.Of(next));
+        }
+    }
+
+    /// <summary>
     /// A receive scan at a hub: puts the parcel on a shelf there. Handles first arrival, arrival after a truck,
     /// a courier bringing back an undelivered parcel, re-shelving, and returns reaching the seller's hub.
     /// </summary>
@@ -342,8 +362,10 @@ internal sealed class Shipment
                     AdvanceTo(ShipmentStatus.ReturnAtHub, now, details, actor.Source, actor.Name, now);
                 }
             }
-            else if (Status == ShipmentStatus.ReturnInTransit)
+            else if (Status is ShipmentStatus.ReturnInTransit or ShipmentStatus.ReturnAtHub)
             {
+                // Off a truck at a hub on the way, or taken away from the seller's hub: it needs a truck back to the seller
+                // (left as "waiting at the seller's hub", it would never be planned and could be handed over at the wrong hub).
                 AdvanceTo(ShipmentStatus.ReturnInitiated, now, details with { Notes = "Return arrived at an intermediate hub" }, actor.Source, actor.Name, now);
             }
             else
@@ -542,8 +564,7 @@ internal sealed class Shipment
                 throw Rule("shipment.domestic_address", "Domestic deliveries need governorate, address and mobile number.");
             }
 
-            DestinationCode = governorate.ToUpperInvariant();
-            DestinationHubCode = network.ResolveDestinationHub(DestinationCode).Code;
+            MoveDestination(governorate.Trim().ToUpperInvariant(), network, now);
         }
 
         DestinationCity = Clean(city) ?? DestinationCity;
@@ -612,8 +633,7 @@ internal sealed class Shipment
         ConsigneePhone = phone;
         if (governorate != DestinationCode)
         {
-            DestinationCode = governorate;
-            DestinationHubCode = network.ResolveDestinationHub(governorate).Code;
+            MoveDestination(governorate, network, now);
         }
 
         DestinationCity = Clean(request.DestinationCity);
@@ -666,7 +686,7 @@ internal sealed class Shipment
     /// </summary>
     public void RecordConfirmation(ConfirmationOutcome outcome, string? note, Actor actor, DateTimeOffset now)
     {
-        if (Confirmation != ConfirmationStatus.Pending)
+        if (!AwaitsConfirmation)
         {
             throw Rule("shipment.confirmation_not_pending", "This order is not waiting for confirmation.");
         }
@@ -706,7 +726,6 @@ internal sealed class Shipment
         StartReturn(Contracts.ReturnReason.SellerCancelled, reason, actor, now);
     }
 
-    /// <summary>The courier handed this parcel's collected cash in at the office.</summary>
     /// <summary>Something about the parcel's journey staff must see on its timeline (a truck it missed, a missing manifest line).</summary>
     public void RecordJourneyNote(string text, Actor actor, DateTimeOffset now)
     {
@@ -721,6 +740,7 @@ internal sealed class Shipment
         UpdatedAt = now;
     }
 
+    /// <summary>The courier handed this parcel's collected cash in at the office.</summary>
     public void MarkCashHandedOver(Guid handoverId, DateTimeOffset now)
     {
         if (CodCollectedAt is null || CodHandedOverAt is not null)
@@ -736,9 +756,30 @@ internal sealed class Shipment
     /// <summary>Marks a delivered COD shipment as remitted to the seller in a settlement batch.</summary>
     public void MarkCodSettled(Guid settlementId, DateTimeOffset now)
     {
+        // Paying the same cash (or deducting the same return fee) twice would leave a payout wrong.
+        if (CodSettlementId is not null)
+        {
+            throw Rule("shipment.cod_already_settled", "This parcel's cash is already in a seller payout.", TrackingNumber);
+        }
+
         CodSettlementId = settlementId;
         CodSettledAt = now;
         UpdatedAt = now;
+    }
+
+    /// <summary>
+    /// The customer's governorate is now <paramref name="governorate"/>: the hub that serves it delivers, and a new
+    /// governorate moves the ETA to that lane's estimate (never earlier than it was; a date agreed with the customer stays).
+    /// </summary>
+    private void MoveDestination(string governorate, HubNetwork network, DateTimeOffset now)
+    {
+        var moved = governorate != DestinationCode;
+        DestinationCode = governorate;
+        DestinationHubCode = network.ResolveDestinationHub(governorate).Code;
+        if (moved && ServiceType == ServiceType.Domestic && RescheduledTo is null)
+        {
+            EtaAt = Max(EtaAt, DeliveryPromise.Estimate(OriginCode, governorate, now));
+        }
     }
 
     private void Reshelve(HubInfo hub, string? shelf, Actor actor, DateTimeOffset now)

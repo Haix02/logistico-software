@@ -429,6 +429,43 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                     b.ToTable("couriers", "shipment");
                 });
 
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.CourierRunStop", b =>
+                {
+                    b.Property<Guid>("ShipmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("shipment_id");
+
+                    b.Property<string>("CourierLabel")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)")
+                        .HasColumnName("courier_label");
+
+                    b.Property<DateTimeOffset>("PlannedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("planned_at");
+
+                    b.Property<Guid>("RunId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("run_id");
+
+                    b.Property<int>("Sequence")
+                        .HasColumnType("integer")
+                        .HasColumnName("sequence");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.HasKey("ShipmentId")
+                        .HasName("pk_courier_run_stops");
+
+                    b.HasIndex("TenantId", "CourierLabel")
+                        .HasDatabaseName("ix_courier_run_stops_tenant_id_courier_label");
+
+                    b.ToTable("courier_run_stops", "shipment");
+                });
+
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.CustomerNotification", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1077,6 +1114,156 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                         .HasDatabaseName("ix_alerts_tenant_id_resolved_at_raised_at");
 
                     b.ToTable("alerts", "shipment");
+                });
+
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.PlanningRun", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset?>("AppliedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("applied_at");
+
+                    b.Property<string>("AppliedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("applied_by");
+
+                    b.Property<decimal?>("CostIqd")
+                        .HasPrecision(19, 2)
+                        .HasColumnType("numeric(19,2)")
+                        .HasColumnName("cost_iqd");
+
+                    b.Property<double?>("Gap")
+                        .HasColumnType("double precision")
+                        .HasColumnName("gap");
+
+                    b.Property<string>("HubCode")
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)")
+                        .HasColumnName("hub_code");
+
+                    b.Property<string>("InputHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("input_hash");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("kind");
+
+                    b.Property<double?>("Km")
+                        .HasColumnType("double precision")
+                        .HasColumnName("km");
+
+                    b.Property<string>("Parameters")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("parameters");
+
+                    b.Property<int>("Parcels")
+                        .HasColumnType("integer")
+                        .HasColumnName("parcels");
+
+                    b.Property<string>("Quality")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("quality");
+
+                    b.Property<DateTimeOffset>("RequestedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("requested_at");
+
+                    b.Property<string>("RequestedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("requested_by");
+
+                    b.Property<string>("Result")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("result");
+
+                    b.Property<double>("Seconds")
+                        .HasColumnType("double precision")
+                        .HasColumnName("seconds");
+
+                    b.Property<int>("Seed")
+                        .HasColumnType("integer")
+                        .HasColumnName("seed");
+
+                    b.Property<string>("Solver")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)")
+                        .HasColumnName("solver");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("status");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<int>("Violations")
+                        .HasColumnType("integer")
+                        .HasColumnName("violations");
+
+                    b.HasKey("Id")
+                        .HasName("pk_planning_runs");
+
+                    b.HasIndex("TenantId", "Kind", "RequestedAt")
+                        .HasDatabaseName("ix_planning_runs_tenant_id_kind_requested_at");
+
+                    b.ToTable("planning_runs", "shipment");
+                });
+
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.PlanningSettings", b =>
+                {
+                    b.Property<Guid>("TenantId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("Policy")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("policy");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("updated_by");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("TenantId")
+                        .HasName("pk_planning_settings");
+
+                    b.ToTable("planning_settings", "shipment");
                 });
 
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.RateCardSettings", b =>
@@ -2309,6 +2496,16 @@ namespace Logistico.Modules.Shipments.Infrastructure.Migrations
                         .HasFilter("is_primary");
 
                     b.ToTable("warehouses", "shipment");
+                });
+
+            modelBuilder.Entity("Logistico.Modules.Shipments.Domain.CourierRunStop", b =>
+                {
+                    b.HasOne("Logistico.Modules.Shipments.Domain.Shipment", null)
+                        .WithMany()
+                        .HasForeignKey("ShipmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_courier_run_stops_shipments_shipment_id");
                 });
 
             modelBuilder.Entity("Logistico.Modules.Shipments.Domain.DeliveryProof", b =>

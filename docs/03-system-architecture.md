@@ -96,6 +96,7 @@ flowchart LR
 | **Logistico.Web** (host) | ASP.NET Core 10 | Serves the WebAssembly app and the account pages; hosts every module's REST endpoints; cookie authentication | ✅ |
 | **Logistico.Web.Client** | Blazor WebAssembly, Blueprint 6 CSS + own components | The whole UI in Arabic and English: shell, tables, forms, labels; typed API clients | ✅ |
 | **Modules** | Class libraries loaded by the host | Domain logic + persistence + endpoints per bounded context | Shipments ✅, Merchants ✅, others 🟡 |
+| **Logistico.Optimization** | Class library on Google OR-Tools | Truck, courier-run and zone planners and their independent checkers; pure (no database or web code), used by the Shipments module only ([20](20-optimization-engine.md)) | ✅ |
 | **PostgreSQL** | PostgreSQL 16+ (18 in CI/production) | All business data, schema per module | ✅ |
 | **Logistico.Worker** | .NET generic host | Outbox relay, scheduled jobs (ETA, SLA rules, FX import), long-running exports | ⏳ |
 | **Event bus** | NATS JetStream (proposed) | Events between modules/services; leaf nodes at sites | ⏳ |
@@ -125,6 +126,8 @@ src/
 │  │                                       Timeline, HubJourney, …), Map/ (Iraq SVG map), Bidi, Plural, Fmt
 │  ├─ Services/                           ShipmentsApi, OperationsApi, MerchantsApi, AccountApi, OpsState, ApiErrors
 │  └─ Resources/                          UiText.resx / UiText.ar.resx
+├─ Logistico.Optimization/                Operations research (docs/20): LineHaul/, Routing/, Zoning/ planners on OR-Tools,
+│                                          each with an independent checker and a baseline of today's practice
 ├─ Logistico.SharedKernel/                Tenancy, DomainException, paging, claim types, AppCultures (ar/en formats),
 │                                          Iraq/ (governorates, phone numbers), shared texts
 └─ Modules/

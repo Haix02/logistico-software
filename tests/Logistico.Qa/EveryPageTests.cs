@@ -65,6 +65,14 @@ public sealed class EveryPageTests(QaServer server, Browser browser, ITestOutput
         Assert.True(desktop.Problems.Count == 0, string.Join(Environment.NewLine, desktop.Problems));
     }
 
-    private static async Task<List<string>> MenuAsync(Visitor person) =>
-        [.. await person.Page.Locator("a.lx-nav-item").EvaluateAllAsync<string[]>("links => links.map(l => l.getAttribute('href'))")];
+    /// <summary>
+    /// The pages in the side menu. The menu is drawn once the person's roles are known, which can come after the network
+    /// is quiet on a busy machine, so wait for it before reading it.
+    /// </summary>
+    private static async Task<List<string>> MenuAsync(Visitor person)
+    {
+        var items = person.Page.Locator("a.lx-nav-item");
+        await items.First.WaitForAsync(new() { Timeout = 30_000 });
+        return [.. await items.EvaluateAllAsync<string[]>("links => links.map(l => l.getAttribute('href'))")];
+    }
 }

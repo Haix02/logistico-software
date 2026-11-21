@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Operations research for Logistico (docs/20-optimization-engine.md): pure models, an independent feasibility checker,
+    and solvers on Google OR-Tools. No database, no web framework: the Shipments module builds the problems and applies
+    approved plans. The browser never references this assembly (it carries native solver code).
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.OrTools" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Logistico.Optimization.Tests" />
+  </ItemGroup>
+
+</Project>

@@ -57,6 +57,7 @@ where, when, and why deliveries fail.** Companies can publish anonymised answers
 | **First run & getting started** | A setup page that creates the company and its first administrator with a one-time code from the server log; a guide that walks each role through setting the company up, done when the data says so; installation health that says what to fix before going live |
 | **Sort plans** | Per hub: which parcels go on which shelves (couriers' areas, truck lanes, returns, a seller's own shelf) and how many fit; receive scans pick the shelf, overflow when one is full and show it large; shelves listed in walking order with their load |
 | **Trucks between hubs** | Parcels planned onto the right truck automatically; load, depart and unload by scan; manifests; missing parcels flagged |
+| **Planning (optimization)** | Operations research, not guesswork: trucks between hubs solved to proven optimality, courier runs within each courier's parcel, weight, time and cash limits, balanced courier zones; every plan re-checked by an independent checker, compared with today's practice, applied only when approved ([below](#planning-proven-plans-not-guesses)) |
 | **Returns** | Start automatically after the last failed attempt or a refusal, travel back by truck, handed over against a manifest |
 | **Customers** | Public tracking without personal data; self-service requests (new day, address, phone, cancel, return, complaint) protected by the phone's last four digits with lockout; ratings that open complaints |
 | **Automation** | Per-company rules (attempts, rescheduling, SLAs); alerts raised and cleared every minute; WhatsApp message queue |
@@ -133,6 +134,39 @@ The **Intelligence → Demand intelligence** page turns a company's own deliveri
 
 How it works and how the data is protected: [docs/16-data-and-insights.md](docs/16-data-and-insights.md).
 
+## Planning: proven plans, not guesses
+
+![Courier runs from the Baghdad hub: two runs drawn around the hub, 40 % less driving and the longest run halved against today's practice](docs/images/planning-courier-runs.png)
+
+**Intelligence → Planning** plans the work with operations research (Google OR-Tools), the mathematics large carriers
+use, instead of rules of thumb:
+
+- **Trucks between hubs**: which trucks leave when and what each carries. Solved exactly in three stages: fewest late
+  parcels first, then the lowest cost, then the earliest arrivals. The screen says *proven optimal*, or how close to
+  optimal the plan is.
+- **Courier runs**: who takes which parcels, in which order, within each courier's parcels, kilograms, working time and
+  the **cash they may carry**. The search starts from Clarke–Wright savings and improves by guided local search.
+  Positions come from the GPS of earlier deliveries, then the customer's area, then the governorate, and the plan
+  says which.
+- **Courier zones**: a hub's areas grouped into compact zones with an even workload (balanced p-median).
+
+Every plan is **re-checked by an independent checker** that recomputes every limit, **compared with today's practice**,
+and **changes nothing until a person approves it**. Approving loads the next trucks or hands the parcels to the couriers
+through the usual scans, and the courier app lists the run in the planned order.
+
+<table>
+<tr>
+<td width="50%"><img src="docs/images/planning-trucks.png" alt="Truck plan: proven optimal, every departure with its trucks, fill by weight and volume, and the lanes on the Iraq map"></td>
+<td width="50%"><img src="docs/images/planning-zones.png" alt="Courier zones of the Baghdad hub: three zones within ±8 % of the average workload, with their areas"></td>
+</tr>
+<tr>
+<td align="center">Trucks between hubs, proven optimal</td>
+<td align="center">Balanced courier zones</td>
+</tr>
+</table>
+
+The models, the research behind them and how accuracy is proven: [docs/20-optimization-engine.md](docs/20-optimization-engine.md).
+
 ## Quick start
 
 ### With Docker (any OS)
@@ -185,18 +219,19 @@ before real customers' data goes in. See [First run & getting started](docs/19-f
 ### Tests
 
 ```bash
-dotnet test tests/Logistico.Modules.Shipments.Tests     # domain rules, product catalogue, open data, formatting, sort plans, paste-to-order (277)
-dotnet test tests/Logistico.ArchitectureTests            # module boundaries, texts in both languages, RTL/CSS and icon guards, a message for every refusal code (34)
-dotnet test tests/Logistico.Web.IntegrationTests         # REST API on real PostgreSQL: flows, roles, setup, every endpoint × every role (162)
+dotnet test tests/Logistico.Modules.Shipments.Tests     # domain rules, the order lifecycle over every status, trucks, cash, requests, sort plans (399)
+dotnet test tests/Logistico.Optimization.Tests           # the planners: brute-force optimality proofs, limits, checker, determinism (30)
+dotnet test tests/Logistico.ArchitectureTests            # module boundaries, texts in both languages, RTL/CSS and icon guards, a message for every refusal code (35)
+dotnet test tests/Logistico.Web.IntegrationTests         # REST API on real PostgreSQL: flows, roles, setup, planning, every endpoint × every role (171)
 dotnet test tests/Logistico.Web.Client.Tests             # the console: components (bUnit), navigation, plurals, texts (46)
-dotnet test tests/Logistico.Qa -c Release                # QA: a delivery day by shops, couriers and a hub, then every page in Chrome (9)
+dotnet test tests/Logistico.Qa -c Release                # QA: a delivery day by shops, couriers and a hub, every page and every planner in Chrome (11)
 ```
 
 The QA suite starts the built server on its own port with its own database (build in Release first) and needs Google
 Chrome; it writes the time of every endpoint to `TestResults/qa/delivery-day.md`.
 Set `LOGISTICO_TEST_DB` to point the integration tests at another PostgreSQL server.
 
-CI also measures line coverage of the server code and fails below 85 % (87.7 % today); see
+CI also measures line coverage of the server code and fails below 85 % (88.5 % today); see
 [CONTRIBUTING](CONTRIBUTING.md) to measure it locally.
 
 ## Stack
@@ -208,6 +243,7 @@ CI also measures line coverage of the server code and fails below 85 % (87.7 % t
 | Languages | Arabic (`ar-IQ`, default, RTL) and English; Almarai font; Western digits; Iraqi month names; Arabic plural forms |
 | Backend | ASP.NET Core modular monolith (strict module boundaries, contracts shared with the browser) |
 | Database | PostgreSQL with EF Core 10 (schema per module, snake_case, optimistic concurrency) |
+| Optimization | Google OR-Tools (Apache-2.0): CP-SAT for trucks and zones, the routing library for courier runs; behind Logistico's own planners and checker |
 | Identity | ASP.NET Core Identity (cookies, roles, 2FA, passkeys), multi-company (tenant) data isolation |
 | Mobile | Flutter (Android and iOS), one app for senders, couriers and managers; Riverpod, go_router, dio |
 | CI | GitHub Actions: format → build → tests on PostgreSQL → QA (API + Chrome) → Docker image check → container image + migration bundles; the same pipeline on a local Jenkins (`Jenkinsfile`, `scripts/jenkins.sh`) |
@@ -221,6 +257,7 @@ src/
   Logistico.Web/              ASP.NET Core host: REST API, sign-in pages, serves the WebAssembly UI
   Logistico.Web.Client/       Blazor WebAssembly UI: components (Ui/), pages, typed API clients, ar/en texts
   Logistico.SharedKernel/     Tenancy, paging, Iraqi governorates and phone numbers, cultures
+  Logistico.Optimization/     Operations research: truck, courier-run and zone planners (OR-Tools) and their checkers
   Modules/Shipments/          Orders, hubs and trucks, returns, requests, automation, insights, customs, fleet, COD
   Modules/Merchants/          Sellers (Instagram / online shops)
   Modules/Audit/              Audit log: who changed what, recorded with every change
@@ -254,6 +291,7 @@ Dockerfile, docker-compose.yml
 | 17 | [Release audits](docs/17-release-audits.md) | What each release checked and fixed |
 | 18 | [Ideas from open source](docs/18-ideas-from-open-source.md) | What we took from Fleetbase, OpenBoxes, Karrio, Odoo, VROOM, Traccar |
 | 19 | [First run & getting started](docs/19-first-run-and-getting-started.md) | The setup page, the getting-started guide, installation health |
+| 20 | [Optimization engine](docs/20-optimization-engine.md) | Truck, courier-run and zone planning: the models, the research, how accuracy is proven |
 
 ## Alternatives and how Logistico differs
 

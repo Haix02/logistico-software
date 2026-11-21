@@ -139,7 +139,7 @@ internal static class ShipmentProjections
             Contracts.Rules.RequestRules.Allowed(s.Status, s.DeliveredAt, now),
             openRequests,
             [],
-            s.Confirmation == ConfirmationStatus.Pending,
+            s.AwaitsConfirmation, // a cancelled order no longer asks the customer to confirm it
             s.CanBeRated(now),
             s.Rating,
             // Coarse flags so the progress bar is right ("between cities"), without revealing the hubs themselves.

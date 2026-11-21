@@ -1,0 +1,152 @@
+@* Line-haul plan: the figures against today's practice, the lanes on the Iraq map, every departure with how full its
+   trucks are (weight and volume) and the parcels that will be late or wait for the next plan. *@
+
+<div class="lx-kpis">
+    <KpiCard Icon="drive-time" Label="@L["Plan_Kpi_Trucks"]" Value="@Fmt.Number(Plan.Plan.Trucks)" Intent="Intent.Primary"
+             Hint="@VsToday(Fmt.Number(Plan.Baseline.Trucks), Delta(Plan.Plan.Trucks, Plan.Baseline.Trucks))" />
+    <KpiCard Icon="dollar" Label="@L["Plan_Kpi_Cost"]" Amount="@Plan.Plan.CostIqd" Currency="IQD" Intent="@(Plan.Plan.CostIqd < Plan.Baseline.CostIqd ? Intent.Success : Intent.None)"
+             Hint="@VsToday(Fmt.Money(Plan.Baseline.CostIqd, "IQD"), Delta(Plan.Plan.CostIqd, Plan.Baseline.CostIqd))" />
+    <KpiCard Icon="path" Label="@L["Plan_Kpi_TruckKm"]" Value="@Fmt.Number((decimal)Plan.Plan.TruckKm, 0)" Unit="@L["Unit_Km"]"
+             Hint="@VsToday(Fmt.Number((decimal)Plan.Baseline.TruckKm, 0), Delta((decimal)Plan.Plan.TruckKm, (decimal)Plan.Baseline.TruckKm))" />
+    <KpiCard Icon="time" Label="@L["Plan_Kpi_OnTime"]" Value="@($"{Fmt.Number(Plan.Plan.OnTime)} / {Fmt.Number(Plan.Plan.Parcels)}")"
+             Intent="@(Plan.Plan.Late > 0 ? Intent.Warning : Intent.Success)"
+             Hint="@string.Format(CultureInfo.CurrentCulture, L["Plan_TodayOnTime"], Fmt.Number(Plan.Baseline.OnTime))" />
+    <KpiCard Icon="inbox" Label="@L["Plan_Kpi_Waiting"]" Value="@Fmt.Number(Plan.Plan.Waiting)" Intent="@(Plan.Plan.Waiting > 0 ? Intent.Warning : Intent.None)"
+             Hint="@L["Plan_WaitingHint"]" />
+</div>
+
+@if (Plan.Departures.Count == 0)
+{
+    <NonIdealState Icon="drive-time" Title="@L["Plan_NoTrucks"]" Description="@L["Plan_NoTrucksHint"]" />
+}
+else
+{
+    <div class="lx-split lx-plan-split">
+        <div class="lx-table-card">
+            <div class="lx-toolbar">
+                <span class="lx-strong">@L["Plan_Departures"]</span>
+                <span class="lx-spacer"></span>
+                <span class="bp6-text-muted lx-small">@string.Format(CultureInfo.CurrentCulture, L["Plan_TruckSize"], Fmt.Number((decimal)Plan.TruckCapacityKg, 0), Fmt.Number((decimal)Plan.TruckCapacityM3, 1))</span>
+            </div>
+            <DataTable TItem="TruckDepartureView" Items="Plan.Departures" ColumnCount="6" RowClass="@(d => d.IsNext ? "lx-row-selected" : null)">
+                <Header>
+                    <th>@L["Plan_Col_Leaves"]</th>
+                    <th>@L["Plan_Col_Lane"]</th>
+                    <th class="lx-num">@L["Plan_Col_Trucks"]</th>
+                    <th>@L["Plan_Col_Fill"]</th>
+                    <th class="lx-num">@L["Plan_Col_Parcels"]</th>
+                    <th class="lx-num">@L["Plan_Col_Cost"]</th>
+                </Header>
+                <Row Context="d">
+                    <td>
+                        <div class="lx-stack">
+                            <span dir="ltr" class="lx-tabular lx-nowrap">@Fmt.DateTime(d.DepartAt)</span>
+                            @if (d.IsNext)
+                            {
+                                <Tag Intent="Intent.Primary" Icon="tick">@L["Plan_LoadsOnApproval"]</Tag>
+                            }
+                        </div>
+                    </td>
+                    <td title="@($"{Fmt.Hub(d.FromHubCode)} {Bidi.Arrow} {Fmt.Hub(d.ToHubCode)}")">
+                        <div class="lx-stack">
+                            <bdi dir="ltr" class="lx-strong lx-nowrap">@Lane(d.FromHubCode, d.ToHubCode)</bdi>
+                            <span class="bp6-text-muted lx-small">@string.Format(CultureInfo.CurrentCulture, L["Plan_ArrivesKm"], Fmt.DateTime(d.ArriveAt), Fmt.Number((decimal)d.Km, 0))</span>
+                        </div>
+                    </td>
+                    <td class="lx-num lx-tabular">@Fmt.Number(d.Trucks)</td>
+                    <td class="lx-plan-fill-cell">
+                        <div class="lx-plan-fill" title="@L["Plan_Col_Weight"]">
+                            <span class="lx-small">@L["Plan_Weight"]</span>
+                            <ProgressBar Value="@d.WeightFill" Intent="@FillIntent(d.WeightFill)" />
+                            <bdi dir="ltr" class="lx-small lx-tabular">@Pct(d.WeightFill)</bdi>
+                        </div>
+                        <div class="lx-plan-fill" title="@L["Plan_Col_Volume"]">
+                            <span class="lx-small">@L["Plan_Volume"]</span>
+                            <ProgressBar Value="@d.VolumeFill" Intent="@FillIntent(d.VolumeFill)" />
+                            <bdi dir="ltr" class="lx-small lx-tabular">@Pct(d.VolumeFill)</bdi>
+                        </div>
+                    </td>
+                    <td class="lx-num">
+                        <div class="lx-stack" style="align-items:end">
+                            <span class="lx-tabular">@Fmt.Number(d.Parcels)</span>
+                            @if (d.Late > 0)
+                            {
+                                <Tag Intent="Intent.Warning">@L.Count("Plan_LateN", d.Late)</Tag>
+                            }
+                        </div>
+                    </td>
+                    <td class="lx-num lx-tabular">@Fmt.Money(d.CostIqd, "IQD")</td>
+                </Row>
+            </DataTable>
+        </div>
+
+        <div class="lx-card lx-card-pad lx-stack" style="gap:8px">
+            <span class="lx-strong">@L["Plan_LanesMap"]</span>
+            <IraqMap Lanes="Lanes" Compact="true" />
+            <span class="bp6-text-muted lx-small">@L["Plan_LanesMapHint"]</span>
+        </div>
+    </div>
+}
+
+@if (Plan.Attention.Count > 0)
+{
+    <Section Title="@L["Plan_Attention"]" Subtitle="@L["Plan_AttentionHint"]" Icon="warning-sign" Padded="false" CssClass="lx-mt">
+        <DataTable TItem="PlannedParcelView" Items="Plan.Attention" ColumnCount="4">
+            <Header>
+                <th>@L["Col_Tracking"]</th>
+                <th>@L["Plan_Col_Lane"]</th>
+                <th>@L["Plan_Col_DueAtHub"]</th>
+                <th>@L["Plan_Col_Outcome"]</th>
+            </Header>
+            <Row Context="p">
+                <td><a href="@($"shipments/{p.ShipmentId}")" dir="ltr" class="lx-mono">@p.TrackingNumber</a></td>
+                <td class="lx-nowrap" title="@($"{Fmt.Hub(p.FromHubCode)} {Bidi.Arrow} {Fmt.Hub(p.ToHubCode)}")"><bdi dir="ltr">@Lane(p.FromHubCode, p.ToHubCode)</bdi></td>
+                <td dir="ltr" class="lx-tabular">@Fmt.DateTime(p.DueAt)</td>
+                <td>
+                    @if (p.ArriveAt is { } arrive)
+                    {
+                        <Tag Intent="Intent.Warning">@string.Format(CultureInfo.CurrentCulture, L["Plan_LateBy"], Fmt.Number((decimal)Math.Round(p.LateHours, 1), 1))</Tag>
+                        <span class="bp6-text-muted lx-small"> @Fmt.DateTime(arrive)</span>
+                    }
+                    else
+                    {
+                        <Tag>@L["Plan_WaitsNextPlan"]</Tag>
+                    }
+                </td>
+            </Row>
+        </DataTable>
+    </Section>
+}
+
+@if (Plan.EstimatedVolumes > 0)
+{
+    <p class="bp6-text-muted lx-small lx-mt">@L.Count("Plan_EstimatedVolumesN", Plan.EstimatedVolumes)</p>
+}
+
+@code {
+    [Parameter, EditorRequired] public TruckPlanView Plan { get; set; } = default!;
+
+    private IReadOnlyList<LaneLoad> Lanes => Plan.Departures
+        .GroupBy(d => (d.FromHubCode, d.ToHubCode))
+        .Select(g => new LaneLoad(g.Key.FromHubCode, g.Key.ToHubCode, g.Sum(d => d.Trucks), g.Sum(d => d.Parcels), 0, g.Any(d => d.Late > 0)))
+        .ToList();
+
+    private static Intent FillIntent(double fill) => fill >= 0.98 ? Intent.Warning : fill >= 0.5 ? Intent.Success : Intent.Primary;
+
+    /// <summary>"37%", and "&lt;1%" for a truck that is barely used (never a misleading 0%).</summary>
+    private static string Pct(double fill) => fill > 0 && fill < 0.01 ? "<1%" : Fmt.Percent((decimal)Math.Round(fill * 100, 0));
+
+    /// <summary>
+    /// A lane as routing tags, "BGW → EBL": short enough for a table (the full names are in the cell's tooltip). Codes stay
+    /// left-to-right in both languages, so the arrow is always "→"; a mirrored arrow around Latin codes would read backwards.
+    /// </summary>
+    private static string Lane(string from, string to) => $"{HubCatalog.FindOrDefault(from).RoutingTag} → {HubCatalog.FindOrDefault(to).RoutingTag}";
+
+    /// <summary>Relative change against today's practice, e.g. −33 %.</summary>
+    private static decimal? Delta(decimal plan, decimal today) => today == 0 ? null : Math.Round((plan - today) / today * 100, 1);
+
+    private string VsToday(string today, decimal? delta) =>
+        delta is { } d && d != 0
+            ? string.Format(CultureInfo.CurrentCulture, L["Plan_VsTodayDelta"], today, (d > 0 ? "+" : "") + Fmt.Percent(d))
+            : string.Format(CultureInfo.CurrentCulture, L["Plan_VsToday"], today);
+}

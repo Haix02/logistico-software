@@ -26,6 +26,7 @@ public static class AppNavigation
         new("Nav_IntelligenceSection",
         [
             new("insights", "Nav_Insights", "predictive-analysis", "e", "insights demand intelligence analytics data open data customers products رؤى ذكاء الطلب تحليلات بيانات زبائن منتجات"),
+            new("planning", "Nav_Planning", "route", "o", "planning optimisation optimization trucks routes courier runs zones operations research تخطيط تحسين شاحنات مسارات جولات المندوبين مناطق"),
         ]),
         new("Nav_HubsSection",
         [

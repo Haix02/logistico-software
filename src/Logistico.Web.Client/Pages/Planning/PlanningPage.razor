@@ -1,0 +1,232 @@
+@page "/planning"
+@* The optimization engine (docs/20-optimization-engine.md): mathematical plans for trucks, courier runs and zones.
+   Every plan says what the solver proved, is re-checked by an independent checker, is compared with today's practice,
+   and changes nothing until a person approves it. *@
+@inject PlanningApi Planning
+@inject Toaster Toaster
+@inject Confirmer Confirmer
+
+<PageTitle>@L["Nav_Planning"] · @L["AppName"]</PageTitle>
+<PageHeader Title="@L["Nav_Planning"]" Icon="route" Subtitle="@L["Plan_Subtitle"]" />
+
+<Tabs Selected="@tab" SelectedChanged="SelectAsync">
+    <Tab Id="trucks" Title="@L["Plan_TabTrucks"]" Icon="drive-time">
+        <div class="lx-card lx-card-pad lx-plan-bar">
+            <div class="lx-stack">
+                <span class="lx-strong">@L["Plan_TrucksTitle"]</span>
+                <span class="bp6-text-muted lx-small">@L["Plan_TrucksHint"]</span>
+            </div>
+            <span class="lx-spacer"></span>
+            <Allowed Policy="@StaffPolicies.Operate">
+                <Button Icon="predictive-analysis" Intent="Intent.Primary" Text="@L["Plan_Run"]" Loading="running" OnClick="@(() => RunAsync(PlanKind.Trucks))" />
+            </Allowed>
+        </div>
+        <PlanSlot Loaded="@current.ContainsKey(PlanKind.Trucks)" Details="@current.GetValueOrDefault(PlanKind.Trucks)" Busy="applying" OnApply="ApplyAsync" OnDiscard="DiscardAsync" Context="d">
+            @if (d.Trucks is { } trucks)
+            {
+                <TruckPlanPanel Plan="trucks" />
+            }
+        </PlanSlot>
+    </Tab>
+
+    <Tab Id="couriers" Title="@L["Plan_TabCouriers"]" Icon="route">
+        <div class="lx-card lx-card-pad lx-plan-bar">
+            <div class="lx-stack">
+                <span class="lx-strong">@L["Plan_CouriersTitle"]</span>
+                <span class="bp6-text-muted lx-small">@L["Plan_CouriersHint"]</span>
+            </div>
+            <span class="lx-spacer"></span>
+            @HubPicker()
+            <Allowed Policy="@StaffPolicies.Operate">
+                <Button Icon="predictive-analysis" Intent="Intent.Primary" Text="@L["Plan_Run"]" Loading="running" OnClick="@(() => RunAsync(PlanKind.CourierRuns))" />
+            </Allowed>
+        </div>
+        <PlanSlot Loaded="@current.ContainsKey(PlanKind.CourierRuns)" Details="@current.GetValueOrDefault(PlanKind.CourierRuns)" Busy="applying" OnApply="ApplyAsync" OnDiscard="DiscardAsync" Context="d">
+            @if (d.Couriers is { } couriers)
+            {
+                <CourierPlanPanel Plan="couriers" />
+            }
+        </PlanSlot>
+    </Tab>
+
+    <Tab Id="zones" Title="@L["Plan_TabZones"]" Icon="polygon-filter">
+        <div class="lx-card lx-card-pad lx-plan-bar">
+            <div class="lx-stack">
+                <span class="lx-strong">@L["Plan_ZonesTitle"]</span>
+                <span class="bp6-text-muted lx-small">@L["Plan_ZonesHint"]</span>
+            </div>
+            <span class="lx-spacer"></span>
+            @HubPicker()
+            <label class="lx-row lx-small">
+                @L["Plan_ZoneCount"]
+                <input class="bp6-input lx-plan-count" type="number" min="1" max="60" dir="ltr" placeholder="@L["Plan_ZoneCountAuto"]"
+                       value="@zones" @onchange="@(e => zones = int.TryParse(e.Value?.ToString(), out var n) ? Math.Clamp(n, 1, 60) : null)" />
+            </label>
+            <Allowed Policy="@StaffPolicies.Operate">
+                <Button Icon="predictive-analysis" Intent="Intent.Primary" Text="@L["Plan_Run"]" Loading="running" OnClick="@(() => RunAsync(PlanKind.Zones))" />
+            </Allowed>
+        </div>
+        <PlanSlot Loaded="@current.ContainsKey(PlanKind.Zones)" Details="@current.GetValueOrDefault(PlanKind.Zones)" Busy="applying" OnApply="ApplyAsync" OnDiscard="DiscardAsync" Context="d">
+            @if (d.Zones is { } planned)
+            {
+                <ZonePlanPanel Plan="planned" />
+            }
+        </PlanSlot>
+    </Tab>
+
+    <Tab Id="history" Title="@L["Plan_TabHistory"]" Icon="history">
+        <div class="lx-table-card">
+            <DataTable TItem="PlanRunSummary" Items="history" Loading="history is null" ColumnCount="6" OnRowClick="OpenAsync" EmptyIcon="history" EmptyTitle="@L["Plan_NoHistory"]">
+                <Header>
+                    <th>@L["Plan_Col_Made"]</th>
+                    <th>@L["Plan_Col_Planner"]</th>
+                    <th>@L["Plan_Col_Proof"]</th>
+                    <th>@L["Plan_Col_Status"]</th>
+                    <th class="lx-num">@L["Plan_Col_Parcels"]</th>
+                    <th>@L["Plan_Col_By"]</th>
+                </Header>
+                <Row Context="r">
+                    <td dir="ltr" class="lx-tabular">@Fmt.DateTime(r.RequestedAt)</td>
+                    <td>@L["PlanKind_" + r.Kind]@(r.HubCode is { } h ? $" · {Fmt.Hub(h)}" : "")</td>
+                    <td><Tag Intent="@(r.Quality == PlanQuality.Optimal ? Intent.Success : r.Quality == PlanQuality.Feasible ? Intent.Primary : Intent.None)">@L["PlanQuality_" + r.Quality]</Tag></td>
+                    <td><Tag Intent="@(r.Status == PlanRunStatus.Applied ? Intent.Success : r.Status == PlanRunStatus.Ready ? Intent.Primary : Intent.None)">@L["PlanStatus_" + r.Status]</Tag></td>
+                    <td class="lx-num lx-tabular">@Fmt.Number(r.Parcels)</td>
+                    <td>@(r.AppliedBy ?? r.RequestedBy ?? "—")</td>
+                </Row>
+            </DataTable>
+        </div>
+    </Tab>
+
+    <Tab Id="settings" Title="@L["Plan_TabSettings"]" Icon="cog">
+        <PlanningSettings />
+    </Tab>
+</Tabs>
+
+@code {
+    [SupplyParameterFromQuery(Name = "tab")] public string? Tab { get; set; }
+
+    private static readonly IReadOnlyDictionary<PlanKind, string> TabOf =
+        new Dictionary<PlanKind, string> { [PlanKind.Trucks] = "trucks", [PlanKind.CourierRuns] = "couriers", [PlanKind.Zones] = "zones" };
+
+    private string? tab = "trucks";
+    private string hub = HubCatalog.Primary.Code;
+    private int? zones;
+    private bool running;
+    private bool applying;
+    private IReadOnlyList<PlanRunSummary>? history;
+    private readonly Dictionary<PlanKind, PlanRunDetails?> current = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        tab = Tab ?? tab;
+        await LoadHistoryAsync();
+        await Task.WhenAll(LoadLatestAsync(PlanKind.Trucks), LoadLatestAsync(PlanKind.CourierRuns), LoadLatestAsync(PlanKind.Zones));
+    }
+
+    private async Task LoadHistoryAsync() => history = (await Planning.ListAsync()).Items;
+
+    /// <summary>The newest plan of a kind (for the chosen hub when the planner works per hub).</summary>
+    private async Task LoadLatestAsync(PlanKind kind)
+    {
+        var latest = (await Planning.ListAsync(kind, kind == PlanKind.Trucks ? null : hub)).Items.FirstOrDefault();
+        current[kind] = latest is null ? null : await Planning.GetAsync(latest.Id);
+    }
+
+    private Task SelectAsync(string id)
+    {
+        tab = id;
+        return id == "history" ? LoadHistoryAsync() : Task.CompletedTask;
+    }
+
+    private async Task HubChangedAsync(string? code)
+    {
+        hub = code ?? HubCatalog.Primary.Code;
+        await Task.WhenAll(LoadLatestAsync(PlanKind.CourierRuns), LoadLatestAsync(PlanKind.Zones));
+    }
+
+    private async Task RunAsync(PlanKind kind)
+    {
+        running = true;
+        try
+        {
+            current[kind] = await Planning.RunAsync(new StartPlanRequest { Kind = kind, HubCode = kind == PlanKind.Trucks ? null : hub, Zones = kind == PlanKind.Zones ? zones : null });
+            Toaster.Success(L["Plan_Ready"]);
+            await LoadHistoryAsync();
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            running = false;
+        }
+    }
+
+    private async Task ApplyAsync(PlanRunDetails details)
+    {
+        var kind = details.Summary.Kind;
+        if (!await Confirmer.AskAsync(L["Plan_ConfirmTitle"], L["Plan_Confirm_" + kind], L["Plan_ConfirmYes"], Intent.Primary, "tick"))
+        {
+            return;
+        }
+
+        applying = true;
+        try
+        {
+            var result = await Planning.ApplyAsync(details.Summary);
+            current[kind] = details with { Summary = result.Summary };
+            Toaster.Success(result.Skipped == 0
+                ? L.Count("Plan_AppliedN", result.Applied)
+                : string.Format(CultureInfo.CurrentCulture, L["Plan_AppliedSkipped"], Fmt.Number(result.Applied), Fmt.Number(result.Skipped)));
+            await LoadHistoryAsync();
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+        finally
+        {
+            applying = false;
+        }
+    }
+
+    private async Task DiscardAsync(PlanRunDetails details)
+    {
+        try
+        {
+            current[details.Summary.Kind] = details with { Summary = await Planning.DiscardAsync(details.Summary) };
+            await LoadHistoryAsync();
+        }
+        catch (ApiException ex)
+        {
+            Toaster.Error(ex.UserMessage);
+        }
+    }
+
+    private async Task OpenAsync(PlanRunSummary run)
+    {
+        if (await Planning.GetAsync(run.Id) is not { } details)
+        {
+            return;
+        }
+
+        current[run.Kind] = details;
+        if (run.HubCode is { } code)
+        {
+            hub = code;
+        }
+
+        tab = TabOf[run.Kind];
+    }
+
+    private RenderFragment HubPicker() => __builder =>
+    {
+        <HtmlSelect Value="@hub" ValueChanged="HubChangedAsync" Label="@L["Col_Hub"]">
+            @foreach (var h in HubCatalog.All)
+            {
+                <option value="@h.Code">@h.RoutingTag · @h.Name</option>
+            }
+        </HtmlSelect>
+    };
+}

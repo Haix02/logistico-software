@@ -71,6 +71,7 @@ public static class ValidationText
     public static string Email => Get("Validation_Email");
     public static string DateWindow => Get("Validation_DateWindow");
     public static string NoFriday => Get("Validation_NoFriday");
+    public static string TimeList => Get("Validation_TimeList");
     public static string PhoneLast4 => Get("Validation_PhoneLast4");
     public static string RoutingTag => Get("Validation_RoutingTag");
     public static string InsideIraq => Get("Validation_InsideIraq");

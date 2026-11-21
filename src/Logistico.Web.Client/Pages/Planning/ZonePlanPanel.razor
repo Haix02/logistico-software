@@ -1,0 +1,67 @@
+@* Courier zones of one hub: how balanced they are (each zone's workload against the average) and which areas each takes. *@
+
+<div class="lx-kpis">
+    <KpiCard Icon="polygon-filter" Label="@L["Plan_Kpi_Zones"]" Value="@Fmt.Number(Plan.Zones.Count)" Intent="Intent.Primary"
+             Hint="@string.Format(CultureInfo.CurrentCulture, L["Plan_CouriersAtHub"], Fmt.Number(Plan.Couriers))" />
+    <KpiCard Icon="box" Label="@L["Plan_Kpi_Deliveries"]" Value="@Fmt.Number(Plan.Deliveries)"
+             Hint="@string.Format(CultureInfo.CurrentCulture, L["Plan_InDays"], Fmt.Number(Plan.HistoryDays))" />
+    <KpiCard Icon="layout-auto" Label="@L["Plan_Kpi_Balance"]" Value="@($"±{Fmt.Percent((decimal)Plan.MaxDeviationPercent)}")"
+             Intent="@(Plan.MaxDeviationPercent <= Plan.AskedTolerancePercent ? Intent.Success : Intent.Warning)"
+             Hint="@string.Format(CultureInfo.CurrentCulture, L["Plan_BalanceAsked"], Fmt.Percent((decimal)Plan.AskedTolerancePercent))" />
+</div>
+
+@if (Plan.TolerancePercent > Plan.AskedTolerancePercent)
+{
+    <Callout Intent="Intent.Warning" Icon="warning-sign" CssClass="lx-mb">
+        @string.Format(CultureInfo.CurrentCulture, L["Plan_ToleranceWidened"], Fmt.Percent((decimal)Plan.AskedTolerancePercent), Fmt.Percent((decimal)Plan.TolerancePercent))
+    </Callout>
+}
+
+@if (Plan.Zones.Count == 0)
+{
+    <NonIdealState Icon="polygon-filter" Title="@L["Plan_NoZones"]" Description="@L["Plan_NoZonesHint"]" />
+}
+else
+{
+    <div class="lx-zone-grid">
+        @foreach (var zone in Plan.Zones)
+        {
+            <div class="lx-card lx-zone-card">
+                <div class="lx-run-head">
+                    <span class="@($"lx-route-swatch lx-route-{(zone.Number - 1) % 6}")"></span>
+                    <span class="lx-strong">@string.Format(CultureInfo.CurrentCulture, L["Plan_ZoneN"], zone.Number)</span>
+                    <span class="lx-spacer"></span>
+                    <span class="bp6-text-muted lx-small">@string.Format(CultureInfo.CurrentCulture, L["Plan_PerWeek"], Fmt.Number((decimal)zone.Workload, 1))</span>
+                </div>
+                <div class="lx-plan-fill">
+                    <span class="lx-small">@L["Plan_OfAverage"]</span>
+                    <ProgressBar Value="@Math.Clamp(zone.Share / 2, 0, 1)" Intent="@(Math.Abs(zone.Share - 1) * 100 <= Plan.AskedTolerancePercent ? Intent.Success : Intent.Warning)" />
+                    <bdi dir="ltr" class="lx-small lx-tabular">@Fmt.Percent((decimal)Math.Round(zone.Share * 100, 0))</bdi>
+                </div>
+                <span class="bp6-text-muted lx-small">@string.Format(CultureInfo.CurrentCulture, L["Plan_ZoneKm"], Fmt.Number((decimal)zone.AverageKm, 1))</span>
+                <ul class="lx-zone-areas">
+                    @foreach (var area in zone.Areas)
+                    {
+                        <li>
+                            <Mixed Text="@area.Label" />
+                            @if (area.Key == zone.CenterKey)
+                            {
+                                <Tag Intent="Intent.Primary">@L["Plan_Centre"]</Tag>
+                            }
+                            @if (area.Precision == StopPrecision.Governorate)
+                            {
+                                <Tag Title="@L["StopPrecision_Governorate"]">@L["StopPrecisionShort_Governorate"]</Tag>
+                            }
+                            <span class="lx-spacer"></span>
+                            <bdi dir="ltr" class="lx-small lx-tabular">@Fmt.Number((decimal)area.Workload, 1)</bdi>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public ZonePlanView Plan { get; set; } = default!;
+}

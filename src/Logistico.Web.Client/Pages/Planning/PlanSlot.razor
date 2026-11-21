@@ -1,0 +1,24 @@
+@* Where a planner's latest plan shows: loading, "no plan yet", or the plan's header and its own panel. *@
+
+@if (!Loaded)
+{
+    <Skeleton Lines="6" />
+}
+else if (Details is null)
+{
+    <NonIdealState Icon="predictive-analysis" Title="@L["Plan_NoPlanYet"]" Description="@L["Plan_NoPlanYetHint"]" />
+}
+else
+{
+    <PlanHeader Details="Details" Busy="Busy" OnApply="@(() => OnApply.InvokeAsync(Details))" OnDiscard="@(() => OnDiscard.InvokeAsync(Details))" />
+    <div class="lx-mt">@ChildContent(Details)</div>
+}
+
+@code {
+    [Parameter] public bool Loaded { get; set; }
+    [Parameter] public PlanRunDetails? Details { get; set; }
+    [Parameter] public bool Busy { get; set; }
+    [Parameter] public EventCallback<PlanRunDetails> OnApply { get; set; }
+    [Parameter] public EventCallback<PlanRunDetails> OnDiscard { get; set; }
+    [Parameter, EditorRequired] public RenderFragment<PlanRunDetails> ChildContent { get; set; } = default!;
+}

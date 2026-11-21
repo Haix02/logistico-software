@@ -21,6 +21,7 @@ builder.Services.AddScoped(_ => new HttpClient
 });
 builder.Services.AddScoped<ShipmentsApi>();
 builder.Services.AddScoped<OperationsApi>();
+builder.Services.AddScoped<PlanningApi>();
 builder.Services.AddScoped<OpsState>();
 builder.Services.AddScoped<Confirmer>();
 builder.Services.AddScoped<MerchantsApi>();

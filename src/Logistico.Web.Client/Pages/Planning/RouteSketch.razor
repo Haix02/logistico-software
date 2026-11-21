@@ -1,0 +1,82 @@
+@* Courier runs drawn to scale around the hub (pure SVG, no map service): one colour per courier, stops in order.
+   A stop placed only by its governorate is drawn hollow: the plan is less sure where it is. East stays on the right
+   in both languages, as on any map. *@
+
+<svg class="lx-route-sketch" viewBox="0 0 @W @H" role="img" aria-label="@L["Plan_RoutesMap"]" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="@W" height="@H" rx="8" class="lx-route-ground" />
+    @for (var i = 0; i < Runs.Count; i++)
+    {
+        var run = Runs[i];
+        if (run.Stops.Count == 0)
+        {
+            continue;
+        }
+
+        var series = $"lx-route-{i % Series}";
+        var points = new List<(double X, double Y)> { Project(HubLatitude, HubLongitude) };
+        points.AddRange(run.Stops.OrderBy(s => s.Sequence).Select(s => Project(s.Latitude, s.Longitude)));
+        points.Add(Project(HubLatitude, HubLongitude));
+        <polyline points="@string.Join(' ', points.Select(p => $"{F(p.X)},{F(p.Y)}"))" class="@($"lx-route-line {series}")" />
+        @foreach (var stop in run.Stops)
+        {
+            var (x, y) = Project(stop.Latitude, stop.Longitude);
+            <circle cx="@F(x)" cy="@F(y)" r="5" class="@Bp.Cls("lx-route-stop", series, Bp.When(stop.Precision == StopPrecision.Governorate, "lx-route-stop-approx"))">
+                <title>@stop.Sequence · @stop.TrackingNumber · @(stop.Area ?? "") · @Fmt.Time(stop.ArriveAt)</title>
+            </circle>
+        }
+    }
+
+    @{
+        var (hx, hy) = Project(HubLatitude, HubLongitude);
+    }
+    <rect x="@F(hx - 8)" y="@F(hy - 8)" width="16" height="16" rx="3" class="lx-route-hub"><title>@Fmt.Hub(HubCode)</title></rect>
+</svg>
+
+<div class="lx-route-legend">
+    @for (var i = 0; i < Runs.Count; i++)
+    {
+        if (Runs[i].Stops.Count == 0)
+        {
+            continue;
+        }
+
+        <span class="lx-row" style="gap:6px"><span class="@($"lx-route-swatch lx-route-{i % Series}")"></span><Mixed Text="@Runs[i].Courier" /></span>
+    }
+    <span class="lx-row bp6-text-muted" style="gap:6px"><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4.5" class="lx-route-stop lx-route-stop-approx lx-route-0" /></svg> @L["Plan_ApproxPosition"]</span>
+</div>
+
+@code {
+    private const int W = 400;
+    private const int H = 300;
+    private const int Margin = 22;
+    private const int Series = 6;
+
+    [Parameter, EditorRequired] public IReadOnlyList<CourierRunView> Runs { get; set; } = [];
+    [Parameter] public string HubCode { get; set; } = "";
+    [Parameter] public double HubLatitude { get; set; }
+    [Parameter] public double HubLongitude { get; set; }
+
+    private double minLat, maxLat, minLon, maxLon, scale, offsetX, offsetY;
+
+    protected override void OnParametersSet()
+    {
+        var lats = Runs.SelectMany(r => r.Stops).Select(s => s.Latitude).Append(HubLatitude).ToList();
+        var lons = Runs.SelectMany(r => r.Stops).Select(s => s.Longitude).Append(HubLongitude).ToList();
+        (minLat, maxLat, minLon, maxLon) = (lats.Min(), lats.Max(), lons.Min(), lons.Max());
+
+        // Equirectangular around the middle latitude: a kilometre east is as long as a kilometre north.
+        var cos = Math.Cos((minLat + maxLat) / 2 * Math.PI / 180);
+        var spanX = Math.Max((maxLon - minLon) * cos, 0.005);
+        var spanY = Math.Max(maxLat - minLat, 0.005);
+        scale = Math.Min((W - 2 * Margin) / spanX, (H - 2 * Margin) / spanY);
+        offsetX = (W - spanX * scale) / 2;
+        offsetY = (H - spanY * scale) / 2;
+        this.cos = cos;
+    }
+
+    private double cos = 1;
+
+    private (double X, double Y) Project(double lat, double lon) => (offsetX + (lon - minLon) * cos * scale, H - offsetY - (lat - minLat) * scale);
+
+    private static string F(double v) => v.ToString("0.#", CultureInfo.InvariantCulture);
+}

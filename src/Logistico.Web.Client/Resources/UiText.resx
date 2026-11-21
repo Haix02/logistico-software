@@ -1520,4 +1520,213 @@
   <data name="Check_automation_Warning" xml:space="preserve"><value>Automation:Enabled is off: alerts and truck planning do not run.</value></data>
   <data name="Cash_StillShort" xml:space="preserve"><value>Also still short {0} from earlier hand-ins: count it in to pay it back.</value></data>
   <data name="Cash_RepayShortage" xml:space="preserve"><value>No new cash to hand in. Earlier hand-ins were short {0}: record what the courier pays back.</value></data>
+  <data name="Nav_Planning" xml:space="preserve"><value>Planning</value></data>
+  <data name="Plan_Subtitle" xml:space="preserve"><value>Mathematical plans for trucks, courier runs and zones: proven, checked and compared with today's practice before anything changes.</value></data>
+  <data name="Plan_TabTrucks" xml:space="preserve"><value>Trucks</value></data>
+  <data name="Plan_TabCouriers" xml:space="preserve"><value>Courier runs</value></data>
+  <data name="Plan_TabZones" xml:space="preserve"><value>Zones</value></data>
+  <data name="Plan_TabHistory" xml:space="preserve"><value>History</value></data>
+  <data name="Plan_TabSettings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Plan_TrucksTitle" xml:space="preserve"><value>Trucks between hubs</value></data>
+  <data name="Plan_TrucksHint" xml:space="preserve"><value>Which trucks leave when and what each carries, so every parcel reaches its customer's hub in time at the lowest cost.</value></data>
+  <data name="Plan_CouriersTitle" xml:space="preserve"><value>This morning's courier runs</value></data>
+  <data name="Plan_CouriersHint" xml:space="preserve"><value>Who takes which parcels and in what order, within each courier's time, load and cash limit.</value></data>
+  <data name="Plan_ZonesTitle" xml:space="preserve"><value>Courier zones</value></data>
+  <data name="Plan_ZonesHint" xml:space="preserve"><value>Areas grouped into compact zones with an even amount of work, from the hub's recent deliveries.</value></data>
+  <data name="Plan_Run" xml:space="preserve"><value>Make a plan</value></data>
+  <data name="Plan_ZoneCount" xml:space="preserve"><value>Zones</value></data>
+  <data name="Plan_ZoneCountAuto" xml:space="preserve"><value>auto</value></data>
+  <data name="Plan_Ready" xml:space="preserve"><value>The plan is ready and checked.</value></data>
+  <data name="Plan_NoPlanYet" xml:space="preserve"><value>No plan yet</value></data>
+  <data name="Plan_NoPlanYetHint" xml:space="preserve"><value>Make a plan: it is solved in seconds and changes nothing until you approve it.</value></data>
+  <data name="Plan_NoHistory" xml:space="preserve"><value>No plans made yet</value></data>
+  <data name="Plan_Optimal" xml:space="preserve"><value>Proven optimal</value></data>
+  <data name="Plan_OptimalHint" xml:space="preserve"><value>No plan can do better under these settings. Solved in {0} s.</value></data>
+  <data name="Plan_WithinGap" xml:space="preserve"><value>Within {0} of the best possible plan</value></data>
+  <data name="Plan_GapHint" xml:space="preserve"><value>The search time ({0} s) ended before the proof was complete; the gap is the most this plan can be from the best one.</value></data>
+  <data name="Plan_BestFound" xml:space="preserve"><value>Best runs found</value></data>
+  <data name="Plan_SearchHint" xml:space="preserve"><value>Found in {0} s of search: Clarke–Wright savings first, then guided local search.</value></data>
+  <data name="Plan_NothingToPlan" xml:space="preserve"><value>Nothing to plan</value></data>
+  <data name="Plan_NothingHint" xml:space="preserve"><value>No parcels are waiting for this planner right now.</value></data>
+  <data name="Plan_Infeasible" xml:space="preserve"><value>No plan meets the rules</value></data>
+  <data name="Plan_NoSolution" xml:space="preserve"><value>No plan within the search time</value></data>
+  <data name="Plan_FailedHint" xml:space="preserve"><value>Check the settings (limits, couriers, departure times) or allow more search time.</value></data>
+  <data name="Plan_Checked" xml:space="preserve"><value>Checked: no problems</value></data>
+  <data name="Plan_ViolationsN" xml:space="preserve"><value>{0} problems found</value></data>
+  <data name="Plan_ViolationsTitle" xml:space="preserve"><value>The checker refused this plan</value></data>
+  <data name="Plan_MadeBy" xml:space="preserve"><value>Made {0} by {1}</value></data>
+  <data name="Plan_AppliedBy" xml:space="preserve"><value>approved {0} by {1}</value></data>
+  <data name="Plan_DiscardedBy" xml:space="preserve"><value>put aside {0} by {1}</value></data>
+  <data name="Plan_Discard" xml:space="preserve"><value>Put aside</value></data>
+  <data name="Plan_ApplyTrucks" xml:space="preserve"><value>Approve: load the next trucks</value></data>
+  <data name="Plan_ApplyRuns" xml:space="preserve"><value>Approve: hand out the runs</value></data>
+  <data name="Plan_ApplyZones" xml:space="preserve"><value>Approve as the hub's zones</value></data>
+  <data name="PlanStatus_Ready" xml:space="preserve"><value>Waiting for approval</value></data>
+  <data name="PlanStatus_Applied" xml:space="preserve"><value>Approved</value></data>
+  <data name="PlanStatus_Discarded" xml:space="preserve"><value>Put aside</value></data>
+  <data name="Plan_ConfirmTitle" xml:space="preserve"><value>Approve this plan?</value></data>
+  <data name="Plan_Confirm_Trucks" xml:space="preserve"><value>The next truck of each lane gets the planned parcels on its manifest. Parcels that moved since the plan was made are skipped.</value></data>
+  <data name="Plan_Confirm_CourierRuns" xml:space="preserve"><value>Each courier is handed their parcels now, in the planned order, and the customers are told. Parcels that moved since the plan was made are skipped.</value></data>
+  <data name="Plan_Confirm_Zones" xml:space="preserve"><value>These zones become the hub's current zones.</value></data>
+  <data name="Plan_ConfirmYes" xml:space="preserve"><value>Approve</value></data>
+  <data name="Plan_AppliedN" xml:space="preserve"><value>Plan applied to {0} parcels.</value></data>
+  <data name="Plan_AppliedSkipped" xml:space="preserve"><value>Plan applied to {0} parcels; {1} skipped because they moved since it was made.</value></data>
+  <data name="Plan_Kpi_Trucks" xml:space="preserve"><value>Trucks</value></data>
+  <data name="Plan_Kpi_Cost" xml:space="preserve"><value>Line-haul cost</value></data>
+  <data name="Plan_Kpi_TruckKm" xml:space="preserve"><value>Truck kilometres</value></data>
+  <data name="Plan_Kpi_OnTime" xml:space="preserve"><value>On time</value></data>
+  <data name="Plan_Kpi_Waiting" xml:space="preserve"><value>Wait for the next plan</value></data>
+  <data name="Plan_VsToday" xml:space="preserve"><value>Today's practice: {0}</value></data>
+  <data name="Plan_VsTodayDelta" xml:space="preserve"><value>Today's practice: {0} ({1})</value></data>
+  <data name="Plan_TodayOnTime" xml:space="preserve"><value>Today's practice: {0} on time</value></data>
+  <data name="Plan_WaitingHint" xml:space="preserve"><value>No room in the trucks of the planning days</value></data>
+  <data name="Plan_NoTrucks" xml:space="preserve"><value>No trucks needed</value></data>
+  <data name="Plan_NoTrucksHint" xml:space="preserve"><value>No parcel is waiting at a hub to travel to another hub.</value></data>
+  <data name="Plan_Departures" xml:space="preserve"><value>Departures</value></data>
+  <data name="Plan_TruckSize" xml:space="preserve"><value>Truck: {0} kg · {1} m³</value></data>
+  <data name="Plan_Col_Leaves" xml:space="preserve"><value>Leaves</value></data>
+  <data name="Plan_Col_Lane" xml:space="preserve"><value>Lane</value></data>
+  <data name="Plan_Col_Trucks" xml:space="preserve"><value>Trucks</value></data>
+  <data name="Plan_Col_Fill" xml:space="preserve"><value>How full</value></data>
+  <data name="Plan_Col_Parcels" xml:space="preserve"><value>Parcels</value></data>
+  <data name="Plan_Col_Cost" xml:space="preserve"><value>Cost</value></data>
+  <data name="Plan_Col_Weight" xml:space="preserve"><value>By weight</value></data>
+  <data name="Plan_Col_Volume" xml:space="preserve"><value>By volume</value></data>
+  <data name="Plan_Weight" xml:space="preserve"><value>Weight</value></data>
+  <data name="Plan_Volume" xml:space="preserve"><value>Volume</value></data>
+  <data name="Plan_LoadsOnApproval" xml:space="preserve"><value>Loads on approval</value></data>
+  <data name="Plan_ArrivesKm" xml:space="preserve"><value>arrives {0} · {1} km</value></data>
+  <data name="Plan_LateN" xml:space="preserve"><value>{0} late</value></data>
+  <data name="Plan_LanesMap" xml:space="preserve"><value>Lanes in this plan</value></data>
+  <data name="Plan_LanesMapHint" xml:space="preserve"><value>Lines grow with the parcels on them; red means a parcel on that lane will be late.</value></data>
+  <data name="Plan_Attention" xml:space="preserve"><value>Parcels to watch</value></data>
+  <data name="Plan_AttentionHint" xml:space="preserve"><value>Late even in the best plan, or waiting for the next one.</value></data>
+  <data name="Plan_Col_DueAtHub" xml:space="preserve"><value>Due at the hub</value></data>
+  <data name="Plan_Col_Outcome" xml:space="preserve"><value>In this plan</value></data>
+  <data name="Plan_LateBy" xml:space="preserve"><value>{0} h late</value></data>
+  <data name="Plan_WaitsNextPlan" xml:space="preserve"><value>Waits for the next plan</value></data>
+  <data name="Plan_EstimatedVolumesN" xml:space="preserve"><value>{0} parcels had no volume: estimated from their weight.</value></data>
+  <data name="Plan_Kpi_Stops" xml:space="preserve"><value>Parcels on runs</value></data>
+  <data name="Plan_TodayStops" xml:space="preserve"><value>Today's practice: {0}</value></data>
+  <data name="Plan_Kpi_Km" xml:space="preserve"><value>Driving</value></data>
+  <data name="Plan_Kpi_Longest" xml:space="preserve"><value>Longest run</value></data>
+  <data name="Plan_Kpi_Couriers" xml:space="preserve"><value>Couriers out</value></data>
+  <data name="Plan_Spread" xml:space="preserve"><value>Stops per courier differ by at most {0}</value></data>
+  <data name="Plan_Kpi_MustGoLeft" xml:space="preserve"><value>Due today, left at the hub</value></data>
+  <data name="Plan_MustGoHint" xml:space="preserve"><value>Only when no courier can take them</value></data>
+  <data name="Plan_PrecisionTitle" xml:space="preserve"><value>Some addresses are known only by governorate</value></data>
+  <data name="Plan_PrecisionText" xml:space="preserve"><value>Placed by the GPS of earlier deliveries: {0}; by their area: {1}; only by governorate: {2}. Runs get sharper as couriers deliver with the app.</value></data>
+  <data name="Plan_NoStops" xml:space="preserve"><value>No parcels to take out</value></data>
+  <data name="Plan_NoStopsHint" xml:space="preserve"><value>No parcel for this hub's customers is waiting on its shelves.</value></data>
+  <data name="Plan_RunSummary" xml:space="preserve"><value>Stops {0} of {1} · {2} km</value></data>
+  <data name="Plan_Time" xml:space="preserve"><value>Time</value></data>
+  <data name="Plan_Cash" xml:space="preserve"><value>Cash</value></data>
+  <data name="Plan_RoutesMap" xml:space="preserve"><value>Runs around the hub</value></data>
+  <data name="Plan_StartsAt" xml:space="preserve"><value>Runs start {0}</value></data>
+  <data name="Plan_ApproxPosition" xml:space="preserve"><value>Known only by governorate</value></data>
+  <data name="Plan_Deferred" xml:space="preserve"><value>Stays at the hub</value></data>
+  <data name="Plan_DeferredHint" xml:space="preserve"><value>What keeps each parcel off today's runs.</value></data>
+  <data name="Plan_Col_Due" xml:space="preserve"><value>Due</value></data>
+  <data name="Plan_Col_Reason" xml:space="preserve"><value>Why</value></data>
+  <data name="Plan_DueToday" xml:space="preserve"><value>Due today</value></data>
+  <data name="Plan_DueLater" xml:space="preserve"><value>Due later</value></data>
+  <data name="Defer_NoCourier" xml:space="preserve"><value>No courier works for this hub</value></data>
+  <data name="Defer_Stops" xml:space="preserve"><value>Every courier has their most stops</value></data>
+  <data name="Defer_Weight" xml:space="preserve"><value>Too heavy for the couriers' vehicles</value></data>
+  <data name="Defer_Cash" xml:space="preserve"><value>Its cash would pass a courier's safety limit</value></data>
+  <data name="Defer_Time" xml:space="preserve"><value>Does not fit in the working day</value></data>
+  <data name="Defer_NotNeededToday" xml:space="preserve"><value>Not due today, and the detour is not worth it</value></data>
+  <data name="StopPrecision_Gps" xml:space="preserve"><value>Placed by the GPS of an earlier delivery</value></data>
+  <data name="StopPrecision_Area" xml:space="preserve"><value>Placed in the middle of its area</value></data>
+  <data name="StopPrecision_Governorate" xml:space="preserve"><value>Only the governorate is known</value></data>
+  <data name="StopPrecisionShort_Gps" xml:space="preserve"><value>GPS</value></data>
+  <data name="StopPrecisionShort_Area" xml:space="preserve"><value>area</value></data>
+  <data name="StopPrecisionShort_Governorate" xml:space="preserve"><value>approx.</value></data>
+  <data name="Plan_Kpi_Zones" xml:space="preserve"><value>Zones</value></data>
+  <data name="Plan_CouriersAtHub" xml:space="preserve"><value>Couriers at this hub: {0}</value></data>
+  <data name="Plan_Kpi_Deliveries" xml:space="preserve"><value>Deliveries counted</value></data>
+  <data name="Plan_InDays" xml:space="preserve"><value>Over the last {0} days</value></data>
+  <data name="Plan_Kpi_Balance" xml:space="preserve"><value>Largest imbalance</value></data>
+  <data name="Plan_BalanceAsked" xml:space="preserve"><value>Asked: within ±{0}</value></data>
+  <data name="Plan_ToleranceWidened" xml:space="preserve"><value>One area alone is more work than a zone may carry at ±{0}, so the balance was widened to ±{1}.</value></data>
+  <data name="Plan_NoZones" xml:space="preserve"><value>No deliveries to group</value></data>
+  <data name="Plan_NoZonesHint" xml:space="preserve"><value>Zones are made from the parcels this hub delivered in the last weeks.</value></data>
+  <data name="Plan_ZoneN" xml:space="preserve"><value>Zone {0}</value></data>
+  <data name="Plan_PerWeek" xml:space="preserve"><value>Deliveries a week: {0}</value></data>
+  <data name="Plan_OfAverage" xml:space="preserve"><value>Of the average</value></data>
+  <data name="Plan_ZoneKm" xml:space="preserve"><value>Average distance to the zone's centre: {0} km</value></data>
+  <data name="Plan_Centre" xml:space="preserve"><value>centre</value></data>
+  <data name="Plan_Col_Made" xml:space="preserve"><value>Made</value></data>
+  <data name="Plan_Col_Planner" xml:space="preserve"><value>Planner</value></data>
+  <data name="Plan_Col_Proof" xml:space="preserve"><value>Proof</value></data>
+  <data name="Plan_Col_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Plan_Col_By" xml:space="preserve"><value>By</value></data>
+  <data name="PlanKind_Trucks" xml:space="preserve"><value>Trucks</value></data>
+  <data name="PlanKind_CourierRuns" xml:space="preserve"><value>Courier runs</value></data>
+  <data name="PlanKind_Zones" xml:space="preserve"><value>Zones</value></data>
+  <data name="PlanQuality_Empty" xml:space="preserve"><value>Nothing to plan</value></data>
+  <data name="PlanQuality_Optimal" xml:space="preserve"><value>Proven optimal</value></data>
+  <data name="PlanQuality_Feasible" xml:space="preserve"><value>Valid</value></data>
+  <data name="PlanQuality_Infeasible" xml:space="preserve"><value>Impossible</value></data>
+  <data name="PlanQuality_NoSolution" xml:space="preserve"><value>Not found</value></data>
+  <data name="Plan_Set_Trucks" xml:space="preserve"><value>Trucks between hubs</value></data>
+  <data name="Plan_Set_CapacityKg" xml:space="preserve"><value>Truck capacity (weight)</value></data>
+  <data name="Plan_Set_CapacityKgHint" xml:space="preserve"><value>What one line-haul truck may carry.</value></data>
+  <data name="Plan_Set_CapacityM3" xml:space="preserve"><value>Truck capacity (volume)</value></data>
+  <data name="Plan_Set_CapacityM3Hint" xml:space="preserve"><value>Cargo space in cubic metres.</value></data>
+  <data name="Plan_Set_TripCost" xml:space="preserve"><value>Cost of a trip</value></data>
+  <data name="Plan_Set_TripCostHint" xml:space="preserve"><value>Driver and fixed costs of one departure.</value></data>
+  <data name="Plan_Set_KmCost" xml:space="preserve"><value>Cost per kilometre</value></data>
+  <data name="Plan_Set_KmCostHint" xml:space="preserve"><value>Fuel and wear.</value></data>
+  <data name="Plan_Set_Departures" xml:space="preserve"><value>Departure times</value></data>
+  <data name="Plan_Set_DeparturesHint" xml:space="preserve"><value>Every day, Baghdad time, separated by commas (06:00, 14:00, 22:00).</value></data>
+  <data name="Plan_Set_Days" xml:space="preserve"><value>Days ahead</value></data>
+  <data name="Plan_Set_DaysHint" xml:space="preserve"><value>How far ahead the truck plan looks.</value></data>
+  <data name="Plan_Set_MaxTrucks" xml:space="preserve"><value>Trucks per departure</value></data>
+  <data name="Plan_Set_MaxTrucksHint" xml:space="preserve"><value>Most trucks one lane can send at once.</value></data>
+  <data name="Plan_Set_HubTrucks" xml:space="preserve"><value>Trucks a hub has</value></data>
+  <data name="Plan_Set_HubTrucksHint" xml:space="preserve"><value>At one departure time, over all lanes (0 = as many as needed).</value></data>
+  <data name="Plan_Set_Cutoff" xml:space="preserve"><value>Reach the customer's hub by</value></data>
+  <data name="Plan_Set_CutoffHint" xml:space="preserve"><value>On the promised day, before couriers leave.</value></data>
+  <data name="Plan_Set_Couriers" xml:space="preserve"><value>Couriers</value></data>
+  <data name="Plan_Set_MotoStops" xml:space="preserve"><value>Stops by motorcycle</value></data>
+  <data name="Plan_Set_MotoStopsHint" xml:space="preserve"><value>Most parcels on one motorcycle run.</value></data>
+  <data name="Plan_Set_MotoKg" xml:space="preserve"><value>Motorcycle load</value></data>
+  <data name="Plan_Set_VanStops" xml:space="preserve"><value>Stops by van</value></data>
+  <data name="Plan_Set_VanStopsHint" xml:space="preserve"><value>Vans and small trucks used by couriers.</value></data>
+  <data name="Plan_Set_VanKg" xml:space="preserve"><value>Van load</value></data>
+  <data name="Plan_Set_Cash" xml:space="preserve"><value>Cash a courier may carry</value></data>
+  <data name="Plan_Set_CashHint" xml:space="preserve"><value>Safety limit for the cash collected on one run.</value></data>
+  <data name="Plan_Set_Shift" xml:space="preserve"><value>Working time</value></data>
+  <data name="Plan_Set_ShiftHint" xml:space="preserve"><value>From leaving the hub to handing the cash in.</value></data>
+  <data name="Plan_Set_PerStop" xml:space="preserve"><value>Minutes at each door</value></data>
+  <data name="Plan_Set_PerStopHint" xml:space="preserve"><value>Calling, handing over, collecting the cash.</value></data>
+  <data name="Plan_Set_RunStart" xml:space="preserve"><value>Runs start at</value></data>
+  <data name="Plan_Set_RunStartHint" xml:space="preserve"><value>Baghdad time.</value></data>
+  <data name="Plan_Set_Speed" xml:space="preserve"><value>Speed in the city</value></data>
+  <data name="Plan_Set_SpeedHint" xml:space="preserve"><value>Average, with traffic.</value></data>
+  <data name="Plan_Set_RoadFactor" xml:space="preserve"><value>Road factor</value></data>
+  <data name="Plan_Set_RoadFactorHint" xml:space="preserve"><value>How much longer streets are than the straight line.</value></data>
+  <data name="Plan_Set_Zones" xml:space="preserve"><value>Zones</value></data>
+  <data name="Plan_Set_Balance" xml:space="preserve"><value>Balance</value></data>
+  <data name="Plan_Set_BalanceHint" xml:space="preserve"><value>Each zone's work within this much of the average.</value></data>
+  <data name="Plan_Set_History" xml:space="preserve"><value>History used</value></data>
+  <data name="Plan_Set_HistoryHint" xml:space="preserve"><value>Deliveries of the last days that zones are made from.</value></data>
+  <data name="Plan_Set_Search" xml:space="preserve"><value>Search</value></data>
+  <data name="Plan_Set_TimeLimit" xml:space="preserve"><value>Search time</value></data>
+  <data name="Plan_Set_TimeLimitHint" xml:space="preserve"><value>More time can find better courier runs; truck plans usually prove optimal much sooner.</value></data>
+  <data name="Plan_Set_Save" xml:space="preserve"><value>Save settings</value></data>
+  <data name="Plan_Set_Saved" xml:space="preserve"><value>Planning settings saved.</value></data>
+  <data name="Unit_Iqd" xml:space="preserve"><value>IQD</value></data>
+  <data name="Unit_Kg" xml:space="preserve"><value>kg</value></data>
+  <data name="Unit_Km" xml:space="preserve"><value>km</value></data>
+  <data name="Unit_Kmh" xml:space="preserve"><value>km/h</value></data>
+  <data name="Unit_Minutes" xml:space="preserve"><value>min</value></data>
+  <data name="Unit_Seconds" xml:space="preserve"><value>s</value></data>
+  <data name="Plan_ViolationsN_One" xml:space="preserve"><value>1 problem found</value></data>
+  <data name="Plan_LateN_One" xml:space="preserve"><value>1 late</value></data>
+  <data name="Plan_EstimatedVolumesN_One" xml:space="preserve"><value>1 parcel had no volume: estimated from its weight.</value></data>
+  <data name="Plan_AppliedN_One" xml:space="preserve"><value>Plan applied to 1 parcel.</value></data>
+  <data name="Plan_NoPositions" xml:space="preserve"><value>Positions not known yet</value></data>
+  <data name="Plan_NoPositionsHint" xml:space="preserve"><value>The map of the runs appears once couriers deliver with the app (GPS at the door) or customers have earlier deliveries.</value></data>
 </root>

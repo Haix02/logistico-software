@@ -22,6 +22,7 @@
   <data name="Validation_MaxLength" xml:space="preserve"><value>الحد الأقصى {1} حرفاً.</value></data>
   <data name="Validation_Merchant" xml:space="preserve"><value>اختر المتجر الذي يحجز هذا الحساب طلباته.</value></data>
   <data name="Validation_NoFriday" xml:space="preserve"><value>لا يوجد توصيل يوم الجمعة. يرجى اختيار يوم آخر.</value></data>
+  <data name="Validation_TimeList" xml:space="preserve"><value>أدخل الأوقات بصيغة HH:mm (مثل 06:00)، وكل وقت مرة واحدة.</value></data>
   <data name="Validation_Phone" xml:space="preserve"><value>يجب أن يحتوي رقم الهاتف على 7 إلى 20 رقماً، ويمكن أن يبدأ بـ +.</value></data>
   <data name="Validation_PhoneLast4" xml:space="preserve"><value>أدخل آخر 4 أرقام من رقم الموبايل المسجّل في الطلب.</value></data>
   <data name="Validation_Range" xml:space="preserve"><value>أدخل قيمة بين {1} و {2}.</value></data>

@@ -154,11 +154,7 @@ internal static class TransferEndpoints
         await MutateAsync(id, http, db, async transfer => await planner.DepartAsync(transfer, request, user.UserName(), ct), ct);
 
     private static async Task<IResult> CloseAsync(Guid id, CloseTransferRequest request, HttpRequest http, ClaimsPrincipal user, ShipmentsDbContext db, TransferPlanner planner, CancellationToken ct) =>
-        await MutateAsync(id, http, db, transfer =>
-        {
-            planner.Close(transfer, request.Notes, user.UserName());
-            return Task.CompletedTask;
-        }, ct);
+        await MutateAsync(id, http, db, transfer => planner.CloseAsync(transfer, request.Notes, user.UserName(), ct), ct);
 
     private static async Task<IResult> MutateAsync(Guid id, HttpRequest http, ShipmentsDbContext db, Func<HubTransfer, Task> change, CancellationToken ct)
     {

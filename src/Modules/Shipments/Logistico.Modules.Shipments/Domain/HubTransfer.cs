@@ -103,6 +103,8 @@ internal sealed class HubTransfer
     /// <summary>Scan while loading: confirms the parcel is physically on the truck.</summary>
     public TransferItem Load(Shipment shipment, DateTimeOffset now)
     {
+        // A truck that has left cannot take a parcel on, even one already on its manifest.
+        EnsureLoading();
         var item = _items.FirstOrDefault(i => i.ShipmentId == shipment.Id) ?? Plan(shipment, now);
         item.MarkLoaded(now);
         ManifestRevision++;

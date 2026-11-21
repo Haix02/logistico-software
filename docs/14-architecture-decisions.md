@@ -279,3 +279,21 @@ to keep, no more information needed); stored completion flags (drift from the da
 (containers make the log easier to reach than a file).
 **Consequences.** The setup code changes at each start unless `Setup:Code` is set. `Seed:AdminEmail` remains for
 unattended installs. New modules join the guide and the health page by registering the two interfaces.
+
+### ADR-034: Planning with operations research on Google OR-Tools, behind our own planners and checker — Accepted (21 Nov 2026)
+**Context.** Trucks between hubs were filled by a simple rule (the lane's loading truck), courier runs were put
+together by hand, and nobody could say whether a plan was good. Companies asked for the lowest cost and time, with
+reasons they can trust.
+**Decision.** A pure library, `Logistico.Optimization` (no database, no web code, no module reference), holds the
+models and solves them on **Google OR-Tools** (Apache-2.0): line-haul as service network design on CP-SAT in three
+lexicographic stages (lateness, then cost, then earliness); courier runs as a capacitated routing problem with a
+cash-carried limit (savings, then guided local search); zones as a balanced p-median. An **independent checker**
+recomputes every rule for every plan, and a **baseline** of today's practice is computed beside it. The Shipments
+module builds the problems from live data, keeps each run (inputs' hash, settings, proof and plan), and applies an
+approved plan through the existing domain methods and scans. Road times are great-circle × a road factor; OSRM
+comes later. The browser and every contract are kept off the native solver by an architecture test.
+**Alternatives.** Our own C# solvers (no native code, but much more to build and to prove); a commercial solver (a
+licence); heuristics without a bound (no way to say "optimal").
+**Consequences.** Native OR-Tools runtimes are published per platform (the Docker image takes its own architecture
+only). Plans change nothing until approved, and those older than six hours cannot be approved. Accuracy is tested:
+brute-force optimality on small instances, limits and determinism, and the browser QA suite runs every planner.

@@ -8,6 +8,7 @@ WORKDIR /src
 # Restore first so package downloads are cached between source changes.
 COPY global.json Directory.Build.props Directory.Packages.props .editorconfig ./
 COPY src/Logistico.SharedKernel/Logistico.SharedKernel.csproj src/Logistico.SharedKernel/
+COPY src/Logistico.Optimization/Logistico.Optimization.csproj src/Logistico.Optimization/
 COPY src/Logistico.Web/Logistico.Web.csproj src/Logistico.Web/
 COPY src/Logistico.Web.Client/Logistico.Web.Client.csproj src/Logistico.Web.Client/
 COPY src/Modules/Merchants/Logistico.Modules.Merchants/Logistico.Modules.Merchants.csproj src/Modules/Merchants/Logistico.Modules.Merchants/
@@ -21,7 +22,10 @@ RUN dotnet restore src/Logistico.Web/Logistico.Web.csproj
 COPY src/ src/
 # Publish restores again on purpose: the Web SDK adds the package that serves _framework/blazor.web.js only when it
 # sees the .razor files, which the csproj-only restore above cannot. Packages are already cached, so this is quick.
-RUN dotnet publish src/Logistico.Web/Logistico.Web.csproj -c Release -o /app \
+# Published for the image's own architecture, so only that platform's native solver library (OR-Tools) is copied.
+ARG TARGETARCH
+RUN case "$TARGETARCH" in arm64) rid=linux-arm64 ;; *) rid=linux-x64 ;; esac \
+    && dotnet publish src/Logistico.Web/Logistico.Web.csproj -c Release -r "$rid" --self-contained false -o /app \
     && mkdir -p /keys
 
 # Small, shell-less Ubuntu runtime with ICU (Arabic culture) and time-zone data; runs as the non-root "app" user.
