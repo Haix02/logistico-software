@@ -89,11 +89,14 @@ public abstract class RequestFields : IValidatableObject
             case RequestType.Reschedule:
                 var clock = validationContext.GetService(typeof(TimeProvider)) as TimeProvider ?? TimeProvider.System;
                 var today = DeliveryPromise.BaghdadDate(clock.GetUtcNow());
-                if (PreferredDate is null || PreferredDate.Value.Date < today || PreferredDate.Value.Date > today.AddDays(14))
+
+                // The day the customer picked, in Baghdad: a date picker sends local midnight (+03:00), which is the evening
+                // before in UTC, so the UTC date would refuse "today" and let day 15 through.
+                if (PreferredDate is not { } picked || DeliveryPromise.BaghdadDate(picked) is var day && (day < today || day > today.AddDays(14)))
                 {
                     yield return new(ValidationText.DateWindow, [nameof(PreferredDate)]);
                 }
-                else if (DeliveryPromise.IsFriday(PreferredDate.Value))
+                else if (DeliveryPromise.IsFriday(picked))
                 {
                     yield return new(ValidationText.NoFriday, [nameof(PreferredDate)]);
                 }

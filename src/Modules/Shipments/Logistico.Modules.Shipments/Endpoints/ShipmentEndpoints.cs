@@ -53,7 +53,7 @@ internal static class ShipmentEndpoints
             .WithSummary("Books a batch of domestic delivery orders for a seller in a single atomic transaction.")
             .RequireAuthorization(StaffPolicies.Operate);
         shipments.MapPost("/{id:guid}/events", RecordEventAsync)
-            .WithSummary("Records a milestone by hand. Failed attempts apply the automation rules. Requires If-Match with the current ETag.")
+            .WithSummary("Records a milestone by hand. Failed attempts apply the automation rules. Truck, return hand-over and customs steps are refused (they have their own workflows). Requires If-Match with the current ETag.")
             .RequireAuthorization(StaffPolicies.Operate);
         shipments.MapPost("/{id:guid}/return", StartReturnAsync)
             .WithSummary("Starts returning the parcel to the seller (it travels back to the seller's hub). Requires If-Match.")
@@ -333,8 +333,9 @@ internal static class ShipmentEndpoints
         {
             var now = clock.GetUtcNow();
             var actor = new Actor(user.UserName());
-            var policy = await policies.GetAsync(shipment.TenantId, ct);
             var status = request.Status!.Value;
+            shipment.EnsureRecordableByHand(status);
+            var policy = await policies.GetAsync(shipment.TenantId, ct);
             var network = await hubs.NetworkAsync(shipment.TenantId, ct);
             var hub = network.Find(request.Location);
             if (!string.IsNullOrWhiteSpace(request.Location)

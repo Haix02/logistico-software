@@ -142,6 +142,8 @@
   <data name="Problem_shipment.not_found" xml:space="preserve"><value>Shipment not found</value></data>
   <data name="Problem_shipment.not_in_warehouse" xml:space="preserve"><value>This parcel is not in the warehouse.</value></data>
   <data name="Problem_shipment.return_not_at_hub" xml:space="preserve"><value>Only returns waiting at the hub can be handed over.</value></data>
+  <data name="Problem_shipment.step_by_workflow" xml:space="preserve"><value>'{0}' is not recorded by hand: scan the parcel at the hub, or use the truck manifest, the returns desk or the customs screen.</value></data>
+  <data name="Problem_shipment.cod_already_settled" xml:space="preserve"><value>The cash of parcel {0} is already in a seller payout.</value></data>
   <data name="Problem_shipment.same_origin_destination" xml:space="preserve"><value>Origin and destination must differ.</value></data>
   <data name="Problem_shipment.stale" xml:space="preserve"><value>The shipment was changed by someone else</value></data>
   <data name="Problem_shipment.stale_detail" xml:space="preserve"><value>Reload the shipment and try again.</value></data>

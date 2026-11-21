@@ -13,6 +13,12 @@ versions follow [Semantic Versioning](https://semver.org/).
 - **Finance can take cash at the cash desk** (new `cash` policy: administrators, operations, finance). The dialog shows any shortage the courier still owes and records its repayment explicitly, capped at what is owed. Only the parcels on the screen are handed in: one the courier delivered meanwhile waits for the next count instead of being added silently.
 
 ### Fixed
+- **Order steps that belong to a workflow can no longer be typed on the details page.** The API accepted any allowed status, so a parcel could be marked returned with no signed manifest and no return fee, sent "between hubs" without a truck, shelved by hand while its truck manifest still showed it on board (and later counted missing), or released from customs without the mandatory CoO and invoice e-verification. These steps now come only from scans, trucks, the returns desk and the customs workbench, and the server enforces the same list the browser shows.
+- **A return taken away from the seller's hub** (scanned in at another hub) goes back to "return started" and gets a truck back, instead of staying "waiting at the seller's hub" where it could be handed over at the wrong hub.
+- **A cancelled order stops asking the customer to confirm it.** The tracking page kept the prompt, and a late "yes" marked the cancelled order confirmed.
+- **Picking today's date** for a new delivery day is accepted, and day 15 is refused. The window compared a UTC date with today in Baghdad.
+- **A new governorate moves the ETA** to the new lane's estimate (never earlier, and a date agreed with the customer stays), so an order moved from Baghdad to Basra is not flagged late on its first day.
+- **The same parcel cannot be paid out to a seller twice**, and a load scan can no longer put a parcel back on a truck that has left.
 - **Baghdad on the network map can be selected.** Its hub marker sat on the governorate, so the click opened the hub instead. The marker is shifted off the shape; truck lines still meet at the real hub.
 - **The dashboard "right now" strip no longer clips its last figure** when the sidebar is open. The chips scroll inside the strip.
 - **A known phone shows the governorate** next to the saved address, so a Basra address is not applied as if it were Baghdad.

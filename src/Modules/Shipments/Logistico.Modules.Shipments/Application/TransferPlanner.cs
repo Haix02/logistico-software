@@ -121,12 +121,12 @@ internal sealed class TransferPlanner(ShipmentsDbContext db, NumberGenerator num
     }
 
     /// <summary>Closes the manifest at the destination hub; parcels not scanned off the truck are flagged missing.</summary>
-    public IReadOnlyList<TransferItem> Close(HubTransfer transfer, string? notes, string? by)
+    public async Task<IReadOnlyList<TransferItem>> CloseAsync(HubTransfer transfer, string? notes, string? by, CancellationToken ct)
     {
         var now = clock.GetUtcNow();
         var missing = transfer.Close(notes, by, now);
         var ids = missing.Select(i => i.ShipmentId).ToList();
-        var parcels = db.Shipments.Where(s => ids.Contains(s.Id)).ToList();
+        var parcels = await db.Shipments.Where(s => ids.Contains(s.Id)).ToListAsync(ct);
         foreach (var item in missing)
         {
             db.Alerts.Add(OpsAlert.ForTransfer(transfer, AlertKind.MissingInTransfer, AlertSeverity.Critical, null, transfer.Number, now, item.ShipmentId, item.TrackingNumber));

@@ -29,7 +29,7 @@ public static class ShipmentLifecycle
         [ShipmentStatus.Delivered] = [ShipmentStatus.ReturnInitiated],
         [ShipmentStatus.ReturnInitiated] = [ShipmentStatus.ReturnInTransit, ShipmentStatus.ReturnAtHub, ShipmentStatus.Returned],
         [ShipmentStatus.ReturnInTransit] = [ShipmentStatus.ReturnAtHub, ShipmentStatus.ReturnInitiated],
-        [ShipmentStatus.ReturnAtHub] = [ShipmentStatus.Returned, ShipmentStatus.ReturnInTransit],
+        [ShipmentStatus.ReturnAtHub] = [ShipmentStatus.Returned, ShipmentStatus.ReturnInTransit, ShipmentStatus.ReturnInitiated],
         [ShipmentStatus.Returned] = [],
         [ShipmentStatus.Cancelled] = [],
     };
@@ -47,10 +47,23 @@ public static class ShipmentLifecycle
         [ShipmentStatus.Delivered] = [ShipmentStatus.ReturnInitiated],
         [ShipmentStatus.ReturnInitiated] = [ShipmentStatus.ReturnInTransit, ShipmentStatus.ReturnAtHub, ShipmentStatus.Returned],
         [ShipmentStatus.ReturnInTransit] = [ShipmentStatus.ReturnAtHub, ShipmentStatus.ReturnInitiated],
-        [ShipmentStatus.ReturnAtHub] = [ShipmentStatus.Returned, ShipmentStatus.ReturnInTransit],
+
+        // Back to ReturnInitiated when a return waiting at the seller's hub is scanned in at another hub: it needs a truck back.
+        [ShipmentStatus.ReturnAtHub] = [ShipmentStatus.Returned, ShipmentStatus.ReturnInTransit, ShipmentStatus.ReturnInitiated],
         [ShipmentStatus.Returned] = [],
         [ShipmentStatus.Cancelled] = [],
     };
+
+    /// <summary>
+    /// Statuses only a workflow may set, never a person on the details page: truck departures and arrivals (they keep
+    /// the manifest right), the return hand-over (signed manifest and return fee) and customs (the declaration
+    /// workbench, which refuses a release without the mandatory e-verification).
+    /// </summary>
+    public static readonly ShipmentStatus[] WorkflowStatuses =
+    [
+        ShipmentStatus.InTransitToHub, ShipmentStatus.ReturnInTransit, ShipmentStatus.ReturnAtHub, ShipmentStatus.Returned,
+        ShipmentStatus.CustomsPending, ShipmentStatus.CustomsHold, ShipmentStatus.Released,
+    ];
 
     /// <summary>Statuses in which a parcel sits on a hub shelf on its way to the customer.</summary>
     public static readonly ShipmentStatus[] WarehouseStatuses =
@@ -106,11 +119,18 @@ public static class ShipmentLifecycle
 
     /// <summary>
     /// Steps a person may record by hand on the details page. Steps that belong to a scan or a workflow
-    /// (line-haul departure/arrival, return hand-over) are done from the warehouse station, transfers or returns.
+    /// (<see cref="WorkflowStatuses"/>) are done from the warehouse station, transfers, returns or customs. A parcel
+    /// comes off a truck by a scan at the hub (it completes its manifest line), and a return is started only once.
+    /// The server enforces this list, not only the browser.
     /// </summary>
     public static IReadOnlyList<ShipmentStatus> ManualNext(ServiceType service, ShipmentStatus current) =>
         AllowedNext(service, current)
-            .Where(s => s is not (ShipmentStatus.InTransitToHub or ShipmentStatus.ReturnInTransit or ShipmentStatus.ReturnAtHub or ShipmentStatus.Returned))
+            .Where(s => !WorkflowStatuses.Contains(s))
             .Where(s => !(IsOnLineHaul(current) && IsInWarehouse(s)))
+            .Where(s => !(IsReturning(current) && s == ShipmentStatus.ReturnInitiated))
             .ToList();
+
+    /// <summary>Whether a person may record <paramref name="to"/> by hand from <paramref name="from"/> (see <see cref="ManualNext"/>).</summary>
+    public static bool CanRecordByHand(ServiceType service, ShipmentStatus from, ShipmentStatus to) =>
+        ManualNext(service, from).Contains(to);
 }

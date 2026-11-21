@@ -142,6 +142,8 @@
   <data name="Problem_shipment.not_found" xml:space="preserve"><value>الشحنة غير موجودة</value></data>
   <data name="Problem_shipment.not_in_warehouse" xml:space="preserve"><value>هذه الشحنة ليست في المخزن.</value></data>
   <data name="Problem_shipment.return_not_at_hub" xml:space="preserve"><value>يمكن تسليم المرتجعات الموجودة في المركز فقط.</value></data>
+  <data name="Problem_shipment.step_by_workflow" xml:space="preserve"><value>لا تُسجَّل حالة «{0}» يدوياً: امسح الشحنة في المركز، أو استخدم كشف الشاحنة أو شاشة المرتجعات أو شاشة الجمارك.</value></data>
+  <data name="Problem_shipment.cod_already_settled" xml:space="preserve"><value>مبلغ الطرد {0} مُدرج بالفعل في تسوية سابقة للمتجر.</value></data>
   <data name="Problem_shipment.same_origin_destination" xml:space="preserve"><value>يجب أن يختلف المنشأ عن الوجهة.</value></data>
   <data name="Problem_shipment.stale" xml:space="preserve"><value>قام مستخدم آخر بتعديل الشحنة</value></data>
   <data name="Problem_shipment.stale_detail" xml:space="preserve"><value>أعد تحميل الشحنة وحاول مرة أخرى.</value></data>
