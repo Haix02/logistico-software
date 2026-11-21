@@ -39,7 +39,8 @@ internal static class InsightsEndpoints
         app.MapGet("/" + ShipmentsApiRoutes.InsightsOpenData, OpenDataAsync)
             .WithTags("Insights")
             .WithSummary("Anonymised aggregate CSV for publishing (no names, phones or addresses; small groups left out). See docs/16-data-and-insights.md.")
-            .RequireAuthorization(StaffPolicies.Administer); // publishing company data is a management decision
+            .RequireAuthorization(StaffPolicies.Administer) // publishing company data is a management decision
+            .WithRequestTimeout(ShipmentsModule.LongRequestTimeoutPolicy);
         return app;
     }
 

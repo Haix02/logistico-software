@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Logistico.Web.Data;
 
-/// <summary>ASP.NET Core Identity store (users, roles, logins, passkeys), the company profile and the mobile app settings, in the "iam" schema.</summary>
+/// <summary>ASP.NET Core Identity store (users, roles, logins, passkeys), the company profile, the mobile app settings and idempotency keys, in the "iam" schema.</summary>
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
 {
     public const string Schema = "iam";
@@ -11,6 +11,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<MobileAppSettingsRecord> MobileAppSettings => Set<MobileAppSettingsRecord>();
 
     public DbSet<CompanyProfileRecord> CompanyProfiles => Set<CompanyProfileRecord>();
+
+    public DbSet<IdempotentRequestRecord> IdempotentRequests => Set<IdempotentRequestRecord>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -38,6 +40,18 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             e.Property(x => x.UpdatedBy).HasMaxLength(256);
             e.Property(x => x.Version).IsRowVersion();
             e.Ignore(x => x.IsSet);
+        });
+        builder.Entity<IdempotentRequestRecord>(e =>
+        {
+            e.ToTable("idempotent_requests");
+            e.HasKey(x => new { x.TenantId, x.Principal, x.Key });
+            e.Property(x => x.Principal).HasMaxLength(256);
+            e.Property(x => x.Key).HasMaxLength(255);
+            e.Property(x => x.Fingerprint).HasMaxLength(64);
+            e.Property(x => x.ContentType).HasMaxLength(200);
+            e.Property(x => x.Location).HasMaxLength(2048);
+            e.Property(x => x.ETag).HasMaxLength(200);
+            e.HasIndex(x => x.CreatedAt); // the hourly clean-up
         });
     }
 }

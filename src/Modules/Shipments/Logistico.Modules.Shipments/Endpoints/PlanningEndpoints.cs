@@ -30,6 +30,7 @@ internal static class PlanningEndpoints
         planning.MapGet("/runs/{id:guid}", GetAsync).WithSummary("A plan with its figures, today's practice for comparison and the checker's verdict. Returns an ETag.");
         planning.MapPost("/runs", RunAsync)
             .WithSummary("Solves a planner now (trucks for the network, courier runs or zones for one hub) within the company's time limit, checks the plan and keeps it.")
+            .WithRequestTimeout(ShipmentsModule.LongRequestTimeoutPolicy)
             .RequireAuthorization(StaffPolicies.Operate);
         planning.MapPost("/runs/{id:guid}/apply", ApplyAsync)
             .WithSummary("Approves a plan: loads the next trucks, or hands parcels to couriers in the planned order. Parcels that moved since are skipped. Requires If-Match.")

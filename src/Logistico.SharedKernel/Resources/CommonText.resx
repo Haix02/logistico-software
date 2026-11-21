@@ -30,4 +30,7 @@
   <data name="Validation_RoutingTag" xml:space="preserve"><value>Use 3 English letters, e.g. NJF.</value></data>
   <data name="Validation_Role" xml:space="preserve"><value>Choose one of the listed roles.</value></data>
   <data name="Validation_PasswordLength" xml:space="preserve"><value>The password needs at least 10 characters.</value></data>
+  <data name="Problem_idempotency.key_invalid" xml:space="preserve"><value>The Idempotency-Key must be 1 to 255 visible characters, without quotes.</value></data>
+  <data name="Problem_idempotency.in_progress" xml:space="preserve"><value>This request is still being processed. Wait a moment, then try again with the same key.</value></data>
+  <data name="Problem_idempotency.key_reused" xml:space="preserve"><value>This Idempotency-Key was already used for a different request. Use a new key for a new request.</value></data>
 </root>

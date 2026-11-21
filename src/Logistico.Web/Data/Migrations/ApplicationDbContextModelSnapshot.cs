@@ -177,6 +177,68 @@ namespace Logistico.Web.Data.Migrations
                     b.ToTable("company_profiles", "iam");
                 });
 
+            modelBuilder.Entity("Logistico.Web.Data.IdempotentRequestRecord", b =>
+                {
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("Principal")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("principal");
+
+                    b.Property<string>("Key")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("key");
+
+                    b.Property<byte[]>("Body")
+                        .HasColumnType("bytea")
+                        .HasColumnName("body");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("completed_at");
+
+                    b.Property<string>("ContentType")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("content_type");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("ETag")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("e_tag");
+
+                    b.Property<string>("Fingerprint")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("fingerprint");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)")
+                        .HasColumnName("location");
+
+                    b.Property<int>("StatusCode")
+                        .HasColumnType("integer")
+                        .HasColumnName("status_code");
+
+                    b.HasKey("TenantId", "Principal", "Key")
+                        .HasName("pk_idempotent_requests");
+
+                    b.HasIndex("CreatedAt")
+                        .HasDatabaseName("ix_idempotent_requests_created_at");
+
+                    b.ToTable("idempotent_requests", "iam");
+                });
+
             modelBuilder.Entity("Logistico.Web.Data.MobileAppSettingsRecord", b =>
                 {
                     b.Property<Guid>("TenantId")

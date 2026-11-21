@@ -68,7 +68,9 @@ class ApiClient {
   Future<dynamic> get(String path, {Map<String, Object?>? query}) =>
       _send(() => _dio.get(path, queryParameters: _clean(query)));
 
-  Future<dynamic> post(String path, [Object? body]) => _send(() => _dio.post(path, data: body));
+  /// With an [idempotencyKey], a retry of the same request after a lost answer is carried out once (see [RetryKey]).
+  Future<dynamic> post(String path, [Object? body, String? idempotencyKey]) => _send(() => _dio.post(path,
+      data: body, options: idempotencyKey == null ? null : Options(headers: {'Idempotency-Key': idempotencyKey})));
 
   Future<dynamic> put(String path, Object? body) => _send(() => _dio.put(path, data: body));
 

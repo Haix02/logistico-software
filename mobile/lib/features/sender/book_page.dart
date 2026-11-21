@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api/api_client.dart';
+import '../../core/api/retry_key.dart';
 import '../../core/data.dart';
 import '../../core/widgets.dart';
 import '../../l10n/domain_texts.g.dart';
@@ -32,6 +33,9 @@ class _BookOrderPageState extends ConsumerState<BookOrderPage> {
   String? _governorate;
   bool _busy = false;
 
+  /// "Book" tapped again after a lost answer books the order once.
+  final _retry = RetryKey();
+
   @override
   void dispose() {
     for (final c in [_name, _phone, _area, _address, _landmark, _items, _cod, _notes]) {
@@ -49,7 +53,7 @@ class _BookOrderPageState extends ConsumerState<BookOrderPage> {
     String? clean(TextEditingController c) => c.text.trim().isEmpty ? null : c.text.trim();
     final cod = double.tryParse(_cod.text.replaceAll(',', '').trim());
     try {
-      final booked = await ref.read(apiProvider)!.post('api/v1/seller/orders', {
+      final order = {
         'serviceType': 'Domestic',
         'consigneeName': _name.text.trim(),
         'consigneePhone': _phone.text.trim(),
@@ -63,7 +67,9 @@ class _BookOrderPageState extends ConsumerState<BookOrderPage> {
         'notes': clean(_notes),
         'pieces': 1,
         'grossWeightKg': 1,
-      }) as Map<String, dynamic>;
+      };
+      final booked = await ref.read(apiProvider)!.post('api/v1/seller/orders', order, _retry.forBody(order)) as Map<String, dynamic>;
+      _retry.done();
       HapticFeedback.mediumImpact();
       ref.invalidate(senderOrdersProvider);
       ref.invalidate(senderHomeProvider);

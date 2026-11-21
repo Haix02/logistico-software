@@ -6,6 +6,15 @@ versions follow [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **A booking is never made twice by a retry.** The console, the seller portal and the mobile app send an
+  `Idempotency-Key` with each order. When the answer is lost (a weak network, a timeout, a second tap on "Try again"),
+  the retry gets the first answer back instead of a second tracking number, a second pickup and a second cash
+  collection. The same key with a different request is refused, keys are kept 24 hours, and a refused attempt can be
+  corrected and sent again (docs/03, ADR-035).
+- **Every request has a time limit:** 60 seconds, or 180 for exports, open data and planning runs, then a 504. A slow
+  request no longer holds a server thread and a database connection for as long as it runs.
+- **Reliability review** (docs/17) against *Release It!*, *Designing Data-Intensive Applications*, the IETF
+  Idempotency-Key draft and Google's SRE book, with what is open: telemetry, a load test, retention, GS1 labels.
 - **Planning: an optimization engine** (docs/20, Planning in the menu) that plans with operations research instead of guesses, on Google OR-Tools. **Trucks between hubs** are a service network design solved exactly on CP-SAT in three stages: fewest late parcels, then lowest cost, then earliest arrivals. **Courier runs** are a vehicle routing problem with each courier's parcels, kilograms, working time and a cash-carried safety limit; they start from Clarke–Wright savings and improve by guided local search. **Courier zones** are a balanced p-median. Every plan says what the solver proved (optimal, or how far from optimal), is re-checked by an independent checker, and is compared with today's practice. Nothing changes until a person approves it. Approving loads the next trucks or hands the parcels to couriers through the usual scans, and the courier app then lists the run in the planned order. Settings cover trucks and their cost, departure times, courier limits and search time. Plans are kept with their inputs' fingerprint for audit.
 - **A company chooses its country.** Iraq keeps the governorates, the map and the five starting hubs. Any other country starts with no hubs: staff add the regions they deliver to (a code such as JO-AM) and the warehouses that cover them. Phones accept an Iraqi mobile or an international number with a plus. Each company's data stays on its own tenant.
 - **Open parcels are indexed** for large lists (`ix_shipments_tenant_open_created`), so the board of parcels that are not delivered, returned or cancelled does not scan the closed history.

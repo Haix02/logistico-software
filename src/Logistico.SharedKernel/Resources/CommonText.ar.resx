@@ -30,4 +30,7 @@
   <data name="Validation_RoutingTag" xml:space="preserve"><value>استخدم 3 أحرف إنجليزية، مثل ⁦NJF⁩.</value></data>
   <data name="Validation_Role" xml:space="preserve"><value>اختر أحد الأدوار المعروضة.</value></data>
   <data name="Validation_PasswordLength" xml:space="preserve"><value>يجب أن تتكون كلمة المرور من 10 أحرف على الأقل.</value></data>
+  <data name="Problem_idempotency.key_invalid" xml:space="preserve"><value>يجب أن يكون مفتاح Idempotency-Key من 1 إلى 255 حرفًا ظاهرًا، بلا علامات اقتباس.</value></data>
+  <data name="Problem_idempotency.in_progress" xml:space="preserve"><value>ما زال هذا الطلب قيد التنفيذ. انتظر لحظة ثم أعد المحاولة بالمفتاح نفسه.</value></data>
+  <data name="Problem_idempotency.key_reused" xml:space="preserve"><value>استُخدم مفتاح Idempotency-Key هذا لطلب مختلف. استخدم مفتاحًا جديدًا لكل طلب جديد.</value></data>
 </root>

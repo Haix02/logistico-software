@@ -3,6 +3,52 @@
 Each release records what was checked, what was found and what changed, so contributors and operators can see why the
 code looks the way it does. The newest release comes first.
 
+## Reliability review (21 November 2026)
+
+**How it was done.** The system was checked against the standard references for production software: Michael
+Nygard, *Release It!* (2nd ed., 2018), its stability patterns and antipatterns; Martin Kleppmann, *Designing
+Data-Intensive Applications* (2017), ch. 7 on lost updates and ch. 12 on end-to-end request ids; Saltzer, Reed and
+Clark, "End-to-End Arguments in System Design" (1984); the IETF draft "The Idempotency-Key HTTP Header Field"; and
+Google's *Site Reliability Engineering* (2016), ch. 6 on the four golden signals and ch. 22 on cascading failures.
+Each pattern was compared with the code, not the documents.
+
+### Where Logistico stands
+
+| Pattern (source) | Before | Now |
+|---|---|---|
+| Request ids end to end, safe retries (DDIA ch. 12; IETF draft) | A booking retried after a lost answer was booked twice | `Idempotency-Key` on bookings from the console, the seller portal and the app (ADR-035) |
+| Timeouts (Release It!) | No server-side limit: a slow request held its thread and connection for as long as it ran | 60 s per request, 180 s for exports, open data and planning; then 504. The app gives up at 30 s, the database at its command timeout |
+| Steady state (Release It!) | — | Spent keys are deleted every hour. Scan, automation and planning history still grow without limit (open below) |
+| Fail fast (Release It!) | Validation (400) and rules (422) before any change; the tenant fails closed | Unchanged |
+| Unbounded result sets (Release It!) | Lists are paged and capped at 200 rows; CSV exports are the only full reads | Exports now have their own time limit |
+| Bulkheads (Release It!) | Public tracking and sign-in have their own rate limits; scans at a hub take a turn each | Unchanged |
+| Lost updates (DDIA ch. 7) | `xmin` + `ETag` / `If-Match` on every change (412 when stale) | Unchanged |
+| Integration points, circuit breaker (Release It!) | The server calls no outside service | None needed yet. OSRM, SMS or a carrier API will each need a time limit and a circuit breaker |
+| Health checks (SRE) | `/health/live`, `/health/ready` with a 3 s database check | Unchanged |
+| Golden signals: latency, traffic, errors, saturation (SRE ch. 6) | Logs only; the QA suite records each endpoint's time | Open below |
+
+### Verified
+
+| Gate | Result |
+|---|---:|
+| Release build | 0 warnings, 0 errors |
+| Unit, architecture and integration tests | 687 passed |
+| Server code coverage | 88.5 % (minimum 85 %) |
+| Browser QA suite | 11 passed |
+| Mobile app | `flutter analyze` clean, 12 tests passed |
+| Against the running server | The same order sent twice with one key: one order, the same tracking number, the second marked `Idempotent-Replayed`. The same key for another order: 422 in Arabic |
+
+### Open: needs a decision
+
+1. **Telemetry.** OpenTelemetry metrics and traces (golden signals per endpoint, booking latency against the SLOs in
+   [12](12-observability-and-operations.md)) need a choice of library and of where the data goes.
+2. **Load test.** The 2.1 performance targets below have never been measured. A load tool (k6 or NBomber) and a
+   production-sized data set are needed.
+3. **Retention.** `shipment.hub_scans`, `shipment.automation_log` and `shipment.planning_runs` need periods agreed
+   with operations (for example, scans 24 months, automation log 6 months, unapproved plans 30 days).
+4. **Parcel labels to GS1.** An SSCC (GS1 application identifier 00) in a GS1-128 barcode would let a partner's
+   scanner read our labels. It needs the company's GS1 company prefix.
+
 ## QA pass (8 November 2026)
 
 **How it was done.** Seven testers worked on a running copy of the product with demo data, each in one role: a

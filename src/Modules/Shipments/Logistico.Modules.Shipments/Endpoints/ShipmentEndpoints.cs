@@ -35,6 +35,7 @@ internal static class ShipmentEndpoints
             .WithSummary("Counts per status, warehouse/courier workload and cash-on-delivery totals. Optional seller filter.");
         shipments.MapGet("/export.csv", ExportAsync)
             .WithSummary("CSV export (UTF-8 with BOM for Excel) of the filtered list, up to 50,000 rows.")
+            .WithRequestTimeout(ShipmentsModule.LongRequestTimeoutPolicy)
             .RequireAuthorization(StaffPolicies.Operate); // customers' names, phones and addresses in bulk
         shipments.MapPost("/exact", GetExactAsync)
             .WithSummary("Returns up to 200 shipments by exact IDs or tracking numbers, preserving the requested order (label printing).");

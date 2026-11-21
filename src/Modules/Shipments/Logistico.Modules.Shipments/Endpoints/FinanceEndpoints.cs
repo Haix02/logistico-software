@@ -29,6 +29,7 @@ internal static class FinanceEndpoints
         finance.MapPost("/settlements", SettleAsync).WithSummary("Settles all delivered, unsettled COD orders of a seller into one payout batch.")
             .RequireAuthorization(StaffPolicies.Finance);
         finance.MapGet("/settlements/{id:guid}/export.csv", ExportAsync).WithSummary("Parcel-by-parcel CSV statement (UTF-8 with BOM) of a settlement.")
+            .WithRequestTimeout(ShipmentsModule.LongRequestTimeoutPolicy)
             .RequireAuthorization(StaffPolicies.Finance);
         return app;
     }
